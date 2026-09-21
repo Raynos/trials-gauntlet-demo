@@ -1,0 +1,56 @@
+{
+  "sessions": [
+    {
+      "sessionId": "e2-rear-wheel-first-20260921-065047",
+      "attempts": 1,
+      "calls": 20,
+      "exactContinuousFinish": 46.833333333333336,
+      "browserReplayExact": true,
+      "sourceFingerprint": "1255af7f",
+      "allFailedAttemptsRetained": true
+    },
+    {
+      "sessionId": "e2-rear-wheel-first-20260921-065226",
+      "attempts": 2,
+      "calls": 26,
+      "exactContinuousFinish": 53.81666666666667,
+      "browserReplayExact": true,
+      "sourceFingerprint": "1255af7f",
+      "allFailedAttemptsRetained": true
+    },
+    {
+      "sessionId": "e3-stairway-20260921-065902",
+      "attempts": 1,
+      "calls": 11,
+      "exactContinuousFinish": 41.208333333333336,
+      "browserReplayExact": true,
+      "sourceFingerprint": "1255af7f",
+      "allFailedAttemptsRetained": true
+    },
+    {
+      "sessionId": "e3-stairway-20260921-070002",
+      "attempts": 1,
+      "calls": 12,
+      "exactContinuousFinish": 41.9,
+      "browserReplayExact": true,
+      "sourceFingerprint": "1255af7f",
+      "allFailedAttemptsRetained": true
+    }
+  ],
+  "remaining": {},
+  "activePlayers": [],
+  "sessionsPrestartedForRemaining": [],
+  "codeEdits": false,
+  "census": {
+    "e2-rear-wheel-first": {
+      "attempts": [1, 2],
+      "medianAttempts": 1.5,
+      "verdict": "UNDER-BAND"
+    },
+    "e3-stairway": {
+      "attempts": [1, 1],
+      "medianAttempts": 1,
+      "verdict": "UNDER-BAND"
+    }
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "schema": 1,
+  "kind": "stranger-state",
+  "sessionId": "b1-first-ride-20260921-061537",
+  "trackId": "b1-first-ride",
+  "seed": 138717428,
+  "agent": "pose-r3-b1-one",
+  "startedAt": "2026-09-21T11:15:37.713Z",
+  "physicsHz": 120,
+  "physics": "bikePhysicsFactory-v2",
+  "calls": 12,
+  "runTicks": 5810,
+  "snapshot": {
+    "v": 1,
+    "f64": "AAAAAACytkBVVVVVVTVIQAAAAAAAAABAIiIiIiICR0C5WHQ5ATCHPjMzMzMzM+M/vcr9pJzryL+hKPZz6c7iP/8LWoR3GNK/r4v4hMlisj9Il42OalPjPwAAAAAAAAAAAAAAAAAAAAAAAEC39BPewQAAAFzh1qBBAAAAMNkTcsEAAAD6OCKlwQAAAOhRiaBBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC/D3A4UryCQFgyKzhWkPq/9yMnF1PGgkAdTasjCI/6vwAAAAAAAAAAMzMzMzMz4z8AAAAAAAAAACgbwEkEmqq/lfi16ZO/+z4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC+mNXcnwYJAeWMRuVK8gkD6biMuVMaCQItiUSgmwIJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATt3yoQF74v5XGZRdGkPq/O37BKweP+r/dnPWXNq/tvwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvhKHk8rsmT/YdZSl8I6EPyZ8N16C06E/E80pnMGzqb8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGJdEkTJLZU/AAAAAACAczwMx4ZzPbGDv+YaA99Fvnm/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADMhpp/wWK3v35QxlKfDZzAuZPKfuS9msCluLETUZ/ZvwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArVzmf2qYvT+uK9vQ5Je/P7Jc5n9qmL0/13RNmk4FpD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJZ7GmG5p5E/AAAAAAAAwD+SJEmSJEnCP08b6LSBTos/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVOoMVOoO1PxdddNFFF/0/chzHcRzHAUAcx3Ecx3G8PwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "u8": "AQAAAAEBAQEAAAAAAQA=",
+    "counters": {
+      "phase": "finished",
+      "runTicks": 5522,
+      "finishRunTicks": 5522,
+      "faults": 0,
+      "countdownTick": 0,
+      "crashTicks": 0,
+      "holdTicks": 0,
+      "holdFired": false,
+      "restartLatch": false,
+      "resultsTicks": 288,
+      "resultsShown": true,
+      "finishFrozen": false
+    }
+  },
+  "recording": {
+    "header": {
+      "version": 1,
+      "trackId": "b1-first-ride",
+      "seed": 138717428,
+      "physicsHz": 120,
+      "bike": "rookie",
+      "physics": "v2",
+      "note": "stranger b1-first-ride-20260921-061537 agent=pose-r3-b1-one bike=rookie physics=v2 src=1255af7f"
+    },
+    "runs": [
+      [
+        600,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        180,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        660,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        240,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1020,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        300,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1200,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        120,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        60,
+        0,
+        255,
+        0,
+        0
+      ],
+      [
+        540,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        240,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        362,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        288,
+        0,
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  "attempts": [],
+  "events": [
+    {
+      "event": {
+        "type": "checkpoint",
+        "index": 0,
+        "tick": 739,
+        "time": 6.158333333333333
+      },
+      "runTick": 740,
+      "checkpoint": 0
+    },
+    {
+      "event": {
+        "type": "checkpoint",
+        "index": 1,
+        "tick": 2362,
+        "time": 19.683333333333334
+      },
+      "runTick": 2363,
+      "checkpoint": 1
+    },
+    {
+      "event": {
+        "type": "checkpoint",
+        "index": 2,
+        "tick": 3901,
+        "time": 32.50833333333333
+      },
+      "runTick": 3902,
+      "checkpoint": 2
+    },
+    {
+      "event": {
+        "type": "finish",
+        "tick": 5522,
+        "time": 46.016666666666666
+      },
+      "runTick": 5522,
+      "checkpoint": 2
+    }
+  ],
+  "cleared": true,
+  "finishTime": 46.0167,
+  "firstCheckpointCalls": 3,
+  "forcedResets": 0,
+  "attemptStartTick": 0,
+  "budget": {
+    "calls": 150,
+    "minutes": 25
+  },
+  "log": [
+    "2026-09-21T11:15:37.741Z #1 start",
+    "2026-09-21T11:15:42.736Z #2 play \"g40\"",
+    "2026-09-21T11:15:42.753Z #2 -> {\"attempt\":1,\"slots\":\"g40\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":0.59,\"vx\":0,\"angle_deg\":1.4},\"after\":{\"x\":49.03,\"vx\":15.06,\"angle_deg\":-4.1},\"events\":[],\"checkpoint\":-1,\"grounded\":false,\"faults\":0,\"runTime\":5,\"distanceToFinish\":533.97}",
+    "2026-09-21T11:15:46.378Z #3 play \"c12 g28\"",
+    "2026-09-21T11:15:46.399Z #3 -> {\"attempt\":1,\"slots\":\"c12 g28\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":49.03,\"vx\":15.06,\"angle_deg\":-4.1},\"after\":{\"x\":109.95,\"vx\":12.14,\"angle_deg\":5.4},\"events\":[{\"t\":6.167,\"type\":\"checkpoint\",\"index\":0}],\"checkpoint\":0,\"grounded\":false,\"faults\":0,\"runTime\":10,\"distanceToFinish\":473.05}",
+    "2026-09-21T11:15:49.704Z #4 play \"g16 c16 g8\"",
+    "2026-09-21T11:15:49.721Z #4 -> {\"attempt\":1,\"slots\":\"g16 c16 g8\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":109.95,\"vx\":12.14,\"angle_deg\":5.4},\"after\":{\"x\":173.07,\"vx\":11.23,\"angle_deg\":4.9},\"events\":[],\"checkpoint\":0,\"grounded\":true,\"faults\":0,\"runTime\":15,\"distanceToFinish\":409.93}",
+    "2026-09-21T11:15:55.465Z #5 play \"g40\"",
+    "2026-09-21T11:15:55.483Z #5 -> {\"attempt\":1,\"slots\":\"g40\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":173.07,\"vx\":11.23,\"angle_deg\":4.9},\"after\":{\"x\":239.82,\"vx\":16.12,\"angle_deg\":3.8},\"events\":[{\"t\":19.692,\"type\":\"checkpoint\",\"index\":1}],\"checkpoint\":1,\"grounded\":true,\"faults\":0,\"runTime\":20,\"distanceToFinish\":343.18}",
+    "2026-09-21T11:15:59.062Z #6 play \"g20 c20\"",
+    "2026-09-21T11:15:59.081Z #6 -> {\"attempt\":1,\"slots\":\"g20 c20\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":239.82,\"vx\":16.12,\"angle_deg\":3.8},\"after\":{\"x\":312.54,\"vx\":9.25,\"angle_deg\":2.3},\"events\":[],\"checkpoint\":1,\"grounded\":true,\"faults\":0,\"runTime\":25,\"distanceToFinish\":270.46}",
+    "2026-09-21T11:16:03.292Z #7 play \"g40\"",
+    "2026-09-21T11:16:03.317Z #7 -> {\"attempt\":1,\"slots\":\"g40\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":312.54,\"vx\":9.25,\"angle_deg\":2.3},\"after\":{\"x\":374.3,\"vx\":14.86,\"angle_deg\":5.3},\"events\":[],\"checkpoint\":1,\"grounded\":true,\"faults\":0,\"runTime\":30,\"distanceToFinish\":208.7}",
+    "2026-09-21T11:16:09.950Z #8 play \"g40\"",
+    "2026-09-21T11:16:09.987Z #8 -> {\"attempt\":1,\"slots\":\"g40\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":374.3,\"vx\":14.86,\"angle_deg\":5.3},\"after\":{\"x\":453.54,\"vx\":16.46,\"angle_deg\":4.3},\"events\":[{\"t\":32.517,\"type\":\"checkpoint\",\"index\":2}],\"checkpoint\":2,\"grounded\":true,\"faults\":0,\"runTime\":35,\"distanceToFinish\":129.46}",
+    "2026-09-21T11:16:14.393Z #9 play \"c8 b4 g28\"",
+    "2026-09-21T11:16:14.412Z #9 -> {\"attempt\":1,\"slots\":\"c8 b4 g28\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":453.54,\"vx\":16.46,\"angle_deg\":4.3},\"after\":{\"x\":516.41,\"vx\":12.53,\"angle_deg\":12.5},\"events\":[],\"checkpoint\":2,\"grounded\":true,\"faults\":0,\"runTime\":40,\"distanceToFinish\":66.59}",
+    "2026-09-21T11:16:19.753Z #10 play \"g8 c16 g16\"",
+    "2026-09-21T11:16:19.771Z #10 -> {\"attempt\":1,\"slots\":\"g8 c16 g16\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":516.41,\"vx\":12.53,\"angle_deg\":12.5},\"after\":{\"x\":571.59,\"vx\":9.03,\"angle_deg\":2.3},\"events\":[],\"checkpoint\":2,\"grounded\":false,\"faults\":0,\"runTime\":45,\"distanceToFinish\":11.41}",
+    "2026-09-21T11:16:23.275Z #11 play \"g16\"",
+    "2026-09-21T11:16:23.292Z #11 -> {\"attempt\":1,\"slots\":\"g16\",\"slotsPlayed\":9,\"slotsRequested\":16,\"before\":{\"x\":571.59,\"vx\":9.03,\"angle_deg\":2.3},\"after\":{\"x\":600.14,\"vx\":0.03,\"angle_deg\":-5.2},\"events\":[{\"t\":46.017,\"type\":\"finish\"}],\"checkpoint\":2,\"grounded\":true,\"faults\":0,\"runTime\":46.0167,\"distanceToFinish\":-17.14,\"finished\":true,\"runOut\":{\"seconds\":2.4,\"stoppedAt\":600.14,\"stopped\":true,\"frozen\":false},\"note\":\"FINISHED at run time 46.0167s (the game then braked you to a stop at x=600.1 m on the run-out, 2.4 s after the line). Call 'done'.\"}",
+    "2026-09-21T11:16:26.711Z #12 done"
+  ],
+  "firstCallAt": "2026-09-21T11:15:37.741Z"
+}

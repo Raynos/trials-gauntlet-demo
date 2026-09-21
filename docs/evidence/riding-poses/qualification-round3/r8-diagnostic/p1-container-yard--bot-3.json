@@ -1,0 +1,29 @@
+{
+  "file": "p1-container-yard/bot-3.json",
+  "finished": true,
+  "riding": 4288,
+  "overDemand": 868,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.4911247680894445,
+  "maxHipX": 0.09187266545848304,
+  "maxLeg": 0.8759482009464109,
+  "maxArm": 0.573781184732545,
+  "outCom": 200,
+  "maxCom": 0.5602012773949782,
+  "recovered": 853,
+  "outRecovered": 0,
+  "maxComRecovered": 0.06934716911776188,
+  "maxPsiRecovered": 0.10422659330195228,
+  "longestExcursion": 12,
+  "longestExcursionAt": 1821,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 699,
+    "bad": []
+  },
+  "selected": []
+}

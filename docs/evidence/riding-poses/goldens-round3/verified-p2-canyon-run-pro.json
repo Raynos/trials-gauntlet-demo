@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/p2-canyon-run/bot-3-pro.json",
+      "sha256": "90f637a6ef6a769eb7f065a752ab8a9a4c9414adfeaff9308f539b5b1f8f12b6",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "16bcd38b30275083",
+      "browserHash": "16bcd38b30275083",
+      "nodeFinish": 33.59166666666667,
+      "browserFinish": 33.59166666666667,
+      "nodeRunTime": 33.59166666666667,
+      "browserRunTime": 33.59166666666667,
+      "nodeRunTimeBits": "bcbbbbbbbbcb4040",
+      "browserRunTimeBits": "bcbbbbbbbbcb4040",
+      "nodeFinishBits": "bcbbbbbbbbcb4040",
+      "browserFinishBits": "bcbbbbbbbbcb4040",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

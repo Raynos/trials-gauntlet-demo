@@ -1,0 +1,13 @@
+{
+  "agentPath": "/root/pose_stranger_coordinator/r3_b2_one",
+  "forkTurns": "none",
+  "briefing": "PROTOCOL.md verbatim plus one track/session/agent naming line",
+  "protocolSha256": "5b2734b9d54777012a04acb91e446d93ac6b88fbd6537e96ef7963adde0e7eb3",
+  "sourceFingerprint": "1255af7f",
+  "recordingSha256": "6dd3fe70291357a058effb9f1499845e97f4ae2c10a1225c7a029335d7fb9992",
+  "coordinatorObservedCallsDuringPlay": false,
+  "coordinatorProvidedAdvice": false,
+  "faultToRespawn": [],
+  "restartMetricLimit": "Simulation ticks only; not browser input-to-visible-ready wall latency.",
+  "source": "harness/out/stranger/b2-lean-back/b2-lean-back-20260921-062226"
+}

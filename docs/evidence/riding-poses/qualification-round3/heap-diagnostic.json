@@ -1,0 +1,78 @@
+{
+  "renderer": {
+    "ok": true,
+    "kind": "webgl2",
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+    "vendor": "Google Inc. (Apple)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "maxTextureSize": 16384
+  },
+  "samples": [
+    {
+      "seconds": 0,
+      "raw": {
+        "jsHeapUsed": 39922904,
+        "jsHeapTotal": 69287936
+      },
+      "retained": {
+        "jsHeapUsed": 24189404,
+        "jsHeapTotal": 29294592
+      }
+    },
+    {
+      "seconds": 60,
+      "raw": {
+        "jsHeapUsed": 36190116,
+        "jsHeapTotal": 54722560
+      },
+      "retained": {
+        "jsHeapUsed": 22914636,
+        "jsHeapTotal": 26673152
+      }
+    },
+    {
+      "seconds": 120,
+      "raw": {
+        "jsHeapUsed": 30470260,
+        "jsHeapTotal": 50266112
+      },
+      "retained": {
+        "jsHeapUsed": 23183396,
+        "jsHeapTotal": 25624576
+      }
+    },
+    {
+      "seconds": 180,
+      "raw": {
+        "jsHeapUsed": 30612856,
+        "jsHeapTotal": 49479680
+      },
+      "retained": {
+        "jsHeapUsed": 23270536,
+        "jsHeapTotal": 25624576
+      }
+    },
+    {
+      "seconds": 240,
+      "raw": {
+        "jsHeapUsed": 30196372,
+        "jsHeapTotal": 50528256
+      },
+      "retained": {
+        "jsHeapUsed": 23290260,
+        "jsHeapTotal": 25100288
+      }
+    },
+    {
+      "seconds": 300,
+      "raw": {
+        "jsHeapUsed": 30425660,
+        "jsHeapTotal": 51052544
+      },
+      "retained": {
+        "jsHeapUsed": 23449988,
+        "jsHeapTotal": 25624576
+      }
+    }
+  ]
+}

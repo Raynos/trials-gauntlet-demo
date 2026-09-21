@@ -1,0 +1,29 @@
+{
+  "file": "h3-fire-line/bot-3-pro.json",
+  "finished": true,
+  "riding": 5064,
+  "overDemand": 1419,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.47207945558192266,
+  "maxHipX": 0.059578951807898954,
+  "maxLeg": 0.8783675322315733,
+  "maxArm": 0.5739033836582714,
+  "outCom": 185,
+  "maxCom": 0.5071298218138025,
+  "recovered": 560,
+  "outRecovered": 0,
+  "maxComRecovered": 0.06445991214753752,
+  "maxPsiRecovered": 0.0943348636414032,
+  "longestExcursion": 17,
+  "longestExcursionAt": 4170,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 560,
+    "bad": []
+  },
+  "selected": []
+}

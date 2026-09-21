@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/p4-night-circuit/bot-3-pro.json",
+      "sha256": "e1cce61d26fff25a56d10a83237044155b7ea68a43a43e4747d4724d282a453f",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "d48b66c3502e8fcf",
+      "browserHash": "d48b66c3502e8fcf",
+      "nodeFinish": 32.1,
+      "browserFinish": 32.1,
+      "nodeRunTime": 32.1,
+      "browserRunTime": 32.1,
+      "nodeRunTimeBits": "cdcccccccc0c4040",
+      "browserRunTimeBits": "cdcccccccc0c4040",
+      "nodeFinishBits": "cdcccccccc0c4040",
+      "browserFinishBits": "cdcccccccc0c4040",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

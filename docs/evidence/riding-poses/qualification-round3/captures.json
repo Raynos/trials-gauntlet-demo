@@ -1,0 +1,788 @@
+[
+  {
+    "capture": "rookie-street-mustard-high",
+    "clip": "harness/out/riding-poses-round3/rookie-street-mustard-high/clip.mp4",
+    "clipSha256": "d66299a18304447d746f66e7aa0f0b459a788e7f815329bf2aa439c471a5af4e",
+    "evidence": "harness/out/riding-poses-round3/rookie-street-mustard-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "street-mustard",
+    "errors": [],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "rookie-street-mustard-low-rerun",
+    "clip": "harness/out/riding-poses-round3/rookie-street-mustard-low-rerun/clip.mp4",
+    "clipSha256": "0d105b898bfd249eae057b58a4ddbc5a5dcb49c38d8d4aeeb1b3380d964ddec6",
+    "evidence": "harness/out/riding-poses-round3/rookie-street-mustard-low-rerun/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "street-mustard",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "rookie-street-openface-high",
+    "clip": "harness/out/riding-poses-round3/rookie-street-openface-high/clip.mp4",
+    "clipSha256": "8baab9934571971098a1d422969742f516cb73314980c9114acec8129d049de2",
+    "evidence": "harness/out/riding-poses-round3/rookie-street-openface-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "street-openface",
+    "errors": [],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "rookie-street-openface-low-rerun",
+    "clip": "harness/out/riding-poses-round3/rookie-street-openface-low-rerun/clip.mp4",
+    "clipSha256": "c5220e08acb3037994417e7ec719f379dc77544d630e6d6bcb37b703d1a61cae",
+    "evidence": "harness/out/riding-poses-round3/rookie-street-openface-low-rerun/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "street-openface",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "rookie-street-charcoal-high",
+    "clip": "harness/out/riding-poses-round3/rookie-street-charcoal-high/clip.mp4",
+    "clipSha256": "a6aaea675aac49f035157d9cecac30b8963e778e409571e95e33b212e6f4dc3c",
+    "evidence": "harness/out/riding-poses-round3/rookie-street-charcoal-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "street-charcoal",
+    "errors": [],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "rookie-street-charcoal-low",
+    "clip": "harness/out/riding-poses-round3/rookie-street-charcoal-low/clip.mp4",
+    "clipSha256": "358dfd9a1432518eaabcbde87008e0796f0cacd4dfff0a581a89a3cc06e4babb",
+    "evidence": "harness/out/riding-poses-round3/rookie-street-charcoal-low/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "street-charcoal",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "rookie-race-bluewhite-high",
+    "clip": "harness/out/riding-poses-round3/rookie-race-bluewhite-high/clip.mp4",
+    "clipSha256": "6028c856f351628c1e74f541407d1c1220fd81df70f1f9ea465946359f7e7441",
+    "evidence": "harness/out/riding-poses-round3/rookie-race-bluewhite-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "race-bluewhite",
+    "errors": [],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "rookie-race-bluewhite-low",
+    "clip": "harness/out/riding-poses-round3/rookie-race-bluewhite-low/clip.mp4",
+    "clipSha256": "346540b28af8b47a1697b9f4d3aef57d267ff89bc9d773ba0e31a317d0e1bbe7",
+    "evidence": "harness/out/riding-poses-round3/rookie-race-bluewhite-low/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "race-bluewhite",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "rookie-race-charcoalyellow-high",
+    "clip": "harness/out/riding-poses-round3/rookie-race-charcoalyellow-high/clip.mp4",
+    "clipSha256": "7c8debb5e8798af6f1cc6965ea505dc7911b5f5e484b897eb1a0aae5e25205ce",
+    "evidence": "harness/out/riding-poses-round3/rookie-race-charcoalyellow-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "race-charcoalyellow",
+    "errors": [],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "rookie-race-charcoalyellow-low",
+    "clip": "harness/out/riding-poses-round3/rookie-race-charcoalyellow-low/clip.mp4",
+    "clipSha256": "9248892d6c75cc3177ff2624f1fe658e470c2b5b66f7492b3413af37f03428b0",
+    "evidence": "harness/out/riding-poses-round3/rookie-race-charcoalyellow-low/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "race-charcoalyellow",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "pro-street-mustard-high",
+    "clip": "harness/out/riding-poses-round3/pro-street-mustard-high/clip.mp4",
+    "clipSha256": "580c9f938ccc0077cfacec0e5ec703ab85086514a9a62d537519bad10324ad07",
+    "evidence": "harness/out/riding-poses-round3/pro-street-mustard-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "street-mustard",
+    "errors": [],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "pro-street-mustard-low",
+    "clip": "harness/out/riding-poses-round3/pro-street-mustard-low/clip.mp4",
+    "clipSha256": "655353e7bc406ef7fa23c053c71662af63476bd070a2f76c69bf0aa5a11cc164",
+    "evidence": "harness/out/riding-poses-round3/pro-street-mustard-low/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "street-mustard",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "pro-street-openface-high",
+    "clip": "harness/out/riding-poses-round3/pro-street-openface-high/clip.mp4",
+    "clipSha256": "28af3b1707f0a75e9e7db85c8b32601fe3dc03a101a6a6ac0f4e107c9ae4f650",
+    "evidence": "harness/out/riding-poses-round3/pro-street-openface-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "street-openface",
+    "errors": [],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "pro-street-openface-low",
+    "clip": "harness/out/riding-poses-round3/pro-street-openface-low/clip.mp4",
+    "clipSha256": "cf5eb3e286db32d0c663bb6c734910d39434ac1af65634100bd6143f3176c3dd",
+    "evidence": "harness/out/riding-poses-round3/pro-street-openface-low/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "street-openface",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "pro-street-charcoal-high",
+    "clip": "harness/out/riding-poses-round3/pro-street-charcoal-high/clip.mp4",
+    "clipSha256": "a76629a645d8dcdcbaf7d5a2039580f84f1d912e84855bdaf70754cb481c9d1b",
+    "evidence": "harness/out/riding-poses-round3/pro-street-charcoal-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "street-charcoal",
+    "errors": [],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "pro-street-charcoal-low",
+    "clip": "harness/out/riding-poses-round3/pro-street-charcoal-low/clip.mp4",
+    "clipSha256": "957642577799cf87f7a42451f396d52ac3a7bdd378abab51f3650f7fa5e3f5fd",
+    "evidence": "harness/out/riding-poses-round3/pro-street-charcoal-low/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "street-charcoal",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "pro-race-bluewhite-high",
+    "clip": "harness/out/riding-poses-round3/pro-race-bluewhite-high/clip.mp4",
+    "clipSha256": "8021438b0b9f9429bb2b183505ce672c5874b0522ef0c37a94be61a54fbc31ad",
+    "evidence": "harness/out/riding-poses-round3/pro-race-bluewhite-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "race-bluewhite",
+    "errors": [],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "pro-race-bluewhite-low",
+    "clip": "harness/out/riding-poses-round3/pro-race-bluewhite-low/clip.mp4",
+    "clipSha256": "631185bf2b31a68ecc483690c509160f89c9979dd90d15b171fe96329ce90a0c",
+    "evidence": "harness/out/riding-poses-round3/pro-race-bluewhite-low/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "race-bluewhite",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "pro-race-charcoalyellow-high",
+    "clip": "harness/out/riding-poses-round3/pro-race-charcoalyellow-high/clip.mp4",
+    "clipSha256": "da423afa61048bb16d8ecc0d8f6c824f710b1457f30d370154ce166f69cc135f",
+    "evidence": "harness/out/riding-poses-round3/pro-race-charcoalyellow-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "race-charcoalyellow",
+    "errors": [],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "pro-race-charcoalyellow-low",
+    "clip": "harness/out/riding-poses-round3/pro-race-charcoalyellow-low/clip.mp4",
+    "clipSha256": "facb4e7f70006526c5b93909c0c0fe879923bab2a57fdac20391807bb6641180",
+    "evidence": "harness/out/riding-poses-round3/pro-race-charcoalyellow-low/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "race-charcoalyellow",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "phone-lean",
+    "clip": "harness/out/riding-poses-round3/phone-lean/clip.mp4",
+    "clipSha256": "cc91e5261a19ae54f9ae79f0005136db955abbcdd4830623a220d6bacda14157",
+    "evidence": "harness/out/riding-poses-round3/phone-lean/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "street",
+    "errors": [],
+    "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678"
+  },
+  {
+    "capture": "race-pro-high",
+    "clip": "harness/out/riding-poses-round3/race-pro-high/clip.mp4",
+    "clipSha256": "8021438b0b9f9429bb2b183505ce672c5874b0522ef0c37a94be61a54fbc31ad",
+    "evidence": "harness/out/riding-poses-round3/race-pro-high/evidence.json.gz",
+    "frames": 165,
+    "quality": "high",
+    "outfit": "race",
+    "errors": [],
+    "recordingSha256": "7c3e2f5b7b6559c0a438fb59995c307b191a29172775ebc2747b562e1917d3f0"
+  },
+  {
+    "capture": "impact-rookie-street-mustard-high",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-street-mustard-high/clip.mp4",
+    "clipSha256": "5ff28d0bce9ad971e6d8ac4c0c4237b8372a0fa781904dbabec9e68e444763e7",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-street-mustard-high/evidence.json.gz",
+    "frames": 237,
+    "quality": "high",
+    "outfit": "street-mustard",
+    "errors": [],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-rookie-street-mustard-low",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-street-mustard-low/clip.mp4",
+    "clipSha256": "a215ba1c8d89890d85a5a08484242e0cd21780b029c37f3fdbb5909da1d75429",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-street-mustard-low/evidence.json.gz",
+    "frames": 237,
+    "quality": "low",
+    "outfit": "street-mustard",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-rookie-street-openface-high",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-street-openface-high/clip.mp4",
+    "clipSha256": "7398f105a094014de7b5989499a816a04608a5ca1505f5c1eb3010d1c3ba13dc",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-street-openface-high/evidence.json.gz",
+    "frames": 237,
+    "quality": "high",
+    "outfit": "street-openface",
+    "errors": [],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-rookie-street-openface-low",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-street-openface-low/clip.mp4",
+    "clipSha256": "db39dbe301c68c9bbf868ed35b0b767eefb5b473e3f76cd47152546fa3831085",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-street-openface-low/evidence.json.gz",
+    "frames": 237,
+    "quality": "low",
+    "outfit": "street-openface",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-rookie-street-charcoal-high",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-street-charcoal-high/clip.mp4",
+    "clipSha256": "aa124675d06e7744d9342c3751592490e381236e9cf548f5917f17ce0a32350f",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-street-charcoal-high/evidence.json.gz",
+    "frames": 237,
+    "quality": "high",
+    "outfit": "street-charcoal",
+    "errors": [],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-rookie-street-charcoal-low",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-street-charcoal-low/clip.mp4",
+    "clipSha256": "e03c69a3b68352a7f8e00fad2f0af2bbcf6140a1847856aab3ba3a2cc179b22c",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-street-charcoal-low/evidence.json.gz",
+    "frames": 237,
+    "quality": "low",
+    "outfit": "street-charcoal",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-rookie-race-bluewhite-high",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-race-bluewhite-high/clip.mp4",
+    "clipSha256": "c148c58b8f44cf88d0d2bb83e680372cc643c4796e60c5fd9b858c6d73001ca1",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-race-bluewhite-high/evidence.json.gz",
+    "frames": 237,
+    "quality": "high",
+    "outfit": "race-bluewhite",
+    "errors": [],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-rookie-race-bluewhite-low",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-race-bluewhite-low/clip.mp4",
+    "clipSha256": "b393d71f313124426f44954660f50e790eddfe9569c9c2b70e0552403032e45a",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-race-bluewhite-low/evidence.json.gz",
+    "frames": 237,
+    "quality": "low",
+    "outfit": "race-bluewhite",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-rookie-race-charcoalyellow-high",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-race-charcoalyellow-high/clip.mp4",
+    "clipSha256": "ece5a8468197c7028990bd2ef482dc214dc2c6879852d9c824395192d48e5545",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-race-charcoalyellow-high/evidence.json.gz",
+    "frames": 237,
+    "quality": "high",
+    "outfit": "race-charcoalyellow",
+    "errors": [],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-rookie-race-charcoalyellow-low",
+    "clip": "harness/out/riding-poses-round3/impact-rookie-race-charcoalyellow-low/clip.mp4",
+    "clipSha256": "7bdfa62fcf944cc8d834a8fcae59fde29ebd67863affa42a1526b46ebb94e202",
+    "evidence": "harness/out/riding-poses-round3/impact-rookie-race-charcoalyellow-low/evidence.json.gz",
+    "frames": 237,
+    "quality": "low",
+    "outfit": "race-charcoalyellow",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "b2069685ca14e5ea0b28800fd082cd312e89be5a83ad912d37f56ff34559a7a1"
+  },
+  {
+    "capture": "impact-pro-street-mustard-high",
+    "clip": "harness/out/riding-poses-round3/impact-pro-street-mustard-high/clip.mp4",
+    "clipSha256": "616a9298ef678a60db76765f0487c9bd65fe66e8abb640682b8bbcca7cde4ab4",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-street-mustard-high/evidence.json.gz",
+    "frames": 234,
+    "quality": "high",
+    "outfit": "street-mustard",
+    "errors": [],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "impact-pro-street-mustard-low",
+    "clip": "harness/out/riding-poses-round3/impact-pro-street-mustard-low/clip.mp4",
+    "clipSha256": "c5cf3dfe29de7b7cab835548f238dc998d029d5e0de7de2b5350fcebcc07820b",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-street-mustard-low/evidence.json.gz",
+    "frames": 234,
+    "quality": "low",
+    "outfit": "street-mustard",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "impact-pro-street-openface-high",
+    "clip": "harness/out/riding-poses-round3/impact-pro-street-openface-high/clip.mp4",
+    "clipSha256": "b0b32c5f8e8bf9a6d259f292b60c8495a0c8636ed82044f32313c786765438c2",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-street-openface-high/evidence.json.gz",
+    "frames": 234,
+    "quality": "high",
+    "outfit": "street-openface",
+    "errors": [],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "impact-pro-street-openface-low",
+    "clip": "harness/out/riding-poses-round3/impact-pro-street-openface-low/clip.mp4",
+    "clipSha256": "ded719600d107bbfeb8b55a32ca0a5c4e7d06833727220d16aba52da6cc38aee",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-street-openface-low/evidence.json.gz",
+    "frames": 234,
+    "quality": "low",
+    "outfit": "street-openface",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "impact-pro-street-charcoal-high",
+    "clip": "harness/out/riding-poses-round3/impact-pro-street-charcoal-high/clip.mp4",
+    "clipSha256": "620327614a7360a5bb0cac22f155aef4386c349ef31b0a7e097ff628ed927754",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-street-charcoal-high/evidence.json.gz",
+    "frames": 234,
+    "quality": "high",
+    "outfit": "street-charcoal",
+    "errors": [],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "impact-pro-street-charcoal-low",
+    "clip": "harness/out/riding-poses-round3/impact-pro-street-charcoal-low/clip.mp4",
+    "clipSha256": "aa3ac89ad35ae3ebbc762705e97248094cce09ea7b3c9c88b88048abd2df3c8d",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-street-charcoal-low/evidence.json.gz",
+    "frames": 234,
+    "quality": "low",
+    "outfit": "street-charcoal",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "impact-pro-race-bluewhite-high",
+    "clip": "harness/out/riding-poses-round3/impact-pro-race-bluewhite-high/clip.mp4",
+    "clipSha256": "0ec96bf59bd4e5740a0a6193488a766cf764beb3ad75724b5490d8f640b3f09b",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-race-bluewhite-high/evidence.json.gz",
+    "frames": 234,
+    "quality": "high",
+    "outfit": "race-bluewhite",
+    "errors": [],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "impact-pro-race-bluewhite-low",
+    "clip": "harness/out/riding-poses-round3/impact-pro-race-bluewhite-low/clip.mp4",
+    "clipSha256": "48d275b9498e9c2e950942fd44de6fc2be7674a798516595542c708d498eb933",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-race-bluewhite-low/evidence.json.gz",
+    "frames": 234,
+    "quality": "low",
+    "outfit": "race-bluewhite",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "impact-pro-race-charcoalyellow-high",
+    "clip": "harness/out/riding-poses-round3/impact-pro-race-charcoalyellow-high/clip.mp4",
+    "clipSha256": "6faa17cb0a758910e58db0c351736ab2464bfc08be19bd41cbddb986ec0409ec",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-race-charcoalyellow-high/evidence.json.gz",
+    "frames": 234,
+    "quality": "high",
+    "outfit": "race-charcoalyellow",
+    "errors": [],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "impact-pro-race-charcoalyellow-low",
+    "clip": "harness/out/riding-poses-round3/impact-pro-race-charcoalyellow-low/clip.mp4",
+    "clipSha256": "8947bcba82e82ba2bebdbf095d650485f174e1b9268557fccc2f9d7a7d464e50",
+    "evidence": "harness/out/riding-poses-round3/impact-pro-race-charcoalyellow-low/evidence.json.gz",
+    "frames": 234,
+    "quality": "low",
+    "outfit": "race-charcoalyellow",
+    "errors": [
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "f52520e7316136f2cdcdcde715597203b7c2c457f15f906f4b139aad30530bdf"
+  },
+  {
+    "capture": "thrown-rookie-street-mustard-high",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-street-mustard-high/clip.mp4",
+    "clipSha256": "e25ea0fef1c8a2ba2eaee4648af68546e7ee037101553b6a2dc731baec9916bc",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-street-mustard-high/evidence.json.gz",
+    "frames": 209,
+    "quality": "high",
+    "outfit": "street-mustard",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-rookie-street-mustard-low",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-street-mustard-low/clip.mp4",
+    "clipSha256": "beb19f46f97b26c08ebaa8bf6f8a925023569c935ce15a86eaf052136d8d3ad0",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-street-mustard-low/evidence.json.gz",
+    "frames": 209,
+    "quality": "low",
+    "outfit": "street-mustard",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-rookie-street-openface-high",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-street-openface-high/clip.mp4",
+    "clipSha256": "1d642bdbf4a5622544fccf44dee647948bca3beef405c6fab6d1be4db458be2d",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-street-openface-high/evidence.json.gz",
+    "frames": 209,
+    "quality": "high",
+    "outfit": "street-openface",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-rookie-street-openface-low",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-street-openface-low/clip.mp4",
+    "clipSha256": "ab68f975e9147271ddc0c0074d67d2ebb33387918a21ddbd6ed00a9116e6e4df",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-street-openface-low/evidence.json.gz",
+    "frames": 209,
+    "quality": "low",
+    "outfit": "street-openface",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-rookie-street-charcoal-high",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-street-charcoal-high/clip.mp4",
+    "clipSha256": "a0fade27c0cf6055ba51b131f57c235c80aec3fda31f944e9f6f48029069e52d",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-street-charcoal-high/evidence.json.gz",
+    "frames": 209,
+    "quality": "high",
+    "outfit": "street-charcoal",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-rookie-street-charcoal-low",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-street-charcoal-low/clip.mp4",
+    "clipSha256": "209fb911aa819da162ff48849a9faebef10c8f60a4a2be27d4b23d35eb6020c8",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-street-charcoal-low/evidence.json.gz",
+    "frames": 209,
+    "quality": "low",
+    "outfit": "street-charcoal",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-rookie-race-bluewhite-high",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-race-bluewhite-high/clip.mp4",
+    "clipSha256": "7cde831250132becbffd47ccc732ea7fc37b5b06d8313a95878a9e1589a03543",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-race-bluewhite-high/evidence.json.gz",
+    "frames": 209,
+    "quality": "high",
+    "outfit": "race-bluewhite",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-rookie-race-bluewhite-low",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-race-bluewhite-low/clip.mp4",
+    "clipSha256": "d0ffe55702f47ce4176cd6a7975ce9721f664f8b5501e912c75c702570858f77",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-race-bluewhite-low/evidence.json.gz",
+    "frames": 209,
+    "quality": "low",
+    "outfit": "race-bluewhite",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-rookie-race-charcoalyellow-high",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-race-charcoalyellow-high/clip.mp4",
+    "clipSha256": "8086890ce3e6fa84c4bdd7b26f0ffb72546e809100be0440eb9bcf0470e84a18",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-race-charcoalyellow-high/evidence.json.gz",
+    "frames": 209,
+    "quality": "high",
+    "outfit": "race-charcoalyellow",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-rookie-race-charcoalyellow-low",
+    "clip": "harness/out/riding-poses-round3/thrown-rookie-race-charcoalyellow-low/clip.mp4",
+    "clipSha256": "fd2f5bffb5ef7b5f36acd9c6c0e3b2b8e03d947d9cc0502c8f3f1f6c41016087",
+    "evidence": "harness/out/riding-poses-round3/thrown-rookie-race-charcoalyellow-low/evidence.json.gz",
+    "frames": 209,
+    "quality": "low",
+    "outfit": "race-charcoalyellow",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "2eae558c7beeec7b2b004849511e3a586bc0e44434006dd924b5d1a9c37ba146"
+  },
+  {
+    "capture": "thrown-pro-street-mustard-high",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-street-mustard-high/clip.mp4",
+    "clipSha256": "ba86d77c11b221c4e275d22ff9fdd9cf0ecf9ce062af3cb6e6edba5cf047161a",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-street-mustard-high/evidence.json.gz",
+    "frames": 129,
+    "quality": "high",
+    "outfit": "street-mustard",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "thrown-pro-street-mustard-low",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-street-mustard-low/clip.mp4",
+    "clipSha256": "9f476de63c4ac3af7f068c4ac36c6e03409eac53251bf375c0585c19a3158c0a",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-street-mustard-low/evidence.json.gz",
+    "frames": 129,
+    "quality": "low",
+    "outfit": "street-mustard",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "thrown-pro-street-openface-high",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-street-openface-high/clip.mp4",
+    "clipSha256": "4c5e80c932bda82f011a162c450acade47d85a6d4fbeec082c20278159134d2b",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-street-openface-high/evidence.json.gz",
+    "frames": 129,
+    "quality": "high",
+    "outfit": "street-openface",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "thrown-pro-street-openface-low",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-street-openface-low/clip.mp4",
+    "clipSha256": "7bba67e8b55e4f95032ab231f61f5bc92eb22c5f2460334e5bb34bca3ee32631",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-street-openface-low/evidence.json.gz",
+    "frames": 129,
+    "quality": "low",
+    "outfit": "street-openface",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "thrown-pro-street-charcoal-high",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-street-charcoal-high/clip.mp4",
+    "clipSha256": "6d72bc9940dab3186273209e76229c04331b554f0254fc41873f89115aa48352",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-street-charcoal-high/evidence.json.gz",
+    "frames": 129,
+    "quality": "high",
+    "outfit": "street-charcoal",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "thrown-pro-street-charcoal-low",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-street-charcoal-low/clip.mp4",
+    "clipSha256": "e11731f2f86b29bee34126c4037ddac63513c13df85ecd3f3e53cbeb8a2a630e",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-street-charcoal-low/evidence.json.gz",
+    "frames": 129,
+    "quality": "low",
+    "outfit": "street-charcoal",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "thrown-pro-race-bluewhite-high",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-race-bluewhite-high/clip.mp4",
+    "clipSha256": "629621fc93414ff6224b74827859ea497e90da2b911865bb3955efa4d65c73ef",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-race-bluewhite-high/evidence.json.gz",
+    "frames": 129,
+    "quality": "high",
+    "outfit": "race-bluewhite",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "thrown-pro-race-bluewhite-low",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-race-bluewhite-low/clip.mp4",
+    "clipSha256": "c3164f33a76ec1c9010efe1ce49b75ca85b173d7404bd6e2b6a16d941109bcec",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-race-bluewhite-low/evidence.json.gz",
+    "frames": 129,
+    "quality": "low",
+    "outfit": "race-bluewhite",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "thrown-pro-race-charcoalyellow-high",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-race-charcoalyellow-high/clip.mp4",
+    "clipSha256": "7a147501a943411f10e323091a82ece74aab3aeb4a2a590e0d5b943273fdcc29",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-race-charcoalyellow-high/evidence.json.gz",
+    "frames": 129,
+    "quality": "high",
+    "outfit": "race-charcoalyellow",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "thrown-pro-race-charcoalyellow-low",
+    "clip": "harness/out/riding-poses-round3/thrown-pro-race-charcoalyellow-low/clip.mp4",
+    "clipSha256": "b12c0cbae3301fb3c18a4fb7aa952a533c6ed4a1225ee34a00a27758fc8f32a3",
+    "evidence": "harness/out/riding-poses-round3/thrown-pro-race-charcoalyellow-low/evidence.json.gz",
+    "frames": 129,
+    "quality": "low",
+    "outfit": "race-charcoalyellow",
+    "errors": [
+      "warning: [render] track budget: 11 calls / 145668 tris (cap 20 / 80k)",
+      "warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+    ],
+    "recordingSha256": "94fb12943ec7789de647a3b35ef361738c7fc9432479221fae9f9456e8ef5e91"
+  },
+  {
+    "capture": "snow-phone-low",
+    "clip": "harness/out/riding-poses-round3/snow-phone-low/clip.mp4",
+    "clipSha256": "9982e8fea3939996b9fe460f071614fadacad40c5d3a9b93980a5a8ef32930ad",
+    "evidence": "harness/out/riding-poses-round3/snow-phone-low/evidence.json.gz",
+    "frames": 165,
+    "quality": "low",
+    "outfit": "street-mustard",
+    "errors": [
+      "warning: [render] track budget: 15 calls / 94364 tris (cap 20 / 80k)",
+      "warning: [render] track budget: 15 calls / 94364 tris (cap 20 / 80k)"
+    ],
+    "recordingSha256": "bd62f82f52e340b2283f3574223f7cb2ea6066607a78de5ae4721b97ecd6e2b2"
+  }
+]

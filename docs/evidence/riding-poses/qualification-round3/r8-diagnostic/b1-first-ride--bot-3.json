@@ -1,0 +1,29 @@
+{
+  "file": "b1-first-ride/bot-3.json",
+  "finished": true,
+  "riding": 4846,
+  "overDemand": 883,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.5065244812653433,
+  "maxHipX": 0.009306815557384093,
+  "maxLeg": 0.8545360812609722,
+  "maxArm": 0.5740055266856753,
+  "outCom": 240,
+  "maxCom": 0.3948467001131668,
+  "recovered": 1318,
+  "outRecovered": 0,
+  "maxComRecovered": 0.04765874959163167,
+  "maxPsiRecovered": 0.07106025855890835,
+  "longestExcursion": 5,
+  "longestExcursionAt": 3638,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 1312,
+    "bad": []
+  },
+  "selected": []
+}

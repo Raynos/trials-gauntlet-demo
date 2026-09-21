@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/lab-flat-200/bot-3.json",
+      "sha256": "58f277dbe41b1cf5b0a29dccaaf8464c6a91a15c95119537e8cf80f9a2ffdc0b",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "80081045fa834b92",
+      "browserHash": "80081045fa834b92",
+      "nodeFinish": 12.625,
+      "browserFinish": 12.625,
+      "nodeRunTime": 12.625,
+      "browserRunTime": 12.625,
+      "nodeRunTimeBits": "0000000000402940",
+      "browserRunTimeBits": "0000000000402940",
+      "nodeFinishBits": "0000000000402940",
+      "browserFinishBits": "0000000000402940",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

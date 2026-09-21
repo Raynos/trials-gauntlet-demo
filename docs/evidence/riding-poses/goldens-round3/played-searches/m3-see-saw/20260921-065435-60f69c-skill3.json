@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "bot",
+  "runId": "20260921-065435-60f69c",
+  "startedAt": "2026-09-21T11:54:35.855Z",
+  "wallMs": 135335,
+  "git": "2dece1ce",
+  "srcFingerprint": "1255af7f",
+  "node": "v24.18.1",
+  "physics": "bikePhysicsFactory-v2",
+  "bike": "pro",
+  "trackId": "m3-see-saw",
+  "seed": 1066951255,
+  "physicsHz": 120,
+  "skill": 3,
+  "config": {
+    "width": 32,
+    "depth": 32,
+    "commit": 1,
+    "budgetMs": 4000,
+    "cells": [
+      0.25,
+      0.5,
+      0.1
+    ]
+  },
+  "weights": {
+    "progress": 1,
+    "speed": 0.15,
+    "upright": 0.5,
+    "airPitch": 0.3,
+    "checkpoint": 50,
+    "finish": 1000000,
+    "fault": -1000000
+  },
+  "outcome": "finished",
+  "maxX": 503.4019074446191,
+  "progress": 0.9986151704912102,
+  "firstBlocker": null,
+  "attempts": 1,
+  "faults": [],
+  "faultsByCheckpoint": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "finishTime": 36.5,
+  "segmentFinishTime": 36.5,
+  "simSeconds": 36.5,
+  "ticks": 4380,
+  "rewinds": 0,
+  "search": {
+    "plans": 228,
+    "expandedTotal": 1860384,
+    "ticksSimulated": 27910140,
+    "planWallMs": {
+      "p50": 605.2635829999927,
+      "p95": 722.5397919999959,
+      "max": 785.8630000000121
+    }
+  },
+  "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/m3-see-saw/20260921-065435-60f69c-skill3.rec.json",
+  "nodeHash": "2202150e9ed4d055",
+  "playReplayDivergence": null,
+  "browserHash": null,
+  "browserVerified": null
+}

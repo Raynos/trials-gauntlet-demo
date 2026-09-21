@@ -1,0 +1,29 @@
+{
+  "file": "m3-see-saw/bot-3-pro.json",
+  "finished": true,
+  "riding": 4379,
+  "overDemand": 1383,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.4904882730638148,
+  "maxHipX": 0.16009006117665717,
+  "maxLeg": 0.8779615279291527,
+  "maxArm": 0.5739619606704952,
+  "outCom": 205,
+  "maxCom": 0.39050933270735877,
+  "recovered": 171,
+  "outRecovered": 0,
+  "maxComRecovered": 0.040935364106728454,
+  "maxPsiRecovered": 0.054677747055237536,
+  "longestExcursion": 5,
+  "longestExcursionAt": 3998,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 169,
+    "bad": []
+  },
+  "selected": []
+}

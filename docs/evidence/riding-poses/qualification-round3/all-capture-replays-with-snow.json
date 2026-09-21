@@ -1,0 +1,509 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "capture": "impact-pro-race-bluewhite-high",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-pro-race-bluewhite-low",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-pro-race-charcoalyellow-high",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-pro-race-charcoalyellow-low",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-pro-street-charcoal-high",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-pro-street-charcoal-low",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-pro-street-mustard-high",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-pro-street-mustard-low",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-pro-street-openface-high",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-pro-street-openface-low",
+      "checked": 294,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-race-bluewhite-high",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-race-bluewhite-low",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-race-charcoalyellow-high",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-race-charcoalyellow-low",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-street-charcoal-high",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-street-charcoal-low",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-street-mustard-high",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-street-mustard-low",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-street-openface-high",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "impact-rookie-street-openface-low",
+      "checked": 297,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "phone-lean",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-race-bluewhite-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-race-bluewhite-low",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-race-charcoalyellow-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-race-charcoalyellow-low",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-street-charcoal-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-street-charcoal-low",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-street-mustard-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-street-mustard-low",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-street-openface-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "pro-street-openface-low",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "race-pro-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-race-bluewhite-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-race-bluewhite-low",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-race-charcoalyellow-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-race-charcoalyellow-low",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-street-charcoal-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-street-charcoal-low",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-street-mustard-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-street-mustard-low-rerun",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-street-openface-high",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "rookie-street-openface-low-rerun",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "snow-phone-low",
+      "checked": 210,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-race-bluewhite-high",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-race-bluewhite-low",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-race-charcoalyellow-high",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-race-charcoalyellow-low",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-street-charcoal-high",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-street-charcoal-low",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-street-mustard-high",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-street-mustard-low",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-street-openface-high",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-pro-street-openface-low",
+      "checked": 174,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-race-bluewhite-high",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-race-bluewhite-low",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-race-charcoalyellow-high",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-race-charcoalyellow-low",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-street-charcoal-high",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-street-charcoal-low",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-street-mustard-high",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-street-mustard-low",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-street-openface-high",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    },
+    {
+      "capture": "thrown-rookie-street-openface-low",
+      "checked": 254,
+      "exactPhysicsHash": true,
+      "fullStateJsonEqual": true,
+      "runClockIdentical": true,
+      "displayTimeIdentical": true
+    }
+  ]
+}

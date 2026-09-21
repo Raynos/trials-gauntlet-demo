@@ -1,23 +1,23 @@
 {
   "flat-test": {
     "canonical1200": {
-      "hash": "afee0f1094a0587c",
+      "hash": "68dc260a8d8fc536",
       "physics": "bikePhysicsFactory-v2"
     },
     "golden": {
       "file": "bot-3.json",
-      "finishTime": 8.65,
-      "hash": "ecdf62a55f6185a6",
-      "ticks": 1038,
+      "finishTime": 8.591666666666667,
+      "hash": "d6c410b216914469",
+      "ticks": 1031,
       "physics": "bikePhysicsFactory-v2"
     }
   },
   "flat-test:pro": {
     "golden": {
       "file": "bot-3-pro.json",
-      "finishTime": 7.8999999999999995,
-      "hash": "40e2115db273b7ff",
-      "ticks": 948,
+      "finishTime": 8.041666666666666,
+      "hash": "34d6c6fb33ceb61d",
+      "ticks": 965,
       "physics": "bikePhysicsFactory-v2"
     },
     "canonical1200": {
@@ -28,9 +28,9 @@
   "b1-first-ride:pro": {
     "golden": {
       "file": "bot-3-pro.json",
-      "finishTime": 37.96666666666667,
-      "hash": "f0549ee508d870ed",
-      "ticks": 4556,
+      "finishTime": 37.95,
+      "hash": "1e0c74c3b7e516d0",
+      "ticks": 4554,
       "physics": "bikePhysicsFactory-v2"
     },
     "canonical1200": {

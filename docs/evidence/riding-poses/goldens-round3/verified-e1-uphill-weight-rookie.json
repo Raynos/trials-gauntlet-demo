@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/e1-uphill-weight/bot-3.json",
+      "sha256": "59f6eced1e76b52ea5d4f862b9e7d5ce8563f7dc86907fd7f9e6a6dbf7b11faf",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "f8ffaeb6d47e6a52",
+      "browserHash": "f8ffaeb6d47e6a52",
+      "nodeFinish": 44.18333333333333,
+      "browserFinish": 44.18333333333333,
+      "nodeRunTime": 44.18333333333333,
+      "browserRunTime": 44.18333333333333,
+      "nodeRunTimeBits": "7777777777174640",
+      "browserRunTimeBits": "7777777777174640",
+      "nodeFinishBits": "7777777777174640",
+      "browserFinishBits": "7777777777174640",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

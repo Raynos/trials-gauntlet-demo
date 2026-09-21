@@ -509,7 +509,7 @@ async function main(): Promise<void> {
         t.resize(640, 360); // heap/perf counters do not depend on the viewport; SwiftShader raster cost does
         for (let i = 0; i < 5; i++) t.render(true);
       }, [trackId] as const);
-      const heapBefore = await readHeap(page);
+      const heapBefore = await readHeap(page, true);
       const physicsMs: number[] = [];
       const submitMs: number[] = [];
       const syncedMs: number[] = [];
@@ -546,7 +546,7 @@ async function main(): Promise<void> {
         submitMs.push(...r.sm);
         syncedMs.push(...r.ym);
       }
-      const heapAfter = await readHeap(page);
+      const heapAfter = await readHeap(page, true);
       const stats = await page.evaluate(() => window.__trials!.stats());
       await closeIsolated(page);
       const growthMB = (heapAfter.jsHeapUsed - heapBefore.jsHeapUsed) / (1024 * 1024);
@@ -561,7 +561,7 @@ async function main(): Promise<void> {
         renderSyncedMsP95: percentileOf(syncedMs, 95),
       };
       const limitGrowth = num('heap.growthMBPer60s');
-      check({ id: 'heap.growthMBPer60s', value: growthMB, limit: limitGrowth, pass: growthMB <= limitGrowth, unit: 'MB', note: `over ${heapSeconds}s of play${heapSeconds < 60 ? ' (--quick: shorter than the 60 s the threshold is written for)' : ''}` });
+      check({ id: 'heap.growthMBPer60s', value: growthMB, limit: limitGrowth, pass: growthMB <= limitGrowth, unit: 'MB', note: `retained heap after GC at both endpoints over ${heapSeconds}s of play${heapSeconds < 60 ? ' (--quick: shorter than the 60 s the threshold is written for)' : ''}` });
       check({ id: 'perf.drawCallsMax', value: stats.calls, limit: num('perf.drawCallsMax'), pass: stats.calls <= num('perf.drawCallsMax') });
       check({ id: 'perf.trianglesMax', value: stats.triangles, limit: num('perf.trianglesMax'), pass: stats.triangles <= num('perf.trianglesMax') });
       check({ id: 'perf.texturesMBMax', value: stats.texturesMB, limit: num('perf.texturesMBMax'), pass: stats.texturesMB <= num('perf.texturesMBMax'), unit: 'MB' });

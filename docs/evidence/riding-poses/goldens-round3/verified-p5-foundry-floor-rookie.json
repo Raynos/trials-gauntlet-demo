@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/p5-foundry-floor/bot-3.json",
+      "sha256": "9a0f8ced8204539e0088a9bef8927c92bedb79c991fe6b43b5ee0a7b9fbda1ce",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "7ca27d25e39588bb",
+      "browserHash": "7ca27d25e39588bb",
+      "nodeFinish": 32.3,
+      "browserFinish": 32.3,
+      "nodeRunTime": 32.3,
+      "browserRunTime": 32.3,
+      "nodeRunTimeBits": "6666666666264040",
+      "browserRunTimeBits": "6666666666264040",
+      "nodeFinishBits": "6666666666264040",
+      "browserFinishBits": "6666666666264040",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

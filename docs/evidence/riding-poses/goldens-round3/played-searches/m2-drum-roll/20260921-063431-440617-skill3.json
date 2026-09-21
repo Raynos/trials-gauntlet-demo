@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "kind": "bot",
+  "runId": "20260921-063431-440617",
+  "startedAt": "2026-09-21T11:34:31.976Z",
+  "wallMs": 204894,
+  "git": "2dece1ce",
+  "srcFingerprint": "1255af7f",
+  "node": "v24.18.1",
+  "physics": "bikePhysicsFactory-v2",
+  "bike": "rookie",
+  "trackId": "m2-drum-roll",
+  "seed": 3505190447,
+  "physicsHz": 120,
+  "skill": 3,
+  "config": {
+    "width": 32,
+    "depth": 32,
+    "commit": 1,
+    "budgetMs": 4000,
+    "cells": [
+      0.25,
+      0.5,
+      0.1
+    ]
+  },
+  "weights": {
+    "progress": 1,
+    "speed": 0.15,
+    "upright": 0.5,
+    "airPitch": 0.3,
+    "checkpoint": 50,
+    "finish": 1000000,
+    "fault": -1000000
+  },
+  "outcome": "finished",
+  "maxX": 487.4600774143961,
+  "progress": 0.9984843863465713,
+  "firstBlocker": {
+    "reason": "crash",
+    "x": 423.7407667437165,
+    "checkpoint": 3,
+    "runTime": 33.40833333333333,
+    "obstacle": {
+      "kind": "ramp",
+      "x": 422.4,
+      "index": 31
+    }
+  },
+  "attempts": 2,
+  "faults": [
+    {
+      "attempt": 1,
+      "reason": "crash",
+      "tick": 4009,
+      "simTime": 33.40833333333333,
+      "runTime": 33.40833333333333,
+      "x": 423.7407667437165,
+      "checkpoint": 3
+    }
+  ],
+  "faultsByCheckpoint": [
+    0,
+    0,
+    0,
+    0,
+    1
+  ],
+  "finishTime": 45.21666666666667,
+  "segmentFinishTime": 11.8,
+  "simSeconds": 45.21666666666667,
+  "ticks": 5426,
+  "rewinds": 0,
+  "search": {
+    "plans": 266,
+    "expandedTotal": 2035336,
+    "ticksSimulated": 30533093,
+    "planWallMs": {
+      "p50": 799.1177920000009,
+      "p95": 1094.5622079999885,
+      "max": 2169.7077089999802
+    }
+  },
+  "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/m2-drum-roll/20260921-063431-440617-skill3.rec.json",
+  "nodeHash": "0acddebd6435d7d3",
+  "playReplayDivergence": null,
+  "browserHash": null,
+  "browserVerified": null
+}

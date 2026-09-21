@@ -1,0 +1,28 @@
+{
+  "agentPath": "/root/pose_stranger_round3_second/b3_player1",
+  "forkTurns": "none",
+  "briefing": "PROTOCOL.md verbatim plus one track/session/agent naming line",
+  "protocolSha256": "5b2734b9d54777012a04acb91e446d93ac6b88fbd6537e96ef7963adde0e7eb3",
+  "sourceFingerprint": "1255af7f",
+  "recordingSha256": "e8f2c293dc56491a37aeb22d4bdace232b265f82e96f15241f1098b508d1a8f0",
+  "coordinatorObservedCallsDuringPlay": false,
+  "coordinatorProvidedAdvice": false,
+  "faultToRespawn": [
+    {
+      "faultTick": 939,
+      "reason": "crash",
+      "respawnTick": 1059,
+      "ticks": 120,
+      "seconds": 1.0
+    },
+    {
+      "faultTick": 1925,
+      "reason": "crash",
+      "respawnTick": 2045,
+      "ticks": 120,
+      "seconds": 1.0
+    }
+  ],
+  "restartMetricLimit": "Simulation ticks only; not browser input-to-visible-ready wall latency.",
+  "source": "harness/out/stranger/b3-kicker-row/b3-kicker-row-20260921-063235"
+}

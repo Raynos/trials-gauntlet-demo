@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/e2-rear-wheel-first/bot-3-pro.json",
+      "sha256": "8fc49c142ab4f1339246ac96b0ec16e762d66da31bd697e97ee69fccf76d7af9",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "4534a2f868996477",
+      "browserHash": "4534a2f868996477",
+      "nodeFinish": 39.43333333333333,
+      "browserFinish": 39.43333333333333,
+      "nodeRunTime": 39.43333333333333,
+      "browserRunTime": 39.43333333333333,
+      "nodeRunTimeBits": "7777777777b74340",
+      "browserRunTimeBits": "7777777777b74340",
+      "nodeFinishBits": "7777777777b74340",
+      "browserFinishBits": "7777777777b74340",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

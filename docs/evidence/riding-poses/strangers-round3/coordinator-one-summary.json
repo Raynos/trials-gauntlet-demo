@@ -1,0 +1,155 @@
+{
+  "fingerprintAtStart": "1255af7f",
+  "fingerprintAfterAllFour": "1255af7f",
+  "frozenBuild": "/tmp/trials-poses-round3/dist",
+  "rows": [
+    {
+      "sessionId": "b1-first-ride-20260921-061537",
+      "trackId": "b1-first-ride",
+      "agent": "pose-r3-b1-one",
+      "seed": 138717428,
+      "bike": "rookie",
+      "srcFingerprint": "1255af7f",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "calls": 12,
+      "forcedResets": 0,
+      "exactRunClock": 46.016666666666666,
+      "exactSegmentFinish": 46.016666666666666,
+      "replayPassed": true,
+      "hash": "01487cf766ec3986",
+      "faultToRespawn": []
+    },
+    {
+      "sessionId": "b1-first-ride-20260921-061643",
+      "trackId": "b1-first-ride",
+      "agent": "pose-r3-b1-two",
+      "seed": 2,
+      "bike": "rookie",
+      "srcFingerprint": "1255af7f",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "calls": 13,
+      "forcedResets": 0,
+      "exactRunClock": 47.175,
+      "exactSegmentFinish": 47.175,
+      "replayPassed": true,
+      "hash": "a0629e8f1aea3587",
+      "faultToRespawn": []
+    },
+    {
+      "sessionId": "b2-lean-back-20260921-062226",
+      "trackId": "b2-lean-back",
+      "agent": "pose-r3-b2-one",
+      "seed": 3802965488,
+      "bike": "rookie",
+      "srcFingerprint": "1255af7f",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "calls": 12,
+      "forcedResets": 0,
+      "exactRunClock": 40.975,
+      "exactSegmentFinish": 40.975,
+      "replayPassed": true,
+      "hash": "4e21795889ce128a",
+      "faultToRespawn": []
+    },
+    {
+      "sessionId": "b2-lean-back-20260921-062324",
+      "trackId": "b2-lean-back",
+      "agent": "pose-r3-b2-two",
+      "seed": 2,
+      "bike": "rookie",
+      "srcFingerprint": "1255af7f",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "calls": 16,
+      "forcedResets": 0,
+      "exactRunClock": 55.141666666666666,
+      "exactSegmentFinish": 36.958333333333336,
+      "replayPassed": true,
+      "hash": "15ad02b5cd64c615",
+      "faultToRespawn": [
+        {
+          "faultTick": 2062,
+          "reason": "crash",
+          "respawnTick": 2182,
+          "ticks": 120,
+          "seconds": 1.0
+        }
+      ]
+    }
+  ],
+  "census": {
+    "b1": {
+      "census": {
+        "n": 2,
+        "minSessions": 2,
+        "censored": [
+          {
+            "sessionId": "b1-first-ride-r4-s1-20260914-164224",
+            "status": "abandoned",
+            "attemptsSoFar": 1,
+            "calls": 0
+          },
+          {
+            "sessionId": "b1-first-ride-r4-s2-20260914-164224",
+            "status": "abandoned",
+            "attemptsSoFar": 1,
+            "calls": 0
+          }
+        ],
+        "staleExcluded": 20,
+        "otherBikeExcluded": 0
+      },
+      "medianAttempts": 1,
+      "verdict": "PASS",
+      "asserted": {
+        "band": [
+          1,
+          1
+        ],
+        "factor": 1.5,
+        "limit": 1.5
+      }
+    },
+    "b2": {
+      "census": {
+        "n": 2,
+        "minSessions": 2,
+        "censored": [
+          {
+            "sessionId": "b2-lean-back-r4-s1-20260914-164224",
+            "status": "abandoned",
+            "attemptsSoFar": 1,
+            "calls": 0
+          },
+          {
+            "sessionId": "b2-lean-back-r4-s2-20260914-164224",
+            "status": "abandoned",
+            "attemptsSoFar": 1,
+            "calls": 0
+          }
+        ],
+        "staleExcluded": 17,
+        "otherBikeExcluded": 0
+      },
+      "medianAttempts": 1.5,
+      "verdict": "PASS",
+      "asserted": {
+        "band": [
+          1,
+          2
+        ],
+        "factor": 1.5,
+        "limit": 3
+      }
+    }
+  },
+  "remaining": {
+    "b3-kicker-row": 2,
+    "e1-uphill-weight": 2,
+    "e2-rear-wheel-first": 2,
+    "e3-stairway": 2
+  }
+}

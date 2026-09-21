@@ -1,0 +1,13 @@
+{
+  "agentPath": "/root/pose_stranger_round3_last/e2_player1",
+  "forkTurns": "none",
+  "briefing": "PROTOCOL.md verbatim plus one track/session/agent naming line",
+  "protocolSha256": "5b2734b9d54777012a04acb91e446d93ac6b88fbd6537e96ef7963adde0e7eb3",
+  "sourceFingerprint": "1255af7f",
+  "recordingSha256": "0ab851f9db7b0472bcaab430e4dbeffb59b5ddf30feafd42e87ca4217b45240b",
+  "coordinatorObservedCallsDuringPlay": false,
+  "coordinatorProvidedAdvice": false,
+  "faultToRespawn": [],
+  "restartMetricLimit": "Simulation ticks only; not browser input-to-visible-ready wall latency.",
+  "source": "harness/out/stranger/e2-rear-wheel-first/e2-rear-wheel-first-20260921-065047"
+}

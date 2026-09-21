@@ -1,0 +1,14 @@
+{
+  "n": 1,
+  "endedBy": "fault",
+  "checkpoint": 0,
+  "x": 57.507,
+  "simTime": 5.3917,
+  "runTime": 5.3917,
+  "wallMs": 148007,
+  "calls": 4,
+  "startTick": 0,
+  "endTick": 647,
+  "recordingFile": "harness/out/stranger/b3-kicker-row/b3-kicker-row-20260921-063438/attempts/001.rec.json",
+  "reason": "crash"
+}

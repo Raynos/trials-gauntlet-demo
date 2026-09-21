@@ -1,0 +1,18 @@
+{
+  "fingerprint": "1255af7f",
+  "prefixFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/p3-snow-line/20260921-064010-325164-skill3.rec.json",
+  "prefixFrames": 10879,
+  "prefixFaults": 13,
+  "startHash": "603d931f5b1253a3",
+  "outcome": "wallTimeout",
+  "maxX": 238.00518212275236,
+  "finishTime": null,
+  "attempts": 33,
+  "continuationAttempts": 20,
+  "wallMs": 300007.355042,
+  "nodeHash": "aeb9d13a44ff5341",
+  "playHash": "aeb9d13a44ff5341",
+  "mismatches": [],
+  "finished": false,
+  "recordingFile": "docs/evidence/riding-poses/goldens-round3/p3-snow-line-rookie-continued.rec.json"
+}

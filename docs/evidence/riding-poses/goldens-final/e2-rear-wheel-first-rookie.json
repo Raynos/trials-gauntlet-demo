@@ -1,0 +1,18 @@
+{
+  "fingerprint": "ae2c0bca",
+  "prefixFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/e2-rear-wheel-first/20260921-050211-dfa9aa-skill3.rec.json",
+  "prefixFrames": 4560,
+  "prefixFaults": 0,
+  "startHash": "7984b40d227542ab",
+  "outcome": "finished",
+  "maxX": 615.5014471877545,
+  "finishTime": 43.49166666666667,
+  "attempts": 1,
+  "continuationAttempts": 1,
+  "wallMs": 3438.2672079999998,
+  "nodeHash": "8363aa43e8c4e574",
+  "playHash": "8363aa43e8c4e574",
+  "mismatches": [],
+  "finished": true,
+  "recordingFile": "docs/evidence/riding-poses/goldens-final/e2-rear-wheel-first-rookie.rec.json"
+}

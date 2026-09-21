@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/b3-kicker-row/bot-3.json",
+      "sha256": "805488a56038742f7a4a6dacd36c3e3383a7f0fa61ec211ecd76367ae5ff2e56",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "a67823fb82bd6e72",
+      "browserHash": "a67823fb82bd6e72",
+      "nodeFinish": 32.608333333333334,
+      "browserFinish": 32.608333333333334,
+      "nodeRunTime": 32.608333333333334,
+      "browserRunTime": 32.608333333333334,
+      "nodeRunTimeBits": "dedddddddd4d4040",
+      "browserRunTimeBits": "dedddddddd4d4040",
+      "nodeFinishBits": "dedddddddd4d4040",
+      "browserFinishBits": "dedddddddd4d4040",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

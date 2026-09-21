@@ -1,0 +1,40 @@
+{
+  "prefixTicks": 1773,
+  "success": true,
+  "bestX": 255.0447116486433,
+  "rows": [
+    {
+      "speed": 6,
+      "throttle": 0.35,
+      "target": 0,
+      "kp": 1,
+      "kd": 0.2,
+      "maxX": 213.0863069675603,
+      "fault": "crash",
+      "ticks": 136,
+      "hash": "f88b003115304c8b"
+    },
+    {
+      "speed": 6,
+      "throttle": 0.35,
+      "target": 0,
+      "kp": 1,
+      "kd": 0.5,
+      "maxX": 219.45997662710823,
+      "fault": "crash",
+      "ticks": 193,
+      "hash": "88e0d58844212b63"
+    },
+    {
+      "speed": 6,
+      "throttle": 0.35,
+      "target": 0,
+      "kp": 1,
+      "kd": 1,
+      "maxX": 255.0447116486433,
+      "fault": null,
+      "ticks": 957,
+      "hash": "0f9eadaf77352a35"
+    }
+  ]
+}

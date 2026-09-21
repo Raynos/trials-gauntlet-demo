@@ -109,6 +109,30 @@ without the previously rejected outer-arm craters.
   evidence-script lint errors are being removed. Full fresh suite, strangers, ship gate and garment
   completion review are still required.
 
+## Round 3 checkpoint — paused by the user on 2026-09-21
+
+The user requested a good pause point because of remaining usage. Implementation
+remains frozen at `1255af7f`; no completion or deployment is claimed.
+
+- All 48 current golden recordings finish and match browser/Node state hashes and
+  exact finish/run-clock bytes. Twelve independent b1–e3 players completed and have
+  exact continuous replay proofs. E2/E3 are under their intended difficulty bands;
+  those results and every failed search remain explicit.
+- Parent reviewed 60 outfit/detail/class/motion combinations and an additional
+  Snow Line phone-layout sequence. Across 63 captures, 15,020 sampled states match
+  independent production replay. WebKit also exactly replays B1/E2 on both bikes.
+- Full Metal ship gate passes 31/31. R3/R5 unchanged CPU limits pass at 3.893/4.458µs
+  in the serial suite. Overall: 1,078 passed, one failed, two skipped.
+- The remaining R8 failure is 20 ticks on Rookie M1, not a replay or cloth failure.
+  Its recovery measurement assumes 4,000 N available, while the deliberate landing
+  cap supplies about 1,200 N. A new airborne lean command and touchdown produce
+  target demand above the actual cap during the alleged recovered window. No test
+  or runtime change has been accepted yet; preserve the 60-tick/0.15m requirements.
+
+Resume from [PAUSE.md](../evidence/riding-poses/qualification-round3/PAUSE.md).
+The six checkboxes remain open until the final acceptance audit, and this plan
+remains live rather than archived.
+
 ## Historical starting point (R9, `f00724e`)
 
 Astra's seated pose landed as a **drawn / physical split**: `riderBody.drawn` (`drawnBody()` in `rider.ts`) is a pure

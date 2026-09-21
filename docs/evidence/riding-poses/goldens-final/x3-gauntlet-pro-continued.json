@@ -1,0 +1,18 @@
+{
+  "fingerprint": "ae2c0bca",
+  "prefixFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/x3-gauntlet/20260921-053937-699742-skill3.rec.json",
+  "prefixFrames": 7740,
+  "prefixFaults": 0,
+  "startHash": "2c048884d7595abf",
+  "outcome": "wallTimeout",
+  "maxX": 530.7019703319592,
+  "finishTime": null,
+  "attempts": 1,
+  "continuationAttempts": 1,
+  "wallMs": 240246.171208,
+  "nodeHash": "db6e9508429bd03b",
+  "playHash": "db6e9508429bd03b",
+  "mismatches": [],
+  "finished": false,
+  "recordingFile": "docs/evidence/riding-poses/goldens-final/x3-gauntlet-pro-continued.rec.json"
+}

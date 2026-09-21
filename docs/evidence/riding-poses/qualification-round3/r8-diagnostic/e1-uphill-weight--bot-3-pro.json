@@ -1,0 +1,31 @@
+{
+  "file": "e1-uphill-weight/bot-3-pro.json",
+  "finished": true,
+  "riding": 6285,
+  "overDemand": 2182,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.43840490128088694,
+  "maxHipX": 0.17931238588050208,
+  "maxLeg": 0.8764763867416147,
+  "maxArm": 0.5750087324739311,
+  "outCom": 398,
+  "maxCom": 0.47981844361692316,
+  "recovered": 502,
+  "outRecovered": 0,
+  "maxComRecovered": 0.025526393064493138,
+  "maxPsiRecovered": 0.0722197969444246,
+  "longestExcursion": 8,
+  "longestExcursionAt": 5244,
+  "faults": [
+    "@1562 sensor"
+  ],
+  "bad": [],
+  "availability": {
+    "recovered": 470,
+    "bad": []
+  },
+  "selected": []
+}

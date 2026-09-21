@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "kind": "bot",
+  "runId": "20260921-065537-4a48d4",
+  "startedAt": "2026-09-21T11:55:37.227Z",
+  "wallMs": 300443,
+  "git": "2dece1ce",
+  "srcFingerprint": "1255af7f",
+  "node": "v24.18.1",
+  "physics": "bikePhysicsFactory-v2",
+  "bike": "rookie",
+  "trackId": "p3-snow-line",
+  "seed": 2782902854,
+  "physicsHz": 120,
+  "skill": 3,
+  "config": {
+    "width": 32,
+    "depth": 32,
+    "commit": 1,
+    "budgetMs": 4000,
+    "cells": [
+      0.25,
+      0.5,
+      0.1
+    ]
+  },
+  "weights": {
+    "progress": 1,
+    "speed": 0.15,
+    "upright": 0.5,
+    "airPitch": 0.3,
+    "checkpoint": 50,
+    "finish": 1000000,
+    "fault": -1000000
+  },
+  "outcome": "wallTimeout",
+  "maxX": 238.00518212275236,
+  "progress": 0.4874381728302626,
+  "firstBlocker": {
+    "reason": "crash",
+    "x": 223.2321749691374,
+    "checkpoint": 1,
+    "runTime": 16.458333333333332,
+    "obstacle": {
+      "kind": "drum",
+      "x": 222.4,
+      "index": 5
+    }
+  },
+  "attempts": 15,
+  "faults": [
+    {
+      "attempt": 1,
+      "reason": "crash",
+      "tick": 1975,
+      "simTime": 16.458333333333332,
+      "runTime": 16.458333333333332,
+      "x": 223.2321749691374,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 2,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 22.533333333333335,
+      "x": 237.6547659271891,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 3,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 28.608333333333334,
+      "x": 237.65476393283086,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 4,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 34.68333333333333,
+      "x": 237.6561213148532,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 5,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 40.75833333333333,
+      "x": 237.6561229353989,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 6,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 46.833333333333336,
+      "x": 237.65636643034128,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 7,
+      "reason": "crash",
+      "tick": 732,
+      "simTime": 6.1,
+      "runTime": 52.94166666666667,
+      "x": 238.00518212275236,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 8,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 59.016666666666666,
+      "x": 237.6561229353989,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 9,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 65.09166666666667,
+      "x": 237.6561229353989,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 10,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 71.16666666666667,
+      "x": 237.65636643034128,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 11,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 77.24166666666666,
+      "x": 237.65636643034128,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 12,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 83.31666666666666,
+      "x": 237.6561229353989,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 13,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 89.39166666666667,
+      "x": 237.6561229353989,
+      "checkpoint": 1
+    },
+    {
+      "attempt": 14,
+      "reason": "crash",
+      "tick": 728,
+      "simTime": 6.066666666666666,
+      "runTime": 95.46666666666667,
+      "x": 237.65636643034128,
+      "checkpoint": 1
+    }
+  ],
+  "faultsByCheckpoint": [
+    0,
+    0,
+    14,
+    0,
+    0
+  ],
+  "finishTime": null,
+  "segmentFinishTime": null,
+  "simSeconds": 98.98333333333333,
+  "ticks": 11878,
+  "rewinds": 0,
+  "search": {
+    "plans": 701,
+    "expandedTotal": 4785697,
+    "ticksSimulated": 71797333,
+    "planWallMs": {
+      "p50": 469.5192500000121,
+      "p95": 639.3468750000002,
+      "max": 772.4725829999952
+    }
+  },
+  "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/p3-snow-line/20260921-065537-4a48d4-skill3.rec.json",
+  "nodeHash": "2870a4d76cef044a",
+  "playReplayDivergence": null,
+  "browserHash": null,
+  "browserVerified": null
+}

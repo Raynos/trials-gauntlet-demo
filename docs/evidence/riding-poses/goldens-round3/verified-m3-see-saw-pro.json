@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/m3-see-saw/bot-3-pro.json",
+      "sha256": "46d238a14f2b69683c18364c3873eb95fc17d8b82452fe2088be9fc3fb7a06bd",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "2202150e9ed4d055",
+      "browserHash": "2202150e9ed4d055",
+      "nodeFinish": 36.5,
+      "browserFinish": 36.5,
+      "nodeRunTime": 36.5,
+      "browserRunTime": 36.5,
+      "nodeRunTimeBits": "0000000000404240",
+      "browserRunTimeBits": "0000000000404240",
+      "nodeFinishBits": "0000000000404240",
+      "browserFinishBits": "0000000000404240",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

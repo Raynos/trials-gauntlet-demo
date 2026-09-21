@@ -1,0 +1,29 @@
+{
+  "file": "x1-vertical-limit/bot-3.json",
+  "finished": true,
+  "riding": 6535,
+  "overDemand": 1237,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.4245282214205124,
+  "maxHipX": 0.07462517442901107,
+  "maxLeg": 0.8807425015212663,
+  "maxArm": 0.5743802025850471,
+  "outCom": 354,
+  "maxCom": 0.565829999797309,
+  "recovered": 1568,
+  "outRecovered": 0,
+  "maxComRecovered": 0.0678384097804309,
+  "maxPsiRecovered": 0.10865512518166537,
+  "longestExcursion": 13,
+  "longestExcursionAt": 5391,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 1169,
+    "bad": []
+  },
+  "selected": []
+}

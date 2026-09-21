@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/x3-gauntlet/bot-3.json",
+      "sha256": "3b8b80be69588acb6be09a002d3f9ef5d1084870e8dc19cffa4a65486f64fff0",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "22c7761617462157",
+      "browserHash": "22c7761617462157",
+      "nodeFinish": 43.94166666666666,
+      "browserFinish": 43.94166666666666,
+      "nodeRunTime": 43.94166666666667,
+      "browserRunTime": 43.94166666666667,
+      "nodeRunTimeBits": "8988888888f84540",
+      "browserRunTimeBits": "8988888888f84540",
+      "nodeFinishBits": "8888888888f84540",
+      "browserFinishBits": "8888888888f84540",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "file": "lab-flat-200/bot-3-pro.json",
+  "finished": true,
+  "riding": 1427,
+  "overDemand": 130,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.5104152747814794,
+  "maxHipX": 0.008785541826572492,
+  "maxLeg": 0.83549600254712,
+  "maxArm": 0.5736320058247922,
+  "outCom": 7,
+  "maxCom": 0.16870879658732174,
+  "recovered": 777,
+  "outRecovered": 0,
+  "maxComRecovered": 0.025526393064493138,
+  "maxPsiRecovered": 0.0407214715154155,
+  "longestExcursion": 0,
+  "longestExcursionAt": -1,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 777,
+    "bad": []
+  },
+  "selected": []
+}

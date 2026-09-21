@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/b1-first-ride/bot-3-pro.json",
+      "sha256": "2d7931f40af87f4a232c92f88e02c47f452da9c2a32254b07445ba3680a90806",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "1e0c74c3b7e516d0",
+      "browserHash": "1e0c74c3b7e516d0",
+      "nodeFinish": 37.95,
+      "browserFinish": 37.95,
+      "nodeRunTime": 37.95,
+      "browserRunTime": 37.95,
+      "nodeRunTimeBits": "9a99999999f94240",
+      "browserRunTimeBits": "9a99999999f94240",
+      "nodeFinishBits": "9a99999999f94240",
+      "browserFinishBits": "9a99999999f94240",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

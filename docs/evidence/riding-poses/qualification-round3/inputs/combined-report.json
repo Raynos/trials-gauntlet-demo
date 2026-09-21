@@ -1,0 +1,24 @@
+[
+  {
+    "cls": "rookie",
+    "ticks": 1188,
+    "faults": 2,
+    "faultReasons": [
+      "restart",
+      "crash"
+    ],
+    "finalHash": "f7dc16054995562d",
+    "allSnapshotsByteEqual": true
+  },
+  {
+    "cls": "pro",
+    "ticks": 1176,
+    "faults": 2,
+    "faultReasons": [
+      "restart",
+      "crash"
+    ],
+    "finalHash": "ae2065e063dd969f",
+    "allSnapshotsByteEqual": true
+  }
+]

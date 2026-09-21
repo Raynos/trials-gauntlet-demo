@@ -1,0 +1,361 @@
+{
+  "simulation": "1255af7f",
+  "method": "Parent inspection of temporally ordered decoded frames from input-driven30fpsMP4s; full clips retained. This is not a claim of human continuous-video viewing.",
+  "transitionFrames": [
+    0,
+    17,
+    22,
+    34,
+    48,
+    55,
+    62,
+    78,
+    99,
+    110,
+    140,
+    158
+  ],
+  "reviewed": [
+    {
+      "capture": "rookie-street-mustard-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "rookie-street-openface-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "rookie-race-bluewhite-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "rookie-street-charcoal-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "rookie-race-charcoalyellow-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "rookie-street-charcoal-low",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "rookie-street-mustard-low-rerun",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "rookie-street-openface-low-rerun",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "rookie-race-bluewhite-low",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "rookie-race-charcoalyellow-low",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-street-mustard-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-street-mustard-low",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-street-openface-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-street-openface-low",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-street-charcoal-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-street-charcoal-low",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-race-bluewhite-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-race-bluewhite-low",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-race-charcoalyellow-high",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "pro-race-charcoalyellow-low",
+      "motion": "lean-transitions",
+      "judgment": "Seated neutral; visible forward pelvic rise/chest lean; hips move rearward; elbow bends remain down beside torso; hands/feet remain attached. No visible sleeve crater, hood separation or body/fender penetration in inspected sequence. Impact/release qualification separate."
+    },
+    {
+      "capture": "impact-rookie-street-mustard-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-rookie-street-mustard-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-rookie-street-openface-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-rookie-street-openface-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-rookie-street-charcoal-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-rookie-street-charcoal-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-rookie-race-bluewhite-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-rookie-race-bluewhite-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-rookie-race-charcoalyellow-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-rookie-race-charcoalyellow-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-street-mustard-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-street-mustard-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-street-openface-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-street-openface-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-street-charcoal-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-street-charcoal-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-race-bluewhite-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-race-bluewhite-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-race-charcoalyellow-high",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "impact-pro-race-charcoalyellow-low",
+      "motion": "hop-flat-landing-crash-restart",
+      "judgment": "Whole-body preload/extension and landing recovery visible with contacts retained. Actual inverted crash releases rider into separate ragdoll; restart restores coherent seated skeleton. No visible sleeve/hood separation or gross deformation in inspected sequence."
+    },
+    {
+      "capture": "thrown-rookie-street-mustard-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-rookie-street-mustard-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-rookie-street-openface-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-rookie-street-openface-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-rookie-street-charcoal-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-rookie-street-charcoal-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-rookie-race-bluewhite-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-rookie-race-bluewhite-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-rookie-race-charcoalyellow-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-rookie-race-charcoalyellow-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-street-mustard-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-street-mustard-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-street-openface-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-street-openface-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-street-charcoal-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-street-charcoal-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-race-bluewhite-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-race-bluewhite-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-race-charcoalyellow-high",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "thrown-pro-race-charcoalyellow-low",
+      "motion": "sloped-landing-thrown-release",
+      "judgment": "Input-driven kicker jumps and sloped landing preserve a coherent riding silhouette. After the fault the torso and limbs detach and slump independently of the bike; no gross sleeve twist, tearing, or visible sustained fender intersection in inspected sequence. Numerical cloth minimum is -2.38mm within the declared 5mm envelope; no claim of mathematically zero penetration."
+    },
+    {
+      "capture": "snow-phone-low",
+      "motion": "snow-phone-playback",
+      "judgment": "Temporally sampled actual Snow Line play in WebKit phone geometry: forward rise, back movement and coherent garment at riding speed; scene edges and bike silhouette are resolved through the final AA pass. Snow background triangle warning remains preexisting. This is a Mac WebKit compatibility/appearance check, not an iPhone frame-rate measurement."
+    }
+  ],
+  "impactFramesRookie": [
+    0,
+    8,
+    14,
+    18,
+    24,
+    32,
+    45,
+    85,
+    147,
+    174,
+    178,
+    183,
+    189,
+    197,
+    205,
+    230
+  ],
+  "impactFramesPro": [
+    0,
+    8,
+    14,
+    18,
+    24,
+    32,
+    45,
+    85,
+    147,
+    170,
+    174,
+    179,
+    185,
+    193,
+    201,
+    230
+  ]
+}

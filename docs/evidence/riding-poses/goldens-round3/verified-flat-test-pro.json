@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/flat-test/bot-3-pro.json",
+      "sha256": "daa878a98443449483e930660b42e7a582e14c8e2086b667c358c0623b9c52f5",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "34d6c6fb33ceb61d",
+      "browserHash": "34d6c6fb33ceb61d",
+      "nodeFinish": 8.041666666666666,
+      "browserFinish": 8.041666666666666,
+      "nodeRunTime": 8.041666666666666,
+      "browserRunTime": 8.041666666666666,
+      "nodeRunTimeBits": "5555555555152040",
+      "browserRunTimeBits": "5555555555152040",
+      "nodeFinishBits": "5555555555152040",
+      "browserFinishBits": "5555555555152040",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "fingerprint": "ae2c0bca",
+  "prefixFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/b2-lean-back/20260921-045838-0ecfdb-skill3.rec.json",
+  "prefixFrames": 3585,
+  "prefixFaults": 0,
+  "startHash": "77ac55b1dc516983",
+  "outcome": "finished",
+  "maxX": 591.5003799998876,
+  "finishTime": 38.958333333333336,
+  "attempts": 1,
+  "continuationAttempts": 1,
+  "wallMs": 14204.789999999999,
+  "nodeHash": "a6945144313322d8",
+  "playHash": "a6945144313322d8",
+  "mismatches": [],
+  "finished": true,
+  "recordingFile": "docs/evidence/riding-poses/goldens-final/b2-lean-back-rookie.rec.json"
+}

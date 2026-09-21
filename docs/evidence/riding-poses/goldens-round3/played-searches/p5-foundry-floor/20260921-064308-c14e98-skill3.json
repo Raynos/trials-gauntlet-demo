@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "bot",
+  "runId": "20260921-064308-c14e98",
+  "startedAt": "2026-09-21T11:43:08.269Z",
+  "wallMs": 108279,
+  "git": "2dece1ce",
+  "srcFingerprint": "1255af7f",
+  "node": "v24.18.1",
+  "physics": "bikePhysicsFactory-v2",
+  "bike": "rookie",
+  "trackId": "p5-foundry-floor",
+  "seed": 1610333913,
+  "physicsHz": 120,
+  "skill": 3,
+  "config": {
+    "width": 32,
+    "depth": 32,
+    "commit": 1,
+    "budgetMs": 4000,
+    "cells": [
+      0.25,
+      0.5,
+      0.1
+    ]
+  },
+  "weights": {
+    "progress": 1,
+    "speed": 0.15,
+    "upright": 0.5,
+    "airPitch": 0.3,
+    "checkpoint": 50,
+    "finish": 1000000,
+    "fault": -1000000
+  },
+  "outcome": "finished",
+  "maxX": 441.87571027153456,
+  "progress": 0.9984820459648323,
+  "firstBlocker": null,
+  "attempts": 1,
+  "faults": [],
+  "faultsByCheckpoint": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "finishTime": 32.3,
+  "segmentFinishTime": 32.3,
+  "simSeconds": 32.3,
+  "ticks": 3876,
+  "rewinds": 0,
+  "search": {
+    "plans": 171,
+    "expandedTotal": 1344853,
+    "ticksSimulated": 20174947,
+    "planWallMs": {
+      "p50": 596.2732499999984,
+      "p95": 891.7900420000005,
+      "max": 1188.2604999999967
+    }
+  },
+  "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/p5-foundry-floor/20260921-064308-c14e98-skill3.rec.json",
+  "nodeHash": "7ca27d25e39588bb",
+  "playReplayDivergence": null,
+  "browserHash": null,
+  "browserVerified": null
+}

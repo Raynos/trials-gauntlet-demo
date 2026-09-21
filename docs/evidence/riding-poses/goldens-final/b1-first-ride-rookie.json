@@ -1,0 +1,18 @@
+{
+  "fingerprint": "ae2c0bca",
+  "prefixFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/b1-first-ride/20260921-045831-063b95-skill3.rec.json",
+  "prefixFrames": 4080,
+  "prefixFaults": 0,
+  "startHash": "b700b377dae8e2ee",
+  "outcome": "finished",
+  "maxX": 582.2716977774272,
+  "finishTime": 40.59166666666667,
+  "attempts": 1,
+  "continuationAttempts": 1,
+  "wallMs": 5829.070167,
+  "nodeHash": "277f7a403482c05b",
+  "playHash": "277f7a403482c05b",
+  "mismatches": [],
+  "finished": true,
+  "recordingFile": "docs/evidence/riding-poses/goldens-final/b1-first-ride-rookie.rec.json"
+}

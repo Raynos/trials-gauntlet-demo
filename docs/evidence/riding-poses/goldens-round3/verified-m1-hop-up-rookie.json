@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/m1-hop-up/bot-3.json",
+      "sha256": "0606527563b270b064dbb979d891a71cb87d13f10b8b443e1602889565f3d4b8",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "ad425584d6a03ae0",
+      "browserHash": "ad425584d6a03ae0",
+      "nodeFinish": 33.325,
+      "browserFinish": 33.325,
+      "nodeRunTime": 33.325,
+      "browserRunTime": 33.325,
+      "nodeRunTimeBits": "9a99999999a94040",
+      "browserRunTimeBits": "9a99999999a94040",
+      "nodeFinishBits": "9a99999999a94040",
+      "browserFinishBits": "9a99999999a94040",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/lab-physics-test/bot-3.json",
+      "sha256": "abf5c48b72e3a3a8cf415b394caba5923ce198c1e3ec4ca389442fd1cbb855b8",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "4bf50715abb0dd3a",
+      "browserHash": "4bf50715abb0dd3a",
+      "nodeFinish": 8.083333333333334,
+      "browserFinish": 8.083333333333334,
+      "nodeRunTime": 8.083333333333334,
+      "browserRunTime": 8.083333333333334,
+      "nodeRunTimeBits": "abaaaaaaaa2a2040",
+      "browserRunTimeBits": "abaaaaaaaa2a2040",
+      "nodeFinishBits": "abaaaaaaaa2a2040",
+      "browserFinishBits": "abaaaaaaaa2a2040",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

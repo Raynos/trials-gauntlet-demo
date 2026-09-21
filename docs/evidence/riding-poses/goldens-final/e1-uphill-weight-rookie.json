@@ -1,0 +1,18 @@
+{
+  "fingerprint": "ae2c0bca",
+  "prefixFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/e1-uphill-weight/20260921-050039-2bceb3-skill3.rec.json",
+  "prefixFrames": 3945,
+  "prefixFaults": 0,
+  "startHash": "485fa69da7fbb1dd",
+  "outcome": "finished",
+  "maxX": 543.2425301100892,
+  "finishTime": 44.225,
+  "attempts": 1,
+  "continuationAttempts": 1,
+  "wallMs": 17512.79225,
+  "nodeHash": "96cf8272b01e1f10",
+  "playHash": "96cf8272b01e1f10",
+  "mismatches": [],
+  "finished": true,
+  "recordingFile": "docs/evidence/riding-poses/goldens-final/e1-uphill-weight-rookie.rec.json"
+}

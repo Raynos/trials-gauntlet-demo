@@ -1,0 +1,41 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/b1-first-ride/bot-3.json",
+      "sha256": "8a2eee9ad7ee8cd94256ae0270db1e2c86cbbbbbb1b795df5e6f3dc2257298b9",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "d908ddcb5761c89d",
+      "browserHash": "d908ddcb5761c89d",
+      "nodeFinish": 40.391666666666666,
+      "browserFinish": 40.391666666666666,
+      "nodeRunTime": 40.391666666666666,
+      "browserRunTime": 40.391666666666666,
+      "nodeRunTimeBits": "2222222222324440",
+      "browserRunTimeBits": "2222222222324440",
+      "nodeFinishBits": "2222222222324440",
+      "browserFinishBits": "2222222222324440",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    },
+    {
+      "file": "harness/inputs/b2-lean-back/bot-3.json",
+      "sha256": "86298bade858a4ae589587ce59c8090d9b16dab1c6d10c34c9b424427009e1e3",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "7712e6d466ccf102",
+      "browserHash": "7712e6d466ccf102",
+      "nodeFinish": 39.475,
+      "browserFinish": 39.475,
+      "nodeRunTime": 39.475,
+      "browserRunTime": 39.475,
+      "nodeRunTimeBits": "cdccccccccbc4340",
+      "browserRunTimeBits": "cdccccccccbc4340",
+      "nodeFinishBits": "cdccccccccbc4340",
+      "browserFinishBits": "cdccccccccbc4340",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

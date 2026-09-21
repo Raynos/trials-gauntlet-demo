@@ -1,0 +1,29 @@
+{
+  "file": "p4-night-circuit/bot-3-pro.json",
+  "finished": true,
+  "riding": 3851,
+  "overDemand": 1009,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.43073826603473053,
+  "maxHipX": 0.23580307034401748,
+  "maxLeg": 0.8699736458494354,
+  "maxArm": 0.5740010305785345,
+  "outCom": 172,
+  "maxCom": 0.43406318456140336,
+  "recovered": 714,
+  "outRecovered": 0,
+  "maxComRecovered": 0.025526393064405538,
+  "maxPsiRecovered": 0.08216585726198622,
+  "longestExcursion": 6,
+  "longestExcursionAt": 1996,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 714,
+    "bad": []
+  },
+  "selected": []
+}

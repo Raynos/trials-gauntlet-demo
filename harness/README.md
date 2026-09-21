@@ -1,12 +1,18 @@
 # Headless harness
 
-Drives the game in headless Chromium (SwiftShader WebGL2, no GPU, no window)
+Drives the game in headless Chromium (SwiftShader WebGL2 by default, no window)
 through `window.__trials`, the in-page test hook, and drives the same physics
 directly in node (`lib/sim.ts`) for search. Nothing here uses a real clock:
 the harness owns every physics tick and every rendered frame.
 
 The metric is **attempts-to-clear and restart latency, from a bot and from a
 stranger** (AGENTS.md). Everything below produces numbers or clips for that.
+
+On macOS, `TRIALS_BROWSER_BACKEND=metal pnpm harness:gate --quiet-timing`
+uses headless hardware rendering and the existing hardware ship limits. The
+launcher verifies the actual Metal renderer and records its identity; it never
+silently substitutes software. Omit the variable for portable SwiftShader runs.
+Retain software failures separately when comparing the two backends.
 
 ## Commands
 

@@ -1,0 +1,29 @@
+{
+  "file": "e3-stairway/bot-3.json",
+  "finished": true,
+  "riding": 4734,
+  "overDemand": 1214,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.49670303779390157,
+  "maxHipX": 0.12956400310241042,
+  "maxLeg": 0.8591096228187857,
+  "maxArm": 0.5739226093980011,
+  "outCom": 269,
+  "maxCom": 0.3204302036927053,
+  "recovered": 486,
+  "outRecovered": 0,
+  "maxComRecovered": 0.08934970580637555,
+  "maxPsiRecovered": 0.08215426028412365,
+  "longestExcursion": 0,
+  "longestExcursionAt": -1,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 445,
+    "bad": []
+  },
+  "selected": []
+}

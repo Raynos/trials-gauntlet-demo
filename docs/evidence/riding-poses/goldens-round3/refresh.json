@@ -1,0 +1,389 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/b1-first-ride/bot-3.json",
+      "finished": false,
+      "faults": 14,
+      "hash": "2fe4c9380f34bb74",
+      "runTime": 40.59166666666667,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/b1-first-ride/bot-3-pro.json",
+      "finished": false,
+      "faults": 5,
+      "hash": "9a56efe165b637de",
+      "runTime": 37.9,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/b2-lean-back/bot-3.json",
+      "finished": false,
+      "faults": 12,
+      "hash": "c202ce58b4db0d65",
+      "runTime": 38.958333333333336,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/b2-lean-back/bot-3-pro.json",
+      "finished": false,
+      "faults": 8,
+      "hash": "5e56cce1a1b497ed",
+      "runTime": 36.325,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/b3-kicker-row/bot-3.json",
+      "finished": false,
+      "faults": 10,
+      "hash": "7308a055eb117b52",
+      "runTime": 32.44166666666667,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/b3-kicker-row/bot-3-pro.json",
+      "finished": false,
+      "faults": 11,
+      "hash": "b31e3d132a90742b",
+      "runTime": 36.333333333333336,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/e1-uphill-weight/bot-3.json",
+      "finished": false,
+      "faults": 10,
+      "hash": "6172444e9ba73d3e",
+      "runTime": 44.225,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/e1-uphill-weight/bot-3-pro.json",
+      "finished": false,
+      "faults": 10,
+      "hash": "41c9d10cf9c11a5c",
+      "runTime": 41.858333333333334,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/e2-rear-wheel-first/bot-3.json",
+      "finished": false,
+      "faults": 9,
+      "hash": "108592b07e9b4870",
+      "runTime": 43.49166666666667,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/e2-rear-wheel-first/bot-3-pro.json",
+      "finished": false,
+      "faults": 14,
+      "hash": "d34718ebf69b3e9f",
+      "runTime": 39.69166666666667,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/e3-stairway/bot-3.json",
+      "finished": false,
+      "faults": 11,
+      "hash": "5f79a210b25cbe4e",
+      "runTime": 39.225,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/e3-stairway/bot-3-pro.json",
+      "finished": false,
+      "faults": 10,
+      "hash": "f8ee679644abdbed",
+      "runTime": 36.025,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/flat-test/bot-3.json",
+      "finished": true,
+      "faults": 0,
+      "hash": "d6c410b216914469",
+      "runTime": 8.591666666666667,
+      "finishTime": 8.591666666666667
+    },
+    {
+      "file": "harness/inputs/flat-test/bot-3-pro.json",
+      "finished": true,
+      "faults": 0,
+      "hash": "34d6c6fb33ceb61d",
+      "runTime": 8.041666666666666,
+      "finishTime": 8.041666666666666
+    },
+    {
+      "file": "harness/inputs/gap-test/bot-3.json",
+      "finished": true,
+      "faults": 0,
+      "hash": "1ac5128a16d7231f",
+      "runTime": 5.65,
+      "finishTime": 5.65
+    },
+    {
+      "file": "harness/inputs/gap-test/bot-3-pro.json",
+      "finished": true,
+      "faults": 0,
+      "hash": "e0ff126e8518f235",
+      "runTime": 5.341666666666667,
+      "finishTime": 5.341666666666667
+    },
+    {
+      "file": "harness/inputs/h1-wheelie-wire/bot-3.json",
+      "finished": false,
+      "faults": 11,
+      "hash": "57bddc7970ca5f3a",
+      "runTime": 45.416666666666664,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/h1-wheelie-wire/bot-3-pro.json",
+      "finished": false,
+      "faults": 13,
+      "hash": "33909ae1f101ef3d",
+      "runTime": 46.541666666666664,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/h2-gap-chain/bot-3.json",
+      "finished": false,
+      "faults": 14,
+      "hash": "f9a56e5ee6953aa8",
+      "runTime": 46.583333333333336,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/h2-gap-chain/bot-3-pro.json",
+      "finished": false,
+      "faults": 16,
+      "hash": "b73b71e91a1d4c54",
+      "runTime": 42.96666666666667,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/h3-fire-line/bot-3.json",
+      "finished": false,
+      "faults": 11,
+      "hash": "23f7476c3330c487",
+      "runTime": 47.06666666666667,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/h3-fire-line/bot-3-pro.json",
+      "finished": false,
+      "faults": 12,
+      "hash": "67956ef325a1f322",
+      "runTime": 42.49166666666667,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/lab-flat-200/bot-3.json",
+      "finished": true,
+      "faults": 0,
+      "hash": "80081045fa834b92",
+      "runTime": 12.625,
+      "finishTime": 12.625
+    },
+    {
+      "file": "harness/inputs/lab-flat-200/bot-3-pro.json",
+      "finished": true,
+      "faults": 0,
+      "hash": "5de61cd6d537b01d",
+      "runTime": 11.9,
+      "finishTime": 11.9
+    },
+    {
+      "file": "harness/inputs/lab-physics-test/bot-3.json",
+      "finished": true,
+      "faults": 0,
+      "hash": "4bf50715abb0dd3a",
+      "runTime": 8.083333333333334,
+      "finishTime": 8.083333333333334
+    },
+    {
+      "file": "harness/inputs/lab-physics-test/bot-3-pro.json",
+      "finished": true,
+      "faults": 0,
+      "hash": "475ec8597f9eb619",
+      "runTime": 7.533333333333333,
+      "finishTime": 7.533333333333333
+    },
+    {
+      "file": "harness/inputs/m1-hop-up/bot-3.json",
+      "finished": false,
+      "faults": 9,
+      "hash": "ce3022dae4f871d2",
+      "runTime": 34,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/m1-hop-up/bot-3-pro.json",
+      "finished": false,
+      "faults": 10,
+      "hash": "ceef388b0ea6025b",
+      "runTime": 31.3,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/m2-drum-roll/bot-3.json",
+      "finished": false,
+      "faults": 12,
+      "hash": "baf61ee256478875",
+      "runTime": 39.94166666666667,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/m2-drum-roll/bot-3-pro.json",
+      "finished": false,
+      "faults": 10,
+      "hash": "5284a427ea508585",
+      "runTime": 36.375,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/m3-see-saw/bot-3.json",
+      "finished": false,
+      "faults": 10,
+      "hash": "f463f66fc0dd7acd",
+      "runTime": 40.016666666666666,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/m3-see-saw/bot-3-pro.json",
+      "finished": false,
+      "faults": 10,
+      "hash": "9984d656a51ae7bf",
+      "runTime": 38.11666666666667,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p1-container-yard/bot-3.json",
+      "finished": false,
+      "faults": 9,
+      "hash": "12c5a01b1fc69388",
+      "runTime": 35.766666666666666,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p1-container-yard/bot-3-pro.json",
+      "finished": false,
+      "faults": 9,
+      "hash": "dcc3ce66a62c3305",
+      "runTime": 32.958333333333336,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p2-canyon-run/bot-3.json",
+      "finished": false,
+      "faults": 9,
+      "hash": "d1fe32dbb37c4c63",
+      "runTime": 34.325,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p2-canyon-run/bot-3-pro.json",
+      "finished": false,
+      "faults": 7,
+      "hash": "706f3d4f2d00d45e",
+      "runTime": 31.95,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p3-snow-line/bot-3.json",
+      "finished": false,
+      "faults": 8,
+      "hash": "590029ee1a318430",
+      "runTime": 34.325,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p3-snow-line/bot-3-pro.json",
+      "finished": false,
+      "faults": 6,
+      "hash": "14ea665d2f5c0300",
+      "runTime": 37.108333333333334,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p4-night-circuit/bot-3.json",
+      "finished": false,
+      "faults": 9,
+      "hash": "b42739dd34a0141d",
+      "runTime": 34.53333333333333,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p4-night-circuit/bot-3-pro.json",
+      "finished": false,
+      "faults": 13,
+      "hash": "ea946e68dcf2ca8d",
+      "runTime": 35.766666666666666,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p5-foundry-floor/bot-3.json",
+      "finished": false,
+      "faults": 7,
+      "hash": "1dae46c179b3d593",
+      "runTime": 31.466666666666665,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/p5-foundry-floor/bot-3-pro.json",
+      "finished": false,
+      "faults": 6,
+      "hash": "2568e3ffb3bb306f",
+      "runTime": 29.225,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/x1-vertical-limit/bot-3.json",
+      "finished": false,
+      "faults": 15,
+      "hash": "c129bc7fd4196913",
+      "runTime": 55.55,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/x1-vertical-limit/bot-3-pro.json",
+      "finished": false,
+      "faults": 17,
+      "hash": "bdad6ca279e0a9d9",
+      "runTime": 51.55833333333333,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/x2-pipe-dream/bot-3.json",
+      "finished": false,
+      "faults": 13,
+      "hash": "4ddb3e216e52ff3c",
+      "runTime": 42.50833333333333,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/x2-pipe-dream/bot-3-pro.json",
+      "finished": false,
+      "faults": 14,
+      "hash": "9eb88f97c291ebcb",
+      "runTime": 41.18333333333333,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/x3-gauntlet/bot-3.json",
+      "finished": false,
+      "faults": 12,
+      "hash": "b0c04e0778e54c7a",
+      "runTime": 49.016666666666666,
+      "finishTime": null
+    },
+    {
+      "file": "harness/inputs/x3-gauntlet/bot-3-pro.json",
+      "finished": false,
+      "faults": 12,
+      "hash": "0222b1ad0103cb7b",
+      "runTime": 43.4,
+      "finishTime": null
+    }
+  ]
+}

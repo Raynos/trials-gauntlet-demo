@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "bot",
+  "runId": "20260921-065027-6b5eef",
+  "startedAt": "2026-09-21T11:50:27.188Z",
+  "wallMs": 108729,
+  "git": "2dece1ce",
+  "srcFingerprint": "1255af7f",
+  "node": "v24.18.1",
+  "physics": "bikePhysicsFactory-v2",
+  "bike": "pro",
+  "trackId": "p4-night-circuit",
+  "seed": 1052590580,
+  "physicsHz": 120,
+  "skill": 3,
+  "config": {
+    "width": 32,
+    "depth": 32,
+    "commit": 1,
+    "budgetMs": 4000,
+    "cells": [
+      0.25,
+      0.5,
+      0.1
+    ]
+  },
+  "weights": {
+    "progress": 1,
+    "speed": 0.15,
+    "upright": 0.5,
+    "airPitch": 0.3,
+    "checkpoint": 50,
+    "finish": 1000000,
+    "fault": -1000000
+  },
+  "outcome": "finished",
+  "maxX": 497.60405255773424,
+  "progress": 0.9988037987911165,
+  "firstBlocker": null,
+  "attempts": 1,
+  "faults": [],
+  "faultsByCheckpoint": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "finishTime": 32.1,
+  "segmentFinishTime": 32.1,
+  "simSeconds": 32.1,
+  "ticks": 3852,
+  "rewinds": 0,
+  "search": {
+    "plans": 181,
+    "expandedTotal": 1512367,
+    "ticksSimulated": 22689123,
+    "planWallMs": {
+      "p50": 589.4162499999948,
+      "p95": 849.1274580000027,
+      "max": 963.6278750000056
+    }
+  },
+  "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/p4-night-circuit/20260921-065027-6b5eef-skill3.rec.json",
+  "nodeHash": "d48b66c3502e8fcf",
+  "playReplayDivergence": null,
+  "browserHash": null,
+  "browserVerified": null
+}

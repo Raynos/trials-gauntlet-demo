@@ -1,0 +1,22 @@
+2026-09-21T11:15:37.741Z #1 start
+2026-09-21T11:15:42.736Z #2 play "g40"
+2026-09-21T11:15:42.753Z #2 -> {"attempt":1,"slots":"g40","slotsPlayed":40,"slotsRequested":40,"before":{"x":0.59,"vx":0,"angle_deg":1.4},"after":{"x":49.03,"vx":15.06,"angle_deg":-4.1},"events":[],"checkpoint":-1,"grounded":false,"faults":0,"runTime":5,"distanceToFinish":533.97}
+2026-09-21T11:15:46.378Z #3 play "c12 g28"
+2026-09-21T11:15:46.399Z #3 -> {"attempt":1,"slots":"c12 g28","slotsPlayed":40,"slotsRequested":40,"before":{"x":49.03,"vx":15.06,"angle_deg":-4.1},"after":{"x":109.95,"vx":12.14,"angle_deg":5.4},"events":[{"t":6.167,"type":"checkpoint","index":0}],"checkpoint":0,"grounded":false,"faults":0,"runTime":10,"distanceToFinish":473.05}
+2026-09-21T11:15:49.704Z #4 play "g16 c16 g8"
+2026-09-21T11:15:49.721Z #4 -> {"attempt":1,"slots":"g16 c16 g8","slotsPlayed":40,"slotsRequested":40,"before":{"x":109.95,"vx":12.14,"angle_deg":5.4},"after":{"x":173.07,"vx":11.23,"angle_deg":4.9},"events":[],"checkpoint":0,"grounded":true,"faults":0,"runTime":15,"distanceToFinish":409.93}
+2026-09-21T11:15:55.465Z #5 play "g40"
+2026-09-21T11:15:55.483Z #5 -> {"attempt":1,"slots":"g40","slotsPlayed":40,"slotsRequested":40,"before":{"x":173.07,"vx":11.23,"angle_deg":4.9},"after":{"x":239.82,"vx":16.12,"angle_deg":3.8},"events":[{"t":19.692,"type":"checkpoint","index":1}],"checkpoint":1,"grounded":true,"faults":0,"runTime":20,"distanceToFinish":343.18}
+2026-09-21T11:15:59.062Z #6 play "g20 c20"
+2026-09-21T11:15:59.081Z #6 -> {"attempt":1,"slots":"g20 c20","slotsPlayed":40,"slotsRequested":40,"before":{"x":239.82,"vx":16.12,"angle_deg":3.8},"after":{"x":312.54,"vx":9.25,"angle_deg":2.3},"events":[],"checkpoint":1,"grounded":true,"faults":0,"runTime":25,"distanceToFinish":270.46}
+2026-09-21T11:16:03.292Z #7 play "g40"
+2026-09-21T11:16:03.317Z #7 -> {"attempt":1,"slots":"g40","slotsPlayed":40,"slotsRequested":40,"before":{"x":312.54,"vx":9.25,"angle_deg":2.3},"after":{"x":374.3,"vx":14.86,"angle_deg":5.3},"events":[],"checkpoint":1,"grounded":true,"faults":0,"runTime":30,"distanceToFinish":208.7}
+2026-09-21T11:16:09.950Z #8 play "g40"
+2026-09-21T11:16:09.987Z #8 -> {"attempt":1,"slots":"g40","slotsPlayed":40,"slotsRequested":40,"before":{"x":374.3,"vx":14.86,"angle_deg":5.3},"after":{"x":453.54,"vx":16.46,"angle_deg":4.3},"events":[{"t":32.517,"type":"checkpoint","index":2}],"checkpoint":2,"grounded":true,"faults":0,"runTime":35,"distanceToFinish":129.46}
+2026-09-21T11:16:14.393Z #9 play "c8 b4 g28"
+2026-09-21T11:16:14.412Z #9 -> {"attempt":1,"slots":"c8 b4 g28","slotsPlayed":40,"slotsRequested":40,"before":{"x":453.54,"vx":16.46,"angle_deg":4.3},"after":{"x":516.41,"vx":12.53,"angle_deg":12.5},"events":[],"checkpoint":2,"grounded":true,"faults":0,"runTime":40,"distanceToFinish":66.59}
+2026-09-21T11:16:19.753Z #10 play "g8 c16 g16"
+2026-09-21T11:16:19.771Z #10 -> {"attempt":1,"slots":"g8 c16 g16","slotsPlayed":40,"slotsRequested":40,"before":{"x":516.41,"vx":12.53,"angle_deg":12.5},"after":{"x":571.59,"vx":9.03,"angle_deg":2.3},"events":[],"checkpoint":2,"grounded":false,"faults":0,"runTime":45,"distanceToFinish":11.41}
+2026-09-21T11:16:23.275Z #11 play "g16"
+2026-09-21T11:16:23.292Z #11 -> {"attempt":1,"slots":"g16","slotsPlayed":9,"slotsRequested":16,"before":{"x":571.59,"vx":9.03,"angle_deg":2.3},"after":{"x":600.14,"vx":0.03,"angle_deg":-5.2},"events":[{"t":46.017,"type":"finish"}],"checkpoint":2,"grounded":true,"faults":0,"runTime":46.0167,"distanceToFinish":-17.14,"finished":true,"runOut":{"seconds":2.4,"stoppedAt":600.14,"stopped":true,"frozen":false},"note":"FINISHED at run time 46.0167s (the game then braked you to a stop at x=600.1 m on the run-out, 2.4 s after the line). Call 'done'."}
+2026-09-21T11:16:26.711Z #12 done

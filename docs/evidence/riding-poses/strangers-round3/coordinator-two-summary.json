@@ -1,0 +1,47 @@
+{
+  "sessions": [
+    {
+      "sessionId": "b3-kicker-row-20260921-063235",
+      "attempts": 3,
+      "calls": 22,
+      "exactContinuousFinish": 52.525,
+      "browserReplayExact": true,
+      "sourceFingerprint": "1255af7f",
+      "allFailedAttemptsRetained": true
+    },
+    {
+      "sessionId": "b3-kicker-row-20260921-063438",
+      "attempts": 2,
+      "calls": 26,
+      "exactContinuousFinish": 48.86666666666667,
+      "browserReplayExact": true,
+      "sourceFingerprint": "1255af7f",
+      "allFailedAttemptsRetained": true
+    },
+    {
+      "sessionId": "e1-uphill-weight-20260921-064121",
+      "attempts": 4,
+      "calls": 23,
+      "exactContinuousFinish": 72.625,
+      "browserReplayExact": true,
+      "sourceFingerprint": "1255af7f",
+      "allFailedAttemptsRetained": true
+    },
+    {
+      "sessionId": "e1-uphill-weight-20260921-064306",
+      "attempts": 2,
+      "calls": 21,
+      "exactContinuousFinish": 63.40833333333333,
+      "browserReplayExact": true,
+      "sourceFingerprint": "1255af7f",
+      "allFailedAttemptsRetained": true
+    }
+  ],
+  "remaining": {
+    "e2-rear-wheel-first": 2,
+    "e3-stairway": 2
+  },
+  "activePlayers": [],
+  "sessionsPrestartedForRemaining": [],
+  "codeEdits": false
+}

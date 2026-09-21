@@ -1,0 +1,29 @@
+{
+  "file": "x2-pipe-dream/bot-3-pro.json",
+  "finished": true,
+  "riding": 5014,
+  "overDemand": 1443,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.44376668277247044,
+  "maxHipX": 0.16435520364117415,
+  "maxLeg": 0.8758604116021906,
+  "maxArm": 0.573872646075118,
+  "outCom": 317,
+  "maxCom": 0.5637715313339807,
+  "recovered": 604,
+  "outRecovered": 0,
+  "maxComRecovered": 0.03351623224741109,
+  "maxPsiRecovered": 0.2008112072863167,
+  "longestExcursion": 18,
+  "longestExcursionAt": 2264,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 556,
+    "bad": []
+  },
+  "selected": []
+}

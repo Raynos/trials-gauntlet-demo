@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "gap-test",
   "bike": "rookie",
-  "updatedAt": "2026-09-16T03:59:46.453Z",
+  "updatedAt": "2026-09-21T10:04:39.121Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        5.691666666666666
+        5.65
       ]
     }
   ],
@@ -39,6 +39,7 @@
     "20260915-214049-e50174",
     "20260915-220113-b696b5",
     "20260915-223607-c2b5a2",
-    "20260915-225444-3c7ccf"
+    "20260915-225444-3c7ccf",
+    "20260921-045820-65739a"
   ]
 }

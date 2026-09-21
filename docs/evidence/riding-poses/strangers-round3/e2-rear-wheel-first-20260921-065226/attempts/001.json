@@ -1,0 +1,14 @@
+{
+  "n": 1,
+  "endedBy": "fault",
+  "checkpoint": 3,
+  "x": 522.645,
+  "simTime": 39.7667,
+  "runTime": 39.7667,
+  "wallMs": 211411,
+  "calls": 20,
+  "startTick": 0,
+  "endTick": 4772,
+  "recordingFile": "harness/out/stranger/e2-rear-wheel-first/e2-rear-wheel-first-20260921-065226/attempts/001.rec.json",
+  "reason": "crash"
+}

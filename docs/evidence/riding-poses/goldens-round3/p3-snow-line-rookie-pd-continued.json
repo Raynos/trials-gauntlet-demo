@@ -1,0 +1,18 @@
+{
+  "fingerprint": "1255af7f",
+  "prefixFile": "docs/evidence/riding-poses/qualification-round3/p3-probe/best-prefix.rec.json",
+  "prefixFrames": 2730,
+  "prefixFaults": 0,
+  "startHash": "0f9eadaf77352a35",
+  "outcome": "finished",
+  "maxX": 487.67877024442123,
+  "finishTime": 39.59166666666667,
+  "attempts": 1,
+  "continuationAttempts": 1,
+  "wallMs": 33254.656082999994,
+  "nodeHash": "e32b658b3395b2cc",
+  "playHash": "e32b658b3395b2cc",
+  "mismatches": [],
+  "finished": true,
+  "recordingFile": "docs/evidence/riding-poses/goldens-round3/p3-snow-line-rookie-pd-continued.rec.json"
+}

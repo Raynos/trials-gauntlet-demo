@@ -1,3 +1,5 @@
+import type { MaterialLibrary } from '../../../../src/render/materials/library';
+import type { HeroBike } from '../../../../src/render/bike/bikeModel';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {loadRigAt} from '../../../../src/render/hero/gltfTestUtils';
 import {prepareHero} from '../../../../src/render/hero/lod';
@@ -5,9 +7,9 @@ import {GltfRider} from '../../../../src/render/hero/gltfRider';
 import {FrameBuilder} from '../../../../src/render/frame';
 import {BIKE_GEOMETRY_V2} from '../../../../src/render/hero/assetFrame';
 import * as T from 'three';
-const e=JSON.parse(readFileSync('/tmp/trials-poses-final/race/evidence.json','utf8'));const row=e.trace.find((r:any)=>r.inputTick===404);const state=JSON.parse(row.stateJson);
+const e=JSON.parse(readFileSync('/tmp/trials-poses-final/race/evidence.json','utf8'));const row=e.trace.find((r: {inputTick:number})=>r.inputTick===404);const state=JSON.parse(row.stateJson);
 const g=await loadRigAt(new URL('../../../../public/models/rider-race-bluewhite.glb',import.meta.url),true);await prepareHero(g);
-const frame=new T.Group(),rider=new GltfRider(g,{complete(){}} as any);rider.attach({frame} as any);rider.setLivery('pro');
+const frame=new T.Group(),rider=new GltfRider(g,{complete(){}} as unknown as MaterialLibrary);rider.attach({frame} as unknown as HeroBike);rider.setLivery('pro');
 const f=new FrameBuilder().build(state,1),o=BIKE_GEOMETRY_V2.chassisToAxle,c=Math.cos(f.bikeAngle),s=Math.sin(f.bikeAngle);frame.position.set(f.bikeX+o.x*c-o.y*s,f.bikeY+o.x*s+o.y*c,0);frame.rotation.z=f.bikeAngle;frame.updateMatrixWorld(true);rider.update(f);frame.updateMatrixWorld(true);
 const mesh=frame.getObjectByName('rider_body') as T.SkinnedMesh;mesh.skeleton.update();
 const p=mesh.geometry.getAttribute('position'),n=mesh.geometry.getAttribute('normal'),ix=mesh.geometry.index!,si=mesh.geometry.getAttribute('skinIndex'),sw=mesh.geometry.getAttribute('skinWeight');const pts=[],norms=[];

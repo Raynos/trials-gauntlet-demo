@@ -1,0 +1,41 @@
+{
+  "fingerprint": "ae2c0bca",
+  "rows": [
+    {
+      "file": "harness/inputs/b1-first-ride/stranger-b1-first-ride-20260921-051433.json",
+      "sha256": "023b3d668c2bec036c540a05a08b622d3bfa69987ac097918279b0910bc43d5c",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "fe3ff59b10d657b2",
+      "browserHash": "fe3ff59b10d657b2",
+      "nodeFinish": 46.333333333333336,
+      "browserFinish": 46.333333333333336,
+      "nodeRunTime": 46.333333333333336,
+      "browserRunTime": 46.333333333333336,
+      "nodeRunTimeBits": "abaaaaaaaa2a4740",
+      "browserRunTimeBits": "abaaaaaaaa2a4740",
+      "nodeFinishBits": "abaaaaaaaa2a4740",
+      "browserFinishBits": "abaaaaaaaa2a4740",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    },
+    {
+      "file": "harness/inputs/b1-first-ride/stranger-b1-first-ride-20260921-051948.json",
+      "sha256": "9a30048921251a07a608239fd807137db4b70d4dd991ec40c0f2edbc822d35a5",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "4cb8fc61d9d14221",
+      "browserHash": "4cb8fc61d9d14221",
+      "nodeFinish": 47.925,
+      "browserFinish": 47.925,
+      "nodeRunTime": 47.925,
+      "browserRunTime": 47.925,
+      "nodeRunTimeBits": "6666666666f64740",
+      "browserRunTimeBits": "6666666666f64740",
+      "nodeFinishBits": "6666666666f64740",
+      "browserFinishBits": "6666666666f64740",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

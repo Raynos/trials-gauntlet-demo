@@ -1,0 +1,14 @@
+{
+  "n": 1,
+  "endedBy": "fault",
+  "checkpoint": 1,
+  "x": 279.913,
+  "simTime": 26.6667,
+  "runTime": 26.6667,
+  "wallMs": 27187,
+  "calls": 9,
+  "startTick": 0,
+  "endTick": 3200,
+  "recordingFile": "harness/out/stranger/e1-uphill-weight/e1-uphill-weight-20260921-064121/attempts/001.rec.json",
+  "reason": "crash"
+}

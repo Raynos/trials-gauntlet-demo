@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/x2-pipe-dream/bot-3-pro.json",
+      "sha256": "a9e44fff1368a8164e8b825d291ff0f2c9dbfb50a09f5d6249978dd78e7df7b3",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "d7895fd28cbf030c",
+      "browserHash": "d7895fd28cbf030c",
+      "nodeFinish": 41.791666666666664,
+      "browserFinish": 41.791666666666664,
+      "nodeRunTime": 41.791666666666664,
+      "browserRunTime": 41.791666666666664,
+      "nodeRunTimeBits": "5555555555e54440",
+      "browserRunTimeBits": "5555555555e54440",
+      "nodeFinishBits": "5555555555e54440",
+      "browserFinishBits": "5555555555e54440",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

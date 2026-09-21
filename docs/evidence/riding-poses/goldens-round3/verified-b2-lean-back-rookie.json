@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/b2-lean-back/bot-3.json",
+      "sha256": "86298bade858a4ae589587ce59c8090d9b16dab1c6d10c34c9b424427009e1e3",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "7712e6d466ccf102",
+      "browserHash": "7712e6d466ccf102",
+      "nodeFinish": 39.475,
+      "browserFinish": 39.475,
+      "nodeRunTime": 39.475,
+      "browserRunTime": 39.475,
+      "nodeRunTimeBits": "cdccccccccbc4340",
+      "browserRunTimeBits": "cdccccccccbc4340",
+      "nodeFinishBits": "cdccccccccbc4340",
+      "browserFinishBits": "cdccccccccbc4340",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

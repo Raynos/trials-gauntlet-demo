@@ -1,0 +1,274 @@
+{
+  "schema": 1,
+  "kind": "stranger-state",
+  "sessionId": "b2-lean-back-20260921-055219",
+  "trackId": "b2-lean-back",
+  "seed": 2,
+  "agent": "pose-b2-fresh-two",
+  "startedAt": "2026-09-21T10:52:19.289Z",
+  "physicsHz": 120,
+  "physics": "bikePhysicsFactory-v2",
+  "calls": 18,
+  "runTicks": 6511,
+  "snapshot": {
+    "v": 1,
+    "f64": "AAAAAACSoEDNzMzMzKwxQAAAAAAAAAhAAAAAAADALUC8FJZL969LPjMzMzMzM+M/vcr9pJzryL+hKPZz6c7iP/8LWoR3GNK/tOn6AZgosj+aED/A6F7jPwAAAAAAAAAAAAAAAAAAAAAAAECbDa3ewQAAANwSAJnBAAAAgj2RoEEAAMBzb+TcQQAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAz6iCfGT+DQD5NeeypvtU/7fk0UhpJg0AcD7K34cPVPwAAAAAAAAAAMzMzMzMz4z8AAAAAAAAAADDLh6nvsay/PZ0SyCx+9zoAAAAAAAAAAAAAAAAAAPA/G+aIQauxHCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACtJaSfvQ4NAlhEDVRo/g0CfaqmGG0mDQNfHjeHtQoNAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACpHN7PbYbePzZJnEvxvtU/qHLtieLD1T8toZo2dyjxPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYIUnl4k0pD+g7vOzsqqUPyoGoF65SqU/SPuWWTuSkb8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKH24XNruZI/AAAAAAAAcDy/NnwIXdODv8xQxejXb3q/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABF04BpqX+3v9OnhK8Ah4TAc9NiWy6hg8Bu3EQwOKrZvwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAl1x3VIgMuT/Q4WNvARG7P4pcd1SIDLk/L61VQFWsnz8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJZ7GmG5p5E/AAAAAAAAwD+SJEmSJEnCP08b6LSBTos/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVOoMVOoO1PxdddNFFF/0/chzHcRzHAUAcx3Ecx3G8PwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "u8": "AQAAAAEBAQEAAAAAAQA=",
+    "counters": {
+      "phase": "finished",
+      "runTicks": 6175,
+      "finishRunTicks": 6175,
+      "faults": 1,
+      "countdownTick": 0,
+      "crashTicks": 0,
+      "holdTicks": 0,
+      "holdFired": false,
+      "restartLatch": false,
+      "resultsTicks": 336,
+      "resultsShown": true,
+      "finishFrozen": false
+    }
+  },
+  "recording": {
+    "header": {
+      "version": 1,
+      "trackId": "b2-lean-back",
+      "seed": 2,
+      "physicsHz": 120,
+      "bike": "rookie",
+      "physics": "v2",
+      "note": "stranger b2-lean-back-20260921-055219 agent=pose-b2-fresh-two bike=rookie physics=v2 src=ae2c0bca"
+    },
+    "runs": [
+      [
+        300,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        30,
+        0,
+        0,
+        -127,
+        0
+      ],
+      [
+        150,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1515,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        105,
+        0,
+        0,
+        -127,
+        0
+      ],
+      [
+        120,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1965,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        85,
+        0,
+        0,
+        -127,
+        0
+      ],
+      [
+        120,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        885,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        15,
+        0,
+        0,
+        -127,
+        0
+      ],
+      [
+        180,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        705,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        336,
+        0,
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  "attempts": [
+    {
+      "n": 1,
+      "endedBy": "fault",
+      "checkpoint": 2,
+      "x": 491.508,
+      "simTime": 35.5833,
+      "runTime": 35.5833,
+      "wallMs": 183215,
+      "calls": 13,
+      "startTick": 0,
+      "endTick": 4270,
+      "recordingFile": "harness/out/stranger/b2-lean-back/b2-lean-back-20260921-055219/attempts/001.rec.json",
+      "reason": "crash"
+    }
+  ],
+  "events": [
+    {
+      "event": {
+        "type": "checkpoint",
+        "index": 0,
+        "tick": 753,
+        "time": 6.275
+      },
+      "runTick": 754,
+      "checkpoint": 0
+    },
+    {
+      "event": {
+        "type": "checkpoint",
+        "index": 1,
+        "tick": 2412,
+        "time": 20.1
+      },
+      "runTick": 2413,
+      "checkpoint": 1
+    },
+    {
+      "event": {
+        "type": "checkpoint",
+        "index": 2,
+        "tick": 3519,
+        "time": 29.325
+      },
+      "runTick": 3520,
+      "checkpoint": 2
+    },
+    {
+      "event": {
+        "type": "fault",
+        "reason": "crash",
+        "tick": 4270,
+        "time": 35.583333333333336
+      },
+      "runTick": 4270,
+      "checkpoint": 2
+    },
+    {
+      "event": {
+        "type": "restart",
+        "checkpoint": 2,
+        "tick": 0
+      },
+      "runTick": 4390,
+      "checkpoint": 2
+    },
+    {
+      "event": {
+        "type": "checkpoint",
+        "index": 3,
+        "tick": 1071,
+        "time": 8.925
+      },
+      "runTick": 5462,
+      "checkpoint": 3
+    },
+    {
+      "event": {
+        "type": "finish",
+        "tick": 1785,
+        "time": 14.875
+      },
+      "runTick": 6175,
+      "checkpoint": 3
+    }
+  ],
+  "cleared": true,
+  "finishTime": 51.4583,
+  "firstCheckpointCalls": 5,
+  "forcedResets": 0,
+  "attemptStartTick": 4390,
+  "budget": {
+    "calls": 150,
+    "minutes": 25
+  },
+  "log": [
+    "2026-09-21T10:52:19.315Z #1 start",
+    "2026-09-21T10:54:42.706Z #2 look",
+    "2026-09-21T10:54:45.914Z #3 play \"g20\"",
+    "2026-09-21T10:54:45.924Z #3 -> {\"attempt\":1,\"slots\":\"g20\",\"slotsPlayed\":20,\"slotsRequested\":20,\"before\":{\"x\":0.59,\"vx\":0,\"angle_deg\":1.4},\"after\":{\"x\":15.96,\"vx\":12,\"angle_deg\":4.7},\"events\":[],\"checkpoint\":-1,\"grounded\":true,\"faults\":0,\"runTime\":2.5,\"distanceToFinish\":576.24}",
+    "2026-09-21T10:54:49.811Z #4 play \"lb2 c10 g12\"",
+    "2026-09-21T10:54:49.822Z #4 -> {\"attempt\":1,\"slots\":\"lb2 c10 g12\",\"slotsPlayed\":24,\"slotsRequested\":24,\"before\":{\"x\":15.96,\"vx\":12,\"angle_deg\":4.7},\"after\":{\"x\":44.29,\"vx\":11.37,\"angle_deg\":6.1},\"events\":[],\"checkpoint\":-1,\"grounded\":true,\"faults\":0,\"runTime\":5.5,\"distanceToFinish\":547.91}",
+    "2026-09-21T10:54:53.775Z #5 play \"g24\"",
+    "2026-09-21T10:54:53.787Z #5 -> {\"attempt\":1,\"slots\":\"g24\",\"slotsPlayed\":24,\"slotsRequested\":24,\"before\":{\"x\":44.29,\"vx\":11.37,\"angle_deg\":6.1},\"after\":{\"x\":88.1,\"vx\":16.83,\"angle_deg\":5.5},\"events\":[{\"t\":6.283,\"type\":\"checkpoint\",\"index\":0}],\"checkpoint\":0,\"grounded\":true,\"faults\":0,\"runTime\":8.5,\"distanceToFinish\":504.1}",
+    "2026-09-21T10:54:57.128Z #6 play \"g24\"",
+    "2026-09-21T10:54:57.140Z #6 -> {\"attempt\":1,\"slots\":\"g24\",\"slotsPlayed\":24,\"slotsRequested\":24,\"before\":{\"x\":88.1,\"vx\":16.83,\"angle_deg\":5.5},\"after\":{\"x\":139.83,\"vx\":16.18,\"angle_deg\":-5.5},\"events\":[],\"checkpoint\":0,\"grounded\":false,\"faults\":0,\"runTime\":11.5,\"distanceToFinish\":452.37}",
+    "2026-09-21T10:55:00.379Z #7 play \"g36\"",
+    "2026-09-21T10:55:00.394Z #7 -> {\"attempt\":1,\"slots\":\"g36\",\"slotsPlayed\":36,\"slotsRequested\":36,\"before\":{\"x\":139.83,\"vx\":16.18,\"angle_deg\":-5.5},\"after\":{\"x\":205.31,\"vx\":13.83,\"angle_deg\":9.9},\"events\":[],\"checkpoint\":0,\"grounded\":true,\"faults\":0,\"runTime\":16,\"distanceToFinish\":386.89}",
+    "2026-09-21T10:55:04.050Z #8 play \"g5 lb7 c8 g15\"",
+    "2026-09-21T10:55:04.066Z #8 -> {\"attempt\":1,\"slots\":\"g5 lb7 c8 g15\",\"slotsPlayed\":35,\"slotsRequested\":35,\"before\":{\"x\":205.31,\"vx\":13.83,\"angle_deg\":9.9},\"after\":{\"x\":256.52,\"vx\":13.01,\"angle_deg\":4.4},\"events\":[{\"t\":20.108,\"type\":\"checkpoint\",\"index\":1}],\"checkpoint\":1,\"grounded\":true,\"faults\":0,\"runTime\":20.375,\"distanceToFinish\":335.68}",
+    "2026-09-21T10:55:07.080Z #9 play \"g40\"",
+    "2026-09-21T10:55:07.096Z #9 -> {\"attempt\":1,\"slots\":\"g40\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":256.52,\"vx\":13.01,\"angle_deg\":4.4},\"after\":{\"x\":332.8,\"vx\":16.24,\"angle_deg\":9.7},\"events\":[],\"checkpoint\":1,\"grounded\":true,\"faults\":0,\"runTime\":25.375,\"distanceToFinish\":259.4}",
+    "2026-09-21T10:55:12.973Z #10 play \"g32\"",
+    "2026-09-21T10:55:12.987Z #10 -> {\"attempt\":1,\"slots\":\"g32\",\"slotsPlayed\":32,\"slotsRequested\":32,\"before\":{\"x\":332.8,\"vx\":16.24,\"angle_deg\":9.7},\"after\":{\"x\":395.16,\"vx\":14.32,\"angle_deg\":5.2},\"events\":[{\"t\":29.333,\"type\":\"checkpoint\",\"index\":2}],\"checkpoint\":2,\"grounded\":true,\"faults\":0,\"runTime\":29.375,\"distanceToFinish\":197.04}",
+    "2026-09-21T10:55:16.060Z #11 play \"g32\"",
+    "2026-09-21T10:55:16.073Z #11 -> {\"attempt\":1,\"slots\":\"g32\",\"slotsPlayed\":32,\"slotsRequested\":32,\"before\":{\"x\":395.16,\"vx\":14.32,\"angle_deg\":5.2},\"after\":{\"x\":458.51,\"vx\":15.82,\"angle_deg\":16.1},\"events\":[],\"checkpoint\":2,\"grounded\":true,\"faults\":0,\"runTime\":33.375,\"distanceToFinish\":133.69}",
+    "2026-09-21T10:55:19.028Z #12 play \"g12\"",
+    "2026-09-21T10:55:19.037Z #12 -> {\"attempt\":1,\"slots\":\"g12\",\"slotsPlayed\":12,\"slotsRequested\":12,\"before\":{\"x\":458.51,\"vx\":15.82,\"angle_deg\":16.1},\"after\":{\"x\":481.19,\"vx\":14.85,\"angle_deg\":12.6},\"events\":[],\"checkpoint\":2,\"grounded\":true,\"faults\":0,\"runTime\":34.875,\"distanceToFinish\":111.01}",
+    "2026-09-21T10:55:22.522Z #13 play \"lb7 c9 g20\"",
+    "2026-09-21T10:55:22.536Z #13 -> {\"attempt\":1,\"slots\":\"lb7 c9 g20\",\"slotsPlayed\":6,\"slotsRequested\":36,\"before\":{\"x\":481.19,\"vx\":14.85,\"angle_deg\":12.6},\"after\":{\"x\":396.29,\"vx\":0,\"angle_deg\":1.4},\"events\":[{\"t\":35.583,\"type\":\"fault\",\"reason\":\"crash\"},{\"t\":36.583,\"type\":\"respawn\",\"checkpoint\":2}],\"checkpoint\":2,\"grounded\":false,\"faults\":1,\"runTime\":36.583,\"distanceToFinish\":195.91,\"faulted\":{\"reason\":\"crash\",\"at\":491.51,\"respawnedAt\":396.29,\"respawnAfterS\":1},\"note\":\"crashed (crash) at x=491.5 after slot 6; the game respawned you 1.0 s later at checkpoint 2 (x=396.3), stationary, facing +x. Remaining 30 slot(s) were NOT played; your next play starts here.\"}",
+    "2026-09-21T10:55:25.992Z #14 play \"g40\"",
+    "2026-09-21T10:55:26.006Z #14 -> {\"attempt\":2,\"slots\":\"g40\",\"slotsPlayed\":40,\"slotsRequested\":40,\"before\":{\"x\":396.29,\"vx\":0,\"angle_deg\":1.4},\"after\":{\"x\":445.67,\"vx\":15.04,\"angle_deg\":1.4},\"events\":[],\"checkpoint\":2,\"grounded\":true,\"faults\":1,\"runTime\":41.583,\"distanceToFinish\":146.53}",
+    "2026-09-21T10:55:29.922Z #15 play \"g19 lb1 c12\"",
+    "2026-09-21T10:55:29.937Z #15 -> {\"attempt\":2,\"slots\":\"g19 lb1 c12\",\"slotsPlayed\":32,\"slotsRequested\":32,\"before\":{\"x\":445.67,\"vx\":15.04,\"angle_deg\":1.4},\"after\":{\"x\":502.34,\"vx\":11.74,\"angle_deg\":0.6},\"events\":[{\"t\":45.517,\"type\":\"checkpoint\",\"index\":3}],\"checkpoint\":3,\"grounded\":true,\"faults\":1,\"runTime\":45.583,\"distanceToFinish\":89.86}",
+    "2026-09-21T10:55:33.112Z #16 play \"g32\"",
+    "2026-09-21T10:55:33.127Z #16 -> {\"attempt\":2,\"slots\":\"g32\",\"slotsPlayed\":32,\"slotsRequested\":32,\"before\":{\"x\":502.34,\"vx\":11.74,\"angle_deg\":0.6},\"after\":{\"x\":562.12,\"vx\":17.98,\"angle_deg\":4.6},\"events\":[],\"checkpoint\":3,\"grounded\":true,\"faults\":1,\"runTime\":49.583,\"distanceToFinish\":30.08}",
+    "2026-09-21T10:55:36.671Z #17 play \"g20\"",
+    "2026-09-21T10:55:36.690Z #17 -> {\"attempt\":2,\"slots\":\"g20\",\"slotsPlayed\":15,\"slotsRequested\":20,\"before\":{\"x\":562.12,\"vx\":17.98,\"angle_deg\":4.6},\"after\":{\"x\":616.49,\"vx\":0.04,\"angle_deg\":-5.3},\"events\":[{\"t\":51.458,\"type\":\"finish\"}],\"checkpoint\":3,\"grounded\":true,\"faults\":1,\"runTime\":51.4583,\"distanceToFinish\":-24.29,\"finished\":true,\"runOut\":{\"seconds\":2.8,\"stoppedAt\":616.49,\"stopped\":true,\"frozen\":false},\"note\":\"FINISHED at run time 51.4583s (the game then braked you to a stop at x=616.5 m on the run-out, 2.8 s after the line). Call 'done'.\"}",
+    "2026-09-21T10:55:40.848Z #18 done"
+  ],
+  "firstCallAt": "2026-09-21T10:52:19.315Z"
+}

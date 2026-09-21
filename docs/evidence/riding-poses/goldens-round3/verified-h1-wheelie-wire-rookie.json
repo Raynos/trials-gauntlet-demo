@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/h1-wheelie-wire/bot-3.json",
+      "sha256": "d0fcfddbab213283f463b5b2cc9bfbb4725853b0fce5faf02bdc93664c7bfc08",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "a6eb4a318074c604",
+      "browserHash": "a6eb4a318074c604",
+      "nodeFinish": 46.36666666666667,
+      "browserFinish": 46.36666666666667,
+      "nodeRunTime": 46.36666666666667,
+      "browserRunTime": 46.36666666666667,
+      "nodeRunTimeBits": "efeeeeeeee2e4740",
+      "browserRunTimeBits": "efeeeeeeee2e4740",
+      "nodeFinishBits": "efeeeeeeee2e4740",
+      "browserFinishBits": "efeeeeeeee2e4740",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

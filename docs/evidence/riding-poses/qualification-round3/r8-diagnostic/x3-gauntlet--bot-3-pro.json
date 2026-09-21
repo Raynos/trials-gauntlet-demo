@@ -1,0 +1,29 @@
+{
+  "file": "x3-gauntlet/bot-3-pro.json",
+  "finished": true,
+  "riding": 5145,
+  "overDemand": 1902,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.45869577988757915,
+  "maxHipX": 0.19461834497944205,
+  "maxLeg": 0.8761065578831546,
+  "maxArm": 0.5737969757255346,
+  "outCom": 479,
+  "maxCom": 0.5401057121480944,
+  "recovered": 336,
+  "outRecovered": 0,
+  "maxComRecovered": 0.025526393064451047,
+  "maxPsiRecovered": 0.03330137950366452,
+  "longestExcursion": 18,
+  "longestExcursionAt": 1520,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 336,
+    "bad": []
+  },
+  "selected": []
+}

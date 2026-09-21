@@ -1,0 +1,29 @@
+{
+  "file": "h1-wheelie-wire/bot-3.json",
+  "finished": true,
+  "riding": 5563,
+  "overDemand": 1250,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.32246180828336013,
+  "maxHipX": 0.25164172641071125,
+  "maxLeg": 0.8791552522418453,
+  "maxArm": 0.573964405597282,
+  "outCom": 322,
+  "maxCom": 0.5446733538755426,
+  "recovered": 1454,
+  "outRecovered": 0,
+  "maxComRecovered": 0.057596389759044596,
+  "maxPsiRecovered": 0.10555059897045799,
+  "longestExcursion": 24,
+  "longestExcursionAt": 1951,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 1328,
+    "bad": []
+  },
+  "selected": []
+}

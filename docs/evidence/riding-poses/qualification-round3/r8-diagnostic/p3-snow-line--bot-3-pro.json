@@ -1,0 +1,31 @@
+{
+  "file": "p3-snow-line/bot-3-pro.json",
+  "finished": true,
+  "riding": 4468,
+  "overDemand": 1355,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.4686236437909749,
+  "maxHipX": 0.19603995228216323,
+  "maxLeg": 0.8744944399630877,
+  "maxArm": 0.5740078236217195,
+  "outCom": 184,
+  "maxCom": 0.563232216252877,
+  "recovered": 454,
+  "outRecovered": 0,
+  "maxComRecovered": 0.034066753176082716,
+  "maxPsiRecovered": 0.06307947439265582,
+  "longestExcursion": 10,
+  "longestExcursionAt": 4096,
+  "faults": [
+    "@1895 sensor"
+  ],
+  "bad": [],
+  "availability": {
+    "recovered": 422,
+    "bad": []
+  },
+  "selected": []
+}

@@ -1,0 +1,29 @@
+{
+  "file": "gap-test/bot-3.json",
+  "finished": true,
+  "riding": 677,
+  "overDemand": 163,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.5104523602664165,
+  "maxHipX": -0.005514881784528192,
+  "maxLeg": 0.8339836693392622,
+  "maxArm": 0.5737811847313206,
+  "outCom": 64,
+  "maxCom": 0.36020383999541405,
+  "recovered": 130,
+  "outRecovered": 0,
+  "maxComRecovered": 0.04901215155130843,
+  "maxPsiRecovered": 0.08507207620890012,
+  "longestExcursion": 7,
+  "longestExcursionAt": 588,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 86,
+    "bad": []
+  },
+  "selected": []
+}

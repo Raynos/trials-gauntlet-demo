@@ -1,0 +1,22 @@
+[
+  {
+    "bike": "rookie",
+    "track": "b3-kicker-row",
+    "tries": 121,
+    "prefixTicks": 889,
+    "faultTick": 958,
+    "totalTicks": 1018,
+    "cause": "thrown",
+    "exactReplay": true
+  },
+  {
+    "bike": "pro",
+    "track": "b3-kicker-row",
+    "tries": 67,
+    "prefixTicks": 577,
+    "faultTick": 636,
+    "totalTicks": 696,
+    "cause": "thrown",
+    "exactReplay": true
+  }
+]

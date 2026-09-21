@@ -1,0 +1,14 @@
+{
+  "n": 1,
+  "endedBy": "fault",
+  "checkpoint": 0,
+  "x": 216.315,
+  "simTime": 17.1833,
+  "runTime": 17.1833,
+  "wallMs": 169052,
+  "calls": 7,
+  "startTick": 0,
+  "endTick": 2062,
+  "recordingFile": "harness/out/stranger/b2-lean-back/b2-lean-back-20260921-062324/attempts/001.rec.json",
+  "reason": "crash"
+}

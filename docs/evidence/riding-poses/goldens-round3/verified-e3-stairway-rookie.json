@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/e3-stairway/bot-3.json",
+      "sha256": "5e98d3095efe1b500b84113a387e2837029adaa47df5085a27fac4565ee5ec85",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "d190435bfa4c43c0",
+      "browserHash": "d190435bfa4c43c0",
+      "nodeFinish": 39.458333333333336,
+      "browserFinish": 39.458333333333336,
+      "nodeRunTime": 39.458333333333336,
+      "browserRunTime": 39.458333333333336,
+      "nodeRunTimeBits": "abaaaaaaaaba4340",
+      "browserRunTimeBits": "abaaaaaaaaba4340",
+      "nodeFinishBits": "abaaaaaaaaba4340",
+      "browserFinishBits": "abaaaaaaaaba4340",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

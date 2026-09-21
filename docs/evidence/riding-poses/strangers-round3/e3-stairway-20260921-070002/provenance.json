@@ -1,0 +1,13 @@
+{
+  "agentPath": "/root/pose_stranger_round3_last/e3_player2",
+  "forkTurns": "none",
+  "briefing": "PROTOCOL.md verbatim plus one track/session/agent naming line",
+  "protocolSha256": "5b2734b9d54777012a04acb91e446d93ac6b88fbd6537e96ef7963adde0e7eb3",
+  "sourceFingerprint": "1255af7f",
+  "recordingSha256": "9ec7a09476b6ca796be86a0972670418116a4aa48376a40a14efb8f7aa362b79",
+  "coordinatorObservedCallsDuringPlay": false,
+  "coordinatorProvidedAdvice": false,
+  "faultToRespawn": [],
+  "restartMetricLimit": "Simulation ticks only; not browser input-to-visible-ready wall latency.",
+  "source": "harness/out/stranger/e3-stairway/e3-stairway-20260921-070002"
+}

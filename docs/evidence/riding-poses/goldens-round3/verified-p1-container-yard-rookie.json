@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/p1-container-yard/bot-3.json",
+      "sha256": "8de78afcfb66b4ad6dfd69ce585439fdd54614ff684186d5ef2184c0bb713dae",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "bdd60ca17bc9c8fa",
+      "browserHash": "bdd60ca17bc9c8fa",
+      "nodeFinish": 35.74166666666667,
+      "browserFinish": 35.74166666666667,
+      "nodeRunTime": 35.74166666666667,
+      "browserRunTime": 35.74166666666667,
+      "nodeRunTimeBits": "efeeeeeeeede4140",
+      "browserRunTimeBits": "efeeeeeeeede4140",
+      "nodeFinishBits": "efeeeeeeeede4140",
+      "browserFinishBits": "efeeeeeeeede4140",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

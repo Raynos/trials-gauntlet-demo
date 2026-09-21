@@ -1,0 +1,29 @@
+{
+  "file": "b3-kicker-row/bot-3-pro.json",
+  "finished": true,
+  "riding": 3755,
+  "overDemand": 1124,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.48236751081719165,
+  "maxHipX": 0.24048020984978147,
+  "maxLeg": 0.877492185389823,
+  "maxArm": 0.5740025739907755,
+  "outCom": 218,
+  "maxCom": 0.552139516255743,
+  "recovered": 388,
+  "outRecovered": 0,
+  "maxComRecovered": 0.025526393064448337,
+  "maxPsiRecovered": 0.07582348824302165,
+  "longestExcursion": 11,
+  "longestExcursionAt": 2481,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 385,
+    "bad": []
+  },
+  "selected": []
+}

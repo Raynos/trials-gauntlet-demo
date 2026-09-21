@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "bot",
+  "runId": "20260921-063927-00fd0f",
+  "startedAt": "2026-09-21T11:39:27.046Z",
+  "wallMs": 97414,
+  "git": "2dece1ce",
+  "srcFingerprint": "1255af7f",
+  "node": "v24.18.1",
+  "physics": "bikePhysicsFactory-v2",
+  "bike": "rookie",
+  "trackId": "p2-canyon-run",
+  "seed": 1374220946,
+  "physicsHz": 120,
+  "skill": 3,
+  "config": {
+    "width": 32,
+    "depth": 32,
+    "commit": 1,
+    "budgetMs": 4000,
+    "cells": [
+      0.25,
+      0.5,
+      0.1
+    ]
+  },
+  "weights": {
+    "progress": 1,
+    "speed": 0.15,
+    "upright": 0.5,
+    "airPitch": 0.3,
+    "checkpoint": 50,
+    "finish": 1000000,
+    "fault": -1000000
+  },
+  "outcome": "finished",
+  "maxX": 492.8644645552157,
+  "progress": 0.9985098552577303,
+  "firstBlocker": null,
+  "attempts": 1,
+  "faults": [],
+  "faultsByCheckpoint": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "finishTime": 34.233333333333334,
+  "segmentFinishTime": 34.233333333333334,
+  "simSeconds": 34.233333333333334,
+  "ticks": 4108,
+  "rewinds": 0,
+  "search": {
+    "plans": 192,
+    "expandedTotal": 1518498,
+    "ticksSimulated": 22781560,
+    "planWallMs": {
+      "p50": 507.9550840000011,
+      "p95": 615.7382079999952,
+      "max": 693.3364579999998
+    }
+  },
+  "recordingFile": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/bot/p2-canyon-run/20260921-063927-00fd0f-skill3.rec.json",
+  "nodeHash": "06c3c5bd1d72e233",
+  "playReplayDivergence": null,
+  "browserHash": null,
+  "browserVerified": null
+}

@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/x1-vertical-limit/bot-3.json",
+      "sha256": "d08394e5bf5a71fe5eb1a8f9faabb39620554491f6540a50a5a238c2123463ce",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "48171414fc402e79",
+      "browserHash": "48171414fc402e79",
+      "nodeFinish": 54.46666666666667,
+      "browserFinish": 54.46666666666667,
+      "nodeRunTime": 54.46666666666667,
+      "browserRunTime": 54.46666666666667,
+      "nodeRunTimeBits": "bcbbbbbbbb3b4b40",
+      "browserRunTimeBits": "bcbbbbbbbb3b4b40",
+      "nodeFinishBits": "bcbbbbbbbb3b4b40",
+      "browserFinishBits": "bcbbbbbbbb3b4b40",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

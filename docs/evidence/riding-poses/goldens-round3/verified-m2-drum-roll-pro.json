@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/m2-drum-roll/bot-3-pro.json",
+      "sha256": "5fa1731cc7ce376064339f967247900c8a7e1cbc02efac1df2f531a23f3881da",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "f4a1c028e586364f",
+      "browserHash": "f4a1c028e586364f",
+      "nodeFinish": 10.025,
+      "browserFinish": 10.025,
+      "nodeRunTime": 41.791666666666664,
+      "browserRunTime": 41.791666666666664,
+      "nodeRunTimeBits": "5555555555e54440",
+      "browserRunTimeBits": "5555555555e54440",
+      "nodeFinishBits": "cdcccccccc0c2440",
+      "browserFinishBits": "cdcccccccc0c2440",
+      "nodeFaults": 1,
+      "browserFaults": 1
+    }
+  ]
+}

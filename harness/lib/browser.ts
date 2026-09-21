@@ -1,9 +1,10 @@
 /**
  * Headless Chromium with a working WebGL2 context (SwiftShader via ANGLE).
  *
- * Playwright's headless shell has no GPU; without these flags WebGL context
- * creation fails silently and three throws. We try the modern flag set first
- * and fall back to the legacy `--use-gl=angle` spelling.
+ * SwiftShader is the portable default. On macOS, explicitly request
+ * TRIALS_BROWSER_BACKEND=metal for hardware timing with the unchanged ship
+ * limits. Every launch probes and records the actual renderer; Metal never
+ * silently falls back to software.
  */
 import { spawnSync } from 'node:child_process';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
@@ -86,7 +87,13 @@ export async function launchBrowser(options: LaunchOptions = {}): Promise<Launch
   const width = options.width ?? 1280;
   const height = options.height ?? 720;
   const errors: string[] = [];
-  for (const [name, flags] of Object.entries(FLAG_SETS)) {
+  const backend = process.env.TRIALS_BROWSER_BACKEND ?? 'swiftshader';
+  if (backend !== 'swiftshader' && backend !== 'metal') throw new Error(`Unsupported browser backend: ${backend}`);
+  if (backend === 'metal' && process.platform !== 'darwin') throw new Error('Metal requires macOS');
+  const flagSets = backend === 'metal'
+    ? { 'angle-metal': ['--use-angle=metal', ...COMMON_FLAGS.filter(flag => flag !== '--enable-unsafe-swiftshader')] }
+    : FLAG_SETS;
+  for (const [name, flags] of Object.entries(flagSets)) {
     let browser: Browser | null = null;
     try {
       browser = await chromium.launch({
@@ -108,6 +115,11 @@ export async function launchBrowser(options: LaunchOptions = {}): Promise<Launch
       const probe = await probeWebGL(page);
       if (!probe.ok || probe.kind !== 'webgl2') {
         errors.push(`${name}: webgl2 unavailable (${probe.kind} / ${probe.renderer || 'no renderer'})`);
+        await browser.close();
+        continue;
+      }
+      if (backend === 'metal' && !/Metal/.test(probe.renderer)) {
+        errors.push(`${name}: requested Metal, received ${probe.renderer}`);
         await browser.close();
         continue;
       }

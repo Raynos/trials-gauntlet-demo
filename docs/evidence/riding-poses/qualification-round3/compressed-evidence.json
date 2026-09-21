@@ -1,0 +1,20 @@
+[
+  {
+    "file": "transitions.json.gz",
+    "uncompressedSha256": "32445f422270481ca0b7750e1e32bcddc41786bf1337986ee81c52c132b12f14",
+    "uncompressedBytes": 11629703,
+    "compressedBytes": 1290609
+  },
+  {
+    "file": "hop-cloth.json.gz",
+    "uncompressedSha256": "0b3ccd9f3a4b7d6a8f4278e991b25b38e67a8d3813f944b28da48b895e91a972",
+    "uncompressedBytes": 8240253,
+    "compressedBytes": 882372
+  },
+  {
+    "file": "thrown-cloth.json.gz",
+    "uncompressedSha256": "ef501920b0a34302d3cc9223a32b761252c97aa6afce49eb3b453611ab4c8026",
+    "uncompressedBytes": 11063002,
+    "compressedBytes": 1293310
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "fingerprint": "ae2c0bca",
+  "rows": [
+    {
+      "file": "docs/evidence/riding-poses/strangers-final/b2-lean-back-20260921-055045/recording.json",
+      "sha256": "8125fb0ad53dfaf0fcd10f21f2bc9beaa185b5b36a5f7e386137e68223879747",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "1a30e6dcb4834693",
+      "browserHash": "1a30e6dcb4834693",
+      "nodeFinish": 42.375,
+      "browserFinish": 42.375,
+      "nodeRunTime": 42.375,
+      "browserRunTime": 42.375,
+      "nodeRunTimeBits": "0000000000304540",
+      "browserRunTimeBits": "0000000000304540",
+      "nodeFinishBits": "0000000000304540",
+      "browserFinishBits": "0000000000304540",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

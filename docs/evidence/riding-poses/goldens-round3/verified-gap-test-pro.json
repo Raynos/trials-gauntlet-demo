@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/gap-test/bot-3-pro.json",
+      "sha256": "8efe6ce8b62144e15e6610583695448be09ebc2f84b42ba1fae2452a8b93263c",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "e0ff126e8518f235",
+      "browserHash": "e0ff126e8518f235",
+      "nodeFinish": 5.341666666666667,
+      "browserFinish": 5.341666666666667,
+      "nodeRunTime": 5.341666666666667,
+      "browserRunTime": 5.341666666666667,
+      "nodeRunTimeBits": "dedddddddd5d1540",
+      "browserRunTimeBits": "dedddddddd5d1540",
+      "nodeFinishBits": "dedddddddd5d1540",
+      "browserFinishBits": "dedddddddd5d1540",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

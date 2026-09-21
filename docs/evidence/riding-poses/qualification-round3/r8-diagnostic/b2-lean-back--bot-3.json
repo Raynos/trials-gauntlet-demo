@@ -1,0 +1,29 @@
+{
+  "file": "b2-lean-back/bot-3.json",
+  "finished": true,
+  "riding": 4736,
+  "overDemand": 1210,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.5054460684209237,
+  "maxHipX": 0.1553075099390441,
+  "maxLeg": 0.8510486374384522,
+  "maxArm": 0.5740015969928831,
+  "outCom": 255,
+  "maxCom": 0.3664476420823815,
+  "recovered": 736,
+  "outRecovered": 0,
+  "maxComRecovered": 0.0758840062378948,
+  "maxPsiRecovered": 0.1341611880442694,
+  "longestExcursion": 2,
+  "longestExcursionAt": 1718,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 706,
+    "bad": []
+  },
+  "selected": []
+}

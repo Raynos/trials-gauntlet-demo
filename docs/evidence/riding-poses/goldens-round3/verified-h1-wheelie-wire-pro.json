@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/h1-wheelie-wire/bot-3-pro.json",
+      "sha256": "0a7de51e7fec1ac66f7a2782d330adc16911bb0e6dd4606164e8781c2db3d333",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "54851a0cc2e4b16f",
+      "browserHash": "54851a0cc2e4b16f",
+      "nodeFinish": 42.1,
+      "browserFinish": 42.1,
+      "nodeRunTime": 42.1,
+      "browserRunTime": 42.1,
+      "nodeRunTimeBits": "cdcccccccc0c4540",
+      "browserRunTimeBits": "cdcccccccc0c4540",
+      "nodeFinishBits": "cdcccccccc0c4540",
+      "browserFinishBits": "cdcccccccc0c4540",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

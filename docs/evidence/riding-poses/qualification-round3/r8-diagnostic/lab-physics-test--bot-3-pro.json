@@ -1,0 +1,29 @@
+{
+  "file": "lab-physics-test/bot-3-pro.json",
+  "finished": true,
+  "riding": 903,
+  "overDemand": 184,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.5099389860960528,
+  "maxHipX": 0.0087855418266777,
+  "maxLeg": 0.8441952953310894,
+  "maxArm": 0.573872646075118,
+  "outCom": 24,
+  "maxCom": 0.21726450465628977,
+  "recovered": 173,
+  "outRecovered": 0,
+  "maxComRecovered": 0.02552639306434696,
+  "maxPsiRecovered": 0.06557058942063654,
+  "longestExcursion": 0,
+  "longestExcursionAt": -1,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 173,
+    "bad": []
+  },
+  "selected": []
+}

@@ -1,0 +1,29 @@
+{
+  "file": "h2-gap-chain/bot-3-pro.json",
+  "finished": true,
+  "riding": 5129,
+  "overDemand": 1357,
+  "belowSeat": 0,
+  "pastTank": 0,
+  "legOver": 0,
+  "armOver": 0,
+  "minHipY": 0.49000333974242927,
+  "maxHipX": 0.18153729217965472,
+  "maxLeg": 0.8777226529850758,
+  "maxArm": 0.574008995373185,
+  "outCom": 242,
+  "maxCom": 0.3641735696169808,
+  "recovered": 799,
+  "outRecovered": 0,
+  "maxComRecovered": 0.043036798636218794,
+  "maxPsiRecovered": 0.07970200957364859,
+  "longestExcursion": 3,
+  "longestExcursionAt": 2360,
+  "faults": [],
+  "bad": [],
+  "availability": {
+    "recovered": 799,
+    "bad": []
+  },
+  "selected": []
+}

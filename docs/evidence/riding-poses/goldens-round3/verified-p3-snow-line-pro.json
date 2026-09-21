@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/p3-snow-line/bot-3-pro.json",
+      "sha256": "c0826d85e8d87e731ca8f13cfca2d8b75d528ff5efee52159c8fb1e4aaff2aca",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "7bef6555f82d067d",
+      "browserHash": "7bef6555f82d067d",
+      "nodeFinish": 21.45,
+      "browserFinish": 21.45,
+      "nodeRunTime": 37.25,
+      "browserRunTime": 37.25,
+      "nodeRunTimeBits": "0000000000a04240",
+      "browserRunTimeBits": "0000000000a04240",
+      "nodeFinishBits": "3333333333733540",
+      "browserFinishBits": "3333333333733540",
+      "nodeFaults": 1,
+      "browserFaults": 1
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "fingerprint": "ae2c0bca",
+  "rows": [
+    {
+      "file": "docs/evidence/riding-poses/strangers-final/b3-kicker-row-20260921-055813/recording.json",
+      "sha256": "af815e46a46faa808553321a5f59e26476173530c395ba7bbd10ed5c307ef6b0",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "4083e270c2986cbe",
+      "browserHash": "4083e270c2986cbe",
+      "nodeFinish": 37.88333333333333,
+      "browserFinish": 37.88333333333333,
+      "nodeRunTime": 44.275,
+      "browserRunTime": 44.275,
+      "nodeRunTimeBits": "3333333333234640",
+      "browserRunTimeBits": "3333333333234640",
+      "nodeFinishBits": "1111111111f14240",
+      "browserFinishBits": "1111111111f14240",
+      "nodeFaults": 1,
+      "browserFaults": 1
+    }
+  ]
+}

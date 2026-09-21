@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/h3-fire-line/bot-3.json",
+      "sha256": "d05011264970ee2902bfa6a676ef13779da99c6c44353a235320b7cd96159956",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "48ae28299e5c1923",
+      "browserHash": "48ae28299e5c1923",
+      "nodeFinish": 48.34166666666667,
+      "browserFinish": 48.34166666666667,
+      "nodeRunTime": 48.34166666666667,
+      "browserRunTime": 48.34166666666667,
+      "nodeRunTimeBits": "bcbbbbbbbb2b4840",
+      "browserRunTimeBits": "bcbbbbbbbb2b4840",
+      "nodeFinishBits": "bcbbbbbbbb2b4840",
+      "browserFinishBits": "bcbbbbbbbb2b4840",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

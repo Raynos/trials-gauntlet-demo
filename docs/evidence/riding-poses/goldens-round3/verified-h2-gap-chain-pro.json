@@ -1,0 +1,23 @@
+{
+  "fingerprint": "1255af7f",
+  "rows": [
+    {
+      "file": "harness/inputs/h2-gap-chain/bot-3-pro.json",
+      "sha256": "569d93fef10428d216c476ebc4018782434f88b7e8881d82c9f541389f609cd3",
+      "fresh": true,
+      "passed": true,
+      "nodeHash": "ccf0268bcf8ee740",
+      "browserHash": "ccf0268bcf8ee740",
+      "nodeFinish": 42.75,
+      "browserFinish": 42.75,
+      "nodeRunTime": 42.75,
+      "browserRunTime": 42.75,
+      "nodeRunTimeBits": "0000000000604540",
+      "browserRunTimeBits": "0000000000604540",
+      "nodeFinishBits": "0000000000604540",
+      "browserFinishBits": "0000000000604540",
+      "nodeFaults": 0,
+      "browserFaults": 0
+    }
+  ]
+}

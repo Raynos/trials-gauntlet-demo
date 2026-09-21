@@ -77,9 +77,12 @@ export async function openGame(page: Page, baseUrl: string, options: OpenGameOpt
   return { bootMs, ...nav, ...heap };
 }
 
-export async function readHeap(page: Page): Promise<{ jsHeapUsed: number; jsHeapTotal: number }> {
+export async function readHeap(page: Page, collectGarbage = false): Promise<{ jsHeapUsed: number; jsHeapTotal: number }> {
   const cdp = await page.context().newCDPSession(page);
   try {
+    // Retained-growth checks need equivalent GC boundaries. Raw heap includes
+    // unreachable temporary objects and depends on when V8 last collected.
+    if (collectGarbage) await cdp.send('HeapProfiler.collectGarbage');
     await cdp.send('Performance.enable');
     const { metrics } = await cdp.send('Performance.getMetrics');
     const get = (name: string): number => metrics.find((m) => m.name === name)?.value ?? 0;
