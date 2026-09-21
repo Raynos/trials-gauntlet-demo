@@ -1,0 +1,191 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:49:10.592Z",
+  "pass": true,
+  "checkout": "8a70e3b3 + graphics-interruption repair",
+  "ios": {
+    "icon": {
+      "path": "ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png",
+      "sha256": "908f76e927732d487a131975be4b677167089c95b83f57a7be8bf02513e7d6d7",
+      "width": 1024,
+      "height": 1024,
+      "colorType": 3
+    },
+    "source": "Existing PWA public/art/icons/icon-1024.png, byte-identical and opaque RGB.",
+    "splashes": [
+      {
+        "path": "ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732-1.png",
+        "sha256": "bc5756c5edd88d09569db4f26bd77b5f9150f0895ceb7da1b83f5b853aeea71a",
+        "width": 2556,
+        "height": 1179,
+        "colorType": 2
+      },
+      {
+        "path": "ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732-2.png",
+        "sha256": "bc5756c5edd88d09569db4f26bd77b5f9150f0895ceb7da1b83f5b853aeea71a",
+        "width": 2556,
+        "height": 1179,
+        "colorType": 2
+      },
+      {
+        "path": "ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732.png",
+        "sha256": "bc5756c5edd88d09569db4f26bd77b5f9150f0895ceb7da1b83f5b853aeea71a",
+        "width": 2556,
+        "height": 1179,
+        "colorType": 2
+      }
+    ],
+    "launchLayout": "LaunchScreen.storyboard uses centered scaleAspectFill; title artwork is pre-existing PWA branding.",
+    "release": {
+      "path": ".native-build/ios-release/Build/Products/Release-iphonesimulator/App.app",
+      "binarySha256": "a61b96431aee3a2cca058aa1949ca194f14765e97980baf564247aae0a1ca598",
+      "contract": {
+        "schema": 1,
+        "target": "native",
+        "runtime": "native-v1",
+        "saveSchema": 1,
+        "sourceRevision": "8a70e3b3",
+        "production": false,
+        "channels": null,
+        "publicKeyFingerprint": null
+      },
+      "debugProbeSymbolsAbsent": true,
+      "codeSigningAllowed": false,
+      "platform": "iOS Simulator; not an IPA or device archive"
+    }
+  },
+  "android": {
+    "icons": [
+      {
+        "path": "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+        "sha256": "1cf0e58e8c636bd27e80fe5f7dd8aacd9a939e803ee1b643cb17a2fa3fc89dc1",
+        "width": 48,
+        "height": 48,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+        "sha256": "1cf0e58e8c636bd27e80fe5f7dd8aacd9a939e803ee1b643cb17a2fa3fc89dc1",
+        "width": 48,
+        "height": 48,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png",
+        "sha256": "bb14f6646f882bb750683b89cfd4e6a9b1aff983e5b1aca23aa80b0ee519f63b",
+        "width": 108,
+        "height": 108,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+        "sha256": "542ef80039ea1442a58acd8f95900b7d5846336b0787dc3b27565fc4fd2cf34b",
+        "width": 72,
+        "height": 72,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+        "sha256": "542ef80039ea1442a58acd8f95900b7d5846336b0787dc3b27565fc4fd2cf34b",
+        "width": 72,
+        "height": 72,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png",
+        "sha256": "cda2804fd7cc686e1f455ef8d194c96ba32d867932777cfd88189af49b0bb6bf",
+        "width": 162,
+        "height": 162,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+        "sha256": "7e6c36ec9ad0201f3ce76f6d8ab5cb8312e9960a5d8b5365eac81e8260321926",
+        "width": 96,
+        "height": 96,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+        "sha256": "7e6c36ec9ad0201f3ce76f6d8ab5cb8312e9960a5d8b5365eac81e8260321926",
+        "width": 96,
+        "height": 96,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png",
+        "sha256": "4a64c098fe384913fecffbc90fcbbef2c921eaa329de21d6e376288da04f4455",
+        "width": 216,
+        "height": 216,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+        "sha256": "47b414fda1f5fd256a3cc0005e8985fbf8aaa6b49a23134679c8cea245faff53",
+        "width": 144,
+        "height": 144,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+        "sha256": "47b414fda1f5fd256a3cc0005e8985fbf8aaa6b49a23134679c8cea245faff53",
+        "width": 144,
+        "height": 144,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+        "sha256": "818a0a993b7916569254226c24dea24a8ffe34cb18c8780787fdb1d9a5f8c55d",
+        "width": 324,
+        "height": 324,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+        "sha256": "e5aec5fa291c90df7e7650f97a5e224e7697b71e6237ac71d2de861d08aa76fe",
+        "width": 192,
+        "height": 192,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+        "sha256": "e5aec5fa291c90df7e7650f97a5e224e7697b71e6237ac71d2de861d08aa76fe",
+        "width": 192,
+        "height": 192,
+        "colorType": 2
+      },
+      {
+        "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+        "sha256": "4c9febfbe2e7e4ca589e13e4bc22330c7a8146a5a22eb9dae47afb1100e41774",
+        "width": 432,
+        "height": 432,
+        "colorType": 2
+      }
+    ],
+    "adaptive": "mipmap-anydpi-v26 XML references matching foreground and #101218 background; legacy/round alternatives exist at all five densities.",
+    "release": {
+      "path": "android/app/build/outputs/bundle/release/app-release.aab",
+      "sha256": "5676caea03324ca095294faca013d93310f767b1c57912797eac1c7ea2907000",
+      "bytes": 42315144,
+      "contract": {
+        "schema": 1,
+        "target": "native",
+        "runtime": "native-v1",
+        "saveSchema": 1,
+        "sourceRevision": "8a70e3b3",
+        "production": false,
+        "channels": null,
+        "publicKeyFingerprint": null
+      },
+      "debuggable": false,
+      "signatureVerification": "no manifest.\n\njar is unsigned."
+    }
+  },
+  "staticArtworkReview": "Parent viewed native iOS1024 icon, Android432 foreground and iOS launch image: game rider/title artwork, no stock Capacitor placeholder. This is source artwork review, not a played launch-transition verdict.",
+  "limitations": [
+    "Native Release configurations build with development identity and OTA disabled; production channel/key/account settings and signing remain required.",
+    "Simulator artifact is not device distribution; AAB is unsigned.",
+    "Source artwork/dimensions and packaged metadata do not qualify all device crops/rotation/system bars.",
+    "Captured launch clips are retained separately; no motion-quality approval from static artwork inspection."
+  ]
+}

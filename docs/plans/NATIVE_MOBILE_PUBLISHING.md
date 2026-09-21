@@ -194,6 +194,21 @@ verify the new setting on cold launch. Static native screenshot review confirms 
 messages and retry targets of at least 44 CSS pixels on both tested profiles. This `EISDIR` fault is deliberately distinct
 from real disk exhaustion or denied permissions; those OS-specific cases remain open.
 
+Round 6 audits the existing branded native icons/launch artwork and builds native Release configurations;
+[package metadata](../evidence/native-mobile/package-round6.json) confirms 1024-pixel opaque iOS art,
+all five Android density sets, no iOS debug-probe symbols and a non-debuggable Android release manifest.
+The simulator app and unsigned AAB remain development artifacts with OTA disabled. This does not close
+signing, production configuration, launcher/splash motion review or all-device layout qualification.
+
+Installed graphics-loss probes exposed a gameplay defect: physics continued while the WebGL context was
+unavailable. The shared shell now pauses simulation/audio, clears held controls, waits for renderer
+rebuilding, and requires explicit Resume. Graphics and OS inactivity compose independently, so one
+recovery cannot prematurely resume the other. The [iOS](../evidence/native-mobile/ios-graphics-round6.json)
+and [Android](../evidence/native-mobile/android-graphics-round6.json) reports retain failing before
+evidence and passing final-artifact qualification. Both also pass the sixth-round cold boot, identical
+clear pair, terminal crash and one-tick logical restart gate. Recorded launch clips and rendering diagnostics do not replace
+physical-device interruption or played-motion judgement.
+
 ### P0 — Freeze scope and build requirements
 
 - [ ] Record publisher identity, permanent bundle/application IDs, countries, device support and distribution
@@ -245,7 +260,7 @@ from real disk exhaustion or denied permissions; those OS-specific cases remain 
 
 - [ ] Run `pnpm check`, determinism, touch and ship gates against a frozen build. Every third implementation
   round includes cold boot → clear → crash → instant restart. A headless WebKit pass is not an iPhone pass.
-- [ ] Add scripted native-shell coverage through simulator/emulator/device test runners; retain the headless
+- [x] Add scripted native-shell coverage through simulator/emulator/device test runners; retain the headless
   browser harness for web checks. Use played clips for visual judgement, not posed screenshots.
 - [ ] Capture at least three actual-device reports: a supported older iPhone, a current iPhone and a midrange
   Android. Apply `harness/gate/thresholds.json`: exact finish-time/hash replay, one-tick logical restart,

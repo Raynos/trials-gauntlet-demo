@@ -1,0 +1,401 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:49:05.526Z",
+  "finishedAt": "2026-09-21T10:49:43.618Z",
+  "pass": true,
+  "apkSha256": "2a0008fac4aa0b2afc8a22e5642b28d3ff0a29988b675c6edca62db8b8ea145c",
+  "package": "package: name='com.trialsgauntlet.game' versionCode='1' versionName='1.0.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+  "boot": {
+    "readyAtMs": 993.5,
+    "platform": "android",
+    "origin": "https://localhost",
+    "online": false,
+    "screen": "menu",
+    "current": {
+      "checksum": "",
+      "id": "builtin",
+      "version": "1.0.0",
+      "downloaded": "1970-01-01T00:00:00.000Z",
+      "status": "success"
+    },
+    "viewport": {
+      "width": 690,
+      "height": 360,
+      "dpr": 1.75
+    }
+  },
+  "display": {
+    "size": "Physical size: 1080x2400\nOverride size: 720x1280",
+    "density": "Physical density: 420\nOverride density: 280"
+  },
+  "nativeWebViewBounds": {
+    "left": 73,
+    "top": 49,
+    "right": 1280,
+    "bottom": 678
+  },
+  "clears": [
+    {
+      "phase": "finished",
+      "time": 8.65,
+      "hash": "ecdf62a55f6185a6",
+      "faults": 0
+    },
+    {
+      "phase": "finished",
+      "time": 8.65,
+      "hash": "ecdf62a55f6185a6",
+      "faults": 0
+    }
+  ],
+  "crashRestart": {
+    "crash": {
+      "phase": "crashed",
+      "faults": 1,
+      "tick": 92,
+      "stepped": 92
+    },
+    "restart": {
+      "phase": "riding",
+      "tick": 1,
+      "wallMs": 80.40000000002328
+    }
+  },
+  "graphicsErrors": [],
+  "launchVideo": ".native-build/graphics-round6/delivery-report-launch.mp4",
+  "limitations": [
+    "Headless API36 emulator with software GPU; no physical-device performance, visual quality, or audible-output claim.",
+    "Non-black sampled framebuffer pixels plus render/runtime evidence establish drawing, not visual correctness. Parent judges recorded clip.",
+    "Clear/crash/restart gate uses recorded input and bounded simulation hooks; wall time includes emulator overhead.",
+    "Restart wallMs includes synchronized software-GPU drawing (80.4ms); this is not a physical-device restart latency claim. Simulation restart is exactly one tick."
+  ],
+  "runner": "scripts/native-android-graphics.mjs",
+  "rawReport": ".native-build/graphics-round6/delivery-report.json",
+  "sourceCandidate": "8a70e3b3 plus graphics recovery and persisted-pagehide handling",
+  "device": {
+    "avd": "trials_gauntlet_api36",
+    "profile": "Pixel 7",
+    "api": 36,
+    "headless": true,
+    "gpu": "swiftshader"
+  },
+  "cases": [
+    {
+      "name": "Offline cold launch opens native bundled menu",
+      "pass": true
+    },
+    {
+      "name": "menu: actual WebGL loss event recognized",
+      "pass": true
+    },
+    {
+      "name": "menu: restored content remains available without navigation",
+      "pass": true
+    },
+    {
+      "name": "ride: actual WebGL loss event recognized",
+      "pass": true
+    },
+    {
+      "name": "Ride context loss pauses physics and clears input",
+      "pass": true
+    },
+    {
+      "name": "ride: restored content remains available without navigation",
+      "pass": true
+    },
+    {
+      "name": "Restored ride waits for explicit resume",
+      "pass": true
+    },
+    {
+      "name": "Ride advances after explicit resume",
+      "pass": true
+    },
+    {
+      "name": "Context recovery has no resource or runtime errors",
+      "pass": true
+    },
+    {
+      "name": "Two recorded clears have identical finish time and hash",
+      "pass": true
+    },
+    {
+      "name": "Terminal crash restarts to riding in one simulation tick",
+      "pass": true
+    }
+  ],
+  "contexts": [
+    {
+      "stage": "menu",
+      "before": {
+        "tick": 0,
+        "phase": "menu",
+        "paused": false,
+        "lost": false,
+        "heldControls": [],
+        "input": {
+          "throttle": 0,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "menu",
+        "frames": 0
+      },
+      "lost": {
+        "tick": 0,
+        "phase": "menu",
+        "paused": false,
+        "lost": true,
+        "heldControls": [],
+        "input": {
+          "throttle": 0,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "menu",
+        "frames": 0
+      },
+      "lostLater": {
+        "tick": 0,
+        "phase": "menu",
+        "paused": false,
+        "lost": true,
+        "heldControls": [],
+        "input": {
+          "throttle": 0,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "menu",
+        "frames": 0
+      },
+      "restored": {
+        "tick": 0,
+        "phase": "menu",
+        "paused": false,
+        "lost": false,
+        "heldControls": [],
+        "input": {
+          "throttle": 0,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "menu",
+        "frames": 0
+      },
+      "recoveryReadyWaitMs": 1135,
+      "events": [
+        {
+          "type": "webglcontextlost",
+          "at": 22563.79999999993,
+          "defaultPrevented": true
+        },
+        {
+          "type": "webglcontextrestored",
+          "at": 23808,
+          "defaultPrevented": false
+        }
+      ],
+      "sample": {
+        "screen": "menu",
+        "menuLive": true,
+        "artDecoded": true,
+        "artUrl": "https://localhost/art/menu/keyart-nalati-1920.webp?v=b1e47620",
+        "rendererEntering": false
+      }
+    },
+    {
+      "stage": "ride",
+      "before": {
+        "tick": 0,
+        "phase": "riding",
+        "paused": false,
+        "lost": false,
+        "heldControls": [],
+        "input": {
+          "throttle": 0,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "run",
+        "frames": 7
+      },
+      "lost": {
+        "tick": 78,
+        "phase": "riding",
+        "paused": true,
+        "lost": true,
+        "heldControls": [],
+        "input": {
+          "throttle": 1,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "run",
+        "frames": 19
+      },
+      "lostLater": {
+        "tick": 78,
+        "phase": "riding",
+        "paused": true,
+        "lost": true,
+        "heldControls": [],
+        "input": {
+          "throttle": 1,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "run",
+        "frames": 19
+      },
+      "restored": {
+        "tick": 78,
+        "phase": "riding",
+        "paused": true,
+        "lost": false,
+        "heldControls": [],
+        "input": {
+          "throttle": 1,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "run",
+        "frames": 20
+      },
+      "recoveryReadyWaitMs": 1342,
+      "events": [
+        {
+          "type": "webglcontextlost",
+          "at": 22563.79999999993,
+          "defaultPrevented": true
+        },
+        {
+          "type": "webglcontextrestored",
+          "at": 23808,
+          "defaultPrevented": false
+        },
+        {
+          "type": "webglcontextlost",
+          "at": 27127.29999999993,
+          "defaultPrevented": true
+        },
+        {
+          "type": "webglcontextrestored",
+          "at": 28428.5,
+          "defaultPrevented": false
+        }
+      ],
+      "sample": {
+        "redrawMethod": "same-dimension window resize invalidates static-frame cache before synchronous render/readPixels",
+        "framesBefore": 20,
+        "lost": false,
+        "glError": 0,
+        "nonBlack": true,
+        "distinctRgb": 24,
+        "frames": 21
+      },
+      "heldGesture": {
+        "source": "adb input touchscreen swipe",
+        "x": 1130,
+        "y": 364,
+        "durationMs": 4000
+      },
+      "explicitResumeCalled": true,
+      "pausedScreenshot": ".native-build/graphics-round6/delivery-report-restored-paused.png",
+      "heldBeforeLoss": {
+        "tick": 60,
+        "phase": "riding",
+        "paused": false,
+        "lost": false,
+        "heldControls": [
+          "tz tz-zone tz-throttle held"
+        ],
+        "input": {
+          "throttle": 1,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "run",
+        "frames": 17
+      },
+      "afterResume": {
+        "tick": 134,
+        "phase": "riding",
+        "paused": false,
+        "lost": false,
+        "heldControls": [],
+        "input": {
+          "throttle": 0,
+          "brake": 0,
+          "lean": 0
+        },
+        "origin": "https://localhost",
+        "screen": "run",
+        "frames": 32
+      }
+    }
+  ],
+  "beforeFix": {
+    "apkSha256": "117ad2a29692ea15bb318825f35c6f303b96984ae25644639e90292f1934401b",
+    "rawReport": ".native-build/graphics-round6/before-fix.json",
+    "launchVideo": ".native-build/graphics-round6/before-fix-launch.mp4",
+    "lost": {
+      "tick": 74,
+      "phase": "riding",
+      "paused": false,
+      "lost": true,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      },
+      "origin": "https://localhost",
+      "screen": "run",
+      "frames": 5
+    },
+    "lostLater": {
+      "tick": 194,
+      "phase": "riding",
+      "paused": false,
+      "lost": true,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      },
+      "origin": "https://localhost",
+      "screen": "run",
+      "frames": 5
+    },
+    "finding": "Ride advanced120ticks during1second of real context loss and did not pause or require explicit resume."
+  },
+  "probeCorrections": [
+    "Menu artwork is DOM-backed and covers the WebGL canvas; test its decoded artwork/live menu plus context restoration instead of hidden framebuffer diversity.",
+    "Paused renderer skips unchanged frames while the browser can discard non-preserved drawing buffer. Captured actual compositor screenshot before any redraw, then invalidated static cache with same-dimension resize for synchronous render/readPixels. No physics or route changes.",
+    "Frozen physics state retains its last sampled input field. Touch held state clears at interruption; neutral input is verified after explicit resume when solver steps again."
+  ],
+  "artifact": ".native-build/graphics-round6/delivery.apk",
+  "priorRepairedPass": {
+    "apkSha256": "d1583329b51586a014c97759aa454f4817cf0f1ce833ce1b22ef58fd4ea5c200",
+    "casesPassed": 11,
+    "rawReport": ".native-build/graphics-round6/final-report.json",
+    "note": "Repeated all11 checks on final APK after persisted-pagehide source adjustment; final results above."
+  },
+  "launchVideoDurationSeconds": 30.008711,
+  "cleanup": {
+    "emulatorPid": 63515,
+    "emulatorStopped": true,
+    "normalArtifactInstalled": true,
+    "sdkAndIgnoredProofArtifactsPreserved": true
+  }
+}

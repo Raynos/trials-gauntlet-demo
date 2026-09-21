@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:52:19.261Z",
+  "baseRevision": "8a70e3b3",
+  "finding": "Actual WebGL context loss allowed live physics to continue. Shared lifecycle now pauses/neutralizes input until renderer readiness, then requires explicit Resume; graphics and native inactivity compose.",
+  "sourceHashes": {
+    "src/platform/graphics.ts": "72afd3a8e9f56384e544a2026d0f5e029b16e42c83d7669af85a9b11779be567",
+    "src/game/app.ts": "bb7de883c2f8f3133d477fd9253f821a1a8a2422c02eb04ef18fd163e340ea7a",
+    "src/main.ts": "fabc871fcc90ba70b956d467d2ea052715a261421b25507fc18953a9d8ed5833"
+  },
+  "finalArtifacts": {
+    "androidApk": "2a0008fac4aa0b2afc8a22e5642b28d3ff0a29988b675c6edca62db8b8ea145c",
+    "iosIndex": "71099dd384cf7e0c25e2613a0cbfca569c2d7a8aa44e0f53c3a92f473470eaa2",
+    "iosBundleTree": "e6193b096616ea2d010fc0238cf0a5b9beddd8af115772a1fa95fc13b5dfff90"
+  },
+  "validation": {
+    "targetedTests": "22 graphics/lifecycle/resource tests passed.",
+    "gameTests": "90 game tests passed; includes the7 App lifecycle tests also counted in targeted tests.",
+    "types": "App and harness TypeScript checks passed on final source.",
+    "lint": "Changed production/test and native-runner files pass targeted ESLint.",
+    "builds": "Final web production, native Vite, iOS Debug/Release Simulator, Android Debug APK and Release AAB builds passed.",
+    "iosGraphics": "Actual context loss at menu/ride restores; ride ticks remain frozen and controls neutral after explicit Resume; no JS/external-resource errors.",
+    "androidGraphics": "11/11 installed checks; real OS-held throttle cleared on loss, frozen ride, local restored graphics, manual Resume with neutral input.",
+    "sixthRoundShipGate": "Both final installed artifacts cold boot, replay clear twice with identical finish/hash, register terminal crash and restart in one logical tick."
+  },
+  "packaging": "See package-round6.json: branded opaque iOS icon/PWA identity,15 Android density assets, launch art, absent iOS Debug probe symbols and non-debuggable unsigned AAB.",
+  "cleanup": {
+    "taskPrimarySimulatorShutdown": true,
+    "android": {
+      "emulatorPid": 63515,
+      "emulatorStopped": true,
+      "normalArtifactInstalled": true,
+      "sdkAndIgnoredProofArtifactsPreserved": true
+    },
+    "userSimulatorUntouched": true
+  },
+  "limitations": [
+    "Simulator/emulator graphics extension is not a physical GPU/process crash or real-phone performance result.",
+    "Native Release configuration is distinct from signed production release: current build identities are development, AAB unsigned and OTA channels disabled.",
+    "Cold-launch videos are retained; no played-motion quality approval inferred from readback/statistics or static screenshots.",
+    "Remaining actual-device/olderOS/storage-failure/layout/production-channel/account/store gates stay open."
+  ]
+}

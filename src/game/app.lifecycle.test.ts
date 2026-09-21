@@ -7,7 +7,7 @@ import { App } from './app';
 function setup(screen = 'run') {
   let paused = false;
   const fields = {
-    screen, nativeInactive: false, prevRestart: true, prevThrottle: true,
+    screen, nativeInactive: false, graphicsUnavailable: false, prevRestart: true, prevThrottle: true,
     lastNow: 0, lastRenderAt: 123, screenAt: 0, audioUnlocked: true,
     soundOn: true, volume: 0.7, replayMuted: false,
     mux: { reset: vi.fn(), activeDevice: () => 'touch' },
@@ -29,6 +29,39 @@ function setup(screen = 'run') {
 }
 
 describe('native app interruption', () => {
+  it('keeps a lost-context ride paused and neutral until recovery and explicit Resume', () => {
+    const { app, fields } = setup();
+    const actions = app as unknown as { resume(via: string): void; fullRestart(via: string): void };
+    app.setGraphicsAvailable(false);
+    expect(fields.game.paused()).toBe(true);
+    expect(fields.game.setInput).toHaveBeenLastCalledWith(NEUTRAL_INPUT);
+    expect(fields.audio.setAppActive).toHaveBeenLastCalledWith(false);
+    actions.resume('pause:resume');
+    actions.fullRestart('pause:restart');
+    expect(fields.game.paused()).toBe(true);
+    expect(fields.pause.fadeOut).not.toHaveBeenCalled();
+    app.setGraphicsAvailable(true);
+    expect(fields.game.paused()).toBe(true);
+    actions.resume('pause:resume');
+    expect(fields.game.paused()).toBe(false);
+  });
+
+  it('does not resume audio or timing until both graphics and the OS are available', () => {
+    for (const restoreGraphicsFirst of [true, false]) {
+      const { app, fields } = setup();
+      app.setGraphicsAvailable(false);
+      app.setNativeActive(false);
+      if (restoreGraphicsFirst) app.setGraphicsAvailable(true);
+      else app.setNativeActive(true);
+      expect(fields.audio.setAppActive.mock.calls).toEqual([[false]]);
+      expect(fields.game.paused()).toBe(true);
+      if (restoreGraphicsFirst) app.setNativeActive(true);
+      else app.setGraphicsAvailable(true);
+      expect(fields.audio.setAppActive.mock.calls).toEqual([[false], [true]]);
+      expect(fields.game.paused()).toBe(true);
+      expect(fields.cadence.reset).toHaveBeenCalledTimes(2);
+    }
+  });
   it('pauses riding, releases controls and audio, and keeps the run paused after foregrounding', () => {
     const { app, fields } = setup();
     app.setNativeActive(false);
@@ -46,7 +79,7 @@ describe('native app interruption', () => {
     expect((app as unknown as { lastRenderAt: number }).lastRenderAt).toBe(0);
   });
 
-  it('skips background frames and discards background wall time on the first foreground frame', () => {
+  it.each(['native', 'graphics'] as const)('skips %s interruption frames and discards accumulated wall time after recovery', (source) => {
     const { app } = setup('menu');
     let now = 100;
     const callbacks: FrameRequestCallback[] = [];
@@ -61,11 +94,13 @@ describe('native app interruption', () => {
     });
     try {
       app.start();
-      app.setNativeActive(false);
+      if (source === 'native') app.setNativeActive(false);
+      else app.setGraphicsAvailable(false);
       now = 30_100;
       callbacks.shift()!(now);
       expect(tickFrame).not.toHaveBeenCalled();
-      app.setNativeActive(true);
+      if (source === 'native') app.setNativeActive(true);
+      else app.setGraphicsAvailable(true);
       now += 16;
       callbacks.shift()!(now);
       expect(tickFrame).toHaveBeenCalledExactlyOnceWith(0.016);

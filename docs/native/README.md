@@ -149,6 +149,30 @@ then remove it and activate Retry save. This tests the write-error path without 
 it is not proof of OS low-storage or denied-access handling. Both change test preferences, capture a
 static warning screenshot, and clean their temporary obstruction/control files.
 
+Graphics recovery and the native ship gate have dedicated installed-app runners:
+
+```sh
+node scripts/native-ios-graphics.mjs
+node scripts/native-android-graphics.mjs
+```
+
+They use the actual WebView `WEBGL_lose_context` extension at the menu and during a ride, then check
+restoration, paused simulation, cleared held controls and explicit Resume. GPU recovery and OS
+foregrounding are independent: the app cannot resume its frame loop while either remains unavailable.
+The shared renderer must finish rebuilding before gameplay is enabled; restoration does not reload the
+app, clear saves, or invoke PWA recovery. The browser back/forward cache retains these listeners.
+The same artifact then runs deterministic clears, a terminal crash and one-tick logical restart.
+The runners retain cold-launch recordings; GPU readback is a rendering diagnostic, not a visual verdict.
+Readbacks must follow a real draw because the WebViews discard non-preserved drawing buffers and the
+renderer skips unchanged frames. A transparent sample after an idle pause is insufficient evidence of
+a black screen. Android also records a compositor screenshot before its diagnostic redraw.
+
+Native icons and launch artwork reuse the existing PWA brand assets. The
+[package audit](../evidence/native-mobile/package-round6.json) records dimensions, hashes and Release
+artifact metadata. A native **Release configuration** alone is not a production release: the audited
+simulator app is unsigned/non-distributable, the AAB is unsigned, and both have OTA disabled. Production
+web-bundle configuration, permanent identity, signing and store/device qualification remain required.
+
 ## Signed updates hosted on Vercel
 
 The native updater is `@capgo/capacitor-updater` in manual, self-hosted mode. Vendor auto-update,

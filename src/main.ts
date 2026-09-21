@@ -22,6 +22,7 @@
  *                   `&quick=1` (menu + garage, 3 s), `&no=audio,hud,render,touch`, `&cap=60`
  */
 import { DEFAULT_PHYSICS_HZ, type PhysicsVersion } from './core';
+import { bindGraphicsLifecycle } from './platform/graphics';
 import * as audioMod from './audio';
 import * as physicsMod from './physics';
 import * as renderMod from './render';
@@ -358,6 +359,11 @@ function boot(): void {
         return shell;
       });
       const shell = sFront.value;
+      const disposeGraphics = bindGraphicsLifecycle(shell, renderer);
+      window.addEventListener('pagehide', (event) => {
+        // A browser back/forward-cache entry can return with this same canvas and shell.
+        if (!event.persisted) disposeGraphics();
+      });
       // Ask 58: everything the game can show, in the first bar. The user asked for it to behave like a
       // game — "load everything up front, but aggressively cache it" — so the rest of the art pack and
       // both world-map tiers are streamed here, counted honestly, and kept by the service worker's

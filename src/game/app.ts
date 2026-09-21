@@ -232,6 +232,7 @@ export class App {
   private lastNow = 0;
   private raf = 0;
   private nativeInactive = false;
+  private graphicsUnavailable = false;
   private audioUnlocked = false;
   private lastTrackId: string | null = null;
   /** Seconds of riding since the last GO (touch zones settle at 3 s). */
@@ -535,7 +536,7 @@ export class App {
     if (this.qualityChoice === 'auto') this.qualityWhy = `governor start ${start}${loadHeldTier() ? ' (held last session)' : ''}`;
 
     const unlock = (): void => {
-      if (this.audioUnlocked || this.nativeInactive) return;
+      if (this.audioUnlocked || this.interrupted()) return;
       this.audioUnlocked = true;
       void this.audio?.unlock();
     };
@@ -783,7 +784,7 @@ export class App {
     }
     this.lastNow = performance.now();
     const frame = (now: number): void => {
-      if (this.nativeInactive) {
+      if (this.interrupted()) {
         this.raf = requestAnimationFrame(frame);
         return;
       }
@@ -821,7 +822,24 @@ export class App {
   /** OS interruptions stop simulation, discard held controls, and require an explicit Resume. */
   setNativeActive(active: boolean): void {
     if (this.nativeInactive === !active) return;
+    const wasInterrupted = this.interrupted();
     this.nativeInactive = !active;
+    this.applyInterruption(wasInterrupted, 'native:background');
+  }
+
+  /** GPU recovery and OS foreground are independent; neither may clear the other's interruption. */
+  setGraphicsAvailable(available: boolean): void {
+    if (this.graphicsUnavailable === !available) return;
+    const wasInterrupted = this.interrupted();
+    this.graphicsUnavailable = !available;
+    this.applyInterruption(wasInterrupted, 'graphics:lost');
+  }
+
+  private interrupted(): boolean { return this.nativeInactive || this.graphicsUnavailable; }
+
+  private applyInterruption(wasInterrupted: boolean, via: string): void {
+    const active = !this.interrupted();
+    if (wasInterrupted === !active) return;
     this.audio?.setAppActive?.(active);
     this.mux.reset();
     this.game.setInput(NEUTRAL_INPUT);
@@ -830,7 +848,7 @@ export class App {
     this.lastRenderAt = 0;
     this.cadence.reset();
     if (!active) {
-      if (this.inRun() && this.game.phase() !== 'finished' && !this.game.paused()) this.togglePause('native:background');
+      if (this.inRun() && this.game.phase() !== 'finished' && !this.game.paused()) this.togglePause(via);
       if (this.screen === 'replay') this.game.setPaused(true);
       // Reviewer is a development surface; return to its picker instead of resuming a ride unattended.
       if (this.screen === 'reviewer') this.leaveReview();
@@ -844,7 +862,7 @@ export class App {
 
   /** Android Back uses the visible app hierarchy; false permits minimizing only at the main menu. */
   nativeBack(): boolean {
-    if (this.nativeInactive) return true;
+    if (this.interrupted()) return true;
     this.mux.reset();
     this.game.setInput(NEUTRAL_INPUT);
     if (this.onboard.visible) this.onboard.dismiss();
@@ -935,6 +953,7 @@ export class App {
   }
 
   private play(id: string): void {
+    if (this.interrupted()) return;
     const def = getTrack(id);
     if (!def) return;
     // Bike: the Garage choice when the player has made one, else the tier default (medium = last ridden).
@@ -1073,6 +1092,7 @@ export class App {
 
   /** Resume: the game unpauses on this frame; the overlay fades over --t1 while the HUD fades back over --t2 (SPEC §6). */
   private resume(via: string): void {
+    if (this.interrupted()) return;
     this.navLog.record('resume', this.navContext(), via);
     this.screenAt = performance.now();
     this.pause.fadeOut();
@@ -1106,6 +1126,7 @@ export class App {
 
   /** Full restart asked by the UI (results / pause tile, throttle edge on the results): the game's `restart` event logs it under `via`. */
   private fullRestart(via: string): void {
+    if (this.interrupted()) return;
     this.restartVia = via;
     this.game.restartFromStart();
     this.restartVia = null;
