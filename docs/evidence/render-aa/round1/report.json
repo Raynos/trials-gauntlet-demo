@@ -1,0 +1,4077 @@
+{
+  "phone-before": {
+    "graphics": {
+      "requestedBackend": "webkit",
+      "launchArgs": [],
+      "browser": "webkit",
+      "browserVersion": "26.5",
+      "hostPlatform": "darwin",
+      "vendor": "Apple Inc.",
+      "renderer": "Apple GPU",
+      "version": "WebGL 2.0",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "renderSettings": {
+        "prepare": [],
+        "biome": "industrial",
+        "zoom": "idle",
+        "occluder": {
+          "ms": 0,
+          "tested": 0,
+          "hits": 0,
+          "count": 5,
+          "override": null
+        },
+        "garage": {
+          "on": false,
+          "draws": 0,
+          "hidden": 0,
+          "textureMB": 0,
+          "reflection": false
+        },
+        "phase": "menu",
+        "tier": "low",
+        "dpr": 1,
+        "devicePixelRatio": 3,
+        "canvasW": 932,
+        "canvasH": 430,
+        "calls": 602,
+        "tris": 462822,
+        "rtMpx": 0.66,
+        "rtMB": 5.1,
+        "rtPasses": "shadow 512\u00d7512 | scene\u2192canvas 932\u00d7430",
+        "shadowMap": 512,
+        "heroTris": 13629,
+        "heroDoc": "bike-lod rider-lod",
+        "riderOutfit": "street-mustard",
+        "riderMaterialVariant": null,
+        "heroShadow": "hero-only",
+        "trackCalls": 9,
+        "trackTris": 48516,
+        "textureGenMs": 0,
+        "passes": 1,
+        "stalePrograms": 1,
+        "stabilized": {
+          "singlePass": 4,
+          "split": 0,
+          "depth": 31
+        },
+        "skippedFrames": 0,
+        "deviceClass": "phone",
+        "profile": "low",
+        "bloomers": 19,
+        "entryMs": 641.7,
+        "entry": {
+          "biome": "industrial",
+          "ms": 641.7,
+          "compileMs": 151.48000000000002,
+          "textureMs": 11.319999999999936,
+          "warmMs": 20.9,
+          "textures": 36,
+          "texturesMB": 57.4,
+          "materials": 68,
+          "programs": 29,
+          "programsBefore": 20
+        },
+        "heroSwap": {
+          "loads": [
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+              "bytes": 870440,
+              "fetchMs": 119.91999999999999,
+              "parseMs": 155.52000000000004,
+              "prepareMs": 0.5599999999999454,
+              "at": 55.78
+            },
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+              "bytes": 2283040,
+              "fetchMs": 125.03999999999999,
+              "parseMs": 174.48000000000002,
+              "prepareMs": 0.13999999999998636,
+              "at": 55.4
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb",
+              "bytes": 864848,
+              "fetchMs": 127.75999999999999,
+              "parseMs": 180.68,
+              "prepareMs": 0.07999999999998408,
+              "at": 56
+            },
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb",
+              "bytes": 1480204,
+              "fetchMs": 129.51999999999998,
+              "parseMs": 192.22,
+              "prepareMs": 0.36000000000001364,
+              "at": 55.9
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb",
+              "bytes": 1753256,
+              "fetchMs": 133.95999999999998,
+              "parseMs": 202.29999999999998,
+              "prepareMs": 0.18000000000000682,
+              "at": 56.08
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb",
+              "bytes": 2270544,
+              "fetchMs": 164.26,
+              "parseMs": 196.48000000000002,
+              "prepareMs": 0.0999999999999659,
+              "at": 55.94
+            },
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb",
+              "bytes": 3015120,
+              "fetchMs": 167.18,
+              "parseMs": 221.23999999999998,
+              "prepareMs": 0.160000000000025,
+              "at": 55.86
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb",
+              "bytes": 3616252,
+              "fetchMs": 171.07999999999998,
+              "parseMs": 245.68,
+              "prepareMs": 0.12000000000000455,
+              "at": 56.06
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb",
+              "bytes": 1706124,
+              "fetchMs": 175.48,
+              "parseMs": 256.67999999999995,
+              "prepareMs": 0.1400000000000432,
+              "at": 56.18
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb",
+              "bytes": 3486940,
+              "fetchMs": 178.60000000000002,
+              "parseMs": 282.20000000000005,
+              "prepareMs": 0.13999999999998636,
+              "at": 56.14
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb",
+              "bytes": 2448152,
+              "fetchMs": 224.76000000000002,
+              "parseMs": 256.19999999999993,
+              "prepareMs": 0.14000000000010004,
+              "at": 56.22
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb",
+              "bytes": 946824,
+              "fetchMs": 228.44,
+              "parseMs": 264.46,
+              "prepareMs": 0.13999999999998636,
+              "at": 56.26
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb",
+              "bytes": 912696,
+              "fetchMs": 230.3,
+              "parseMs": 268.84000000000003,
+              "prepareMs": 0.07999999999992724,
+              "at": 56.32
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb",
+              "bytes": 2355380,
+              "fetchMs": 232.26,
+              "parseMs": 287.2,
+              "prepareMs": 0.10000000000002274,
+              "at": 56.3
+            }
+          ],
+          "swaps": []
+        },
+        "entering": false,
+        "retirement": {
+          "requested": 4,
+          "released": 4,
+          "deferred": 0,
+          "pending": 0,
+          "maxPending": 0,
+          "contextLosses": 0
+        },
+        "terminalPrograms": {
+          "deleted": 0,
+          "contextReleased": 0
+        },
+        "art": {
+          "settled": true,
+          "ok": true,
+          "loadMs": 611,
+          "deliveredMB": 1.11,
+          "inWorld": true,
+          "trackComplete": true,
+          "trackIds": 28,
+          "builtAtFrame": 0,
+          "frames": 0
+        }
+      }
+    },
+    "buildFiles": {
+      "art/icons/apple-touch-icon-152.png": "e624d214712261f0d2791c8122ff3ca12599c71c06a3124a9145d4495d2b76d9",
+      "art/icons/apple-touch-icon-167.png": "225d6457fa8336b6bcbee3fea9e39bb26435fa70669466fc38f549cd7cc43390",
+      "art/icons/apple-touch-icon.png": "93d86e48bd6dee6b30ede98efdd08dc6cd263a42d46979b4b874604301aaa50b",
+      "art/icons/emblem-512.png": "23b4314890b05e7d340e4a2ca13cf695f2eb9ab7420c0bfb2201c42b6f24cb62",
+      "art/icons/favicon-16.png": "c1711f6279e2a95e229bdc89c53976715a686400a75822df7d06938e18075cc3",
+      "art/icons/favicon-32.png": "9a338662ea22ed9b8cc492f94fb87f27582d6402995a5b3a11f92248a9a849a1",
+      "art/icons/favicon.svg": "c1350cbc46c32741b0cd7d6748d2127ff592f880ee3b6efaa3118ff6ba049c92",
+      "art/icons/icon-1024.png": "908f76e927732d487a131975be4b677167089c95b83f57a7be8bf02513e7d6d7",
+      "art/icons/icon-192.png": "3d3f3477aeee8256417ae476e7190fa19ac282e43f9ff6d0792298e5c153c8e8",
+      "art/icons/icon-512.png": "4d3c5ccdf5f3ed0bfb31a70356b78c93b0fa160cdd5a8365ad56045854e7ec49",
+      "art/icons/icon-maskable-192.png": "9c1c94733b64e24775e8bc0dda1114e811547355024bf1b411747ed2b8c1a5ec",
+      "art/icons/icon-maskable-512.png": "bf6e010e5f41ccd80a643fd51dbe6fa5e68bfef4d18aa9b8af0cbfaaf4ecf036",
+      "art/manifest.json": "298405c3bfeb6cb63a73fd8ef8fb200cb076872ba487d17ff3b6e70818f06f8b",
+      "art/menu/bike-pro-1536.webp": "3e042f66dfc1f4bb6b652c89bd44361ce54f57c5b28a3185788439e360d48f6f",
+      "art/menu/bike-pro-768.webp": "76cb83fff215258ef04e45a69cc1bf8dee8d09acae49a0017cdc52a8be8c7b59",
+      "art/menu/bike-pro-alt.webp": "23c607e66b412000e6dfccc22ed11794c167fe3df7740002e423074fce59a78a",
+      "art/menu/bike-rookie-1536.webp": "ddcf8ace189a1286c3812eaf5c39432314e62d49539b45cf279d92e9bbf619c2",
+      "art/menu/bike-rookie-768.webp": "b16a24afaf9302bde9550bb4832283787ab2917ca9702af9d3a0ce2805cab4cf",
+      "art/menu/bike-rookie-alt.webp": "c1c3df43d901f2e17ba17c2d17d42fcbe3ebe52384bf0af8f21c0b85efba4ee3",
+      "art/menu/garage-plate.webp": "9ccf0f5b56600f09d8830cda538523ad9163beb189fbd5b7164c2443444836cf",
+      "art/menu/keyart-canyon-1920.webp": "6370bc7bd228fb573169a7fa08b9df344aae418b240637c7c0cb137d9179dd3a",
+      "art/menu/keyart-canyon-960.webp": "c6108bb2c4f70bd719f587387cc50c2264d65d39746337319fcd1981425fe245",
+      "art/menu/keyart-industrial-1920.webp": "2facbba1870f569e4e62142e3907469f9818ebfca9b14165ca4385b96da4e6c7",
+      "art/menu/keyart-industrial-960.webp": "3c36185592585cb19dec5a2e8fa64a2f7ef1a815f1c1e131b4183303ea054630",
+      "art/menu/keyart-nalati-1920.webp": "b1e476201cf771f1a573af920b6bdd76be721866c8cecdfcfe548da7f72e457e",
+      "art/menu/keyart-nalati-960.webp": "479343217aed306b489e6303990ca60881e094319d155bb10ea16442734d3ff9",
+      "art/menu/loading-plate.webp": "81d3c72b2f9ad2ff20f37de7816d7e9c2e95d8a3fd6b918ce90b26c8ef5c7dd4",
+      "art/menu/medal-bronze-512.png": "d471240127df3a4a6e8f501516a22c2f9764865e5506dfac9b64e3aaec8d7845",
+      "art/menu/medal-bronze.png": "1ace6c5d54c7fe2ffec32c979df4a5fba84840eb1e45d7b4ad2b0c4cbdfe1040",
+      "art/menu/medal-gold-512.png": "31b1ae0ec1dfcd02af8ae9a20f044ba595e2ffe6a24f3d181913f1252261452f",
+      "art/menu/medal-gold.png": "2d57129bb214258e85b80eddab0d2e7f960a7356b15d2e136e9ce688028fa57a",
+      "art/menu/medal-platinum-512.png": "0e116af3f76a73b1f550c5bc0b70522d2ce8119f3b687cca5b0592573a02b664",
+      "art/menu/medal-platinum.png": "613381217e7215e31236358d0f5afc28d5b918d76ad2360ed1d61c8a319c6da5",
+      "art/menu/medal-silver-512.png": "e29c508c4ba7cbee3dbba15d3f552df3e88817b205b52df926cabf906a478a61",
+      "art/menu/medal-silver.png": "273f649c9a41f096a76885d6651dcd0cf17493f199b6f59f504dcd158a73caf8",
+      "art/menu/results-canyon.webp": "b6ffb0182cd34a86f909813ddb5d7e4f370e2173813c344db45324933792dc56",
+      "art/menu/results-credits.webp": "596d57f262e8cd32b2e42b1f173a7efc350be9b65aebc0332c533bc148911b1d",
+      "art/menu/results-foundry.webp": "18f374c44494f54d9a810911b8412edcf947a9ccb03a6df255ffc49a15f1dbb3",
+      "art/menu/results-garage.webp": "b8f4993d812a0b711cac7f58b8bc5c33024e89d1514b2789f05c0f022e3fade2",
+      "art/menu/results-industrial.webp": "5a10949eae984d2196bec4d4f3f6de46d88d228efaecfbc2f2b8e9e95fe66919",
+      "art/menu/results-nightCity.webp": "5b59f1e3151023d033fc775ade3081f5c92c88f1358adca892dfa369afa1ca11",
+      "art/menu/results-snow.webp": "51a9567ecb7682210f275384cb2f91d17837a2179c7a2a0e3e3ed04bab1cf82a",
+      "art/menu/tier-beginner.webp": "8cd6d9e89bc3b990149937c38142cc2564c9f719874f9dd39cbaf7ad26047b70",
+      "art/menu/tier-easy.webp": "e0f948665cfcd779ae53dd55648934a874528b722ae44e23f7baa1cee816ea22",
+      "art/menu/tier-extreme.webp": "bf5abc29f964cc78c46e779a8e12b7daf11b2cda898d9f35edb29ad206fae46d",
+      "art/menu/tier-hard.webp": "26cffd64018d934ac5956e7fa56c565d8d4a113c2b4ba4e27ef9ffac75d4f02d",
+      "art/menu/tier-medium.webp": "06250a86790e0f6e8ce04f9f0b8ddd27e91fc9ecae927da7dd34f0af4599ccdd",
+      "art/menu/track-b1-first-ride.webp": "c379ef826ee40672995e858be369dbd7dd21a24db199f5af5a8b4234da7604eb",
+      "art/menu/track-b2-lean-back.webp": "18a362cd6a70b6ae322c4604ef20c0f7ed030275155fe5021eba232db06356a0",
+      "art/menu/track-b3-kicker-row.webp": "0162b613762dcc8bf647b04fec3314d6633e9ba0203989b6b21444be635d6ee3",
+      "art/menu/track-e1-uphill-weight.webp": "00bfeac18f8bdb2412bfe171475f04a906989106e75bd54e0b02a786adb8e5df",
+      "art/menu/track-e2-rear-wheel-first.webp": "e7ce831e017a955e9138c1e87b3fb2f4931dda0727cbc9ec3be88f13bc86f7c7",
+      "art/menu/track-e3-stairway.webp": "43b77a22eadbdbe515cd33966710976233c7bf24322f6fbc07423cc1c93eb030",
+      "art/menu/track-h1-wheelie-wire.webp": "eabfc07ab922850f7673d385df738c172bd720906706e8805afbd3e9a6d4fb20",
+      "art/menu/track-h2-gap-chain.webp": "d666d583166e6923039eb65fd00b9fa898c1fb56bff797c7ef1f04bcabc21f2c",
+      "art/menu/track-h3-fire-line.webp": "5b31d85b4e284d1d5abd5a6da72ace3beb02885cf7b941c1af2f50eed6d941e0",
+      "art/menu/track-m1-hop-up.webp": "872cc0df21d4609f53bcbd7ad912ea581a579f17cd6d39da4bd5517c54af37a2",
+      "art/menu/track-m2-drum-roll.webp": "e27a69b8dc82f2ec3d2894c20ccfe8ee856f87d367aea19f7c88f596d0decc34",
+      "art/menu/track-m3-see-saw.webp": "d3945643189426a7e01063ef6e09751baf3dc1f4eda10ad5c76eda4ba4027810",
+      "art/menu/track-x1-vertical-limit.webp": "71f0c3df7e6f2b1d1f0388e17c216436da2476e63b3f0d2b70330fef7a813726",
+      "art/menu/track-x2-pipe-dream.webp": "fb08958efa129f566131ef4f09c5295286b7147b1f1ca20d9e3dc9f6f41a22a6",
+      "art/menu/track-x3-gauntlet.webp": "eba55c2a06ee391a64f84ed5e6f66bf037f9bbaaa0132493da4a78595d2c48ea",
+      "art/menu/wordmark-plate.webp": "8c7ded1f3cf66b1a28bbd9585cddd6bf6fbc707126ab508ec160cbcfe8c86630",
+      "art/og.jpg": "8f07a982275ddf1468fbe57f6215c46df54730b3e87dc6aad81f0d4f3bd0c538",
+      "art/plates/plate-canyon.webp": "e0c48cb62502aabf31a8f55872cfb8a3342fc7e7459ddea5cc53484e1a75c4b3",
+      "art/plates/plate-foundry.webp": "a4209e10ee8f4493b8abacfc7a3b10490755ae4b5e178d8679f5730af92d2bc7",
+      "art/plates/plate-industrial.webp": "dee7b119a7c41d9b305265178698e44b5ae7464f0d5fa2c63274954518733cf5",
+      "art/plates/plate-nightcity.webp": "f30a70740b6fe89c99d077d3faeac44daaffdea634391441022b335b1bef2ee6",
+      "art/plates/plate-snow.webp": "5e6479e44db7a689c0f306b55e1c9e411f1091ec4f5b5e1592227cef67d93cbc",
+      "art/plates/sky-canyon.webp": "ec66e12f87cad096badde41ff2e9edd533065625ae7b8330422c0139877ecba8",
+      "art/plates/sky-foundry.webp": "c610ff3192f35553bfb3d5d663efc6f0669d3c399a9832dfe76e499cfb541c91",
+      "art/plates/sky-industrial.webp": "a76dc2bb2221d28a9c95c5aa44f50ca721d47c501512260e072cf29685817e07",
+      "art/plates/sky-nightcity.webp": "ef7aa3d78b307d750e839de18ce6477a64b105d18ed115b30c0145d0bc874269",
+      "art/plates/sky-snow.webp": "ef347821f5514c0a8be04a0ecf0292eeee52d90d1cde41e2c5213d85512cd590",
+      "art/splash/1125x2436.png": "3185677ac4ed28550cd0d78358ce7355e1659c98a04073c0e2e22a10feedec08",
+      "art/splash/1170x2532.png": "b09ba5a003d1ead6c22094c90e5c06a10cff338665a4ee96a151b54b45ec26f3",
+      "art/splash/1179x2556.png": "daf9fad2a3e3658d3a5a15b392d5028b84c043a670c93020a0a415293ba3a039",
+      "art/splash/1206x2622.png": "67d4b2b4603cc3ac3f793f495edbe7d509b7473705b9c0888bd1eeb4b6e77c95",
+      "art/splash/1242x2688.png": "055b945b3f649a9081f1b186ff7d7f2a145be950cff8cec039b564b421b426d5",
+      "art/splash/1284x2778.png": "d18506079a98fef502a335912ada691f1623a3abe3d40da15c16d1e8bc194a04",
+      "art/splash/1290x2796.png": "2757d208e7a3a08604f93ff43eb7f87584a1e6585babef65a86da865d1594339",
+      "art/splash/1320x2868.png": "540091bb4afdaec6200cd73e9d02a24816ddc8a4b4e70060caab968ea838eecb",
+      "art/splash/1334x750.png": "cdb96cc669c4b857481f450276729348fecd362698b742c26040a983dd60ad82",
+      "art/splash/1536x2048.png": "ca81c129f7e1174e280992c8eab34d32b4f251504ee284676a0ac1158aa1a9f2",
+      "art/splash/1620x2160.png": "5c7173a3da6fa13d7a9242ec2e9a271fa90aa1d885e437d701d46de082ad52a5",
+      "art/splash/1668x2388.png": "6a86066f4bbf97f78b873e166496c9b2e77070df0564968a85823c50e2b27f5f",
+      "art/splash/1792x828.png": "ec0b7c4d5c5e55673a2c25bc110c5bc362bd03479c1d666e089bdabdb99a9e15",
+      "art/splash/2048x1536.png": "e485348c45928e594d1862e14b93b304f608eb4ed4f7c9bb50b92de09ebdee13",
+      "art/splash/2048x2732.png": "73bab5a96acfa3b2cd972bc3f3f1df6d9d1f017d03957618b95498e377ce71e6",
+      "art/splash/2160x1620.png": "7477319347d98fafe87ae3314f0c2b8c54d3f1ed8bb850a83f4b957022378765",
+      "art/splash/2388x1668.png": "2012682390558f92e2bc7b634c05fa5765020d00f2d0c4cb6931ddc40dd1cced",
+      "art/splash/2436x1125.png": "db3217ea0128709d6dc29c652e8f0d29738eb4a5f2b748702632d2ca2059bed6",
+      "art/splash/2532x1170.png": "1ef47ed80c6e96dc37e5c551ab7a7cd56ab570fd3f04fec2ff0abab181e281ab",
+      "art/splash/2556x1179.png": "bc5756c5edd88d09569db4f26bd77b5f9150f0895ceb7da1b83f5b853aeea71a",
+      "art/splash/2622x1206.png": "7a0bc561ba39c5e3e22037056f0e3ab6b5766e99d7be2e9f04a26382e3e71c2f",
+      "art/splash/2688x1242.png": "bb1876eb1000182747d2e4ca78c80fa47ff21766a5cc9811b29d97b2826870c6",
+      "art/splash/2732x2048.png": "79e1976df660e361883355484d58570204fe5d7e1d249a7d0a4e1b1d1f091215",
+      "art/splash/2778x1284.png": "f8a87f54b404bf7ca9313961dc718d5d86c70aa042a215ce40f4d87f6a0e42e4",
+      "art/splash/2796x1290.png": "37fb1ac6426386b3278c8470c9004c4b138b6ff4b4c263364f9ed086aa452ece",
+      "art/splash/2868x1320.png": "2c6645bc964da93ab57bc68ccd40074bd6fe614734cdc8dcfd3af869743d8b40",
+      "art/splash/750x1334.png": "a50f181a41e1e06e919528fb441d957e10b3b5e529b559f45d1d299aa521228b",
+      "art/splash/828x1792.png": "e49a3279f9100fba68631e395b3e6c70afdad081d07e3a8bf65a3e5a6176cdf2",
+      "art/thumbs/b1-first-ride.webp": "5299ea627d572c0eac603482cd5e86202c04ef4d71ec20cf4bb1041a194cdad0",
+      "art/thumbs/b2-lean-back.webp": "1e20d81650efb3442baa4009d64c9fb043ccd3c90f51b0992f97c4c29b0f5f68",
+      "art/thumbs/b3-kicker-row.webp": "9f5a73600813a6fac54352d2849c21628b7edf83d4b69995e5e4f71d1e823be6",
+      "art/thumbs/e1-uphill-weight.webp": "7f9b0388024a2055c0e3a2ae1f2d1103eb01f3ad30b05352f60c6723be24ffac",
+      "art/thumbs/e2-rear-wheel-first.webp": "0b92a41701e74d473f59a238426ae42b75af975488b406ec94c4aa28a83326aa",
+      "art/thumbs/e3-stairway.webp": "0970e7849432b059da5c396acee6a530494169746565741a42fc0c7cfac0ad0f",
+      "art/thumbs/h1-wheelie-wire.webp": "f15134cf7728ae35c16d86b6f4ca55d744c3f9e1b9906f5f2933512e0796ba40",
+      "art/thumbs/h2-gap-chain.webp": "3386771d32997bdf3545f98550e8a109ee5160c8d0fafdabe4135c3eae8c5de9",
+      "art/thumbs/h3-fire-line.webp": "e1d087f0c4fe6198e8df4d24da298014b5e5b221c4bd90615897f61a8ed2b840",
+      "art/thumbs/m1-hop-up.webp": "59b4349cb2851185a48d5b3764789334ac28f0cc9132c85181b1d05b23081b75",
+      "art/thumbs/m2-drum-roll.webp": "ef32044572712ab969b121091708cc2628f6a860e5c3cc6bed8583541a2a5fcf",
+      "art/thumbs/m3-see-saw.webp": "f5d1a7b01f54ba16f435bf596c7237dc4a50abfad7b8b2738a8a1f92f1413df7",
+      "art/thumbs/x1-vertical-limit.webp": "51a8e26e09c2ba3b2b5602f0abc9345399bef908a03dd9099e0f42b3ab559e43",
+      "art/thumbs/x2-pipe-dream.webp": "bffdc25fd68d6a2b7f6d70d30bf622a70c970a17a0c24cb35686d950f689eedd",
+      "art/thumbs/x3-gauntlet.webp": "50cfacf7edb3af4ff3133edd6b5c0682e1b89c15b0171ee82bfe6db34416bdad",
+      "art/world/banner-apex-suspension.webp": "1a7dd09b2dd8ab3de22751a56334e8793e188bd406a39e9909f858de39e1b282",
+      "art/world/banner-bolt-energy.webp": "130c65d046130e7cadc52fb8d2ceb54aba1c34ce4da2052b189cb881f321c3c3",
+      "art/world/banner-ironworks-series.webp": "a4361a0b8c8118d049ac3a094017f993e6a67f1604ffc934bd9c8ab30f90e1c9",
+      "art/world/banner-kestrel-tyres.webp": "9e22bb9741e8b5e37d684734612e8d8f4968dfa8679dce5ed0be9e63e68e6468",
+      "art/world/banner-nordvik.webp": "bdd15aa45d2d21214bc2e4c24a351c345869819321f53a667ee6019d6211e424",
+      "art/world/banner-vortex-oil.webp": "2fea659f77c0b2f7a0320451af2ee2be4f0209a93cf7e8f357d6bb62dbf51f56",
+      "art/world/crowd-day.webp": "aec9d62002fda6897eb78666ff76fbe6ea8846991dcbbefc53e54f6f5c02732c",
+      "art/world/crowd-night.webp": "da616c8636dde4c81dcdcb106963dce2fcb90b1670466844ccadf35660f0f232",
+      "art/world/graffiti-grind.webp": "1f75a1ce90f7d5393b39796b2dd12341b4d3258e08e3aa0e6f3bd1695bc2b01f",
+      "art/world/graffiti-nofear.webp": "672578e679a1a2044de87f234a8edf3e6a43b07d80dbf915332841cd1c905c1a",
+      "art/world/graffiti-rise.webp": "b3b865f7e8c3dafc50bb886ec71ed14abaa0c5fcabca7062ee6cf58dfd77b484",
+      "art/world/graffiti-skull.webp": "b10d2418cc34353f13e037c65ce7e78eccefda003b7f710e3770bf15ce29b449",
+      "art/world/graffiti-tag-wall.webp": "d9f5531e47b1799133aa17d0a9de66356f3d66e44cf38ac07d892433833c1e5d",
+      "art/world/graffiti-wheel.webp": "1a1b02decbaa81fecdfbf4c827a9b5e0cce8817de37ed142cc29bbbdbd517a2f",
+      "art/world/kit-pro.webp": "da575160705872106118456363c3d21936b74d0ec515b882a9f919f40c6705bc",
+      "art/world/kit-rookie.webp": "a3b385484999c1762b62a488954728c841aa3c08db19f3e72b4c1654901f97e7",
+      "art/world/mask-edge-grime.webp": "5512e0a93eeeb2eb4642ee9226d9fb5e03df86ee218e5061291a2718c3bf7806",
+      "art/world/mask-grime-spatter.webp": "1ffdb30c0b4684c93c9696a8a1957ef232e70f1cb24f2639c407f54572fa0e79",
+      "art/world/mask-rivet-drips.webp": "5a4d4a38aa5e303c383eb81beec4fd3746496c57bcc5ba7414137f4354ba667d",
+      "art/world/mask-rust-streaks.webp": "f8b91860441ff550ffdf51ac5682ddee3e0f3bf91a061a334f3935394fcc0f07",
+      "art/world/poster-trials-night.webp": "be7251ac3acc36d455136c9f34a8ae779c959da089564c692713465717fb6a14",
+      "art/world/poster-tyres.webp": "9fe1b890bc51d033ccab0c1bf55584880adc8980116098b33189b2f89e4bcb4d",
+      "art/world/sign-exit.webp": "160bed9f19c006c3070a0a16260d9b75d044a9fe01e87c632ebb733229639825",
+      "art/world/sign-forklift.webp": "674eadbd3dbe9b0f58e11d8c446e743abf69f00bb960b5471323023d9c8fe76e",
+      "art/world/sign-hard-hat.webp": "b710c9868379ee3d7323c9dec0f575cc9101f123ec78a7311adc25f09f35086f",
+      "art/world/sign-overhead-crane.webp": "ebba5c576c4b32c52d46f3d0dfcb7afbd638b4fc156673bda1c596086c0f29ed",
+      "art/world/stencil-apex.webp": "d5d942904b15494ae007b8aeaec44b9ec097c98b1ca1a6b265bc8059c583f5d2",
+      "art/world/stencil-arrows.webp": "a0c7300aff015ea18a5e9b593b7108555d8be8f70dcd6297545d0b2a02605a8d",
+      "art/world/stencil-hazard.webp": "0148c9937e3377033bfe97ea14bf48ebd9faa7491c9acf6c7e8e096f57d9348a",
+      "art/world/stencil-hkr.webp": "481d1378596de6787b99eb03709f845c6ef8323ada137127e0ce469e79f4d29d",
+      "art/world/stencil-nordvik.webp": "95925305aa7a7dcef5b7cf60bc2359dd3521113589770c1bbafc820a62c69521",
+      "art/world/stencil-serial.webp": "c3539b3920bd9b26ef47982033f45aa1fe3c01c0ea3f59c95c60e54c1425ab74",
+      "art/world/stencil-taro.webp": "40d02bbb67e7d9313b83634c6e21e5fcf7e7fc9b703620307b46b5f522d9e2a8",
+      "art/world/stencil-weights.webp": "ff5a353824ec0bbbf7edd83e2c4c7c44fbe20789e4ac733df5c240f1e3aa2065",
+      "art/world/tyremark-arc.webp": "925fae78ab1bc39cc535757da3e1e8e79651cbc1d4c6177c2b34592a7bf9cb1b",
+      "art/world/tyremark-straight.webp": "8940ca99d90cf1c9950db30153197de7f4e82a1919a32d46dc730ded0af2a8b6",
+      "art/worldmap/region-canyon-1024.webp": "d4b34da4780417206db27c0da31f4a5e19b702258fc8c35b2bc96c14c71848ec",
+      "art/worldmap/region-canyon-1536.webp": "9a3c4c0e4f5953bfffbab927796542bfd4cf04de2f1595cfe56bf3df13e7b249",
+      "art/worldmap/region-foundry-1024.webp": "1b427e6b9467d8619607347e516ed698d5aa359980d4068b34406e988e20609e",
+      "art/worldmap/region-foundry-1536.webp": "e917156f674a8e0917b19f56ab5e9c7d1a812bc77b697100393e8732ef84fd1f",
+      "art/worldmap/region-industrial-1024.webp": "6d78d842697c0c8ba655ee5563da5a6e0c98bc9f0e20e3605c715c1f4190741a",
+      "art/worldmap/region-industrial-1536.webp": "3708055b579835085a8db429ee81b6304ff47ea0f11110edb4024ff886070668",
+      "art/worldmap/region-nightCity-1024.webp": "772c439077b8b41aec96fe467104cba86b86661a7491f17fb508015a4762239b",
+      "art/worldmap/region-nightCity-1536.webp": "53126a6fff4eb863b37b459f2dfc9040f72d5e4be4e69447e5270ca8885ba307",
+      "art/worldmap/region-snow-1024.webp": "db1aa6b92372b240e08dea1f03bf4b42783e48e6d7b5253f0b1661ccd44e64d4",
+      "art/worldmap/region-snow-1536.webp": "102763d4f1a9829d98c097c8a52353529ab785d973eb56e1c4d58001d55e5581",
+      "art/worldmap/world-1024.webp": "5187cb95a98b3c7051e80239a9fe7d0837e858c83c46262600635198c1b3a274",
+      "art/worldmap/world-1536.webp": "ac1eeab0fe05e05abb268a166a67dc2c2a07b322c58c612546aedcb5da6f88bf",
+      "art/worldmap/worldmap.json": "762935830dc1130384640ac8ab107ec19d269591566db240f807d73023180ace",
+      "assets/inbox-BVBKzEKT.js": "88adf02705d436ce60d2c45fe7b20caf706b337129a90836b965a38f2e445967",
+      "assets/inbox-BVBKzEKT.js.map": "5ac699dccc7b3c1a283a15ce3cbcf6f38b1f4afeb1bf5d478e438ea9850b146d",
+      "assets/index-DAdZDK4p.js": "6bc615a2ed6ea71027c5b5784c54cce12c86e7545c319cd1b95e765d70f52979",
+      "assets/index-DAdZDK4p.js.map": "7da8d21f56a0870e367207ae1bfb02e63df6bea2fa1c44e17fda4241e485abed",
+      "assets/three-CGwyv1Ha.js": "8429d100c1bc19b624ac29ee417fc65f08bd63aaaee6ee76a1d42d37b85a7865",
+      "assets/three-CGwyv1Ha.js.map": "bc638f3aa4fef53f45fca810549bd456cd31a9fe4c1f326bcb379583eb58e0ce",
+      "assets/worklet-DGoGEqnF.js": "2326a359b60af20b6bb7abbe3b59abdf05ba3c267ffdddf219139274e0eec0e3",
+      "assets/worklet-DGoGEqnF.js.map": "7650cc976ed0e1bc4a68ad872e3059fa41b24ab362d14208aad1cc4d3e9d5f75",
+      "assets/worklet-Vg1LRsTe.js": "fbcdbe6317f31fd56c6c0e3f02ec7db861a1fb721f5d359ff28ba60a686e80f5",
+      "assets/worklet-Vg1LRsTe.js.map": "2dc8a2f3937657ce31ca30f0354c481fd6f2da9010b0a5246b0def1f47fd77d4",
+      "bench/b1-bot-3.json": "c9b4293a8e8f698aaa48f6a674eef0daa470c28eb1ab921ec6b52ce5a216b8fe",
+      "fonts/BarlowCondensed-BlackItalic.woff2": "83282bcfc9df534b070d8231f10e511ba0c60ae63af9b5e096e4de089454bc88",
+      "fonts/BarlowCondensed-Bold.woff2": "e3e520cb7468f2efd60bc2ce96694567c3312f4ef414fffbe605e3ad146b24e6",
+      "fonts/BarlowCondensed-Medium.woff2": "31ff5e6e96a096fde4d78bc838719e69b093db2d0b062b96e423c065a6d1b2b1",
+      "fonts/LICENSE.txt": "74f4d5bb5ab5fe306120a2174f0fd3dbde3b0e8a6a78f7f5b74f6af0774179e0",
+      "index.html": "ed7ce2362f32f939d8cdb67a268ebb735721908615b31efacd178d823d2fb253",
+      "load-manifest.json": "909a89f905cd510af93906cc9b966b5729962e05eeb37843c5948d1609602512",
+      "manifest.webmanifest": "ab1315c46a69c33839955ccba821970a219e19bf360f405a3c025f546c4a04ca",
+      "model-catalog.json": "11f1653061ab812089ca8e54dbd726382a5b0baf57cb6c333330272c0ee3e6eb",
+      "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
+      "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb": "fbbae43691569760a6ee0b4385533536b986dd5e7697bf48f4c32cbb4810cf5d",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82",
+      "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb": "ad1907131d0de127ec7900f0543ac413dd5d81c0f562a9d9dded7bf7747634e0",
+      "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515",
+      "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
+      "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb": "3ae6a8d20fccb0273d2ee00fb2ced3d92fd5ae4c80aa925a293975b42aaa2c6b",
+      "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb": "95acaf16925f55abd0ce4446c3c8418f385079d7e2b60db697d53a9fd01e8aa0",
+      "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb": "fb3780c48f5c5083ac0410fe17f9245f64830a7b42577f666915f16857e09910",
+      "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+      "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb": "a535485d70b6ecd4874f204162e338d9ac3ae9d67f335b041170b556793f4ff5",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a",
+      "offline.html": "23c24d4b9f01f18c80ae905b5d178ff832c24845643b02c44af88b121c68979a",
+      "sw.js": "876d764b14479e1840a59ffa5fc599742b3990ec6a71936cb1ffe951e24e5148"
+    },
+    "errors": [],
+    "captureWallMs": 2492.3804589999995,
+    "clip": "harness/out/render-aa-round1/phone-before.mp4",
+    "clipSHA256": "de2bec60b8100fc621fd3d911455647b2b61a4cf5c4455cfe975305c000f4084",
+    "recordingSHA256": "a22550453addbd5dbbb274a0ef16841f40d0873eaef2b9e6cf0d243a91e90198",
+    "synchronizedRenderP50Ms": 2.9300000000000637,
+    "synchronizedRenderP95Ms": 3.2399999999997817,
+    "ticks": [
+      {
+        "tick": 4,
+        "hash": "b6bf3a35355f6bf0"
+      },
+      {
+        "tick": 8,
+        "hash": "e6748773057a1059"
+      },
+      {
+        "tick": 12,
+        "hash": "6fa243bc20b258cc"
+      },
+      {
+        "tick": 16,
+        "hash": "ad2b64b79e09a0c2"
+      },
+      {
+        "tick": 20,
+        "hash": "d23f4291e699df0b"
+      },
+      {
+        "tick": 24,
+        "hash": "cfc6449baef7cb7f"
+      },
+      {
+        "tick": 28,
+        "hash": "f88a202be24ff0f8"
+      },
+      {
+        "tick": 32,
+        "hash": "1f0e4e39faa0b9a0"
+      },
+      {
+        "tick": 36,
+        "hash": "d1a6a25a2663f582"
+      },
+      {
+        "tick": 40,
+        "hash": "e729b5c72987ef7b"
+      },
+      {
+        "tick": 44,
+        "hash": "76848f717644961d"
+      },
+      {
+        "tick": 48,
+        "hash": "237bed2137e84157"
+      },
+      {
+        "tick": 52,
+        "hash": "81e30b39a2d3ec8b"
+      },
+      {
+        "tick": 56,
+        "hash": "7080c8ba3aede407"
+      },
+      {
+        "tick": 60,
+        "hash": "cdcbb15c0d95f146"
+      },
+      {
+        "tick": 64,
+        "hash": "6a60b583e7a2aab7"
+      },
+      {
+        "tick": 68,
+        "hash": "b3d93075d2a2d829"
+      },
+      {
+        "tick": 72,
+        "hash": "8dc87c58d919171d"
+      },
+      {
+        "tick": 76,
+        "hash": "c406812ccca27be0"
+      },
+      {
+        "tick": 80,
+        "hash": "7e5dbdf4270f35a7"
+      },
+      {
+        "tick": 84,
+        "hash": "b7b62f7777d4edfd"
+      },
+      {
+        "tick": 88,
+        "hash": "77c4661ff5edb26d"
+      },
+      {
+        "tick": 92,
+        "hash": "c8d7f46edcd76a17"
+      },
+      {
+        "tick": 96,
+        "hash": "801579c92d5e906b"
+      },
+      {
+        "tick": 100,
+        "hash": "da760ee9e8d75d91"
+      },
+      {
+        "tick": 104,
+        "hash": "ecd44bc4a5c42d10"
+      },
+      {
+        "tick": 108,
+        "hash": "e3a40d769539712a"
+      },
+      {
+        "tick": 112,
+        "hash": "4499f67923552d6c"
+      },
+      {
+        "tick": 116,
+        "hash": "df79f004ff856999"
+      },
+      {
+        "tick": 120,
+        "hash": "55661e5dd1f33da3"
+      },
+      {
+        "tick": 124,
+        "hash": "3dc9ec9ed3401ca6"
+      },
+      {
+        "tick": 128,
+        "hash": "751164142e23dd4e"
+      },
+      {
+        "tick": 132,
+        "hash": "82e4a4480753c3d8"
+      },
+      {
+        "tick": 136,
+        "hash": "19a38e8ca3d2fbdb"
+      },
+      {
+        "tick": 140,
+        "hash": "21e16b029cf98180"
+      },
+      {
+        "tick": 144,
+        "hash": "1954e0825862f706"
+      },
+      {
+        "tick": 148,
+        "hash": "6c378de252dcb02e"
+      },
+      {
+        "tick": 152,
+        "hash": "98eddf79b75fa242"
+      },
+      {
+        "tick": 156,
+        "hash": "c2e6094a400b56e6"
+      },
+      {
+        "tick": 160,
+        "hash": "2b11c5a041c36bf1"
+      },
+      {
+        "tick": 164,
+        "hash": "4fe85080964b5507"
+      },
+      {
+        "tick": 168,
+        "hash": "97fb74d790ab5bbe"
+      },
+      {
+        "tick": 172,
+        "hash": "f347d6cb08f6ca16"
+      },
+      {
+        "tick": 176,
+        "hash": "ea7247fdc0943826"
+      },
+      {
+        "tick": 180,
+        "hash": "1d4d28ac7b2f11db"
+      },
+      {
+        "tick": 184,
+        "hash": "2075a83d31d13c62"
+      },
+      {
+        "tick": 188,
+        "hash": "43886d24bf03d80f"
+      },
+      {
+        "tick": 192,
+        "hash": "553c6e3500ebd2c0"
+      },
+      {
+        "tick": 196,
+        "hash": "47e55d469f4e3426"
+      },
+      {
+        "tick": 200,
+        "hash": "5a7b623c8b7cdb25"
+      },
+      {
+        "tick": 204,
+        "hash": "51afc5bb5b2d7eb3"
+      },
+      {
+        "tick": 208,
+        "hash": "01abebfa830aeb8c"
+      },
+      {
+        "tick": 212,
+        "hash": "1ebe22f6ec913a2f"
+      },
+      {
+        "tick": 216,
+        "hash": "a5003b3651923301"
+      },
+      {
+        "tick": 220,
+        "hash": "5ddbb0c5c2ac032e"
+      },
+      {
+        "tick": 224,
+        "hash": "9e41e8c39576b13c"
+      },
+      {
+        "tick": 228,
+        "hash": "a41948f357dc68b1"
+      },
+      {
+        "tick": 232,
+        "hash": "82e6b7af9f01347e"
+      },
+      {
+        "tick": 236,
+        "hash": "364cf3f2694bb0b6"
+      },
+      {
+        "tick": 240,
+        "hash": "0cc9376ce3221abc"
+      },
+      {
+        "tick": 244,
+        "hash": "46c3ad670a3a9875"
+      },
+      {
+        "tick": 248,
+        "hash": "93dcf83dbdac2d4d"
+      },
+      {
+        "tick": 252,
+        "hash": "e20510cc3187cf98"
+      },
+      {
+        "tick": 256,
+        "hash": "8400b8fb1e7997f9"
+      },
+      {
+        "tick": 260,
+        "hash": "84e9fa9dddc9bde5"
+      },
+      {
+        "tick": 264,
+        "hash": "2802229007007903"
+      },
+      {
+        "tick": 268,
+        "hash": "cc3b7c30dc19a4c2"
+      },
+      {
+        "tick": 272,
+        "hash": "3ad3fe6c93c5a7ae"
+      },
+      {
+        "tick": 276,
+        "hash": "c409aa3e49a28c34"
+      },
+      {
+        "tick": 280,
+        "hash": "bc22927c67916dfa"
+      },
+      {
+        "tick": 284,
+        "hash": "cc0d4f1de96fc5ca"
+      },
+      {
+        "tick": 288,
+        "hash": "2c159b08f7f01f7d"
+      },
+      {
+        "tick": 292,
+        "hash": "515abf887fc1c7dd"
+      },
+      {
+        "tick": 296,
+        "hash": "89059244dee36727"
+      },
+      {
+        "tick": 300,
+        "hash": "d94b57c8aa5a688a"
+      },
+      {
+        "tick": 304,
+        "hash": "8ff5f95424ebf870"
+      },
+      {
+        "tick": 308,
+        "hash": "23b88103bf9d93a4"
+      },
+      {
+        "tick": 312,
+        "hash": "1b1804287f906005"
+      },
+      {
+        "tick": 316,
+        "hash": "8a7916111cbb8b2d"
+      },
+      {
+        "tick": 320,
+        "hash": "781d61df56139c65"
+      },
+      {
+        "tick": 324,
+        "hash": "d74b8ad187876782"
+      },
+      {
+        "tick": 328,
+        "hash": "ea38123df651942b"
+      },
+      {
+        "tick": 332,
+        "hash": "10c9a2604920aa67"
+      },
+      {
+        "tick": 336,
+        "hash": "543702541d3e9969"
+      },
+      {
+        "tick": 340,
+        "hash": "c04e5e2a2dcdc79d"
+      },
+      {
+        "tick": 344,
+        "hash": "703decace8156770"
+      },
+      {
+        "tick": 348,
+        "hash": "76f46f0f6db2bcd2"
+      },
+      {
+        "tick": 352,
+        "hash": "7739e2efa7430c15"
+      },
+      {
+        "tick": 356,
+        "hash": "3884439f2cc3d6a7"
+      },
+      {
+        "tick": 360,
+        "hash": "e7befbe5c9ad4955"
+      }
+    ]
+  },
+  "phone-after": {
+    "graphics": {
+      "requestedBackend": "webkit",
+      "launchArgs": [],
+      "browser": "webkit",
+      "browserVersion": "26.5",
+      "hostPlatform": "darwin",
+      "vendor": "Apple Inc.",
+      "renderer": "Apple GPU",
+      "version": "WebGL 2.0",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "renderSettings": {
+        "prepare": [],
+        "biome": "industrial",
+        "zoom": "idle",
+        "occluder": {
+          "ms": 0,
+          "tested": 0,
+          "hits": 0,
+          "count": 5,
+          "override": null
+        },
+        "garage": {
+          "on": false,
+          "draws": 0,
+          "hidden": 0,
+          "textureMB": 0,
+          "reflection": false
+        },
+        "phase": "menu",
+        "tier": "low",
+        "dpr": 1.5,
+        "devicePixelRatio": 3,
+        "canvasW": 1398,
+        "canvasH": 645,
+        "calls": 602,
+        "tris": 462822,
+        "rtMpx": 4.77,
+        "rtMB": 43.3,
+        "rtPasses": "shadow 512\u00d7512 | scene:hdr 1398\u00d7645 | composite:graded 1398\u00d7645 | smaa:edges 1398\u00d7645 | smaa:weights 1398\u00d7645 | smaa\u2192canvas 1398\u00d7645",
+        "shadowMap": 512,
+        "heroTris": 13629,
+        "heroDoc": "bike-lod rider-lod",
+        "riderOutfit": "street-mustard",
+        "riderMaterialVariant": null,
+        "heroShadow": "hero-only",
+        "trackCalls": 9,
+        "trackTris": 48516,
+        "textureGenMs": 0,
+        "passes": 5,
+        "stalePrograms": 1,
+        "stabilized": {
+          "singlePass": 4,
+          "split": 0,
+          "depth": 31
+        },
+        "skippedFrames": 0,
+        "deviceClass": "phone",
+        "profile": "low",
+        "bloomers": 19,
+        "entryMs": 628.1,
+        "entry": {
+          "biome": "industrial",
+          "ms": 628.1,
+          "compileMs": 136.13999999999942,
+          "textureMs": 11.319999999999936,
+          "warmMs": 9.8,
+          "textures": 36,
+          "texturesMB": 57.4,
+          "materials": 68,
+          "programs": 29,
+          "programsBefore": 20
+        },
+        "heroSwap": {
+          "loads": [
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+              "bytes": 870440,
+              "fetchMs": 120.06000000000002,
+              "parseMs": 136.77999999999997,
+              "prepareMs": 0.6000000000000227,
+              "at": 56.8
+            },
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+              "bytes": 2283040,
+              "fetchMs": 125.14000000000001,
+              "parseMs": 160.96,
+              "prepareMs": 0.15999999999996817,
+              "at": 56.38
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb",
+              "bytes": 864848,
+              "fetchMs": 127.94,
+              "parseMs": 167.46,
+              "prepareMs": 0.0999999999999659,
+              "at": 57.02
+            },
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb",
+              "bytes": 1480204,
+              "fetchMs": 129.8,
+              "parseMs": 179.78,
+              "prepareMs": 0.339999999999975,
+              "at": 56.92
+            },
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb",
+              "bytes": 3015120,
+              "fetchMs": 134.5,
+              "parseMs": 201.60000000000002,
+              "prepareMs": 0.18000000000000682,
+              "at": 56.88
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb",
+              "bytes": 2270544,
+              "fetchMs": 165.92000000000002,
+              "parseMs": 195.93999999999997,
+              "prepareMs": 0.12000000000000455,
+              "at": 56.98
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb",
+              "bytes": 3616252,
+              "fetchMs": 168.72000000000003,
+              "parseMs": 225.09999999999997,
+              "prepareMs": 0.20000000000004547,
+              "at": 57.08
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb",
+              "bytes": 1753256,
+              "fetchMs": 173.16,
+              "parseMs": 235.9,
+              "prepareMs": 0.18000000000000682,
+              "at": 57.12
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb",
+              "bytes": 1706124,
+              "fetchMs": 176.07999999999998,
+              "parseMs": 247.46,
+              "prepareMs": 0.13999999999998636,
+              "at": 57.2
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb",
+              "bytes": 3486940,
+              "fetchMs": 179.12,
+              "parseMs": 275.58000000000004,
+              "prepareMs": 0.15999999999996817,
+              "at": 57.16
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb",
+              "bytes": 2448152,
+              "fetchMs": 221.14,
+              "parseMs": 256.44000000000005,
+              "prepareMs": 0.12000000000000455,
+              "at": 57.24
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb",
+              "bytes": 946824,
+              "fetchMs": 224.58,
+              "parseMs": 259.55999999999995,
+              "prepareMs": 0.06000000000005912,
+              "at": 57.28
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb",
+              "bytes": 912696,
+              "fetchMs": 226.4,
+              "parseMs": 264.26,
+              "prepareMs": 0.08000000000004093,
+              "at": 57.34
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb",
+              "bytes": 2355380,
+              "fetchMs": 228.2,
+              "parseMs": 288.02,
+              "prepareMs": 0.12000000000000455,
+              "at": 57.32
+            }
+          ],
+          "swaps": []
+        },
+        "entering": false,
+        "retirement": {
+          "requested": 4,
+          "released": 4,
+          "deferred": 0,
+          "pending": 0,
+          "maxPending": 0,
+          "contextLosses": 0
+        },
+        "terminalPrograms": {
+          "deleted": 0,
+          "contextReleased": 0
+        },
+        "art": {
+          "settled": true,
+          "ok": true,
+          "loadMs": 610,
+          "deliveredMB": 1.11,
+          "inWorld": true,
+          "trackComplete": true,
+          "trackIds": 28,
+          "builtAtFrame": 0,
+          "frames": 0
+        }
+      }
+    },
+    "buildFiles": {
+      "art/icons/apple-touch-icon-152.png": "e624d214712261f0d2791c8122ff3ca12599c71c06a3124a9145d4495d2b76d9",
+      "art/icons/apple-touch-icon-167.png": "225d6457fa8336b6bcbee3fea9e39bb26435fa70669466fc38f549cd7cc43390",
+      "art/icons/apple-touch-icon.png": "93d86e48bd6dee6b30ede98efdd08dc6cd263a42d46979b4b874604301aaa50b",
+      "art/icons/emblem-512.png": "23b4314890b05e7d340e4a2ca13cf695f2eb9ab7420c0bfb2201c42b6f24cb62",
+      "art/icons/favicon-16.png": "c1711f6279e2a95e229bdc89c53976715a686400a75822df7d06938e18075cc3",
+      "art/icons/favicon-32.png": "9a338662ea22ed9b8cc492f94fb87f27582d6402995a5b3a11f92248a9a849a1",
+      "art/icons/favicon.svg": "c1350cbc46c32741b0cd7d6748d2127ff592f880ee3b6efaa3118ff6ba049c92",
+      "art/icons/icon-1024.png": "908f76e927732d487a131975be4b677167089c95b83f57a7be8bf02513e7d6d7",
+      "art/icons/icon-192.png": "3d3f3477aeee8256417ae476e7190fa19ac282e43f9ff6d0792298e5c153c8e8",
+      "art/icons/icon-512.png": "4d3c5ccdf5f3ed0bfb31a70356b78c93b0fa160cdd5a8365ad56045854e7ec49",
+      "art/icons/icon-maskable-192.png": "9c1c94733b64e24775e8bc0dda1114e811547355024bf1b411747ed2b8c1a5ec",
+      "art/icons/icon-maskable-512.png": "bf6e010e5f41ccd80a643fd51dbe6fa5e68bfef4d18aa9b8af0cbfaaf4ecf036",
+      "art/manifest.json": "298405c3bfeb6cb63a73fd8ef8fb200cb076872ba487d17ff3b6e70818f06f8b",
+      "art/menu/bike-pro-1536.webp": "3e042f66dfc1f4bb6b652c89bd44361ce54f57c5b28a3185788439e360d48f6f",
+      "art/menu/bike-pro-768.webp": "76cb83fff215258ef04e45a69cc1bf8dee8d09acae49a0017cdc52a8be8c7b59",
+      "art/menu/bike-pro-alt.webp": "23c607e66b412000e6dfccc22ed11794c167fe3df7740002e423074fce59a78a",
+      "art/menu/bike-rookie-1536.webp": "ddcf8ace189a1286c3812eaf5c39432314e62d49539b45cf279d92e9bbf619c2",
+      "art/menu/bike-rookie-768.webp": "b16a24afaf9302bde9550bb4832283787ab2917ca9702af9d3a0ce2805cab4cf",
+      "art/menu/bike-rookie-alt.webp": "c1c3df43d901f2e17ba17c2d17d42fcbe3ebe52384bf0af8f21c0b85efba4ee3",
+      "art/menu/garage-plate.webp": "9ccf0f5b56600f09d8830cda538523ad9163beb189fbd5b7164c2443444836cf",
+      "art/menu/keyart-canyon-1920.webp": "6370bc7bd228fb573169a7fa08b9df344aae418b240637c7c0cb137d9179dd3a",
+      "art/menu/keyart-canyon-960.webp": "c6108bb2c4f70bd719f587387cc50c2264d65d39746337319fcd1981425fe245",
+      "art/menu/keyart-industrial-1920.webp": "2facbba1870f569e4e62142e3907469f9818ebfca9b14165ca4385b96da4e6c7",
+      "art/menu/keyart-industrial-960.webp": "3c36185592585cb19dec5a2e8fa64a2f7ef1a815f1c1e131b4183303ea054630",
+      "art/menu/keyart-nalati-1920.webp": "b1e476201cf771f1a573af920b6bdd76be721866c8cecdfcfe548da7f72e457e",
+      "art/menu/keyart-nalati-960.webp": "479343217aed306b489e6303990ca60881e094319d155bb10ea16442734d3ff9",
+      "art/menu/loading-plate.webp": "81d3c72b2f9ad2ff20f37de7816d7e9c2e95d8a3fd6b918ce90b26c8ef5c7dd4",
+      "art/menu/medal-bronze-512.png": "d471240127df3a4a6e8f501516a22c2f9764865e5506dfac9b64e3aaec8d7845",
+      "art/menu/medal-bronze.png": "1ace6c5d54c7fe2ffec32c979df4a5fba84840eb1e45d7b4ad2b0c4cbdfe1040",
+      "art/menu/medal-gold-512.png": "31b1ae0ec1dfcd02af8ae9a20f044ba595e2ffe6a24f3d181913f1252261452f",
+      "art/menu/medal-gold.png": "2d57129bb214258e85b80eddab0d2e7f960a7356b15d2e136e9ce688028fa57a",
+      "art/menu/medal-platinum-512.png": "0e116af3f76a73b1f550c5bc0b70522d2ce8119f3b687cca5b0592573a02b664",
+      "art/menu/medal-platinum.png": "613381217e7215e31236358d0f5afc28d5b918d76ad2360ed1d61c8a319c6da5",
+      "art/menu/medal-silver-512.png": "e29c508c4ba7cbee3dbba15d3f552df3e88817b205b52df926cabf906a478a61",
+      "art/menu/medal-silver.png": "273f649c9a41f096a76885d6651dcd0cf17493f199b6f59f504dcd158a73caf8",
+      "art/menu/results-canyon.webp": "b6ffb0182cd34a86f909813ddb5d7e4f370e2173813c344db45324933792dc56",
+      "art/menu/results-credits.webp": "596d57f262e8cd32b2e42b1f173a7efc350be9b65aebc0332c533bc148911b1d",
+      "art/menu/results-foundry.webp": "18f374c44494f54d9a810911b8412edcf947a9ccb03a6df255ffc49a15f1dbb3",
+      "art/menu/results-garage.webp": "b8f4993d812a0b711cac7f58b8bc5c33024e89d1514b2789f05c0f022e3fade2",
+      "art/menu/results-industrial.webp": "5a10949eae984d2196bec4d4f3f6de46d88d228efaecfbc2f2b8e9e95fe66919",
+      "art/menu/results-nightCity.webp": "5b59f1e3151023d033fc775ade3081f5c92c88f1358adca892dfa369afa1ca11",
+      "art/menu/results-snow.webp": "51a9567ecb7682210f275384cb2f91d17837a2179c7a2a0e3e3ed04bab1cf82a",
+      "art/menu/tier-beginner.webp": "8cd6d9e89bc3b990149937c38142cc2564c9f719874f9dd39cbaf7ad26047b70",
+      "art/menu/tier-easy.webp": "e0f948665cfcd779ae53dd55648934a874528b722ae44e23f7baa1cee816ea22",
+      "art/menu/tier-extreme.webp": "bf5abc29f964cc78c46e779a8e12b7daf11b2cda898d9f35edb29ad206fae46d",
+      "art/menu/tier-hard.webp": "26cffd64018d934ac5956e7fa56c565d8d4a113c2b4ba4e27ef9ffac75d4f02d",
+      "art/menu/tier-medium.webp": "06250a86790e0f6e8ce04f9f0b8ddd27e91fc9ecae927da7dd34f0af4599ccdd",
+      "art/menu/track-b1-first-ride.webp": "c379ef826ee40672995e858be369dbd7dd21a24db199f5af5a8b4234da7604eb",
+      "art/menu/track-b2-lean-back.webp": "18a362cd6a70b6ae322c4604ef20c0f7ed030275155fe5021eba232db06356a0",
+      "art/menu/track-b3-kicker-row.webp": "0162b613762dcc8bf647b04fec3314d6633e9ba0203989b6b21444be635d6ee3",
+      "art/menu/track-e1-uphill-weight.webp": "00bfeac18f8bdb2412bfe171475f04a906989106e75bd54e0b02a786adb8e5df",
+      "art/menu/track-e2-rear-wheel-first.webp": "e7ce831e017a955e9138c1e87b3fb2f4931dda0727cbc9ec3be88f13bc86f7c7",
+      "art/menu/track-e3-stairway.webp": "43b77a22eadbdbe515cd33966710976233c7bf24322f6fbc07423cc1c93eb030",
+      "art/menu/track-h1-wheelie-wire.webp": "eabfc07ab922850f7673d385df738c172bd720906706e8805afbd3e9a6d4fb20",
+      "art/menu/track-h2-gap-chain.webp": "d666d583166e6923039eb65fd00b9fa898c1fb56bff797c7ef1f04bcabc21f2c",
+      "art/menu/track-h3-fire-line.webp": "5b31d85b4e284d1d5abd5a6da72ace3beb02885cf7b941c1af2f50eed6d941e0",
+      "art/menu/track-m1-hop-up.webp": "872cc0df21d4609f53bcbd7ad912ea581a579f17cd6d39da4bd5517c54af37a2",
+      "art/menu/track-m2-drum-roll.webp": "e27a69b8dc82f2ec3d2894c20ccfe8ee856f87d367aea19f7c88f596d0decc34",
+      "art/menu/track-m3-see-saw.webp": "d3945643189426a7e01063ef6e09751baf3dc1f4eda10ad5c76eda4ba4027810",
+      "art/menu/track-x1-vertical-limit.webp": "71f0c3df7e6f2b1d1f0388e17c216436da2476e63b3f0d2b70330fef7a813726",
+      "art/menu/track-x2-pipe-dream.webp": "fb08958efa129f566131ef4f09c5295286b7147b1f1ca20d9e3dc9f6f41a22a6",
+      "art/menu/track-x3-gauntlet.webp": "eba55c2a06ee391a64f84ed5e6f66bf037f9bbaaa0132493da4a78595d2c48ea",
+      "art/menu/wordmark-plate.webp": "8c7ded1f3cf66b1a28bbd9585cddd6bf6fbc707126ab508ec160cbcfe8c86630",
+      "art/og.jpg": "8f07a982275ddf1468fbe57f6215c46df54730b3e87dc6aad81f0d4f3bd0c538",
+      "art/plates/plate-canyon.webp": "e0c48cb62502aabf31a8f55872cfb8a3342fc7e7459ddea5cc53484e1a75c4b3",
+      "art/plates/plate-foundry.webp": "a4209e10ee8f4493b8abacfc7a3b10490755ae4b5e178d8679f5730af92d2bc7",
+      "art/plates/plate-industrial.webp": "dee7b119a7c41d9b305265178698e44b5ae7464f0d5fa2c63274954518733cf5",
+      "art/plates/plate-nightcity.webp": "f30a70740b6fe89c99d077d3faeac44daaffdea634391441022b335b1bef2ee6",
+      "art/plates/plate-snow.webp": "5e6479e44db7a689c0f306b55e1c9e411f1091ec4f5b5e1592227cef67d93cbc",
+      "art/plates/sky-canyon.webp": "ec66e12f87cad096badde41ff2e9edd533065625ae7b8330422c0139877ecba8",
+      "art/plates/sky-foundry.webp": "c610ff3192f35553bfb3d5d663efc6f0669d3c399a9832dfe76e499cfb541c91",
+      "art/plates/sky-industrial.webp": "a76dc2bb2221d28a9c95c5aa44f50ca721d47c501512260e072cf29685817e07",
+      "art/plates/sky-nightcity.webp": "ef7aa3d78b307d750e839de18ce6477a64b105d18ed115b30c0145d0bc874269",
+      "art/plates/sky-snow.webp": "ef347821f5514c0a8be04a0ecf0292eeee52d90d1cde41e2c5213d85512cd590",
+      "art/splash/1125x2436.png": "3185677ac4ed28550cd0d78358ce7355e1659c98a04073c0e2e22a10feedec08",
+      "art/splash/1170x2532.png": "b09ba5a003d1ead6c22094c90e5c06a10cff338665a4ee96a151b54b45ec26f3",
+      "art/splash/1179x2556.png": "daf9fad2a3e3658d3a5a15b392d5028b84c043a670c93020a0a415293ba3a039",
+      "art/splash/1206x2622.png": "67d4b2b4603cc3ac3f793f495edbe7d509b7473705b9c0888bd1eeb4b6e77c95",
+      "art/splash/1242x2688.png": "055b945b3f649a9081f1b186ff7d7f2a145be950cff8cec039b564b421b426d5",
+      "art/splash/1284x2778.png": "d18506079a98fef502a335912ada691f1623a3abe3d40da15c16d1e8bc194a04",
+      "art/splash/1290x2796.png": "2757d208e7a3a08604f93ff43eb7f87584a1e6585babef65a86da865d1594339",
+      "art/splash/1320x2868.png": "540091bb4afdaec6200cd73e9d02a24816ddc8a4b4e70060caab968ea838eecb",
+      "art/splash/1334x750.png": "cdb96cc669c4b857481f450276729348fecd362698b742c26040a983dd60ad82",
+      "art/splash/1536x2048.png": "ca81c129f7e1174e280992c8eab34d32b4f251504ee284676a0ac1158aa1a9f2",
+      "art/splash/1620x2160.png": "5c7173a3da6fa13d7a9242ec2e9a271fa90aa1d885e437d701d46de082ad52a5",
+      "art/splash/1668x2388.png": "6a86066f4bbf97f78b873e166496c9b2e77070df0564968a85823c50e2b27f5f",
+      "art/splash/1792x828.png": "ec0b7c4d5c5e55673a2c25bc110c5bc362bd03479c1d666e089bdabdb99a9e15",
+      "art/splash/2048x1536.png": "e485348c45928e594d1862e14b93b304f608eb4ed4f7c9bb50b92de09ebdee13",
+      "art/splash/2048x2732.png": "73bab5a96acfa3b2cd972bc3f3f1df6d9d1f017d03957618b95498e377ce71e6",
+      "art/splash/2160x1620.png": "7477319347d98fafe87ae3314f0c2b8c54d3f1ed8bb850a83f4b957022378765",
+      "art/splash/2388x1668.png": "2012682390558f92e2bc7b634c05fa5765020d00f2d0c4cb6931ddc40dd1cced",
+      "art/splash/2436x1125.png": "db3217ea0128709d6dc29c652e8f0d29738eb4a5f2b748702632d2ca2059bed6",
+      "art/splash/2532x1170.png": "1ef47ed80c6e96dc37e5c551ab7a7cd56ab570fd3f04fec2ff0abab181e281ab",
+      "art/splash/2556x1179.png": "bc5756c5edd88d09569db4f26bd77b5f9150f0895ceb7da1b83f5b853aeea71a",
+      "art/splash/2622x1206.png": "7a0bc561ba39c5e3e22037056f0e3ab6b5766e99d7be2e9f04a26382e3e71c2f",
+      "art/splash/2688x1242.png": "bb1876eb1000182747d2e4ca78c80fa47ff21766a5cc9811b29d97b2826870c6",
+      "art/splash/2732x2048.png": "79e1976df660e361883355484d58570204fe5d7e1d249a7d0a4e1b1d1f091215",
+      "art/splash/2778x1284.png": "f8a87f54b404bf7ca9313961dc718d5d86c70aa042a215ce40f4d87f6a0e42e4",
+      "art/splash/2796x1290.png": "37fb1ac6426386b3278c8470c9004c4b138b6ff4b4c263364f9ed086aa452ece",
+      "art/splash/2868x1320.png": "2c6645bc964da93ab57bc68ccd40074bd6fe614734cdc8dcfd3af869743d8b40",
+      "art/splash/750x1334.png": "a50f181a41e1e06e919528fb441d957e10b3b5e529b559f45d1d299aa521228b",
+      "art/splash/828x1792.png": "e49a3279f9100fba68631e395b3e6c70afdad081d07e3a8bf65a3e5a6176cdf2",
+      "art/thumbs/b1-first-ride.webp": "5299ea627d572c0eac603482cd5e86202c04ef4d71ec20cf4bb1041a194cdad0",
+      "art/thumbs/b2-lean-back.webp": "1e20d81650efb3442baa4009d64c9fb043ccd3c90f51b0992f97c4c29b0f5f68",
+      "art/thumbs/b3-kicker-row.webp": "9f5a73600813a6fac54352d2849c21628b7edf83d4b69995e5e4f71d1e823be6",
+      "art/thumbs/e1-uphill-weight.webp": "7f9b0388024a2055c0e3a2ae1f2d1103eb01f3ad30b05352f60c6723be24ffac",
+      "art/thumbs/e2-rear-wheel-first.webp": "0b92a41701e74d473f59a238426ae42b75af975488b406ec94c4aa28a83326aa",
+      "art/thumbs/e3-stairway.webp": "0970e7849432b059da5c396acee6a530494169746565741a42fc0c7cfac0ad0f",
+      "art/thumbs/h1-wheelie-wire.webp": "f15134cf7728ae35c16d86b6f4ca55d744c3f9e1b9906f5f2933512e0796ba40",
+      "art/thumbs/h2-gap-chain.webp": "3386771d32997bdf3545f98550e8a109ee5160c8d0fafdabe4135c3eae8c5de9",
+      "art/thumbs/h3-fire-line.webp": "e1d087f0c4fe6198e8df4d24da298014b5e5b221c4bd90615897f61a8ed2b840",
+      "art/thumbs/m1-hop-up.webp": "59b4349cb2851185a48d5b3764789334ac28f0cc9132c85181b1d05b23081b75",
+      "art/thumbs/m2-drum-roll.webp": "ef32044572712ab969b121091708cc2628f6a860e5c3cc6bed8583541a2a5fcf",
+      "art/thumbs/m3-see-saw.webp": "f5d1a7b01f54ba16f435bf596c7237dc4a50abfad7b8b2738a8a1f92f1413df7",
+      "art/thumbs/x1-vertical-limit.webp": "51a8e26e09c2ba3b2b5602f0abc9345399bef908a03dd9099e0f42b3ab559e43",
+      "art/thumbs/x2-pipe-dream.webp": "bffdc25fd68d6a2b7f6d70d30bf622a70c970a17a0c24cb35686d950f689eedd",
+      "art/thumbs/x3-gauntlet.webp": "50cfacf7edb3af4ff3133edd6b5c0682e1b89c15b0171ee82bfe6db34416bdad",
+      "art/world/banner-apex-suspension.webp": "1a7dd09b2dd8ab3de22751a56334e8793e188bd406a39e9909f858de39e1b282",
+      "art/world/banner-bolt-energy.webp": "130c65d046130e7cadc52fb8d2ceb54aba1c34ce4da2052b189cb881f321c3c3",
+      "art/world/banner-ironworks-series.webp": "a4361a0b8c8118d049ac3a094017f993e6a67f1604ffc934bd9c8ab30f90e1c9",
+      "art/world/banner-kestrel-tyres.webp": "9e22bb9741e8b5e37d684734612e8d8f4968dfa8679dce5ed0be9e63e68e6468",
+      "art/world/banner-nordvik.webp": "bdd15aa45d2d21214bc2e4c24a351c345869819321f53a667ee6019d6211e424",
+      "art/world/banner-vortex-oil.webp": "2fea659f77c0b2f7a0320451af2ee2be4f0209a93cf7e8f357d6bb62dbf51f56",
+      "art/world/crowd-day.webp": "aec9d62002fda6897eb78666ff76fbe6ea8846991dcbbefc53e54f6f5c02732c",
+      "art/world/crowd-night.webp": "da616c8636dde4c81dcdcb106963dce2fcb90b1670466844ccadf35660f0f232",
+      "art/world/graffiti-grind.webp": "1f75a1ce90f7d5393b39796b2dd12341b4d3258e08e3aa0e6f3bd1695bc2b01f",
+      "art/world/graffiti-nofear.webp": "672578e679a1a2044de87f234a8edf3e6a43b07d80dbf915332841cd1c905c1a",
+      "art/world/graffiti-rise.webp": "b3b865f7e8c3dafc50bb886ec71ed14abaa0c5fcabca7062ee6cf58dfd77b484",
+      "art/world/graffiti-skull.webp": "b10d2418cc34353f13e037c65ce7e78eccefda003b7f710e3770bf15ce29b449",
+      "art/world/graffiti-tag-wall.webp": "d9f5531e47b1799133aa17d0a9de66356f3d66e44cf38ac07d892433833c1e5d",
+      "art/world/graffiti-wheel.webp": "1a1b02decbaa81fecdfbf4c827a9b5e0cce8817de37ed142cc29bbbdbd517a2f",
+      "art/world/kit-pro.webp": "da575160705872106118456363c3d21936b74d0ec515b882a9f919f40c6705bc",
+      "art/world/kit-rookie.webp": "a3b385484999c1762b62a488954728c841aa3c08db19f3e72b4c1654901f97e7",
+      "art/world/mask-edge-grime.webp": "5512e0a93eeeb2eb4642ee9226d9fb5e03df86ee218e5061291a2718c3bf7806",
+      "art/world/mask-grime-spatter.webp": "1ffdb30c0b4684c93c9696a8a1957ef232e70f1cb24f2639c407f54572fa0e79",
+      "art/world/mask-rivet-drips.webp": "5a4d4a38aa5e303c383eb81beec4fd3746496c57bcc5ba7414137f4354ba667d",
+      "art/world/mask-rust-streaks.webp": "f8b91860441ff550ffdf51ac5682ddee3e0f3bf91a061a334f3935394fcc0f07",
+      "art/world/poster-trials-night.webp": "be7251ac3acc36d455136c9f34a8ae779c959da089564c692713465717fb6a14",
+      "art/world/poster-tyres.webp": "9fe1b890bc51d033ccab0c1bf55584880adc8980116098b33189b2f89e4bcb4d",
+      "art/world/sign-exit.webp": "160bed9f19c006c3070a0a16260d9b75d044a9fe01e87c632ebb733229639825",
+      "art/world/sign-forklift.webp": "674eadbd3dbe9b0f58e11d8c446e743abf69f00bb960b5471323023d9c8fe76e",
+      "art/world/sign-hard-hat.webp": "b710c9868379ee3d7323c9dec0f575cc9101f123ec78a7311adc25f09f35086f",
+      "art/world/sign-overhead-crane.webp": "ebba5c576c4b32c52d46f3d0dfcb7afbd638b4fc156673bda1c596086c0f29ed",
+      "art/world/stencil-apex.webp": "d5d942904b15494ae007b8aeaec44b9ec097c98b1ca1a6b265bc8059c583f5d2",
+      "art/world/stencil-arrows.webp": "a0c7300aff015ea18a5e9b593b7108555d8be8f70dcd6297545d0b2a02605a8d",
+      "art/world/stencil-hazard.webp": "0148c9937e3377033bfe97ea14bf48ebd9faa7491c9acf6c7e8e096f57d9348a",
+      "art/world/stencil-hkr.webp": "481d1378596de6787b99eb03709f845c6ef8323ada137127e0ce469e79f4d29d",
+      "art/world/stencil-nordvik.webp": "95925305aa7a7dcef5b7cf60bc2359dd3521113589770c1bbafc820a62c69521",
+      "art/world/stencil-serial.webp": "c3539b3920bd9b26ef47982033f45aa1fe3c01c0ea3f59c95c60e54c1425ab74",
+      "art/world/stencil-taro.webp": "40d02bbb67e7d9313b83634c6e21e5fcf7e7fc9b703620307b46b5f522d9e2a8",
+      "art/world/stencil-weights.webp": "ff5a353824ec0bbbf7edd83e2c4c7c44fbe20789e4ac733df5c240f1e3aa2065",
+      "art/world/tyremark-arc.webp": "925fae78ab1bc39cc535757da3e1e8e79651cbc1d4c6177c2b34592a7bf9cb1b",
+      "art/world/tyremark-straight.webp": "8940ca99d90cf1c9950db30153197de7f4e82a1919a32d46dc730ded0af2a8b6",
+      "art/worldmap/region-canyon-1024.webp": "d4b34da4780417206db27c0da31f4a5e19b702258fc8c35b2bc96c14c71848ec",
+      "art/worldmap/region-canyon-1536.webp": "9a3c4c0e4f5953bfffbab927796542bfd4cf04de2f1595cfe56bf3df13e7b249",
+      "art/worldmap/region-foundry-1024.webp": "1b427e6b9467d8619607347e516ed698d5aa359980d4068b34406e988e20609e",
+      "art/worldmap/region-foundry-1536.webp": "e917156f674a8e0917b19f56ab5e9c7d1a812bc77b697100393e8732ef84fd1f",
+      "art/worldmap/region-industrial-1024.webp": "6d78d842697c0c8ba655ee5563da5a6e0c98bc9f0e20e3605c715c1f4190741a",
+      "art/worldmap/region-industrial-1536.webp": "3708055b579835085a8db429ee81b6304ff47ea0f11110edb4024ff886070668",
+      "art/worldmap/region-nightCity-1024.webp": "772c439077b8b41aec96fe467104cba86b86661a7491f17fb508015a4762239b",
+      "art/worldmap/region-nightCity-1536.webp": "53126a6fff4eb863b37b459f2dfc9040f72d5e4be4e69447e5270ca8885ba307",
+      "art/worldmap/region-snow-1024.webp": "db1aa6b92372b240e08dea1f03bf4b42783e48e6d7b5253f0b1661ccd44e64d4",
+      "art/worldmap/region-snow-1536.webp": "102763d4f1a9829d98c097c8a52353529ab785d973eb56e1c4d58001d55e5581",
+      "art/worldmap/world-1024.webp": "5187cb95a98b3c7051e80239a9fe7d0837e858c83c46262600635198c1b3a274",
+      "art/worldmap/world-1536.webp": "ac1eeab0fe05e05abb268a166a67dc2c2a07b322c58c612546aedcb5da6f88bf",
+      "art/worldmap/worldmap.json": "762935830dc1130384640ac8ab107ec19d269591566db240f807d73023180ace",
+      "assets/inbox-scUqjp7Z.js": "deefb020591262326e89b9a909aa65df60c713d7633fe84e10e5a8705933de10",
+      "assets/inbox-scUqjp7Z.js.map": "8c7f10d363f36191837d55fbf4099af7dee07a5bfb7eeab2b8e94e4adf8b8716",
+      "assets/index-bExEvBLE.js": "109e13ef8c9d51b2552ccc174241e7a0001714e659ca5efbd6c09fed4b75f5fd",
+      "assets/index-bExEvBLE.js.map": "13408298c32e3dab808dd2296a47826ba8df58eb32004a27d46700cd25aa3bb0",
+      "assets/three-CGwyv1Ha.js": "8429d100c1bc19b624ac29ee417fc65f08bd63aaaee6ee76a1d42d37b85a7865",
+      "assets/three-CGwyv1Ha.js.map": "bc638f3aa4fef53f45fca810549bd456cd31a9fe4c1f326bcb379583eb58e0ce",
+      "assets/worklet-DGoGEqnF.js": "2326a359b60af20b6bb7abbe3b59abdf05ba3c267ffdddf219139274e0eec0e3",
+      "assets/worklet-DGoGEqnF.js.map": "7650cc976ed0e1bc4a68ad872e3059fa41b24ab362d14208aad1cc4d3e9d5f75",
+      "assets/worklet-Vg1LRsTe.js": "fbcdbe6317f31fd56c6c0e3f02ec7db861a1fb721f5d359ff28ba60a686e80f5",
+      "assets/worklet-Vg1LRsTe.js.map": "2dc8a2f3937657ce31ca30f0354c481fd6f2da9010b0a5246b0def1f47fd77d4",
+      "bench/b1-bot-3.json": "c9b4293a8e8f698aaa48f6a674eef0daa470c28eb1ab921ec6b52ce5a216b8fe",
+      "fonts/BarlowCondensed-BlackItalic.woff2": "83282bcfc9df534b070d8231f10e511ba0c60ae63af9b5e096e4de089454bc88",
+      "fonts/BarlowCondensed-Bold.woff2": "e3e520cb7468f2efd60bc2ce96694567c3312f4ef414fffbe605e3ad146b24e6",
+      "fonts/BarlowCondensed-Medium.woff2": "31ff5e6e96a096fde4d78bc838719e69b093db2d0b062b96e423c065a6d1b2b1",
+      "fonts/LICENSE.txt": "74f4d5bb5ab5fe306120a2174f0fd3dbde3b0e8a6a78f7f5b74f6af0774179e0",
+      "index.html": "e1901b87f607bd55dcd5343bc5e8e3a80bde380b553708b5b03fb2c0e760c840",
+      "load-manifest.json": "efcd302d2445f0fa5f4296b5295124c536b3f1e0a72ab016756f6f40a77b0419",
+      "manifest.webmanifest": "ab1315c46a69c33839955ccba821970a219e19bf360f405a3c025f546c4a04ca",
+      "model-catalog.json": "11f1653061ab812089ca8e54dbd726382a5b0baf57cb6c333330272c0ee3e6eb",
+      "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
+      "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb": "fbbae43691569760a6ee0b4385533536b986dd5e7697bf48f4c32cbb4810cf5d",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82",
+      "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb": "ad1907131d0de127ec7900f0543ac413dd5d81c0f562a9d9dded7bf7747634e0",
+      "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515",
+      "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
+      "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb": "3ae6a8d20fccb0273d2ee00fb2ced3d92fd5ae4c80aa925a293975b42aaa2c6b",
+      "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb": "95acaf16925f55abd0ce4446c3c8418f385079d7e2b60db697d53a9fd01e8aa0",
+      "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb": "fb3780c48f5c5083ac0410fe17f9245f64830a7b42577f666915f16857e09910",
+      "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+      "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb": "a535485d70b6ecd4874f204162e338d9ac3ae9d67f335b041170b556793f4ff5",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a",
+      "offline.html": "23c24d4b9f01f18c80ae905b5d178ff832c24845643b02c44af88b121c68979a",
+      "sw.js": "365921f1c87375899611ba1fbf150be098072d7b768bfb6e77ef223a764bf27e"
+    },
+    "errors": [],
+    "captureWallMs": 2591.5933330000003,
+    "clip": "harness/out/render-aa-round1/phone-after.mp4",
+    "clipSHA256": "2cbaf8d894ad682dc0470706ede23351825f820db44c50cb71d7c4724e82aaef",
+    "recordingSHA256": "a22550453addbd5dbbb274a0ef16841f40d0873eaef2b9e6cf0d243a91e90198",
+    "synchronizedRenderP50Ms": 4.1599999999998545,
+    "synchronizedRenderP95Ms": 4.399999999999636,
+    "ticks": [
+      {
+        "tick": 4,
+        "hash": "b6bf3a35355f6bf0"
+      },
+      {
+        "tick": 8,
+        "hash": "e6748773057a1059"
+      },
+      {
+        "tick": 12,
+        "hash": "6fa243bc20b258cc"
+      },
+      {
+        "tick": 16,
+        "hash": "ad2b64b79e09a0c2"
+      },
+      {
+        "tick": 20,
+        "hash": "d23f4291e699df0b"
+      },
+      {
+        "tick": 24,
+        "hash": "cfc6449baef7cb7f"
+      },
+      {
+        "tick": 28,
+        "hash": "f88a202be24ff0f8"
+      },
+      {
+        "tick": 32,
+        "hash": "1f0e4e39faa0b9a0"
+      },
+      {
+        "tick": 36,
+        "hash": "d1a6a25a2663f582"
+      },
+      {
+        "tick": 40,
+        "hash": "e729b5c72987ef7b"
+      },
+      {
+        "tick": 44,
+        "hash": "76848f717644961d"
+      },
+      {
+        "tick": 48,
+        "hash": "237bed2137e84157"
+      },
+      {
+        "tick": 52,
+        "hash": "81e30b39a2d3ec8b"
+      },
+      {
+        "tick": 56,
+        "hash": "7080c8ba3aede407"
+      },
+      {
+        "tick": 60,
+        "hash": "cdcbb15c0d95f146"
+      },
+      {
+        "tick": 64,
+        "hash": "6a60b583e7a2aab7"
+      },
+      {
+        "tick": 68,
+        "hash": "b3d93075d2a2d829"
+      },
+      {
+        "tick": 72,
+        "hash": "8dc87c58d919171d"
+      },
+      {
+        "tick": 76,
+        "hash": "c406812ccca27be0"
+      },
+      {
+        "tick": 80,
+        "hash": "7e5dbdf4270f35a7"
+      },
+      {
+        "tick": 84,
+        "hash": "b7b62f7777d4edfd"
+      },
+      {
+        "tick": 88,
+        "hash": "77c4661ff5edb26d"
+      },
+      {
+        "tick": 92,
+        "hash": "c8d7f46edcd76a17"
+      },
+      {
+        "tick": 96,
+        "hash": "801579c92d5e906b"
+      },
+      {
+        "tick": 100,
+        "hash": "da760ee9e8d75d91"
+      },
+      {
+        "tick": 104,
+        "hash": "ecd44bc4a5c42d10"
+      },
+      {
+        "tick": 108,
+        "hash": "e3a40d769539712a"
+      },
+      {
+        "tick": 112,
+        "hash": "4499f67923552d6c"
+      },
+      {
+        "tick": 116,
+        "hash": "df79f004ff856999"
+      },
+      {
+        "tick": 120,
+        "hash": "55661e5dd1f33da3"
+      },
+      {
+        "tick": 124,
+        "hash": "3dc9ec9ed3401ca6"
+      },
+      {
+        "tick": 128,
+        "hash": "751164142e23dd4e"
+      },
+      {
+        "tick": 132,
+        "hash": "82e4a4480753c3d8"
+      },
+      {
+        "tick": 136,
+        "hash": "19a38e8ca3d2fbdb"
+      },
+      {
+        "tick": 140,
+        "hash": "21e16b029cf98180"
+      },
+      {
+        "tick": 144,
+        "hash": "1954e0825862f706"
+      },
+      {
+        "tick": 148,
+        "hash": "6c378de252dcb02e"
+      },
+      {
+        "tick": 152,
+        "hash": "98eddf79b75fa242"
+      },
+      {
+        "tick": 156,
+        "hash": "c2e6094a400b56e6"
+      },
+      {
+        "tick": 160,
+        "hash": "2b11c5a041c36bf1"
+      },
+      {
+        "tick": 164,
+        "hash": "4fe85080964b5507"
+      },
+      {
+        "tick": 168,
+        "hash": "97fb74d790ab5bbe"
+      },
+      {
+        "tick": 172,
+        "hash": "f347d6cb08f6ca16"
+      },
+      {
+        "tick": 176,
+        "hash": "ea7247fdc0943826"
+      },
+      {
+        "tick": 180,
+        "hash": "1d4d28ac7b2f11db"
+      },
+      {
+        "tick": 184,
+        "hash": "2075a83d31d13c62"
+      },
+      {
+        "tick": 188,
+        "hash": "43886d24bf03d80f"
+      },
+      {
+        "tick": 192,
+        "hash": "553c6e3500ebd2c0"
+      },
+      {
+        "tick": 196,
+        "hash": "47e55d469f4e3426"
+      },
+      {
+        "tick": 200,
+        "hash": "5a7b623c8b7cdb25"
+      },
+      {
+        "tick": 204,
+        "hash": "51afc5bb5b2d7eb3"
+      },
+      {
+        "tick": 208,
+        "hash": "01abebfa830aeb8c"
+      },
+      {
+        "tick": 212,
+        "hash": "1ebe22f6ec913a2f"
+      },
+      {
+        "tick": 216,
+        "hash": "a5003b3651923301"
+      },
+      {
+        "tick": 220,
+        "hash": "5ddbb0c5c2ac032e"
+      },
+      {
+        "tick": 224,
+        "hash": "9e41e8c39576b13c"
+      },
+      {
+        "tick": 228,
+        "hash": "a41948f357dc68b1"
+      },
+      {
+        "tick": 232,
+        "hash": "82e6b7af9f01347e"
+      },
+      {
+        "tick": 236,
+        "hash": "364cf3f2694bb0b6"
+      },
+      {
+        "tick": 240,
+        "hash": "0cc9376ce3221abc"
+      },
+      {
+        "tick": 244,
+        "hash": "46c3ad670a3a9875"
+      },
+      {
+        "tick": 248,
+        "hash": "93dcf83dbdac2d4d"
+      },
+      {
+        "tick": 252,
+        "hash": "e20510cc3187cf98"
+      },
+      {
+        "tick": 256,
+        "hash": "8400b8fb1e7997f9"
+      },
+      {
+        "tick": 260,
+        "hash": "84e9fa9dddc9bde5"
+      },
+      {
+        "tick": 264,
+        "hash": "2802229007007903"
+      },
+      {
+        "tick": 268,
+        "hash": "cc3b7c30dc19a4c2"
+      },
+      {
+        "tick": 272,
+        "hash": "3ad3fe6c93c5a7ae"
+      },
+      {
+        "tick": 276,
+        "hash": "c409aa3e49a28c34"
+      },
+      {
+        "tick": 280,
+        "hash": "bc22927c67916dfa"
+      },
+      {
+        "tick": 284,
+        "hash": "cc0d4f1de96fc5ca"
+      },
+      {
+        "tick": 288,
+        "hash": "2c159b08f7f01f7d"
+      },
+      {
+        "tick": 292,
+        "hash": "515abf887fc1c7dd"
+      },
+      {
+        "tick": 296,
+        "hash": "89059244dee36727"
+      },
+      {
+        "tick": 300,
+        "hash": "d94b57c8aa5a688a"
+      },
+      {
+        "tick": 304,
+        "hash": "8ff5f95424ebf870"
+      },
+      {
+        "tick": 308,
+        "hash": "23b88103bf9d93a4"
+      },
+      {
+        "tick": 312,
+        "hash": "1b1804287f906005"
+      },
+      {
+        "tick": 316,
+        "hash": "8a7916111cbb8b2d"
+      },
+      {
+        "tick": 320,
+        "hash": "781d61df56139c65"
+      },
+      {
+        "tick": 324,
+        "hash": "d74b8ad187876782"
+      },
+      {
+        "tick": 328,
+        "hash": "ea38123df651942b"
+      },
+      {
+        "tick": 332,
+        "hash": "10c9a2604920aa67"
+      },
+      {
+        "tick": 336,
+        "hash": "543702541d3e9969"
+      },
+      {
+        "tick": 340,
+        "hash": "c04e5e2a2dcdc79d"
+      },
+      {
+        "tick": 344,
+        "hash": "703decace8156770"
+      },
+      {
+        "tick": 348,
+        "hash": "76f46f0f6db2bcd2"
+      },
+      {
+        "tick": 352,
+        "hash": "7739e2efa7430c15"
+      },
+      {
+        "tick": 356,
+        "hash": "3884439f2cc3d6a7"
+      },
+      {
+        "tick": 360,
+        "hash": "e7befbe5c9ad4955"
+      }
+    ]
+  },
+  "snow-clean": {
+    "graphics": {
+      "requestedBackend": "webkit",
+      "launchArgs": [],
+      "browser": "webkit",
+      "browserVersion": "26.5",
+      "hostPlatform": "darwin",
+      "vendor": "Apple Inc.",
+      "renderer": "Apple GPU",
+      "version": "WebGL 2.0",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "renderSettings": {
+        "prepare": [],
+        "biome": "snow",
+        "zoom": "idle",
+        "occluder": {
+          "ms": 0,
+          "tested": 0,
+          "hits": 0,
+          "count": 48,
+          "override": null
+        },
+        "garage": {
+          "on": false,
+          "draws": 0,
+          "hidden": 0,
+          "textureMB": 0,
+          "reflection": false
+        },
+        "phase": "menu",
+        "tier": "low",
+        "dpr": 1.5,
+        "devicePixelRatio": 3,
+        "canvasW": 1398,
+        "canvasH": 645,
+        "calls": 845,
+        "tris": 751204,
+        "rtMpx": 4.77,
+        "rtMB": 43.3,
+        "rtPasses": "shadow 512\u00d7512 | scene:hdr 1398\u00d7645 | composite:graded 1398\u00d7645 | smaa:edges 1398\u00d7645 | smaa:weights 1398\u00d7645 | smaa\u2192canvas 1398\u00d7645",
+        "shadowMap": 512,
+        "heroTris": 13629,
+        "heroDoc": "bike-lod rider-lod",
+        "riderOutfit": "street-mustard",
+        "riderMaterialVariant": null,
+        "heroShadow": "hero-only",
+        "trackCalls": 15,
+        "trackTris": 94364,
+        "textureGenMs": 0,
+        "passes": 5,
+        "stalePrograms": 12,
+        "stabilized": {
+          "singlePass": 4,
+          "split": 0,
+          "depth": 31
+        },
+        "skippedFrames": 0,
+        "deviceClass": "phone",
+        "profile": "low",
+        "bloomers": 61,
+        "entryMs": 660.1,
+        "entry": {
+          "biome": "snow",
+          "ms": 660.1,
+          "compileMs": 135.18000000000075,
+          "textureMs": 21.90000000000009,
+          "warmMs": 88.9,
+          "textures": 23,
+          "texturesMB": 40.1,
+          "materials": 64,
+          "programs": 38,
+          "programsBefore": 20
+        },
+        "heroSwap": {
+          "loads": [
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+              "bytes": 870440,
+              "fetchMs": 124.98,
+              "parseMs": 153.26000000000002,
+              "prepareMs": 0.5600000000000023,
+              "at": 66.42
+            },
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+              "bytes": 2283040,
+              "fetchMs": 140.51999999999998,
+              "parseMs": 162.68,
+              "prepareMs": 0.13999999999998636,
+              "at": 65.98
+            },
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb",
+              "bytes": 1480204,
+              "fetchMs": 170.06,
+              "parseMs": 145.96,
+              "prepareMs": 0.339999999999975,
+              "at": 66.54
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb",
+              "bytes": 864848,
+              "fetchMs": 175.32,
+              "parseMs": 151.6,
+              "prepareMs": 0.10000000000002274,
+              "at": 66.64
+            },
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb",
+              "bytes": 3015120,
+              "fetchMs": 177.48,
+              "parseMs": 176.16,
+              "prepareMs": 0.160000000000025,
+              "at": 66.5
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb",
+              "bytes": 2270544,
+              "fetchMs": 181.74,
+              "parseMs": 194.42000000000002,
+              "prepareMs": 0.0999999999999659,
+              "at": 66.58
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb",
+              "bytes": 1753256,
+              "fetchMs": 184.14000000000001,
+              "parseMs": 205.95999999999998,
+              "prepareMs": 0.18000000000000682,
+              "at": 66.72
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb",
+              "bytes": 3616252,
+              "fetchMs": 226.18,
+              "parseMs": 194,
+              "prepareMs": 0.18000000000000682,
+              "at": 66.68
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb",
+              "bytes": 1706124,
+              "fetchMs": 230.57999999999998,
+              "parseMs": 203.34000000000003,
+              "prepareMs": 0.12000000000000455,
+              "at": 66.82
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb",
+              "bytes": 946824,
+              "fetchMs": 233.10000000000002,
+              "parseMs": 207.15999999999997,
+              "prepareMs": 0.08000000000004093,
+              "at": 66.88
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb",
+              "bytes": 2448152,
+              "fetchMs": 235.51999999999998,
+              "parseMs": 225.01999999999998,
+              "prepareMs": 0.10000000000002274,
+              "at": 66.86
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb",
+              "bytes": 3486940,
+              "fetchMs": 238.54,
+              "parseMs": 256.78000000000003,
+              "prepareMs": 0.15999999999996817,
+              "at": 66.78
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb",
+              "bytes": 2355380,
+              "fetchMs": 249.2,
+              "parseMs": 264.58000000000004,
+              "prepareMs": 0.13999999999998636,
+              "at": 66.92
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb",
+              "bytes": 912696,
+              "fetchMs": 251.90000000000003,
+              "parseMs": 268.14,
+              "prepareMs": 0.05999999999994543,
+              "at": 66.96
+            }
+          ],
+          "swaps": []
+        },
+        "entering": false,
+        "retirement": {
+          "requested": 5,
+          "released": 5,
+          "deferred": 0,
+          "pending": 0,
+          "maxPending": 0,
+          "contextLosses": 0
+        },
+        "terminalPrograms": {
+          "deleted": 0,
+          "contextReleased": 0
+        },
+        "art": {
+          "settled": true,
+          "ok": true,
+          "loadMs": 735,
+          "deliveredMB": 1.15,
+          "inWorld": true,
+          "trackComplete": true,
+          "trackIds": 9,
+          "builtAtFrame": 0,
+          "frames": 0
+        }
+      }
+    },
+    "buildFiles": {
+      "art/icons/apple-touch-icon-152.png": "e624d214712261f0d2791c8122ff3ca12599c71c06a3124a9145d4495d2b76d9",
+      "art/icons/apple-touch-icon-167.png": "225d6457fa8336b6bcbee3fea9e39bb26435fa70669466fc38f549cd7cc43390",
+      "art/icons/apple-touch-icon.png": "93d86e48bd6dee6b30ede98efdd08dc6cd263a42d46979b4b874604301aaa50b",
+      "art/icons/emblem-512.png": "23b4314890b05e7d340e4a2ca13cf695f2eb9ab7420c0bfb2201c42b6f24cb62",
+      "art/icons/favicon-16.png": "c1711f6279e2a95e229bdc89c53976715a686400a75822df7d06938e18075cc3",
+      "art/icons/favicon-32.png": "9a338662ea22ed9b8cc492f94fb87f27582d6402995a5b3a11f92248a9a849a1",
+      "art/icons/favicon.svg": "c1350cbc46c32741b0cd7d6748d2127ff592f880ee3b6efaa3118ff6ba049c92",
+      "art/icons/icon-1024.png": "908f76e927732d487a131975be4b677167089c95b83f57a7be8bf02513e7d6d7",
+      "art/icons/icon-192.png": "3d3f3477aeee8256417ae476e7190fa19ac282e43f9ff6d0792298e5c153c8e8",
+      "art/icons/icon-512.png": "4d3c5ccdf5f3ed0bfb31a70356b78c93b0fa160cdd5a8365ad56045854e7ec49",
+      "art/icons/icon-maskable-192.png": "9c1c94733b64e24775e8bc0dda1114e811547355024bf1b411747ed2b8c1a5ec",
+      "art/icons/icon-maskable-512.png": "bf6e010e5f41ccd80a643fd51dbe6fa5e68bfef4d18aa9b8af0cbfaaf4ecf036",
+      "art/manifest.json": "298405c3bfeb6cb63a73fd8ef8fb200cb076872ba487d17ff3b6e70818f06f8b",
+      "art/menu/bike-pro-1536.webp": "3e042f66dfc1f4bb6b652c89bd44361ce54f57c5b28a3185788439e360d48f6f",
+      "art/menu/bike-pro-768.webp": "76cb83fff215258ef04e45a69cc1bf8dee8d09acae49a0017cdc52a8be8c7b59",
+      "art/menu/bike-pro-alt.webp": "23c607e66b412000e6dfccc22ed11794c167fe3df7740002e423074fce59a78a",
+      "art/menu/bike-rookie-1536.webp": "ddcf8ace189a1286c3812eaf5c39432314e62d49539b45cf279d92e9bbf619c2",
+      "art/menu/bike-rookie-768.webp": "b16a24afaf9302bde9550bb4832283787ab2917ca9702af9d3a0ce2805cab4cf",
+      "art/menu/bike-rookie-alt.webp": "c1c3df43d901f2e17ba17c2d17d42fcbe3ebe52384bf0af8f21c0b85efba4ee3",
+      "art/menu/garage-plate.webp": "9ccf0f5b56600f09d8830cda538523ad9163beb189fbd5b7164c2443444836cf",
+      "art/menu/keyart-canyon-1920.webp": "6370bc7bd228fb573169a7fa08b9df344aae418b240637c7c0cb137d9179dd3a",
+      "art/menu/keyart-canyon-960.webp": "c6108bb2c4f70bd719f587387cc50c2264d65d39746337319fcd1981425fe245",
+      "art/menu/keyart-industrial-1920.webp": "2facbba1870f569e4e62142e3907469f9818ebfca9b14165ca4385b96da4e6c7",
+      "art/menu/keyart-industrial-960.webp": "3c36185592585cb19dec5a2e8fa64a2f7ef1a815f1c1e131b4183303ea054630",
+      "art/menu/keyart-nalati-1920.webp": "b1e476201cf771f1a573af920b6bdd76be721866c8cecdfcfe548da7f72e457e",
+      "art/menu/keyart-nalati-960.webp": "479343217aed306b489e6303990ca60881e094319d155bb10ea16442734d3ff9",
+      "art/menu/loading-plate.webp": "81d3c72b2f9ad2ff20f37de7816d7e9c2e95d8a3fd6b918ce90b26c8ef5c7dd4",
+      "art/menu/medal-bronze-512.png": "d471240127df3a4a6e8f501516a22c2f9764865e5506dfac9b64e3aaec8d7845",
+      "art/menu/medal-bronze.png": "1ace6c5d54c7fe2ffec32c979df4a5fba84840eb1e45d7b4ad2b0c4cbdfe1040",
+      "art/menu/medal-gold-512.png": "31b1ae0ec1dfcd02af8ae9a20f044ba595e2ffe6a24f3d181913f1252261452f",
+      "art/menu/medal-gold.png": "2d57129bb214258e85b80eddab0d2e7f960a7356b15d2e136e9ce688028fa57a",
+      "art/menu/medal-platinum-512.png": "0e116af3f76a73b1f550c5bc0b70522d2ce8119f3b687cca5b0592573a02b664",
+      "art/menu/medal-platinum.png": "613381217e7215e31236358d0f5afc28d5b918d76ad2360ed1d61c8a319c6da5",
+      "art/menu/medal-silver-512.png": "e29c508c4ba7cbee3dbba15d3f552df3e88817b205b52df926cabf906a478a61",
+      "art/menu/medal-silver.png": "273f649c9a41f096a76885d6651dcd0cf17493f199b6f59f504dcd158a73caf8",
+      "art/menu/results-canyon.webp": "b6ffb0182cd34a86f909813ddb5d7e4f370e2173813c344db45324933792dc56",
+      "art/menu/results-credits.webp": "596d57f262e8cd32b2e42b1f173a7efc350be9b65aebc0332c533bc148911b1d",
+      "art/menu/results-foundry.webp": "18f374c44494f54d9a810911b8412edcf947a9ccb03a6df255ffc49a15f1dbb3",
+      "art/menu/results-garage.webp": "b8f4993d812a0b711cac7f58b8bc5c33024e89d1514b2789f05c0f022e3fade2",
+      "art/menu/results-industrial.webp": "5a10949eae984d2196bec4d4f3f6de46d88d228efaecfbc2f2b8e9e95fe66919",
+      "art/menu/results-nightCity.webp": "5b59f1e3151023d033fc775ade3081f5c92c88f1358adca892dfa369afa1ca11",
+      "art/menu/results-snow.webp": "51a9567ecb7682210f275384cb2f91d17837a2179c7a2a0e3e3ed04bab1cf82a",
+      "art/menu/tier-beginner.webp": "8cd6d9e89bc3b990149937c38142cc2564c9f719874f9dd39cbaf7ad26047b70",
+      "art/menu/tier-easy.webp": "e0f948665cfcd779ae53dd55648934a874528b722ae44e23f7baa1cee816ea22",
+      "art/menu/tier-extreme.webp": "bf5abc29f964cc78c46e779a8e12b7daf11b2cda898d9f35edb29ad206fae46d",
+      "art/menu/tier-hard.webp": "26cffd64018d934ac5956e7fa56c565d8d4a113c2b4ba4e27ef9ffac75d4f02d",
+      "art/menu/tier-medium.webp": "06250a86790e0f6e8ce04f9f0b8ddd27e91fc9ecae927da7dd34f0af4599ccdd",
+      "art/menu/track-b1-first-ride.webp": "c379ef826ee40672995e858be369dbd7dd21a24db199f5af5a8b4234da7604eb",
+      "art/menu/track-b2-lean-back.webp": "18a362cd6a70b6ae322c4604ef20c0f7ed030275155fe5021eba232db06356a0",
+      "art/menu/track-b3-kicker-row.webp": "0162b613762dcc8bf647b04fec3314d6633e9ba0203989b6b21444be635d6ee3",
+      "art/menu/track-e1-uphill-weight.webp": "00bfeac18f8bdb2412bfe171475f04a906989106e75bd54e0b02a786adb8e5df",
+      "art/menu/track-e2-rear-wheel-first.webp": "e7ce831e017a955e9138c1e87b3fb2f4931dda0727cbc9ec3be88f13bc86f7c7",
+      "art/menu/track-e3-stairway.webp": "43b77a22eadbdbe515cd33966710976233c7bf24322f6fbc07423cc1c93eb030",
+      "art/menu/track-h1-wheelie-wire.webp": "eabfc07ab922850f7673d385df738c172bd720906706e8805afbd3e9a6d4fb20",
+      "art/menu/track-h2-gap-chain.webp": "d666d583166e6923039eb65fd00b9fa898c1fb56bff797c7ef1f04bcabc21f2c",
+      "art/menu/track-h3-fire-line.webp": "5b31d85b4e284d1d5abd5a6da72ace3beb02885cf7b941c1af2f50eed6d941e0",
+      "art/menu/track-m1-hop-up.webp": "872cc0df21d4609f53bcbd7ad912ea581a579f17cd6d39da4bd5517c54af37a2",
+      "art/menu/track-m2-drum-roll.webp": "e27a69b8dc82f2ec3d2894c20ccfe8ee856f87d367aea19f7c88f596d0decc34",
+      "art/menu/track-m3-see-saw.webp": "d3945643189426a7e01063ef6e09751baf3dc1f4eda10ad5c76eda4ba4027810",
+      "art/menu/track-x1-vertical-limit.webp": "71f0c3df7e6f2b1d1f0388e17c216436da2476e63b3f0d2b70330fef7a813726",
+      "art/menu/track-x2-pipe-dream.webp": "fb08958efa129f566131ef4f09c5295286b7147b1f1ca20d9e3dc9f6f41a22a6",
+      "art/menu/track-x3-gauntlet.webp": "eba55c2a06ee391a64f84ed5e6f66bf037f9bbaaa0132493da4a78595d2c48ea",
+      "art/menu/wordmark-plate.webp": "8c7ded1f3cf66b1a28bbd9585cddd6bf6fbc707126ab508ec160cbcfe8c86630",
+      "art/og.jpg": "8f07a982275ddf1468fbe57f6215c46df54730b3e87dc6aad81f0d4f3bd0c538",
+      "art/plates/plate-canyon.webp": "e0c48cb62502aabf31a8f55872cfb8a3342fc7e7459ddea5cc53484e1a75c4b3",
+      "art/plates/plate-foundry.webp": "a4209e10ee8f4493b8abacfc7a3b10490755ae4b5e178d8679f5730af92d2bc7",
+      "art/plates/plate-industrial.webp": "dee7b119a7c41d9b305265178698e44b5ae7464f0d5fa2c63274954518733cf5",
+      "art/plates/plate-nightcity.webp": "f30a70740b6fe89c99d077d3faeac44daaffdea634391441022b335b1bef2ee6",
+      "art/plates/plate-snow.webp": "5e6479e44db7a689c0f306b55e1c9e411f1091ec4f5b5e1592227cef67d93cbc",
+      "art/plates/sky-canyon.webp": "ec66e12f87cad096badde41ff2e9edd533065625ae7b8330422c0139877ecba8",
+      "art/plates/sky-foundry.webp": "c610ff3192f35553bfb3d5d663efc6f0669d3c399a9832dfe76e499cfb541c91",
+      "art/plates/sky-industrial.webp": "a76dc2bb2221d28a9c95c5aa44f50ca721d47c501512260e072cf29685817e07",
+      "art/plates/sky-nightcity.webp": "ef7aa3d78b307d750e839de18ce6477a64b105d18ed115b30c0145d0bc874269",
+      "art/plates/sky-snow.webp": "ef347821f5514c0a8be04a0ecf0292eeee52d90d1cde41e2c5213d85512cd590",
+      "art/splash/1125x2436.png": "3185677ac4ed28550cd0d78358ce7355e1659c98a04073c0e2e22a10feedec08",
+      "art/splash/1170x2532.png": "b09ba5a003d1ead6c22094c90e5c06a10cff338665a4ee96a151b54b45ec26f3",
+      "art/splash/1179x2556.png": "daf9fad2a3e3658d3a5a15b392d5028b84c043a670c93020a0a415293ba3a039",
+      "art/splash/1206x2622.png": "67d4b2b4603cc3ac3f793f495edbe7d509b7473705b9c0888bd1eeb4b6e77c95",
+      "art/splash/1242x2688.png": "055b945b3f649a9081f1b186ff7d7f2a145be950cff8cec039b564b421b426d5",
+      "art/splash/1284x2778.png": "d18506079a98fef502a335912ada691f1623a3abe3d40da15c16d1e8bc194a04",
+      "art/splash/1290x2796.png": "2757d208e7a3a08604f93ff43eb7f87584a1e6585babef65a86da865d1594339",
+      "art/splash/1320x2868.png": "540091bb4afdaec6200cd73e9d02a24816ddc8a4b4e70060caab968ea838eecb",
+      "art/splash/1334x750.png": "cdb96cc669c4b857481f450276729348fecd362698b742c26040a983dd60ad82",
+      "art/splash/1536x2048.png": "ca81c129f7e1174e280992c8eab34d32b4f251504ee284676a0ac1158aa1a9f2",
+      "art/splash/1620x2160.png": "5c7173a3da6fa13d7a9242ec2e9a271fa90aa1d885e437d701d46de082ad52a5",
+      "art/splash/1668x2388.png": "6a86066f4bbf97f78b873e166496c9b2e77070df0564968a85823c50e2b27f5f",
+      "art/splash/1792x828.png": "ec0b7c4d5c5e55673a2c25bc110c5bc362bd03479c1d666e089bdabdb99a9e15",
+      "art/splash/2048x1536.png": "e485348c45928e594d1862e14b93b304f608eb4ed4f7c9bb50b92de09ebdee13",
+      "art/splash/2048x2732.png": "73bab5a96acfa3b2cd972bc3f3f1df6d9d1f017d03957618b95498e377ce71e6",
+      "art/splash/2160x1620.png": "7477319347d98fafe87ae3314f0c2b8c54d3f1ed8bb850a83f4b957022378765",
+      "art/splash/2388x1668.png": "2012682390558f92e2bc7b634c05fa5765020d00f2d0c4cb6931ddc40dd1cced",
+      "art/splash/2436x1125.png": "db3217ea0128709d6dc29c652e8f0d29738eb4a5f2b748702632d2ca2059bed6",
+      "art/splash/2532x1170.png": "1ef47ed80c6e96dc37e5c551ab7a7cd56ab570fd3f04fec2ff0abab181e281ab",
+      "art/splash/2556x1179.png": "bc5756c5edd88d09569db4f26bd77b5f9150f0895ceb7da1b83f5b853aeea71a",
+      "art/splash/2622x1206.png": "7a0bc561ba39c5e3e22037056f0e3ab6b5766e99d7be2e9f04a26382e3e71c2f",
+      "art/splash/2688x1242.png": "bb1876eb1000182747d2e4ca78c80fa47ff21766a5cc9811b29d97b2826870c6",
+      "art/splash/2732x2048.png": "79e1976df660e361883355484d58570204fe5d7e1d249a7d0a4e1b1d1f091215",
+      "art/splash/2778x1284.png": "f8a87f54b404bf7ca9313961dc718d5d86c70aa042a215ce40f4d87f6a0e42e4",
+      "art/splash/2796x1290.png": "37fb1ac6426386b3278c8470c9004c4b138b6ff4b4c263364f9ed086aa452ece",
+      "art/splash/2868x1320.png": "2c6645bc964da93ab57bc68ccd40074bd6fe614734cdc8dcfd3af869743d8b40",
+      "art/splash/750x1334.png": "a50f181a41e1e06e919528fb441d957e10b3b5e529b559f45d1d299aa521228b",
+      "art/splash/828x1792.png": "e49a3279f9100fba68631e395b3e6c70afdad081d07e3a8bf65a3e5a6176cdf2",
+      "art/thumbs/b1-first-ride.webp": "5299ea627d572c0eac603482cd5e86202c04ef4d71ec20cf4bb1041a194cdad0",
+      "art/thumbs/b2-lean-back.webp": "1e20d81650efb3442baa4009d64c9fb043ccd3c90f51b0992f97c4c29b0f5f68",
+      "art/thumbs/b3-kicker-row.webp": "9f5a73600813a6fac54352d2849c21628b7edf83d4b69995e5e4f71d1e823be6",
+      "art/thumbs/e1-uphill-weight.webp": "7f9b0388024a2055c0e3a2ae1f2d1103eb01f3ad30b05352f60c6723be24ffac",
+      "art/thumbs/e2-rear-wheel-first.webp": "0b92a41701e74d473f59a238426ae42b75af975488b406ec94c4aa28a83326aa",
+      "art/thumbs/e3-stairway.webp": "0970e7849432b059da5c396acee6a530494169746565741a42fc0c7cfac0ad0f",
+      "art/thumbs/h1-wheelie-wire.webp": "f15134cf7728ae35c16d86b6f4ca55d744c3f9e1b9906f5f2933512e0796ba40",
+      "art/thumbs/h2-gap-chain.webp": "3386771d32997bdf3545f98550e8a109ee5160c8d0fafdabe4135c3eae8c5de9",
+      "art/thumbs/h3-fire-line.webp": "e1d087f0c4fe6198e8df4d24da298014b5e5b221c4bd90615897f61a8ed2b840",
+      "art/thumbs/m1-hop-up.webp": "59b4349cb2851185a48d5b3764789334ac28f0cc9132c85181b1d05b23081b75",
+      "art/thumbs/m2-drum-roll.webp": "ef32044572712ab969b121091708cc2628f6a860e5c3cc6bed8583541a2a5fcf",
+      "art/thumbs/m3-see-saw.webp": "f5d1a7b01f54ba16f435bf596c7237dc4a50abfad7b8b2738a8a1f92f1413df7",
+      "art/thumbs/x1-vertical-limit.webp": "51a8e26e09c2ba3b2b5602f0abc9345399bef908a03dd9099e0f42b3ab559e43",
+      "art/thumbs/x2-pipe-dream.webp": "bffdc25fd68d6a2b7f6d70d30bf622a70c970a17a0c24cb35686d950f689eedd",
+      "art/thumbs/x3-gauntlet.webp": "50cfacf7edb3af4ff3133edd6b5c0682e1b89c15b0171ee82bfe6db34416bdad",
+      "art/world/banner-apex-suspension.webp": "1a7dd09b2dd8ab3de22751a56334e8793e188bd406a39e9909f858de39e1b282",
+      "art/world/banner-bolt-energy.webp": "130c65d046130e7cadc52fb8d2ceb54aba1c34ce4da2052b189cb881f321c3c3",
+      "art/world/banner-ironworks-series.webp": "a4361a0b8c8118d049ac3a094017f993e6a67f1604ffc934bd9c8ab30f90e1c9",
+      "art/world/banner-kestrel-tyres.webp": "9e22bb9741e8b5e37d684734612e8d8f4968dfa8679dce5ed0be9e63e68e6468",
+      "art/world/banner-nordvik.webp": "bdd15aa45d2d21214bc2e4c24a351c345869819321f53a667ee6019d6211e424",
+      "art/world/banner-vortex-oil.webp": "2fea659f77c0b2f7a0320451af2ee2be4f0209a93cf7e8f357d6bb62dbf51f56",
+      "art/world/crowd-day.webp": "aec9d62002fda6897eb78666ff76fbe6ea8846991dcbbefc53e54f6f5c02732c",
+      "art/world/crowd-night.webp": "da616c8636dde4c81dcdcb106963dce2fcb90b1670466844ccadf35660f0f232",
+      "art/world/graffiti-grind.webp": "1f75a1ce90f7d5393b39796b2dd12341b4d3258e08e3aa0e6f3bd1695bc2b01f",
+      "art/world/graffiti-nofear.webp": "672578e679a1a2044de87f234a8edf3e6a43b07d80dbf915332841cd1c905c1a",
+      "art/world/graffiti-rise.webp": "b3b865f7e8c3dafc50bb886ec71ed14abaa0c5fcabca7062ee6cf58dfd77b484",
+      "art/world/graffiti-skull.webp": "b10d2418cc34353f13e037c65ce7e78eccefda003b7f710e3770bf15ce29b449",
+      "art/world/graffiti-tag-wall.webp": "d9f5531e47b1799133aa17d0a9de66356f3d66e44cf38ac07d892433833c1e5d",
+      "art/world/graffiti-wheel.webp": "1a1b02decbaa81fecdfbf4c827a9b5e0cce8817de37ed142cc29bbbdbd517a2f",
+      "art/world/kit-pro.webp": "da575160705872106118456363c3d21936b74d0ec515b882a9f919f40c6705bc",
+      "art/world/kit-rookie.webp": "a3b385484999c1762b62a488954728c841aa3c08db19f3e72b4c1654901f97e7",
+      "art/world/mask-edge-grime.webp": "5512e0a93eeeb2eb4642ee9226d9fb5e03df86ee218e5061291a2718c3bf7806",
+      "art/world/mask-grime-spatter.webp": "1ffdb30c0b4684c93c9696a8a1957ef232e70f1cb24f2639c407f54572fa0e79",
+      "art/world/mask-rivet-drips.webp": "5a4d4a38aa5e303c383eb81beec4fd3746496c57bcc5ba7414137f4354ba667d",
+      "art/world/mask-rust-streaks.webp": "f8b91860441ff550ffdf51ac5682ddee3e0f3bf91a061a334f3935394fcc0f07",
+      "art/world/poster-trials-night.webp": "be7251ac3acc36d455136c9f34a8ae779c959da089564c692713465717fb6a14",
+      "art/world/poster-tyres.webp": "9fe1b890bc51d033ccab0c1bf55584880adc8980116098b33189b2f89e4bcb4d",
+      "art/world/sign-exit.webp": "160bed9f19c006c3070a0a16260d9b75d044a9fe01e87c632ebb733229639825",
+      "art/world/sign-forklift.webp": "674eadbd3dbe9b0f58e11d8c446e743abf69f00bb960b5471323023d9c8fe76e",
+      "art/world/sign-hard-hat.webp": "b710c9868379ee3d7323c9dec0f575cc9101f123ec78a7311adc25f09f35086f",
+      "art/world/sign-overhead-crane.webp": "ebba5c576c4b32c52d46f3d0dfcb7afbd638b4fc156673bda1c596086c0f29ed",
+      "art/world/stencil-apex.webp": "d5d942904b15494ae007b8aeaec44b9ec097c98b1ca1a6b265bc8059c583f5d2",
+      "art/world/stencil-arrows.webp": "a0c7300aff015ea18a5e9b593b7108555d8be8f70dcd6297545d0b2a02605a8d",
+      "art/world/stencil-hazard.webp": "0148c9937e3377033bfe97ea14bf48ebd9faa7491c9acf6c7e8e096f57d9348a",
+      "art/world/stencil-hkr.webp": "481d1378596de6787b99eb03709f845c6ef8323ada137127e0ce469e79f4d29d",
+      "art/world/stencil-nordvik.webp": "95925305aa7a7dcef5b7cf60bc2359dd3521113589770c1bbafc820a62c69521",
+      "art/world/stencil-serial.webp": "c3539b3920bd9b26ef47982033f45aa1fe3c01c0ea3f59c95c60e54c1425ab74",
+      "art/world/stencil-taro.webp": "40d02bbb67e7d9313b83634c6e21e5fcf7e7fc9b703620307b46b5f522d9e2a8",
+      "art/world/stencil-weights.webp": "ff5a353824ec0bbbf7edd83e2c4c7c44fbe20789e4ac733df5c240f1e3aa2065",
+      "art/world/tyremark-arc.webp": "925fae78ab1bc39cc535757da3e1e8e79651cbc1d4c6177c2b34592a7bf9cb1b",
+      "art/world/tyremark-straight.webp": "8940ca99d90cf1c9950db30153197de7f4e82a1919a32d46dc730ded0af2a8b6",
+      "art/worldmap/region-canyon-1024.webp": "d4b34da4780417206db27c0da31f4a5e19b702258fc8c35b2bc96c14c71848ec",
+      "art/worldmap/region-canyon-1536.webp": "9a3c4c0e4f5953bfffbab927796542bfd4cf04de2f1595cfe56bf3df13e7b249",
+      "art/worldmap/region-foundry-1024.webp": "1b427e6b9467d8619607347e516ed698d5aa359980d4068b34406e988e20609e",
+      "art/worldmap/region-foundry-1536.webp": "e917156f674a8e0917b19f56ab5e9c7d1a812bc77b697100393e8732ef84fd1f",
+      "art/worldmap/region-industrial-1024.webp": "6d78d842697c0c8ba655ee5563da5a6e0c98bc9f0e20e3605c715c1f4190741a",
+      "art/worldmap/region-industrial-1536.webp": "3708055b579835085a8db429ee81b6304ff47ea0f11110edb4024ff886070668",
+      "art/worldmap/region-nightCity-1024.webp": "772c439077b8b41aec96fe467104cba86b86661a7491f17fb508015a4762239b",
+      "art/worldmap/region-nightCity-1536.webp": "53126a6fff4eb863b37b459f2dfc9040f72d5e4be4e69447e5270ca8885ba307",
+      "art/worldmap/region-snow-1024.webp": "db1aa6b92372b240e08dea1f03bf4b42783e48e6d7b5253f0b1661ccd44e64d4",
+      "art/worldmap/region-snow-1536.webp": "102763d4f1a9829d98c097c8a52353529ab785d973eb56e1c4d58001d55e5581",
+      "art/worldmap/world-1024.webp": "5187cb95a98b3c7051e80239a9fe7d0837e858c83c46262600635198c1b3a274",
+      "art/worldmap/world-1536.webp": "ac1eeab0fe05e05abb268a166a67dc2c2a07b322c58c612546aedcb5da6f88bf",
+      "art/worldmap/worldmap.json": "762935830dc1130384640ac8ab107ec19d269591566db240f807d73023180ace",
+      "assets/inbox-B243MVep.js": "d26a34f1a2faa5a0134927a5a203ea9120c18f4ef695e6e8be6edd58356ebfaf",
+      "assets/inbox-B243MVep.js.map": "747860303833028e1607d4082f63c5919a09923162840c8117b660dd6dbb64bc",
+      "assets/index-jw4l6n5D.js": "e6be1c8f71c586c234489dcc0ba684d77b2dfe5399c82f8368115fcd1653a31f",
+      "assets/index-jw4l6n5D.js.map": "4540c8bf491c9d9d8f0e4c9c8c20205e213fb310df97f4b69a73da96aab591f2",
+      "assets/three-CGwyv1Ha.js": "8429d100c1bc19b624ac29ee417fc65f08bd63aaaee6ee76a1d42d37b85a7865",
+      "assets/three-CGwyv1Ha.js.map": "bc638f3aa4fef53f45fca810549bd456cd31a9fe4c1f326bcb379583eb58e0ce",
+      "assets/worklet-DGoGEqnF.js": "2326a359b60af20b6bb7abbe3b59abdf05ba3c267ffdddf219139274e0eec0e3",
+      "assets/worklet-DGoGEqnF.js.map": "7650cc976ed0e1bc4a68ad872e3059fa41b24ab362d14208aad1cc4d3e9d5f75",
+      "assets/worklet-Vg1LRsTe.js": "fbcdbe6317f31fd56c6c0e3f02ec7db861a1fb721f5d359ff28ba60a686e80f5",
+      "assets/worklet-Vg1LRsTe.js.map": "2dc8a2f3937657ce31ca30f0354c481fd6f2da9010b0a5246b0def1f47fd77d4",
+      "bench/b1-bot-3.json": "c9b4293a8e8f698aaa48f6a674eef0daa470c28eb1ab921ec6b52ce5a216b8fe",
+      "fonts/BarlowCondensed-BlackItalic.woff2": "83282bcfc9df534b070d8231f10e511ba0c60ae63af9b5e096e4de089454bc88",
+      "fonts/BarlowCondensed-Bold.woff2": "e3e520cb7468f2efd60bc2ce96694567c3312f4ef414fffbe605e3ad146b24e6",
+      "fonts/BarlowCondensed-Medium.woff2": "31ff5e6e96a096fde4d78bc838719e69b093db2d0b062b96e423c065a6d1b2b1",
+      "fonts/LICENSE.txt": "74f4d5bb5ab5fe306120a2174f0fd3dbde3b0e8a6a78f7f5b74f6af0774179e0",
+      "index.html": "6f4951cfde50eb9fe5874361ac7cc3ea32804f00a818fbd0b833060597e6bd4a",
+      "load-manifest.json": "438fee0c1c7184788339bfb2e8e3b4daedaea076d2cb5bf79f8b7a34623c8956",
+      "manifest.webmanifest": "ab1315c46a69c33839955ccba821970a219e19bf360f405a3c025f546c4a04ca",
+      "model-catalog.json": "11f1653061ab812089ca8e54dbd726382a5b0baf57cb6c333330272c0ee3e6eb",
+      "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
+      "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb": "fbbae43691569760a6ee0b4385533536b986dd5e7697bf48f4c32cbb4810cf5d",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82",
+      "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb": "ad1907131d0de127ec7900f0543ac413dd5d81c0f562a9d9dded7bf7747634e0",
+      "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515",
+      "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
+      "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb": "3ae6a8d20fccb0273d2ee00fb2ced3d92fd5ae4c80aa925a293975b42aaa2c6b",
+      "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb": "95acaf16925f55abd0ce4446c3c8418f385079d7e2b60db697d53a9fd01e8aa0",
+      "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb": "fb3780c48f5c5083ac0410fe17f9245f64830a7b42577f666915f16857e09910",
+      "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+      "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb": "a535485d70b6ecd4874f204162e338d9ac3ae9d67f335b041170b556793f4ff5",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a",
+      "offline.html": "23c24d4b9f01f18c80ae905b5d178ff832c24845643b02c44af88b121c68979a",
+      "sw.js": "b5519beda7dfe47c56be9a72e5acbd10599e984fe9245ea8a498783574523d43"
+    },
+    "errors": [
+      "warning: [render] track budget: 15 calls / 94364 tris (cap 20 / 80k)",
+      "warning: [render] track budget: 15 calls / 94364 tris (cap 20 / 80k)"
+    ],
+    "captureWallMs": 2903.242334,
+    "clip": "harness/out/render-aa-round1/snow-clean.mp4",
+    "clipSHA256": "4acfb4a23ed2f1a385e94e80a507b1398bb5b42f5610c1ce59e36afd3b99a910",
+    "recordingSHA256": "82627095e37747f6a22c026fa6c70e1bd1a9f50653433814ce499c4fd67e422b",
+    "synchronizedRenderP50Ms": 3.2200000000000273,
+    "synchronizedRenderP95Ms": 4.180000000000291,
+    "ticks": [
+      {
+        "tick": 4,
+        "hash": "8e4a849e7b2d9be6"
+      },
+      {
+        "tick": 8,
+        "hash": "34eb2be19a7391a1"
+      },
+      {
+        "tick": 12,
+        "hash": "021ae6d40ebd1627"
+      },
+      {
+        "tick": 16,
+        "hash": "6e57f77051a0abca"
+      },
+      {
+        "tick": 20,
+        "hash": "a8312cacf705edb8"
+      },
+      {
+        "tick": 24,
+        "hash": "92455ab9348f7dd6"
+      },
+      {
+        "tick": 28,
+        "hash": "0c90074336647988"
+      },
+      {
+        "tick": 32,
+        "hash": "180fe3f272dd843e"
+      },
+      {
+        "tick": 36,
+        "hash": "08fce5c36e50c08c"
+      },
+      {
+        "tick": 40,
+        "hash": "a05d1b0682022d52"
+      },
+      {
+        "tick": 44,
+        "hash": "46d45600b89ac733"
+      },
+      {
+        "tick": 48,
+        "hash": "fd719e1aadf9b283"
+      },
+      {
+        "tick": 52,
+        "hash": "f2912875eddf0d88"
+      },
+      {
+        "tick": 56,
+        "hash": "d817375e368dc8e5"
+      },
+      {
+        "tick": 60,
+        "hash": "4d5c3266562702e2"
+      },
+      {
+        "tick": 64,
+        "hash": "518b9b69da23703a"
+      },
+      {
+        "tick": 68,
+        "hash": "c7906f3b641a1997"
+      },
+      {
+        "tick": 72,
+        "hash": "a09700a04f06c680"
+      },
+      {
+        "tick": 76,
+        "hash": "f3df5eaa6c75947d"
+      },
+      {
+        "tick": 80,
+        "hash": "5a13175b6098ed4d"
+      },
+      {
+        "tick": 84,
+        "hash": "1bf992c9aca9b4c6"
+      },
+      {
+        "tick": 88,
+        "hash": "c8999f6618898d4d"
+      },
+      {
+        "tick": 92,
+        "hash": "eddec0001db31e65"
+      },
+      {
+        "tick": 96,
+        "hash": "6f1e5c4d1076f311"
+      },
+      {
+        "tick": 100,
+        "hash": "6792407e9e94e12e"
+      },
+      {
+        "tick": 104,
+        "hash": "515e88005a291873"
+      },
+      {
+        "tick": 108,
+        "hash": "055fc4dbf191ab9e"
+      },
+      {
+        "tick": 112,
+        "hash": "4fdd6b96ac11bf26"
+      },
+      {
+        "tick": 116,
+        "hash": "c3a6e38aa21b5ebd"
+      },
+      {
+        "tick": 120,
+        "hash": "e3d28d4523c8d12d"
+      },
+      {
+        "tick": 124,
+        "hash": "b53ad4621b074ea5"
+      },
+      {
+        "tick": 128,
+        "hash": "c0295878970d3f89"
+      },
+      {
+        "tick": 132,
+        "hash": "37b2c60651f1368e"
+      },
+      {
+        "tick": 136,
+        "hash": "dd59a5f14e58d02b"
+      },
+      {
+        "tick": 140,
+        "hash": "43f7d97412c30dc4"
+      },
+      {
+        "tick": 144,
+        "hash": "1198df6028fc9e16"
+      },
+      {
+        "tick": 148,
+        "hash": "0a58110b34b29010"
+      },
+      {
+        "tick": 152,
+        "hash": "ec1dfdc5d8abdec4"
+      },
+      {
+        "tick": 156,
+        "hash": "df712fc1d7ecfaee"
+      },
+      {
+        "tick": 160,
+        "hash": "550b909c305b8ee2"
+      },
+      {
+        "tick": 164,
+        "hash": "fe046f4741447c6b"
+      },
+      {
+        "tick": 168,
+        "hash": "d2c171c0c6c77237"
+      },
+      {
+        "tick": 172,
+        "hash": "d08b6b891e787fd9"
+      },
+      {
+        "tick": 176,
+        "hash": "8079bb1eb68c3076"
+      },
+      {
+        "tick": 180,
+        "hash": "56d09f4ac02e4796"
+      },
+      {
+        "tick": 184,
+        "hash": "476bd98b6a8e5226"
+      },
+      {
+        "tick": 188,
+        "hash": "dc36584bcbb82805"
+      },
+      {
+        "tick": 192,
+        "hash": "ee43cc0236fdaf39"
+      },
+      {
+        "tick": 196,
+        "hash": "40105d805c20b812"
+      },
+      {
+        "tick": 200,
+        "hash": "32247d8417ed5ad3"
+      },
+      {
+        "tick": 204,
+        "hash": "4a0da70b43a7c36b"
+      },
+      {
+        "tick": 208,
+        "hash": "ee4d1cf22721960f"
+      },
+      {
+        "tick": 212,
+        "hash": "880e936509875409"
+      },
+      {
+        "tick": 216,
+        "hash": "f4cf003735ddf2e7"
+      },
+      {
+        "tick": 220,
+        "hash": "852d372c00a9ab9b"
+      },
+      {
+        "tick": 224,
+        "hash": "aafb753cafa32b55"
+      },
+      {
+        "tick": 228,
+        "hash": "b379e3cd17d4ec22"
+      },
+      {
+        "tick": 232,
+        "hash": "13d68a1a636002f3"
+      },
+      {
+        "tick": 236,
+        "hash": "6a3580beb47ada8e"
+      },
+      {
+        "tick": 240,
+        "hash": "5c40252669ceee5f"
+      },
+      {
+        "tick": 244,
+        "hash": "bffb8f1fc90738bc"
+      },
+      {
+        "tick": 248,
+        "hash": "ffd7ae6a399e1f6d"
+      },
+      {
+        "tick": 252,
+        "hash": "24a0a5f2e0f1819f"
+      },
+      {
+        "tick": 256,
+        "hash": "159c5c18df2e47a1"
+      },
+      {
+        "tick": 260,
+        "hash": "dc76f88b061faf39"
+      },
+      {
+        "tick": 264,
+        "hash": "2753fa9f97586215"
+      },
+      {
+        "tick": 268,
+        "hash": "c3f8da01fd047ab6"
+      },
+      {
+        "tick": 272,
+        "hash": "8f80326898563123"
+      },
+      {
+        "tick": 276,
+        "hash": "57d9c7cbe1f0e798"
+      },
+      {
+        "tick": 280,
+        "hash": "5e50c1229796dcb4"
+      },
+      {
+        "tick": 284,
+        "hash": "1f0dfd74c1adbe32"
+      },
+      {
+        "tick": 288,
+        "hash": "457767efd8b35076"
+      },
+      {
+        "tick": 292,
+        "hash": "6a6ab8f9fb88e2a3"
+      },
+      {
+        "tick": 296,
+        "hash": "9e247334a1c60320"
+      },
+      {
+        "tick": 300,
+        "hash": "68f7e2eddc84b830"
+      },
+      {
+        "tick": 304,
+        "hash": "e9f11e9c10d29da0"
+      },
+      {
+        "tick": 308,
+        "hash": "06a9885687f87084"
+      },
+      {
+        "tick": 312,
+        "hash": "8d57e020c9c7d2a4"
+      },
+      {
+        "tick": 316,
+        "hash": "7b3194cb22c03c39"
+      },
+      {
+        "tick": 320,
+        "hash": "4350fb5a9daf97a7"
+      },
+      {
+        "tick": 324,
+        "hash": "b992cef85ae15498"
+      },
+      {
+        "tick": 328,
+        "hash": "34b0f1b0e533074e"
+      },
+      {
+        "tick": 332,
+        "hash": "cae06149af33ecc5"
+      },
+      {
+        "tick": 336,
+        "hash": "89ce6adcc86b7fcd"
+      },
+      {
+        "tick": 340,
+        "hash": "6996ce3442f70e8a"
+      },
+      {
+        "tick": 344,
+        "hash": "0a5dab2d79ea6334"
+      },
+      {
+        "tick": 348,
+        "hash": "1da2c772c50de7ae"
+      },
+      {
+        "tick": 352,
+        "hash": "b064ee7834011b42"
+      },
+      {
+        "tick": 356,
+        "hash": "67d2ab172ffba5b5"
+      },
+      {
+        "tick": 360,
+        "hash": "7c0515209ed9df38"
+      },
+      {
+        "tick": 364,
+        "hash": "ee6463a7c2fe0ad7"
+      },
+      {
+        "tick": 368,
+        "hash": "8b30a1b4a62bd786"
+      },
+      {
+        "tick": 372,
+        "hash": "02bb3519b84d15b7"
+      },
+      {
+        "tick": 376,
+        "hash": "7943a8efd899a4a4"
+      },
+      {
+        "tick": 380,
+        "hash": "9c4b9022b3c74d40"
+      },
+      {
+        "tick": 384,
+        "hash": "ff8de18d6f168b0f"
+      },
+      {
+        "tick": 388,
+        "hash": "3876d06bf825bd9e"
+      },
+      {
+        "tick": 392,
+        "hash": "ce542c7e716276ef"
+      },
+      {
+        "tick": 396,
+        "hash": "69d13d09ee472537"
+      },
+      {
+        "tick": 400,
+        "hash": "2dee314311e915b4"
+      },
+      {
+        "tick": 404,
+        "hash": "62c8850030f692a2"
+      },
+      {
+        "tick": 408,
+        "hash": "7edff02422f66ae5"
+      },
+      {
+        "tick": 412,
+        "hash": "bc1b42785b775cc6"
+      },
+      {
+        "tick": 416,
+        "hash": "81d9049b28dd646e"
+      },
+      {
+        "tick": 420,
+        "hash": "575a14822e3a5e58"
+      },
+      {
+        "tick": 424,
+        "hash": "17d39869eca4775c"
+      },
+      {
+        "tick": 428,
+        "hash": "3b45463d08a15019"
+      },
+      {
+        "tick": 432,
+        "hash": "b9e2f52371813aa7"
+      },
+      {
+        "tick": 436,
+        "hash": "aac2ac75dff1b3e9"
+      },
+      {
+        "tick": 440,
+        "hash": "1949e36b161a0de0"
+      },
+      {
+        "tick": 444,
+        "hash": "f1a0c5b78d5b9cb5"
+      },
+      {
+        "tick": 448,
+        "hash": "dcb517d465c99c4b"
+      },
+      {
+        "tick": 452,
+        "hash": "f4367172ab30a487"
+      },
+      {
+        "tick": 456,
+        "hash": "db6d3330220f7f19"
+      },
+      {
+        "tick": 460,
+        "hash": "7dc25e36c9c6d696"
+      },
+      {
+        "tick": 464,
+        "hash": "8c10c2d7fee2fd83"
+      },
+      {
+        "tick": 468,
+        "hash": "f300acfe98e8dfae"
+      },
+      {
+        "tick": 472,
+        "hash": "fbfb90e119e9974d"
+      },
+      {
+        "tick": 476,
+        "hash": "344b4957ae38e606"
+      },
+      {
+        "tick": 480,
+        "hash": "fdc3dc75381409bb"
+      },
+      {
+        "tick": 484,
+        "hash": "fd3a42c720b27a0e"
+      },
+      {
+        "tick": 488,
+        "hash": "7c8ae1e173f172d9"
+      },
+      {
+        "tick": 492,
+        "hash": "41c247a2cfc25b19"
+      },
+      {
+        "tick": 496,
+        "hash": "2de8b0490ad9c8be"
+      },
+      {
+        "tick": 500,
+        "hash": "04df57f18dbeb65b"
+      },
+      {
+        "tick": 504,
+        "hash": "25bc19d09010c06b"
+      },
+      {
+        "tick": 508,
+        "hash": "6963aa7464ec10ff"
+      },
+      {
+        "tick": 512,
+        "hash": "7cdfdf8a1cb8cf06"
+      },
+      {
+        "tick": 516,
+        "hash": "9c04b8713d18239a"
+      },
+      {
+        "tick": 520,
+        "hash": "0519abfd19d6da42"
+      },
+      {
+        "tick": 524,
+        "hash": "4ee89f4a9d41e2be"
+      },
+      {
+        "tick": 528,
+        "hash": "cc1c4c6461a0369d"
+      },
+      {
+        "tick": 532,
+        "hash": "da0a4da6bf1e3cc4"
+      },
+      {
+        "tick": 536,
+        "hash": "af348465e9f58587"
+      },
+      {
+        "tick": 540,
+        "hash": "653aa2b7e92ffd53"
+      },
+      {
+        "tick": 544,
+        "hash": "716c705d4f55393f"
+      },
+      {
+        "tick": 548,
+        "hash": "f027a667a4ed195e"
+      },
+      {
+        "tick": 552,
+        "hash": "9fbc430a655ae91c"
+      },
+      {
+        "tick": 556,
+        "hash": "0f9a8949fcc81c00"
+      },
+      {
+        "tick": 560,
+        "hash": "678c562f94ce0994"
+      },
+      {
+        "tick": 564,
+        "hash": "2384ae3739198fe1"
+      },
+      {
+        "tick": 568,
+        "hash": "e7ec3e841d04810a"
+      },
+      {
+        "tick": 572,
+        "hash": "6dc0b971c4470038"
+      },
+      {
+        "tick": 576,
+        "hash": "9ca9a40b7a94b5f8"
+      },
+      {
+        "tick": 580,
+        "hash": "7d658e75994527bd"
+      },
+      {
+        "tick": 584,
+        "hash": "0214204ad743636d"
+      },
+      {
+        "tick": 588,
+        "hash": "0285c4e4a8feeb9a"
+      },
+      {
+        "tick": 592,
+        "hash": "e034bc4dab0338b1"
+      },
+      {
+        "tick": 596,
+        "hash": "a1f73ee087b72b4b"
+      },
+      {
+        "tick": 600,
+        "hash": "9946bf4f77f5ea84"
+      },
+      {
+        "tick": 604,
+        "hash": "88c8f3111998a1eb"
+      },
+      {
+        "tick": 608,
+        "hash": "21b814eb2be189a8"
+      },
+      {
+        "tick": 612,
+        "hash": "db0efa94fc68e237"
+      },
+      {
+        "tick": 616,
+        "hash": "0fb7f1002323ee1a"
+      },
+      {
+        "tick": 620,
+        "hash": "cd6bda570df3fb0c"
+      },
+      {
+        "tick": 624,
+        "hash": "2e19bf6c6d460261"
+      },
+      {
+        "tick": 628,
+        "hash": "56fa7b1b3a676264"
+      },
+      {
+        "tick": 632,
+        "hash": "384908d9703bce3c"
+      },
+      {
+        "tick": 636,
+        "hash": "8132a483be67d683"
+      },
+      {
+        "tick": 640,
+        "hash": "d3a675d6bc86b355"
+      },
+      {
+        "tick": 644,
+        "hash": "9d0935715cfa8821"
+      },
+      {
+        "tick": 648,
+        "hash": "4011eab742f91e9d"
+      },
+      {
+        "tick": 652,
+        "hash": "e645157a078da71b"
+      },
+      {
+        "tick": 656,
+        "hash": "a0ac854cd450ddab"
+      },
+      {
+        "tick": 660,
+        "hash": "d286def7f6e4d96e"
+      },
+      {
+        "tick": 664,
+        "hash": "02c7bdf50857d102"
+      },
+      {
+        "tick": 668,
+        "hash": "329db93b9f49a4e3"
+      },
+      {
+        "tick": 672,
+        "hash": "d71b77c92a804f5b"
+      },
+      {
+        "tick": 676,
+        "hash": "50689df9a01a38c8"
+      },
+      {
+        "tick": 680,
+        "hash": "880a3cc0d0926475"
+      },
+      {
+        "tick": 684,
+        "hash": "27c8fd488299183a"
+      },
+      {
+        "tick": 688,
+        "hash": "2e31dc9104673af9"
+      },
+      {
+        "tick": 692,
+        "hash": "b3830df5bce34833"
+      },
+      {
+        "tick": 696,
+        "hash": "bec656795ecbba68"
+      },
+      {
+        "tick": 700,
+        "hash": "3d1bfdcc5927b32b"
+      },
+      {
+        "tick": 704,
+        "hash": "6abf941a4af075f3"
+      },
+      {
+        "tick": 708,
+        "hash": "753b97de5f51bfc1"
+      },
+      {
+        "tick": 712,
+        "hash": "16f0407a271bdf64"
+      },
+      {
+        "tick": 716,
+        "hash": "d2ca9ae9b844d30d"
+      },
+      {
+        "tick": 720,
+        "hash": "4ddb6dcd7f6cc63c"
+      }
+    ]
+  },
+  "desktop-high": {
+    "graphics": {
+      "requestedBackend": "metal",
+      "launchArgs": [
+        "--use-angle=metal",
+        "--enable-webgl",
+        "--ignore-gpu-blocklist",
+        "--mute-audio"
+      ],
+      "browser": "chromium",
+      "browserVersion": "151.0.7922.34",
+      "chromium": "151.0.7922.34",
+      "hostPlatform": "darwin",
+      "vendor": "Google Inc. (Apple)",
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36",
+      "renderSettings": {
+        "prepare": [],
+        "biome": "industrial",
+        "zoom": "idle",
+        "occluder": {
+          "ms": 0,
+          "tested": 0,
+          "hits": 0,
+          "count": 5,
+          "override": null
+        },
+        "garage": {
+          "on": false,
+          "draws": 0,
+          "hidden": 0,
+          "textureMB": 0,
+          "reflection": false
+        },
+        "phase": "menu",
+        "tier": "high",
+        "dpr": 1,
+        "devicePixelRatio": 1,
+        "canvasW": 1280,
+        "canvasH": 720,
+        "calls": 602,
+        "tris": 462822,
+        "rtMpx": 10.34,
+        "rtMB": 84.1,
+        "rtPasses": "shadow 2048\u00d72048 | scene:hdr 1280\u00d7720 | ao 640\u00d7360 | ao:blur 640\u00d7360 | bloom:bright 640\u00d7360 | bloom:h0 640\u00d7360 | bloom:v0 640\u00d7360 | bloom:h1 320\u00d7180 | bloom:v1 320\u00d7180 | bloom:h2 160\u00d790 | bloom:v2 160\u00d790 | bloom:h3 80\u00d745 | bloom:v3 80\u00d745 | bloom:h4 40\u00d723 | bloom:v4 40\u00d723 | bloom:composite 640\u00d7360 | composite:graded 1280\u00d7720 | smaa:edges 1280\u00d7720 | smaa:weights 1280\u00d7720 | smaa\u2192canvas 1280\u00d7720",
+        "shadowMap": 2048,
+        "heroTris": 92171,
+        "heroDoc": "bike rider",
+        "riderOutfit": "street-mustard",
+        "riderMaterialVariant": null,
+        "heroShadow": "world",
+        "trackCalls": 9,
+        "trackTris": 48516,
+        "textureGenMs": 0,
+        "passes": 19,
+        "stalePrograms": 1,
+        "stabilized": {
+          "singlePass": 4,
+          "split": 51,
+          "depth": 377
+        },
+        "skippedFrames": 0,
+        "deviceClass": "desktop",
+        "profile": "high",
+        "bloomers": 0,
+        "entryMs": 359.6,
+        "entry": {
+          "biome": "industrial",
+          "ms": 359.6,
+          "compileMs": 110.56499981880188,
+          "textureMs": 29.424999952316284,
+          "warmMs": 9.9,
+          "textures": 36,
+          "texturesMB": 57.4,
+          "materials": 68,
+          "programs": 29,
+          "programsBefore": 20
+        },
+        "heroSwap": {
+          "loads": [
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb",
+              "bytes": 1480204,
+              "fetchMs": 190.40000009536743,
+              "parseMs": 119.6949999332428,
+              "prepareMs": 0.5799999237060547,
+              "at": 114.61500000953674
+            },
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+              "bytes": 870440,
+              "fetchMs": 188.61999988555908,
+              "parseMs": 126.90499997138977,
+              "prepareMs": 0.5800001621246338,
+              "at": 114.50500011444092
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb",
+              "bytes": 864848,
+              "fetchMs": 191.21000003814697,
+              "parseMs": 126.09500002861023,
+              "prepareMs": 0.059999942779541016,
+              "at": 114.69000005722046
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb",
+              "bytes": 1753256,
+              "fetchMs": 194.2350001335144,
+              "parseMs": 125.35500001907349,
+              "prepareMs": 0.1099998950958252,
+              "at": 114.75999999046326
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb",
+              "bytes": 1706124,
+              "fetchMs": 196.98499989509583,
+              "parseMs": 125.64499998092651,
+              "prepareMs": 0.11500000953674316,
+              "at": 114.83000016212463
+            },
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb",
+              "bytes": 3015120,
+              "fetchMs": 222.41499996185303,
+              "parseMs": 109.28999996185303,
+              "prepareMs": 0.1100001335144043,
+              "at": 114.57500004768372
+            },
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+              "bytes": 2283040,
+              "fetchMs": 213.82500004768372,
+              "parseMs": 129.06500005722046,
+              "prepareMs": 0.15000009536743164,
+              "at": 112.52999997138977
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb",
+              "bytes": 3616252,
+              "fetchMs": 230.71000003814697,
+              "parseMs": 119.30999994277954,
+              "prepareMs": 0.14499998092651367,
+              "at": 114.73000001907349
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb",
+              "bytes": 2270544,
+              "fetchMs": 223.98499989509583,
+              "parseMs": 136.31500005722046,
+              "prepareMs": 0.13000011444091797,
+              "at": 114.65000009536743
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb",
+              "bytes": 3486940,
+              "fetchMs": 232.82500004768372,
+              "parseMs": 134.0149998664856,
+              "prepareMs": 0.14499998092651367,
+              "at": 114.78500008583069
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb",
+              "bytes": 946824,
+              "fetchMs": 246.07000017166138,
+              "parseMs": 130.0899999141693,
+              "prepareMs": 0.1549999713897705,
+              "at": 114.92499995231628
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb",
+              "bytes": 912696,
+              "fetchMs": 256.7649998664856,
+              "parseMs": 120.78999996185303,
+              "prepareMs": 0.07000017166137695,
+              "at": 114.99500012397766
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb",
+              "bytes": 2448152,
+              "fetchMs": 239.47499990463257,
+              "parseMs": 151.9300000667572,
+              "prepareMs": 0.125,
+              "at": 114.88000011444092
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb",
+              "bytes": 2355380,
+              "fetchMs": 284.5699999332428,
+              "parseMs": 120.65000009536743,
+              "prepareMs": 0.1099998950958252,
+              "at": 114.96000003814697
+            }
+          ],
+          "swaps": []
+        },
+        "entering": false,
+        "retirement": {
+          "requested": 4,
+          "released": 4,
+          "deferred": 0,
+          "pending": 0,
+          "maxPending": 0,
+          "contextLosses": 0
+        },
+        "terminalPrograms": {
+          "deleted": 0,
+          "contextReleased": 0
+        },
+        "art": {
+          "settled": true,
+          "ok": true,
+          "loadMs": 373,
+          "deliveredMB": 1.11,
+          "inWorld": true,
+          "trackComplete": true,
+          "trackIds": 28,
+          "builtAtFrame": 0,
+          "frames": 0
+        }
+      }
+    },
+    "buildFiles": {
+      "art/icons/apple-touch-icon-152.png": "e624d214712261f0d2791c8122ff3ca12599c71c06a3124a9145d4495d2b76d9",
+      "art/icons/apple-touch-icon-167.png": "225d6457fa8336b6bcbee3fea9e39bb26435fa70669466fc38f549cd7cc43390",
+      "art/icons/apple-touch-icon.png": "93d86e48bd6dee6b30ede98efdd08dc6cd263a42d46979b4b874604301aaa50b",
+      "art/icons/emblem-512.png": "23b4314890b05e7d340e4a2ca13cf695f2eb9ab7420c0bfb2201c42b6f24cb62",
+      "art/icons/favicon-16.png": "c1711f6279e2a95e229bdc89c53976715a686400a75822df7d06938e18075cc3",
+      "art/icons/favicon-32.png": "9a338662ea22ed9b8cc492f94fb87f27582d6402995a5b3a11f92248a9a849a1",
+      "art/icons/favicon.svg": "c1350cbc46c32741b0cd7d6748d2127ff592f880ee3b6efaa3118ff6ba049c92",
+      "art/icons/icon-1024.png": "908f76e927732d487a131975be4b677167089c95b83f57a7be8bf02513e7d6d7",
+      "art/icons/icon-192.png": "3d3f3477aeee8256417ae476e7190fa19ac282e43f9ff6d0792298e5c153c8e8",
+      "art/icons/icon-512.png": "4d3c5ccdf5f3ed0bfb31a70356b78c93b0fa160cdd5a8365ad56045854e7ec49",
+      "art/icons/icon-maskable-192.png": "9c1c94733b64e24775e8bc0dda1114e811547355024bf1b411747ed2b8c1a5ec",
+      "art/icons/icon-maskable-512.png": "bf6e010e5f41ccd80a643fd51dbe6fa5e68bfef4d18aa9b8af0cbfaaf4ecf036",
+      "art/manifest.json": "298405c3bfeb6cb63a73fd8ef8fb200cb076872ba487d17ff3b6e70818f06f8b",
+      "art/menu/bike-pro-1536.webp": "3e042f66dfc1f4bb6b652c89bd44361ce54f57c5b28a3185788439e360d48f6f",
+      "art/menu/bike-pro-768.webp": "76cb83fff215258ef04e45a69cc1bf8dee8d09acae49a0017cdc52a8be8c7b59",
+      "art/menu/bike-pro-alt.webp": "23c607e66b412000e6dfccc22ed11794c167fe3df7740002e423074fce59a78a",
+      "art/menu/bike-rookie-1536.webp": "ddcf8ace189a1286c3812eaf5c39432314e62d49539b45cf279d92e9bbf619c2",
+      "art/menu/bike-rookie-768.webp": "b16a24afaf9302bde9550bb4832283787ab2917ca9702af9d3a0ce2805cab4cf",
+      "art/menu/bike-rookie-alt.webp": "c1c3df43d901f2e17ba17c2d17d42fcbe3ebe52384bf0af8f21c0b85efba4ee3",
+      "art/menu/garage-plate.webp": "9ccf0f5b56600f09d8830cda538523ad9163beb189fbd5b7164c2443444836cf",
+      "art/menu/keyart-canyon-1920.webp": "6370bc7bd228fb573169a7fa08b9df344aae418b240637c7c0cb137d9179dd3a",
+      "art/menu/keyart-canyon-960.webp": "c6108bb2c4f70bd719f587387cc50c2264d65d39746337319fcd1981425fe245",
+      "art/menu/keyart-industrial-1920.webp": "2facbba1870f569e4e62142e3907469f9818ebfca9b14165ca4385b96da4e6c7",
+      "art/menu/keyart-industrial-960.webp": "3c36185592585cb19dec5a2e8fa64a2f7ef1a815f1c1e131b4183303ea054630",
+      "art/menu/keyart-nalati-1920.webp": "b1e476201cf771f1a573af920b6bdd76be721866c8cecdfcfe548da7f72e457e",
+      "art/menu/keyart-nalati-960.webp": "479343217aed306b489e6303990ca60881e094319d155bb10ea16442734d3ff9",
+      "art/menu/loading-plate.webp": "81d3c72b2f9ad2ff20f37de7816d7e9c2e95d8a3fd6b918ce90b26c8ef5c7dd4",
+      "art/menu/medal-bronze-512.png": "d471240127df3a4a6e8f501516a22c2f9764865e5506dfac9b64e3aaec8d7845",
+      "art/menu/medal-bronze.png": "1ace6c5d54c7fe2ffec32c979df4a5fba84840eb1e45d7b4ad2b0c4cbdfe1040",
+      "art/menu/medal-gold-512.png": "31b1ae0ec1dfcd02af8ae9a20f044ba595e2ffe6a24f3d181913f1252261452f",
+      "art/menu/medal-gold.png": "2d57129bb214258e85b80eddab0d2e7f960a7356b15d2e136e9ce688028fa57a",
+      "art/menu/medal-platinum-512.png": "0e116af3f76a73b1f550c5bc0b70522d2ce8119f3b687cca5b0592573a02b664",
+      "art/menu/medal-platinum.png": "613381217e7215e31236358d0f5afc28d5b918d76ad2360ed1d61c8a319c6da5",
+      "art/menu/medal-silver-512.png": "e29c508c4ba7cbee3dbba15d3f552df3e88817b205b52df926cabf906a478a61",
+      "art/menu/medal-silver.png": "273f649c9a41f096a76885d6651dcd0cf17493f199b6f59f504dcd158a73caf8",
+      "art/menu/results-canyon.webp": "b6ffb0182cd34a86f909813ddb5d7e4f370e2173813c344db45324933792dc56",
+      "art/menu/results-credits.webp": "596d57f262e8cd32b2e42b1f173a7efc350be9b65aebc0332c533bc148911b1d",
+      "art/menu/results-foundry.webp": "18f374c44494f54d9a810911b8412edcf947a9ccb03a6df255ffc49a15f1dbb3",
+      "art/menu/results-garage.webp": "b8f4993d812a0b711cac7f58b8bc5c33024e89d1514b2789f05c0f022e3fade2",
+      "art/menu/results-industrial.webp": "5a10949eae984d2196bec4d4f3f6de46d88d228efaecfbc2f2b8e9e95fe66919",
+      "art/menu/results-nightCity.webp": "5b59f1e3151023d033fc775ade3081f5c92c88f1358adca892dfa369afa1ca11",
+      "art/menu/results-snow.webp": "51a9567ecb7682210f275384cb2f91d17837a2179c7a2a0e3e3ed04bab1cf82a",
+      "art/menu/tier-beginner.webp": "8cd6d9e89bc3b990149937c38142cc2564c9f719874f9dd39cbaf7ad26047b70",
+      "art/menu/tier-easy.webp": "e0f948665cfcd779ae53dd55648934a874528b722ae44e23f7baa1cee816ea22",
+      "art/menu/tier-extreme.webp": "bf5abc29f964cc78c46e779a8e12b7daf11b2cda898d9f35edb29ad206fae46d",
+      "art/menu/tier-hard.webp": "26cffd64018d934ac5956e7fa56c565d8d4a113c2b4ba4e27ef9ffac75d4f02d",
+      "art/menu/tier-medium.webp": "06250a86790e0f6e8ce04f9f0b8ddd27e91fc9ecae927da7dd34f0af4599ccdd",
+      "art/menu/track-b1-first-ride.webp": "c379ef826ee40672995e858be369dbd7dd21a24db199f5af5a8b4234da7604eb",
+      "art/menu/track-b2-lean-back.webp": "18a362cd6a70b6ae322c4604ef20c0f7ed030275155fe5021eba232db06356a0",
+      "art/menu/track-b3-kicker-row.webp": "0162b613762dcc8bf647b04fec3314d6633e9ba0203989b6b21444be635d6ee3",
+      "art/menu/track-e1-uphill-weight.webp": "00bfeac18f8bdb2412bfe171475f04a906989106e75bd54e0b02a786adb8e5df",
+      "art/menu/track-e2-rear-wheel-first.webp": "e7ce831e017a955e9138c1e87b3fb2f4931dda0727cbc9ec3be88f13bc86f7c7",
+      "art/menu/track-e3-stairway.webp": "43b77a22eadbdbe515cd33966710976233c7bf24322f6fbc07423cc1c93eb030",
+      "art/menu/track-h1-wheelie-wire.webp": "eabfc07ab922850f7673d385df738c172bd720906706e8805afbd3e9a6d4fb20",
+      "art/menu/track-h2-gap-chain.webp": "d666d583166e6923039eb65fd00b9fa898c1fb56bff797c7ef1f04bcabc21f2c",
+      "art/menu/track-h3-fire-line.webp": "5b31d85b4e284d1d5abd5a6da72ace3beb02885cf7b941c1af2f50eed6d941e0",
+      "art/menu/track-m1-hop-up.webp": "872cc0df21d4609f53bcbd7ad912ea581a579f17cd6d39da4bd5517c54af37a2",
+      "art/menu/track-m2-drum-roll.webp": "e27a69b8dc82f2ec3d2894c20ccfe8ee856f87d367aea19f7c88f596d0decc34",
+      "art/menu/track-m3-see-saw.webp": "d3945643189426a7e01063ef6e09751baf3dc1f4eda10ad5c76eda4ba4027810",
+      "art/menu/track-x1-vertical-limit.webp": "71f0c3df7e6f2b1d1f0388e17c216436da2476e63b3f0d2b70330fef7a813726",
+      "art/menu/track-x2-pipe-dream.webp": "fb08958efa129f566131ef4f09c5295286b7147b1f1ca20d9e3dc9f6f41a22a6",
+      "art/menu/track-x3-gauntlet.webp": "eba55c2a06ee391a64f84ed5e6f66bf037f9bbaaa0132493da4a78595d2c48ea",
+      "art/menu/wordmark-plate.webp": "8c7ded1f3cf66b1a28bbd9585cddd6bf6fbc707126ab508ec160cbcfe8c86630",
+      "art/og.jpg": "8f07a982275ddf1468fbe57f6215c46df54730b3e87dc6aad81f0d4f3bd0c538",
+      "art/plates/plate-canyon.webp": "e0c48cb62502aabf31a8f55872cfb8a3342fc7e7459ddea5cc53484e1a75c4b3",
+      "art/plates/plate-foundry.webp": "a4209e10ee8f4493b8abacfc7a3b10490755ae4b5e178d8679f5730af92d2bc7",
+      "art/plates/plate-industrial.webp": "dee7b119a7c41d9b305265178698e44b5ae7464f0d5fa2c63274954518733cf5",
+      "art/plates/plate-nightcity.webp": "f30a70740b6fe89c99d077d3faeac44daaffdea634391441022b335b1bef2ee6",
+      "art/plates/plate-snow.webp": "5e6479e44db7a689c0f306b55e1c9e411f1091ec4f5b5e1592227cef67d93cbc",
+      "art/plates/sky-canyon.webp": "ec66e12f87cad096badde41ff2e9edd533065625ae7b8330422c0139877ecba8",
+      "art/plates/sky-foundry.webp": "c610ff3192f35553bfb3d5d663efc6f0669d3c399a9832dfe76e499cfb541c91",
+      "art/plates/sky-industrial.webp": "a76dc2bb2221d28a9c95c5aa44f50ca721d47c501512260e072cf29685817e07",
+      "art/plates/sky-nightcity.webp": "ef7aa3d78b307d750e839de18ce6477a64b105d18ed115b30c0145d0bc874269",
+      "art/plates/sky-snow.webp": "ef347821f5514c0a8be04a0ecf0292eeee52d90d1cde41e2c5213d85512cd590",
+      "art/splash/1125x2436.png": "3185677ac4ed28550cd0d78358ce7355e1659c98a04073c0e2e22a10feedec08",
+      "art/splash/1170x2532.png": "b09ba5a003d1ead6c22094c90e5c06a10cff338665a4ee96a151b54b45ec26f3",
+      "art/splash/1179x2556.png": "daf9fad2a3e3658d3a5a15b392d5028b84c043a670c93020a0a415293ba3a039",
+      "art/splash/1206x2622.png": "67d4b2b4603cc3ac3f793f495edbe7d509b7473705b9c0888bd1eeb4b6e77c95",
+      "art/splash/1242x2688.png": "055b945b3f649a9081f1b186ff7d7f2a145be950cff8cec039b564b421b426d5",
+      "art/splash/1284x2778.png": "d18506079a98fef502a335912ada691f1623a3abe3d40da15c16d1e8bc194a04",
+      "art/splash/1290x2796.png": "2757d208e7a3a08604f93ff43eb7f87584a1e6585babef65a86da865d1594339",
+      "art/splash/1320x2868.png": "540091bb4afdaec6200cd73e9d02a24816ddc8a4b4e70060caab968ea838eecb",
+      "art/splash/1334x750.png": "cdb96cc669c4b857481f450276729348fecd362698b742c26040a983dd60ad82",
+      "art/splash/1536x2048.png": "ca81c129f7e1174e280992c8eab34d32b4f251504ee284676a0ac1158aa1a9f2",
+      "art/splash/1620x2160.png": "5c7173a3da6fa13d7a9242ec2e9a271fa90aa1d885e437d701d46de082ad52a5",
+      "art/splash/1668x2388.png": "6a86066f4bbf97f78b873e166496c9b2e77070df0564968a85823c50e2b27f5f",
+      "art/splash/1792x828.png": "ec0b7c4d5c5e55673a2c25bc110c5bc362bd03479c1d666e089bdabdb99a9e15",
+      "art/splash/2048x1536.png": "e485348c45928e594d1862e14b93b304f608eb4ed4f7c9bb50b92de09ebdee13",
+      "art/splash/2048x2732.png": "73bab5a96acfa3b2cd972bc3f3f1df6d9d1f017d03957618b95498e377ce71e6",
+      "art/splash/2160x1620.png": "7477319347d98fafe87ae3314f0c2b8c54d3f1ed8bb850a83f4b957022378765",
+      "art/splash/2388x1668.png": "2012682390558f92e2bc7b634c05fa5765020d00f2d0c4cb6931ddc40dd1cced",
+      "art/splash/2436x1125.png": "db3217ea0128709d6dc29c652e8f0d29738eb4a5f2b748702632d2ca2059bed6",
+      "art/splash/2532x1170.png": "1ef47ed80c6e96dc37e5c551ab7a7cd56ab570fd3f04fec2ff0abab181e281ab",
+      "art/splash/2556x1179.png": "bc5756c5edd88d09569db4f26bd77b5f9150f0895ceb7da1b83f5b853aeea71a",
+      "art/splash/2622x1206.png": "7a0bc561ba39c5e3e22037056f0e3ab6b5766e99d7be2e9f04a26382e3e71c2f",
+      "art/splash/2688x1242.png": "bb1876eb1000182747d2e4ca78c80fa47ff21766a5cc9811b29d97b2826870c6",
+      "art/splash/2732x2048.png": "79e1976df660e361883355484d58570204fe5d7e1d249a7d0a4e1b1d1f091215",
+      "art/splash/2778x1284.png": "f8a87f54b404bf7ca9313961dc718d5d86c70aa042a215ce40f4d87f6a0e42e4",
+      "art/splash/2796x1290.png": "37fb1ac6426386b3278c8470c9004c4b138b6ff4b4c263364f9ed086aa452ece",
+      "art/splash/2868x1320.png": "2c6645bc964da93ab57bc68ccd40074bd6fe614734cdc8dcfd3af869743d8b40",
+      "art/splash/750x1334.png": "a50f181a41e1e06e919528fb441d957e10b3b5e529b559f45d1d299aa521228b",
+      "art/splash/828x1792.png": "e49a3279f9100fba68631e395b3e6c70afdad081d07e3a8bf65a3e5a6176cdf2",
+      "art/thumbs/b1-first-ride.webp": "5299ea627d572c0eac603482cd5e86202c04ef4d71ec20cf4bb1041a194cdad0",
+      "art/thumbs/b2-lean-back.webp": "1e20d81650efb3442baa4009d64c9fb043ccd3c90f51b0992f97c4c29b0f5f68",
+      "art/thumbs/b3-kicker-row.webp": "9f5a73600813a6fac54352d2849c21628b7edf83d4b69995e5e4f71d1e823be6",
+      "art/thumbs/e1-uphill-weight.webp": "7f9b0388024a2055c0e3a2ae1f2d1103eb01f3ad30b05352f60c6723be24ffac",
+      "art/thumbs/e2-rear-wheel-first.webp": "0b92a41701e74d473f59a238426ae42b75af975488b406ec94c4aa28a83326aa",
+      "art/thumbs/e3-stairway.webp": "0970e7849432b059da5c396acee6a530494169746565741a42fc0c7cfac0ad0f",
+      "art/thumbs/h1-wheelie-wire.webp": "f15134cf7728ae35c16d86b6f4ca55d744c3f9e1b9906f5f2933512e0796ba40",
+      "art/thumbs/h2-gap-chain.webp": "3386771d32997bdf3545f98550e8a109ee5160c8d0fafdabe4135c3eae8c5de9",
+      "art/thumbs/h3-fire-line.webp": "e1d087f0c4fe6198e8df4d24da298014b5e5b221c4bd90615897f61a8ed2b840",
+      "art/thumbs/m1-hop-up.webp": "59b4349cb2851185a48d5b3764789334ac28f0cc9132c85181b1d05b23081b75",
+      "art/thumbs/m2-drum-roll.webp": "ef32044572712ab969b121091708cc2628f6a860e5c3cc6bed8583541a2a5fcf",
+      "art/thumbs/m3-see-saw.webp": "f5d1a7b01f54ba16f435bf596c7237dc4a50abfad7b8b2738a8a1f92f1413df7",
+      "art/thumbs/x1-vertical-limit.webp": "51a8e26e09c2ba3b2b5602f0abc9345399bef908a03dd9099e0f42b3ab559e43",
+      "art/thumbs/x2-pipe-dream.webp": "bffdc25fd68d6a2b7f6d70d30bf622a70c970a17a0c24cb35686d950f689eedd",
+      "art/thumbs/x3-gauntlet.webp": "50cfacf7edb3af4ff3133edd6b5c0682e1b89c15b0171ee82bfe6db34416bdad",
+      "art/world/banner-apex-suspension.webp": "1a7dd09b2dd8ab3de22751a56334e8793e188bd406a39e9909f858de39e1b282",
+      "art/world/banner-bolt-energy.webp": "130c65d046130e7cadc52fb8d2ceb54aba1c34ce4da2052b189cb881f321c3c3",
+      "art/world/banner-ironworks-series.webp": "a4361a0b8c8118d049ac3a094017f993e6a67f1604ffc934bd9c8ab30f90e1c9",
+      "art/world/banner-kestrel-tyres.webp": "9e22bb9741e8b5e37d684734612e8d8f4968dfa8679dce5ed0be9e63e68e6468",
+      "art/world/banner-nordvik.webp": "bdd15aa45d2d21214bc2e4c24a351c345869819321f53a667ee6019d6211e424",
+      "art/world/banner-vortex-oil.webp": "2fea659f77c0b2f7a0320451af2ee2be4f0209a93cf7e8f357d6bb62dbf51f56",
+      "art/world/crowd-day.webp": "aec9d62002fda6897eb78666ff76fbe6ea8846991dcbbefc53e54f6f5c02732c",
+      "art/world/crowd-night.webp": "da616c8636dde4c81dcdcb106963dce2fcb90b1670466844ccadf35660f0f232",
+      "art/world/graffiti-grind.webp": "1f75a1ce90f7d5393b39796b2dd12341b4d3258e08e3aa0e6f3bd1695bc2b01f",
+      "art/world/graffiti-nofear.webp": "672578e679a1a2044de87f234a8edf3e6a43b07d80dbf915332841cd1c905c1a",
+      "art/world/graffiti-rise.webp": "b3b865f7e8c3dafc50bb886ec71ed14abaa0c5fcabca7062ee6cf58dfd77b484",
+      "art/world/graffiti-skull.webp": "b10d2418cc34353f13e037c65ce7e78eccefda003b7f710e3770bf15ce29b449",
+      "art/world/graffiti-tag-wall.webp": "d9f5531e47b1799133aa17d0a9de66356f3d66e44cf38ac07d892433833c1e5d",
+      "art/world/graffiti-wheel.webp": "1a1b02decbaa81fecdfbf4c827a9b5e0cce8817de37ed142cc29bbbdbd517a2f",
+      "art/world/kit-pro.webp": "da575160705872106118456363c3d21936b74d0ec515b882a9f919f40c6705bc",
+      "art/world/kit-rookie.webp": "a3b385484999c1762b62a488954728c841aa3c08db19f3e72b4c1654901f97e7",
+      "art/world/mask-edge-grime.webp": "5512e0a93eeeb2eb4642ee9226d9fb5e03df86ee218e5061291a2718c3bf7806",
+      "art/world/mask-grime-spatter.webp": "1ffdb30c0b4684c93c9696a8a1957ef232e70f1cb24f2639c407f54572fa0e79",
+      "art/world/mask-rivet-drips.webp": "5a4d4a38aa5e303c383eb81beec4fd3746496c57bcc5ba7414137f4354ba667d",
+      "art/world/mask-rust-streaks.webp": "f8b91860441ff550ffdf51ac5682ddee3e0f3bf91a061a334f3935394fcc0f07",
+      "art/world/poster-trials-night.webp": "be7251ac3acc36d455136c9f34a8ae779c959da089564c692713465717fb6a14",
+      "art/world/poster-tyres.webp": "9fe1b890bc51d033ccab0c1bf55584880adc8980116098b33189b2f89e4bcb4d",
+      "art/world/sign-exit.webp": "160bed9f19c006c3070a0a16260d9b75d044a9fe01e87c632ebb733229639825",
+      "art/world/sign-forklift.webp": "674eadbd3dbe9b0f58e11d8c446e743abf69f00bb960b5471323023d9c8fe76e",
+      "art/world/sign-hard-hat.webp": "b710c9868379ee3d7323c9dec0f575cc9101f123ec78a7311adc25f09f35086f",
+      "art/world/sign-overhead-crane.webp": "ebba5c576c4b32c52d46f3d0dfcb7afbd638b4fc156673bda1c596086c0f29ed",
+      "art/world/stencil-apex.webp": "d5d942904b15494ae007b8aeaec44b9ec097c98b1ca1a6b265bc8059c583f5d2",
+      "art/world/stencil-arrows.webp": "a0c7300aff015ea18a5e9b593b7108555d8be8f70dcd6297545d0b2a02605a8d",
+      "art/world/stencil-hazard.webp": "0148c9937e3377033bfe97ea14bf48ebd9faa7491c9acf6c7e8e096f57d9348a",
+      "art/world/stencil-hkr.webp": "481d1378596de6787b99eb03709f845c6ef8323ada137127e0ce469e79f4d29d",
+      "art/world/stencil-nordvik.webp": "95925305aa7a7dcef5b7cf60bc2359dd3521113589770c1bbafc820a62c69521",
+      "art/world/stencil-serial.webp": "c3539b3920bd9b26ef47982033f45aa1fe3c01c0ea3f59c95c60e54c1425ab74",
+      "art/world/stencil-taro.webp": "40d02bbb67e7d9313b83634c6e21e5fcf7e7fc9b703620307b46b5f522d9e2a8",
+      "art/world/stencil-weights.webp": "ff5a353824ec0bbbf7edd83e2c4c7c44fbe20789e4ac733df5c240f1e3aa2065",
+      "art/world/tyremark-arc.webp": "925fae78ab1bc39cc535757da3e1e8e79651cbc1d4c6177c2b34592a7bf9cb1b",
+      "art/world/tyremark-straight.webp": "8940ca99d90cf1c9950db30153197de7f4e82a1919a32d46dc730ded0af2a8b6",
+      "art/worldmap/region-canyon-1024.webp": "d4b34da4780417206db27c0da31f4a5e19b702258fc8c35b2bc96c14c71848ec",
+      "art/worldmap/region-canyon-1536.webp": "9a3c4c0e4f5953bfffbab927796542bfd4cf04de2f1595cfe56bf3df13e7b249",
+      "art/worldmap/region-foundry-1024.webp": "1b427e6b9467d8619607347e516ed698d5aa359980d4068b34406e988e20609e",
+      "art/worldmap/region-foundry-1536.webp": "e917156f674a8e0917b19f56ab5e9c7d1a812bc77b697100393e8732ef84fd1f",
+      "art/worldmap/region-industrial-1024.webp": "6d78d842697c0c8ba655ee5563da5a6e0c98bc9f0e20e3605c715c1f4190741a",
+      "art/worldmap/region-industrial-1536.webp": "3708055b579835085a8db429ee81b6304ff47ea0f11110edb4024ff886070668",
+      "art/worldmap/region-nightCity-1024.webp": "772c439077b8b41aec96fe467104cba86b86661a7491f17fb508015a4762239b",
+      "art/worldmap/region-nightCity-1536.webp": "53126a6fff4eb863b37b459f2dfc9040f72d5e4be4e69447e5270ca8885ba307",
+      "art/worldmap/region-snow-1024.webp": "db1aa6b92372b240e08dea1f03bf4b42783e48e6d7b5253f0b1661ccd44e64d4",
+      "art/worldmap/region-snow-1536.webp": "102763d4f1a9829d98c097c8a52353529ab785d973eb56e1c4d58001d55e5581",
+      "art/worldmap/world-1024.webp": "5187cb95a98b3c7051e80239a9fe7d0837e858c83c46262600635198c1b3a274",
+      "art/worldmap/world-1536.webp": "ac1eeab0fe05e05abb268a166a67dc2c2a07b322c58c612546aedcb5da6f88bf",
+      "art/worldmap/worldmap.json": "762935830dc1130384640ac8ab107ec19d269591566db240f807d73023180ace",
+      "assets/inbox-B243MVep.js": "d26a34f1a2faa5a0134927a5a203ea9120c18f4ef695e6e8be6edd58356ebfaf",
+      "assets/inbox-B243MVep.js.map": "747860303833028e1607d4082f63c5919a09923162840c8117b660dd6dbb64bc",
+      "assets/index-jw4l6n5D.js": "e6be1c8f71c586c234489dcc0ba684d77b2dfe5399c82f8368115fcd1653a31f",
+      "assets/index-jw4l6n5D.js.map": "4540c8bf491c9d9d8f0e4c9c8c20205e213fb310df97f4b69a73da96aab591f2",
+      "assets/three-CGwyv1Ha.js": "8429d100c1bc19b624ac29ee417fc65f08bd63aaaee6ee76a1d42d37b85a7865",
+      "assets/three-CGwyv1Ha.js.map": "bc638f3aa4fef53f45fca810549bd456cd31a9fe4c1f326bcb379583eb58e0ce",
+      "assets/worklet-DGoGEqnF.js": "2326a359b60af20b6bb7abbe3b59abdf05ba3c267ffdddf219139274e0eec0e3",
+      "assets/worklet-DGoGEqnF.js.map": "7650cc976ed0e1bc4a68ad872e3059fa41b24ab362d14208aad1cc4d3e9d5f75",
+      "assets/worklet-Vg1LRsTe.js": "fbcdbe6317f31fd56c6c0e3f02ec7db861a1fb721f5d359ff28ba60a686e80f5",
+      "assets/worklet-Vg1LRsTe.js.map": "2dc8a2f3937657ce31ca30f0354c481fd6f2da9010b0a5246b0def1f47fd77d4",
+      "bench/b1-bot-3.json": "c9b4293a8e8f698aaa48f6a674eef0daa470c28eb1ab921ec6b52ce5a216b8fe",
+      "fonts/BarlowCondensed-BlackItalic.woff2": "83282bcfc9df534b070d8231f10e511ba0c60ae63af9b5e096e4de089454bc88",
+      "fonts/BarlowCondensed-Bold.woff2": "e3e520cb7468f2efd60bc2ce96694567c3312f4ef414fffbe605e3ad146b24e6",
+      "fonts/BarlowCondensed-Medium.woff2": "31ff5e6e96a096fde4d78bc838719e69b093db2d0b062b96e423c065a6d1b2b1",
+      "fonts/LICENSE.txt": "74f4d5bb5ab5fe306120a2174f0fd3dbde3b0e8a6a78f7f5b74f6af0774179e0",
+      "index.html": "6f4951cfde50eb9fe5874361ac7cc3ea32804f00a818fbd0b833060597e6bd4a",
+      "load-manifest.json": "438fee0c1c7184788339bfb2e8e3b4daedaea076d2cb5bf79f8b7a34623c8956",
+      "manifest.webmanifest": "ab1315c46a69c33839955ccba821970a219e19bf360f405a3c025f546c4a04ca",
+      "model-catalog.json": "11f1653061ab812089ca8e54dbd726382a5b0baf57cb6c333330272c0ee3e6eb",
+      "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
+      "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb": "fbbae43691569760a6ee0b4385533536b986dd5e7697bf48f4c32cbb4810cf5d",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82",
+      "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb": "ad1907131d0de127ec7900f0543ac413dd5d81c0f562a9d9dded7bf7747634e0",
+      "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515",
+      "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
+      "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb": "3ae6a8d20fccb0273d2ee00fb2ced3d92fd5ae4c80aa925a293975b42aaa2c6b",
+      "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb": "95acaf16925f55abd0ce4446c3c8418f385079d7e2b60db697d53a9fd01e8aa0",
+      "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb": "fb3780c48f5c5083ac0410fe17f9245f64830a7b42577f666915f16857e09910",
+      "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+      "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb": "a535485d70b6ecd4874f204162e338d9ac3ae9d67f335b041170b556793f4ff5",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a",
+      "offline.html": "23c24d4b9f01f18c80ae905b5d178ff832c24845643b02c44af88b121c68979a",
+      "sw.js": "b5519beda7dfe47c56be9a72e5acbd10599e984fe9245ea8a498783574523d43"
+    },
+    "errors": [],
+    "captureWallMs": 4658.345417,
+    "clip": "harness/out/render-aa-round1/desktop-high.mp4",
+    "clipSHA256": "6760824d6a9ddccffb10e6f7aaa2bd91c0249bba739f673c8ec6afd40374d404",
+    "recordingSHA256": "a22550453addbd5dbbb274a0ef16841f40d0873eaef2b9e6cf0d243a91e90198",
+    "synchronizedRenderP50Ms": 5.8450000286102295,
+    "synchronizedRenderP95Ms": 6.6600000858306885,
+    "ticks": [
+      {
+        "tick": 4,
+        "hash": "10073b7534e4e173"
+      },
+      {
+        "tick": 8,
+        "hash": "cfe42f0ae7d2990e"
+      },
+      {
+        "tick": 12,
+        "hash": "9e0605d6b03777a7"
+      },
+      {
+        "tick": 16,
+        "hash": "394e6f594aa66ef8"
+      },
+      {
+        "tick": 20,
+        "hash": "3074f689adff139c"
+      },
+      {
+        "tick": 24,
+        "hash": "6de197cef6576e87"
+      },
+      {
+        "tick": 28,
+        "hash": "915955205966ab9f"
+      },
+      {
+        "tick": 32,
+        "hash": "3bbfac1b961cbda5"
+      },
+      {
+        "tick": 36,
+        "hash": "84d12ddc205ebe98"
+      },
+      {
+        "tick": 40,
+        "hash": "45468289a4b6da00"
+      },
+      {
+        "tick": 44,
+        "hash": "772f1ec917cd3170"
+      },
+      {
+        "tick": 48,
+        "hash": "435d4c872e7bbe05"
+      },
+      {
+        "tick": 52,
+        "hash": "900880e77116fbdd"
+      },
+      {
+        "tick": 56,
+        "hash": "19deee0ac8c100a2"
+      },
+      {
+        "tick": 60,
+        "hash": "326a4279788b17a1"
+      },
+      {
+        "tick": 64,
+        "hash": "08b6324e3719b198"
+      },
+      {
+        "tick": 68,
+        "hash": "df23b45f1f4d3fbb"
+      },
+      {
+        "tick": 72,
+        "hash": "35dfce06fb59bedb"
+      },
+      {
+        "tick": 76,
+        "hash": "2a40236a53cc5732"
+      },
+      {
+        "tick": 80,
+        "hash": "24f394ceb8805ff6"
+      },
+      {
+        "tick": 84,
+        "hash": "a823d9abd17423ee"
+      },
+      {
+        "tick": 88,
+        "hash": "47b783f7895215cd"
+      },
+      {
+        "tick": 92,
+        "hash": "c0bd6dd103c6f913"
+      },
+      {
+        "tick": 96,
+        "hash": "5e8af56639a6570f"
+      },
+      {
+        "tick": 100,
+        "hash": "6e652577726dc66f"
+      },
+      {
+        "tick": 104,
+        "hash": "3cb6c4858d1b13bd"
+      },
+      {
+        "tick": 108,
+        "hash": "efa33f5bdac142af"
+      },
+      {
+        "tick": 112,
+        "hash": "89b5668c7ca8188c"
+      },
+      {
+        "tick": 116,
+        "hash": "53dfdfc2ff11d292"
+      },
+      {
+        "tick": 120,
+        "hash": "d2be23d22ab4bd72"
+      },
+      {
+        "tick": 124,
+        "hash": "316a8c325c844e8d"
+      },
+      {
+        "tick": 128,
+        "hash": "948f89b59e88ac3e"
+      },
+      {
+        "tick": 132,
+        "hash": "830b8816bf118f20"
+      },
+      {
+        "tick": 136,
+        "hash": "91a9effc57f0eefc"
+      },
+      {
+        "tick": 140,
+        "hash": "0b2a8e2665723a55"
+      },
+      {
+        "tick": 144,
+        "hash": "d23460d0c3050e9d"
+      },
+      {
+        "tick": 148,
+        "hash": "e343298f8ce936cb"
+      },
+      {
+        "tick": 152,
+        "hash": "dd937e99fbdfc75f"
+      },
+      {
+        "tick": 156,
+        "hash": "5e5006ff3757b4f5"
+      },
+      {
+        "tick": 160,
+        "hash": "f737d1720c0b25e3"
+      },
+      {
+        "tick": 164,
+        "hash": "9055a1ddfd49224b"
+      },
+      {
+        "tick": 168,
+        "hash": "1d589fe55c52258e"
+      },
+      {
+        "tick": 172,
+        "hash": "7bb951e56a602ec3"
+      },
+      {
+        "tick": 176,
+        "hash": "d6e32c5c246d856a"
+      },
+      {
+        "tick": 180,
+        "hash": "3b47f4ac2e36ca9e"
+      },
+      {
+        "tick": 184,
+        "hash": "6b050ec41639e575"
+      },
+      {
+        "tick": 188,
+        "hash": "df986803a5b96436"
+      },
+      {
+        "tick": 192,
+        "hash": "0946d7d0b9413a42"
+      },
+      {
+        "tick": 196,
+        "hash": "225b6701137da4b7"
+      },
+      {
+        "tick": 200,
+        "hash": "38a008e9d37392fb"
+      },
+      {
+        "tick": 204,
+        "hash": "c5fe7961442b0031"
+      },
+      {
+        "tick": 208,
+        "hash": "82110ffbd7715ab8"
+      },
+      {
+        "tick": 212,
+        "hash": "9a9df20e66626100"
+      },
+      {
+        "tick": 216,
+        "hash": "b67e723d7f5da5e4"
+      },
+      {
+        "tick": 220,
+        "hash": "69249ff89ea3e279"
+      },
+      {
+        "tick": 224,
+        "hash": "592c39445212b34b"
+      },
+      {
+        "tick": 228,
+        "hash": "673f263cba75e327"
+      },
+      {
+        "tick": 232,
+        "hash": "41d44957363fb64e"
+      },
+      {
+        "tick": 236,
+        "hash": "ac6e89c85cfe6922"
+      },
+      {
+        "tick": 240,
+        "hash": "b56996ff36d78518"
+      }
+    ]
+  },
+  "phone-high": {
+    "graphics": {
+      "requestedBackend": "webkit",
+      "launchArgs": [],
+      "browser": "webkit",
+      "browserVersion": "26.5",
+      "hostPlatform": "darwin",
+      "vendor": "Apple Inc.",
+      "renderer": "Apple GPU",
+      "version": "WebGL 2.0",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "renderSettings": {
+        "prepare": [],
+        "biome": "industrial",
+        "zoom": "idle",
+        "occluder": {
+          "ms": 0,
+          "tested": 0,
+          "hits": 0,
+          "count": 5,
+          "override": null
+        },
+        "garage": {
+          "on": false,
+          "draws": 0,
+          "hidden": 0,
+          "textureMB": 0,
+          "reflection": false
+        },
+        "phase": "menu",
+        "tier": "high",
+        "dpr": 1.5,
+        "devicePixelRatio": 3,
+        "canvasW": 1398,
+        "canvasH": 645,
+        "calls": 602,
+        "tris": 462822,
+        "rtMpx": 4.81,
+        "rtMB": 43.6,
+        "rtPasses": "shadow 512\u00d7512 | scene:hdr 1398\u00d7645 | bloom:src 174\u00d780 | bloom:h 174\u00d780 | bloom:v 174\u00d780 | composite:graded 1398\u00d7645 | smaa:edges 1398\u00d7645 | smaa:weights 1398\u00d7645 | smaa\u2192canvas 1398\u00d7645",
+        "shadowMap": 512,
+        "heroTris": 92171,
+        "heroDoc": "bike rider",
+        "riderOutfit": "street-mustard",
+        "riderMaterialVariant": null,
+        "heroShadow": "hero-only",
+        "trackCalls": 9,
+        "trackTris": 48516,
+        "textureGenMs": 0,
+        "passes": 8,
+        "stalePrograms": 1,
+        "stabilized": {
+          "singlePass": 0,
+          "split": 0,
+          "depth": 0
+        },
+        "skippedFrames": 0,
+        "deviceClass": "phone",
+        "profile": "phone-high",
+        "bloomers": 19,
+        "entryMs": 628.5,
+        "entry": {
+          "biome": "industrial",
+          "ms": 628.5,
+          "compileMs": 148.80000000000064,
+          "textureMs": 11.120000000000118,
+          "warmMs": 8.7,
+          "textures": 36,
+          "texturesMB": 57.4,
+          "materials": 68,
+          "programs": 29,
+          "programsBefore": 20
+        },
+        "heroSwap": {
+          "loads": [
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+              "bytes": 870440,
+              "fetchMs": 125.94000000000001,
+              "parseMs": 139.09999999999997,
+              "prepareMs": 0.5800000000000409,
+              "at": 58.3
+            },
+            {
+              "url": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+              "bytes": 2283040,
+              "fetchMs": 131.42,
+              "parseMs": 163.2,
+              "prepareMs": 0.160000000000025,
+              "at": 57.9
+            },
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb",
+              "bytes": 1480204,
+              "fetchMs": 134.5,
+              "parseMs": 174.28000000000003,
+              "prepareMs": 0.3599999999999568,
+              "at": 58.44
+            },
+            {
+              "url": "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb",
+              "bytes": 3015120,
+              "fetchMs": 139.84,
+              "parseMs": 195.61999999999998,
+              "prepareMs": 0.1400000000000432,
+              "at": 58.38
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb",
+              "bytes": 864848,
+              "fetchMs": 170.85999999999999,
+              "parseMs": 174.18,
+              "prepareMs": 0.10000000000002274,
+              "at": 58.52
+            },
+            {
+              "url": "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb",
+              "bytes": 2270544,
+              "fetchMs": 173.08,
+              "parseMs": 196.32,
+              "prepareMs": 0.12000000000000455,
+              "at": 58.48
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb",
+              "bytes": 1753256,
+              "fetchMs": 175.4,
+              "parseMs": 210.81999999999996,
+              "prepareMs": 0.160000000000025,
+              "at": 58.62
+            },
+            {
+              "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb",
+              "bytes": 3616252,
+              "fetchMs": 178.57999999999998,
+              "parseMs": 238.26000000000002,
+              "prepareMs": 0.18000000000000682,
+              "at": 58.58
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb",
+              "bytes": 1706124,
+              "fetchMs": 183.24,
+              "parseMs": 248.4,
+              "prepareMs": 0.13999999999998636,
+              "at": 58.72
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb",
+              "bytes": 946824,
+              "fetchMs": 185.98,
+              "parseMs": 253.92000000000002,
+              "prepareMs": 0.0999999999999659,
+              "at": 58.78
+            },
+            {
+              "url": "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb",
+              "bytes": 3486940,
+              "fetchMs": 231.3,
+              "parseMs": 238.65999999999997,
+              "prepareMs": 0.15999999999996817,
+              "at": 58.68
+            },
+            {
+              "url": "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb",
+              "bytes": 2448152,
+              "fetchMs": 235.07999999999998,
+              "parseMs": 261.34,
+              "prepareMs": 0.16000000000008185,
+              "at": 58.76
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb",
+              "bytes": 2355380,
+              "fetchMs": 237.76,
+              "parseMs": 279.58,
+              "prepareMs": 0.13999999999998636,
+              "at": 58.82
+            },
+            {
+              "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb",
+              "bytes": 912696,
+              "fetchMs": 240.14,
+              "parseMs": 283.78,
+              "prepareMs": 0.06000000000005912,
+              "at": 58.86
+            }
+          ],
+          "swaps": []
+        },
+        "entering": false,
+        "retirement": {
+          "requested": 4,
+          "released": 4,
+          "deferred": 0,
+          "pending": 0,
+          "maxPending": 0,
+          "contextLosses": 0
+        },
+        "terminalPrograms": {
+          "deleted": 0,
+          "contextReleased": 0
+        },
+        "art": {
+          "settled": true,
+          "ok": true,
+          "loadMs": 760,
+          "deliveredMB": 1.11,
+          "inWorld": true,
+          "trackComplete": true,
+          "trackIds": 28,
+          "builtAtFrame": 0,
+          "frames": 0
+        }
+      }
+    },
+    "buildFiles": {
+      "art/icons/apple-touch-icon-152.png": "e624d214712261f0d2791c8122ff3ca12599c71c06a3124a9145d4495d2b76d9",
+      "art/icons/apple-touch-icon-167.png": "225d6457fa8336b6bcbee3fea9e39bb26435fa70669466fc38f549cd7cc43390",
+      "art/icons/apple-touch-icon.png": "93d86e48bd6dee6b30ede98efdd08dc6cd263a42d46979b4b874604301aaa50b",
+      "art/icons/emblem-512.png": "23b4314890b05e7d340e4a2ca13cf695f2eb9ab7420c0bfb2201c42b6f24cb62",
+      "art/icons/favicon-16.png": "c1711f6279e2a95e229bdc89c53976715a686400a75822df7d06938e18075cc3",
+      "art/icons/favicon-32.png": "9a338662ea22ed9b8cc492f94fb87f27582d6402995a5b3a11f92248a9a849a1",
+      "art/icons/favicon.svg": "c1350cbc46c32741b0cd7d6748d2127ff592f880ee3b6efaa3118ff6ba049c92",
+      "art/icons/icon-1024.png": "908f76e927732d487a131975be4b677167089c95b83f57a7be8bf02513e7d6d7",
+      "art/icons/icon-192.png": "3d3f3477aeee8256417ae476e7190fa19ac282e43f9ff6d0792298e5c153c8e8",
+      "art/icons/icon-512.png": "4d3c5ccdf5f3ed0bfb31a70356b78c93b0fa160cdd5a8365ad56045854e7ec49",
+      "art/icons/icon-maskable-192.png": "9c1c94733b64e24775e8bc0dda1114e811547355024bf1b411747ed2b8c1a5ec",
+      "art/icons/icon-maskable-512.png": "bf6e010e5f41ccd80a643fd51dbe6fa5e68bfef4d18aa9b8af0cbfaaf4ecf036",
+      "art/manifest.json": "298405c3bfeb6cb63a73fd8ef8fb200cb076872ba487d17ff3b6e70818f06f8b",
+      "art/menu/bike-pro-1536.webp": "3e042f66dfc1f4bb6b652c89bd44361ce54f57c5b28a3185788439e360d48f6f",
+      "art/menu/bike-pro-768.webp": "76cb83fff215258ef04e45a69cc1bf8dee8d09acae49a0017cdc52a8be8c7b59",
+      "art/menu/bike-pro-alt.webp": "23c607e66b412000e6dfccc22ed11794c167fe3df7740002e423074fce59a78a",
+      "art/menu/bike-rookie-1536.webp": "ddcf8ace189a1286c3812eaf5c39432314e62d49539b45cf279d92e9bbf619c2",
+      "art/menu/bike-rookie-768.webp": "b16a24afaf9302bde9550bb4832283787ab2917ca9702af9d3a0ce2805cab4cf",
+      "art/menu/bike-rookie-alt.webp": "c1c3df43d901f2e17ba17c2d17d42fcbe3ebe52384bf0af8f21c0b85efba4ee3",
+      "art/menu/garage-plate.webp": "9ccf0f5b56600f09d8830cda538523ad9163beb189fbd5b7164c2443444836cf",
+      "art/menu/keyart-canyon-1920.webp": "6370bc7bd228fb573169a7fa08b9df344aae418b240637c7c0cb137d9179dd3a",
+      "art/menu/keyart-canyon-960.webp": "c6108bb2c4f70bd719f587387cc50c2264d65d39746337319fcd1981425fe245",
+      "art/menu/keyart-industrial-1920.webp": "2facbba1870f569e4e62142e3907469f9818ebfca9b14165ca4385b96da4e6c7",
+      "art/menu/keyart-industrial-960.webp": "3c36185592585cb19dec5a2e8fa64a2f7ef1a815f1c1e131b4183303ea054630",
+      "art/menu/keyart-nalati-1920.webp": "b1e476201cf771f1a573af920b6bdd76be721866c8cecdfcfe548da7f72e457e",
+      "art/menu/keyart-nalati-960.webp": "479343217aed306b489e6303990ca60881e094319d155bb10ea16442734d3ff9",
+      "art/menu/loading-plate.webp": "81d3c72b2f9ad2ff20f37de7816d7e9c2e95d8a3fd6b918ce90b26c8ef5c7dd4",
+      "art/menu/medal-bronze-512.png": "d471240127df3a4a6e8f501516a22c2f9764865e5506dfac9b64e3aaec8d7845",
+      "art/menu/medal-bronze.png": "1ace6c5d54c7fe2ffec32c979df4a5fba84840eb1e45d7b4ad2b0c4cbdfe1040",
+      "art/menu/medal-gold-512.png": "31b1ae0ec1dfcd02af8ae9a20f044ba595e2ffe6a24f3d181913f1252261452f",
+      "art/menu/medal-gold.png": "2d57129bb214258e85b80eddab0d2e7f960a7356b15d2e136e9ce688028fa57a",
+      "art/menu/medal-platinum-512.png": "0e116af3f76a73b1f550c5bc0b70522d2ce8119f3b687cca5b0592573a02b664",
+      "art/menu/medal-platinum.png": "613381217e7215e31236358d0f5afc28d5b918d76ad2360ed1d61c8a319c6da5",
+      "art/menu/medal-silver-512.png": "e29c508c4ba7cbee3dbba15d3f552df3e88817b205b52df926cabf906a478a61",
+      "art/menu/medal-silver.png": "273f649c9a41f096a76885d6651dcd0cf17493f199b6f59f504dcd158a73caf8",
+      "art/menu/results-canyon.webp": "b6ffb0182cd34a86f909813ddb5d7e4f370e2173813c344db45324933792dc56",
+      "art/menu/results-credits.webp": "596d57f262e8cd32b2e42b1f173a7efc350be9b65aebc0332c533bc148911b1d",
+      "art/menu/results-foundry.webp": "18f374c44494f54d9a810911b8412edcf947a9ccb03a6df255ffc49a15f1dbb3",
+      "art/menu/results-garage.webp": "b8f4993d812a0b711cac7f58b8bc5c33024e89d1514b2789f05c0f022e3fade2",
+      "art/menu/results-industrial.webp": "5a10949eae984d2196bec4d4f3f6de46d88d228efaecfbc2f2b8e9e95fe66919",
+      "art/menu/results-nightCity.webp": "5b59f1e3151023d033fc775ade3081f5c92c88f1358adca892dfa369afa1ca11",
+      "art/menu/results-snow.webp": "51a9567ecb7682210f275384cb2f91d17837a2179c7a2a0e3e3ed04bab1cf82a",
+      "art/menu/tier-beginner.webp": "8cd6d9e89bc3b990149937c38142cc2564c9f719874f9dd39cbaf7ad26047b70",
+      "art/menu/tier-easy.webp": "e0f948665cfcd779ae53dd55648934a874528b722ae44e23f7baa1cee816ea22",
+      "art/menu/tier-extreme.webp": "bf5abc29f964cc78c46e779a8e12b7daf11b2cda898d9f35edb29ad206fae46d",
+      "art/menu/tier-hard.webp": "26cffd64018d934ac5956e7fa56c565d8d4a113c2b4ba4e27ef9ffac75d4f02d",
+      "art/menu/tier-medium.webp": "06250a86790e0f6e8ce04f9f0b8ddd27e91fc9ecae927da7dd34f0af4599ccdd",
+      "art/menu/track-b1-first-ride.webp": "c379ef826ee40672995e858be369dbd7dd21a24db199f5af5a8b4234da7604eb",
+      "art/menu/track-b2-lean-back.webp": "18a362cd6a70b6ae322c4604ef20c0f7ed030275155fe5021eba232db06356a0",
+      "art/menu/track-b3-kicker-row.webp": "0162b613762dcc8bf647b04fec3314d6633e9ba0203989b6b21444be635d6ee3",
+      "art/menu/track-e1-uphill-weight.webp": "00bfeac18f8bdb2412bfe171475f04a906989106e75bd54e0b02a786adb8e5df",
+      "art/menu/track-e2-rear-wheel-first.webp": "e7ce831e017a955e9138c1e87b3fb2f4931dda0727cbc9ec3be88f13bc86f7c7",
+      "art/menu/track-e3-stairway.webp": "43b77a22eadbdbe515cd33966710976233c7bf24322f6fbc07423cc1c93eb030",
+      "art/menu/track-h1-wheelie-wire.webp": "eabfc07ab922850f7673d385df738c172bd720906706e8805afbd3e9a6d4fb20",
+      "art/menu/track-h2-gap-chain.webp": "d666d583166e6923039eb65fd00b9fa898c1fb56bff797c7ef1f04bcabc21f2c",
+      "art/menu/track-h3-fire-line.webp": "5b31d85b4e284d1d5abd5a6da72ace3beb02885cf7b941c1af2f50eed6d941e0",
+      "art/menu/track-m1-hop-up.webp": "872cc0df21d4609f53bcbd7ad912ea581a579f17cd6d39da4bd5517c54af37a2",
+      "art/menu/track-m2-drum-roll.webp": "e27a69b8dc82f2ec3d2894c20ccfe8ee856f87d367aea19f7c88f596d0decc34",
+      "art/menu/track-m3-see-saw.webp": "d3945643189426a7e01063ef6e09751baf3dc1f4eda10ad5c76eda4ba4027810",
+      "art/menu/track-x1-vertical-limit.webp": "71f0c3df7e6f2b1d1f0388e17c216436da2476e63b3f0d2b70330fef7a813726",
+      "art/menu/track-x2-pipe-dream.webp": "fb08958efa129f566131ef4f09c5295286b7147b1f1ca20d9e3dc9f6f41a22a6",
+      "art/menu/track-x3-gauntlet.webp": "eba55c2a06ee391a64f84ed5e6f66bf037f9bbaaa0132493da4a78595d2c48ea",
+      "art/menu/wordmark-plate.webp": "8c7ded1f3cf66b1a28bbd9585cddd6bf6fbc707126ab508ec160cbcfe8c86630",
+      "art/og.jpg": "8f07a982275ddf1468fbe57f6215c46df54730b3e87dc6aad81f0d4f3bd0c538",
+      "art/plates/plate-canyon.webp": "e0c48cb62502aabf31a8f55872cfb8a3342fc7e7459ddea5cc53484e1a75c4b3",
+      "art/plates/plate-foundry.webp": "a4209e10ee8f4493b8abacfc7a3b10490755ae4b5e178d8679f5730af92d2bc7",
+      "art/plates/plate-industrial.webp": "dee7b119a7c41d9b305265178698e44b5ae7464f0d5fa2c63274954518733cf5",
+      "art/plates/plate-nightcity.webp": "f30a70740b6fe89c99d077d3faeac44daaffdea634391441022b335b1bef2ee6",
+      "art/plates/plate-snow.webp": "5e6479e44db7a689c0f306b55e1c9e411f1091ec4f5b5e1592227cef67d93cbc",
+      "art/plates/sky-canyon.webp": "ec66e12f87cad096badde41ff2e9edd533065625ae7b8330422c0139877ecba8",
+      "art/plates/sky-foundry.webp": "c610ff3192f35553bfb3d5d663efc6f0669d3c399a9832dfe76e499cfb541c91",
+      "art/plates/sky-industrial.webp": "a76dc2bb2221d28a9c95c5aa44f50ca721d47c501512260e072cf29685817e07",
+      "art/plates/sky-nightcity.webp": "ef7aa3d78b307d750e839de18ce6477a64b105d18ed115b30c0145d0bc874269",
+      "art/plates/sky-snow.webp": "ef347821f5514c0a8be04a0ecf0292eeee52d90d1cde41e2c5213d85512cd590",
+      "art/splash/1125x2436.png": "3185677ac4ed28550cd0d78358ce7355e1659c98a04073c0e2e22a10feedec08",
+      "art/splash/1170x2532.png": "b09ba5a003d1ead6c22094c90e5c06a10cff338665a4ee96a151b54b45ec26f3",
+      "art/splash/1179x2556.png": "daf9fad2a3e3658d3a5a15b392d5028b84c043a670c93020a0a415293ba3a039",
+      "art/splash/1206x2622.png": "67d4b2b4603cc3ac3f793f495edbe7d509b7473705b9c0888bd1eeb4b6e77c95",
+      "art/splash/1242x2688.png": "055b945b3f649a9081f1b186ff7d7f2a145be950cff8cec039b564b421b426d5",
+      "art/splash/1284x2778.png": "d18506079a98fef502a335912ada691f1623a3abe3d40da15c16d1e8bc194a04",
+      "art/splash/1290x2796.png": "2757d208e7a3a08604f93ff43eb7f87584a1e6585babef65a86da865d1594339",
+      "art/splash/1320x2868.png": "540091bb4afdaec6200cd73e9d02a24816ddc8a4b4e70060caab968ea838eecb",
+      "art/splash/1334x750.png": "cdb96cc669c4b857481f450276729348fecd362698b742c26040a983dd60ad82",
+      "art/splash/1536x2048.png": "ca81c129f7e1174e280992c8eab34d32b4f251504ee284676a0ac1158aa1a9f2",
+      "art/splash/1620x2160.png": "5c7173a3da6fa13d7a9242ec2e9a271fa90aa1d885e437d701d46de082ad52a5",
+      "art/splash/1668x2388.png": "6a86066f4bbf97f78b873e166496c9b2e77070df0564968a85823c50e2b27f5f",
+      "art/splash/1792x828.png": "ec0b7c4d5c5e55673a2c25bc110c5bc362bd03479c1d666e089bdabdb99a9e15",
+      "art/splash/2048x1536.png": "e485348c45928e594d1862e14b93b304f608eb4ed4f7c9bb50b92de09ebdee13",
+      "art/splash/2048x2732.png": "73bab5a96acfa3b2cd972bc3f3f1df6d9d1f017d03957618b95498e377ce71e6",
+      "art/splash/2160x1620.png": "7477319347d98fafe87ae3314f0c2b8c54d3f1ed8bb850a83f4b957022378765",
+      "art/splash/2388x1668.png": "2012682390558f92e2bc7b634c05fa5765020d00f2d0c4cb6931ddc40dd1cced",
+      "art/splash/2436x1125.png": "db3217ea0128709d6dc29c652e8f0d29738eb4a5f2b748702632d2ca2059bed6",
+      "art/splash/2532x1170.png": "1ef47ed80c6e96dc37e5c551ab7a7cd56ab570fd3f04fec2ff0abab181e281ab",
+      "art/splash/2556x1179.png": "bc5756c5edd88d09569db4f26bd77b5f9150f0895ceb7da1b83f5b853aeea71a",
+      "art/splash/2622x1206.png": "7a0bc561ba39c5e3e22037056f0e3ab6b5766e99d7be2e9f04a26382e3e71c2f",
+      "art/splash/2688x1242.png": "bb1876eb1000182747d2e4ca78c80fa47ff21766a5cc9811b29d97b2826870c6",
+      "art/splash/2732x2048.png": "79e1976df660e361883355484d58570204fe5d7e1d249a7d0a4e1b1d1f091215",
+      "art/splash/2778x1284.png": "f8a87f54b404bf7ca9313961dc718d5d86c70aa042a215ce40f4d87f6a0e42e4",
+      "art/splash/2796x1290.png": "37fb1ac6426386b3278c8470c9004c4b138b6ff4b4c263364f9ed086aa452ece",
+      "art/splash/2868x1320.png": "2c6645bc964da93ab57bc68ccd40074bd6fe614734cdc8dcfd3af869743d8b40",
+      "art/splash/750x1334.png": "a50f181a41e1e06e919528fb441d957e10b3b5e529b559f45d1d299aa521228b",
+      "art/splash/828x1792.png": "e49a3279f9100fba68631e395b3e6c70afdad081d07e3a8bf65a3e5a6176cdf2",
+      "art/thumbs/b1-first-ride.webp": "5299ea627d572c0eac603482cd5e86202c04ef4d71ec20cf4bb1041a194cdad0",
+      "art/thumbs/b2-lean-back.webp": "1e20d81650efb3442baa4009d64c9fb043ccd3c90f51b0992f97c4c29b0f5f68",
+      "art/thumbs/b3-kicker-row.webp": "9f5a73600813a6fac54352d2849c21628b7edf83d4b69995e5e4f71d1e823be6",
+      "art/thumbs/e1-uphill-weight.webp": "7f9b0388024a2055c0e3a2ae1f2d1103eb01f3ad30b05352f60c6723be24ffac",
+      "art/thumbs/e2-rear-wheel-first.webp": "0b92a41701e74d473f59a238426ae42b75af975488b406ec94c4aa28a83326aa",
+      "art/thumbs/e3-stairway.webp": "0970e7849432b059da5c396acee6a530494169746565741a42fc0c7cfac0ad0f",
+      "art/thumbs/h1-wheelie-wire.webp": "f15134cf7728ae35c16d86b6f4ca55d744c3f9e1b9906f5f2933512e0796ba40",
+      "art/thumbs/h2-gap-chain.webp": "3386771d32997bdf3545f98550e8a109ee5160c8d0fafdabe4135c3eae8c5de9",
+      "art/thumbs/h3-fire-line.webp": "e1d087f0c4fe6198e8df4d24da298014b5e5b221c4bd90615897f61a8ed2b840",
+      "art/thumbs/m1-hop-up.webp": "59b4349cb2851185a48d5b3764789334ac28f0cc9132c85181b1d05b23081b75",
+      "art/thumbs/m2-drum-roll.webp": "ef32044572712ab969b121091708cc2628f6a860e5c3cc6bed8583541a2a5fcf",
+      "art/thumbs/m3-see-saw.webp": "f5d1a7b01f54ba16f435bf596c7237dc4a50abfad7b8b2738a8a1f92f1413df7",
+      "art/thumbs/x1-vertical-limit.webp": "51a8e26e09c2ba3b2b5602f0abc9345399bef908a03dd9099e0f42b3ab559e43",
+      "art/thumbs/x2-pipe-dream.webp": "bffdc25fd68d6a2b7f6d70d30bf622a70c970a17a0c24cb35686d950f689eedd",
+      "art/thumbs/x3-gauntlet.webp": "50cfacf7edb3af4ff3133edd6b5c0682e1b89c15b0171ee82bfe6db34416bdad",
+      "art/world/banner-apex-suspension.webp": "1a7dd09b2dd8ab3de22751a56334e8793e188bd406a39e9909f858de39e1b282",
+      "art/world/banner-bolt-energy.webp": "130c65d046130e7cadc52fb8d2ceb54aba1c34ce4da2052b189cb881f321c3c3",
+      "art/world/banner-ironworks-series.webp": "a4361a0b8c8118d049ac3a094017f993e6a67f1604ffc934bd9c8ab30f90e1c9",
+      "art/world/banner-kestrel-tyres.webp": "9e22bb9741e8b5e37d684734612e8d8f4968dfa8679dce5ed0be9e63e68e6468",
+      "art/world/banner-nordvik.webp": "bdd15aa45d2d21214bc2e4c24a351c345869819321f53a667ee6019d6211e424",
+      "art/world/banner-vortex-oil.webp": "2fea659f77c0b2f7a0320451af2ee2be4f0209a93cf7e8f357d6bb62dbf51f56",
+      "art/world/crowd-day.webp": "aec9d62002fda6897eb78666ff76fbe6ea8846991dcbbefc53e54f6f5c02732c",
+      "art/world/crowd-night.webp": "da616c8636dde4c81dcdcb106963dce2fcb90b1670466844ccadf35660f0f232",
+      "art/world/graffiti-grind.webp": "1f75a1ce90f7d5393b39796b2dd12341b4d3258e08e3aa0e6f3bd1695bc2b01f",
+      "art/world/graffiti-nofear.webp": "672578e679a1a2044de87f234a8edf3e6a43b07d80dbf915332841cd1c905c1a",
+      "art/world/graffiti-rise.webp": "b3b865f7e8c3dafc50bb886ec71ed14abaa0c5fcabca7062ee6cf58dfd77b484",
+      "art/world/graffiti-skull.webp": "b10d2418cc34353f13e037c65ce7e78eccefda003b7f710e3770bf15ce29b449",
+      "art/world/graffiti-tag-wall.webp": "d9f5531e47b1799133aa17d0a9de66356f3d66e44cf38ac07d892433833c1e5d",
+      "art/world/graffiti-wheel.webp": "1a1b02decbaa81fecdfbf4c827a9b5e0cce8817de37ed142cc29bbbdbd517a2f",
+      "art/world/kit-pro.webp": "da575160705872106118456363c3d21936b74d0ec515b882a9f919f40c6705bc",
+      "art/world/kit-rookie.webp": "a3b385484999c1762b62a488954728c841aa3c08db19f3e72b4c1654901f97e7",
+      "art/world/mask-edge-grime.webp": "5512e0a93eeeb2eb4642ee9226d9fb5e03df86ee218e5061291a2718c3bf7806",
+      "art/world/mask-grime-spatter.webp": "1ffdb30c0b4684c93c9696a8a1957ef232e70f1cb24f2639c407f54572fa0e79",
+      "art/world/mask-rivet-drips.webp": "5a4d4a38aa5e303c383eb81beec4fd3746496c57bcc5ba7414137f4354ba667d",
+      "art/world/mask-rust-streaks.webp": "f8b91860441ff550ffdf51ac5682ddee3e0f3bf91a061a334f3935394fcc0f07",
+      "art/world/poster-trials-night.webp": "be7251ac3acc36d455136c9f34a8ae779c959da089564c692713465717fb6a14",
+      "art/world/poster-tyres.webp": "9fe1b890bc51d033ccab0c1bf55584880adc8980116098b33189b2f89e4bcb4d",
+      "art/world/sign-exit.webp": "160bed9f19c006c3070a0a16260d9b75d044a9fe01e87c632ebb733229639825",
+      "art/world/sign-forklift.webp": "674eadbd3dbe9b0f58e11d8c446e743abf69f00bb960b5471323023d9c8fe76e",
+      "art/world/sign-hard-hat.webp": "b710c9868379ee3d7323c9dec0f575cc9101f123ec78a7311adc25f09f35086f",
+      "art/world/sign-overhead-crane.webp": "ebba5c576c4b32c52d46f3d0dfcb7afbd638b4fc156673bda1c596086c0f29ed",
+      "art/world/stencil-apex.webp": "d5d942904b15494ae007b8aeaec44b9ec097c98b1ca1a6b265bc8059c583f5d2",
+      "art/world/stencil-arrows.webp": "a0c7300aff015ea18a5e9b593b7108555d8be8f70dcd6297545d0b2a02605a8d",
+      "art/world/stencil-hazard.webp": "0148c9937e3377033bfe97ea14bf48ebd9faa7491c9acf6c7e8e096f57d9348a",
+      "art/world/stencil-hkr.webp": "481d1378596de6787b99eb03709f845c6ef8323ada137127e0ce469e79f4d29d",
+      "art/world/stencil-nordvik.webp": "95925305aa7a7dcef5b7cf60bc2359dd3521113589770c1bbafc820a62c69521",
+      "art/world/stencil-serial.webp": "c3539b3920bd9b26ef47982033f45aa1fe3c01c0ea3f59c95c60e54c1425ab74",
+      "art/world/stencil-taro.webp": "40d02bbb67e7d9313b83634c6e21e5fcf7e7fc9b703620307b46b5f522d9e2a8",
+      "art/world/stencil-weights.webp": "ff5a353824ec0bbbf7edd83e2c4c7c44fbe20789e4ac733df5c240f1e3aa2065",
+      "art/world/tyremark-arc.webp": "925fae78ab1bc39cc535757da3e1e8e79651cbc1d4c6177c2b34592a7bf9cb1b",
+      "art/world/tyremark-straight.webp": "8940ca99d90cf1c9950db30153197de7f4e82a1919a32d46dc730ded0af2a8b6",
+      "art/worldmap/region-canyon-1024.webp": "d4b34da4780417206db27c0da31f4a5e19b702258fc8c35b2bc96c14c71848ec",
+      "art/worldmap/region-canyon-1536.webp": "9a3c4c0e4f5953bfffbab927796542bfd4cf04de2f1595cfe56bf3df13e7b249",
+      "art/worldmap/region-foundry-1024.webp": "1b427e6b9467d8619607347e516ed698d5aa359980d4068b34406e988e20609e",
+      "art/worldmap/region-foundry-1536.webp": "e917156f674a8e0917b19f56ab5e9c7d1a812bc77b697100393e8732ef84fd1f",
+      "art/worldmap/region-industrial-1024.webp": "6d78d842697c0c8ba655ee5563da5a6e0c98bc9f0e20e3605c715c1f4190741a",
+      "art/worldmap/region-industrial-1536.webp": "3708055b579835085a8db429ee81b6304ff47ea0f11110edb4024ff886070668",
+      "art/worldmap/region-nightCity-1024.webp": "772c439077b8b41aec96fe467104cba86b86661a7491f17fb508015a4762239b",
+      "art/worldmap/region-nightCity-1536.webp": "53126a6fff4eb863b37b459f2dfc9040f72d5e4be4e69447e5270ca8885ba307",
+      "art/worldmap/region-snow-1024.webp": "db1aa6b92372b240e08dea1f03bf4b42783e48e6d7b5253f0b1661ccd44e64d4",
+      "art/worldmap/region-snow-1536.webp": "102763d4f1a9829d98c097c8a52353529ab785d973eb56e1c4d58001d55e5581",
+      "art/worldmap/world-1024.webp": "5187cb95a98b3c7051e80239a9fe7d0837e858c83c46262600635198c1b3a274",
+      "art/worldmap/world-1536.webp": "ac1eeab0fe05e05abb268a166a67dc2c2a07b322c58c612546aedcb5da6f88bf",
+      "art/worldmap/worldmap.json": "762935830dc1130384640ac8ab107ec19d269591566db240f807d73023180ace",
+      "assets/inbox-B243MVep.js": "d26a34f1a2faa5a0134927a5a203ea9120c18f4ef695e6e8be6edd58356ebfaf",
+      "assets/inbox-B243MVep.js.map": "747860303833028e1607d4082f63c5919a09923162840c8117b660dd6dbb64bc",
+      "assets/index-jw4l6n5D.js": "e6be1c8f71c586c234489dcc0ba684d77b2dfe5399c82f8368115fcd1653a31f",
+      "assets/index-jw4l6n5D.js.map": "4540c8bf491c9d9d8f0e4c9c8c20205e213fb310df97f4b69a73da96aab591f2",
+      "assets/three-CGwyv1Ha.js": "8429d100c1bc19b624ac29ee417fc65f08bd63aaaee6ee76a1d42d37b85a7865",
+      "assets/three-CGwyv1Ha.js.map": "bc638f3aa4fef53f45fca810549bd456cd31a9fe4c1f326bcb379583eb58e0ce",
+      "assets/worklet-DGoGEqnF.js": "2326a359b60af20b6bb7abbe3b59abdf05ba3c267ffdddf219139274e0eec0e3",
+      "assets/worklet-DGoGEqnF.js.map": "7650cc976ed0e1bc4a68ad872e3059fa41b24ab362d14208aad1cc4d3e9d5f75",
+      "assets/worklet-Vg1LRsTe.js": "fbcdbe6317f31fd56c6c0e3f02ec7db861a1fb721f5d359ff28ba60a686e80f5",
+      "assets/worklet-Vg1LRsTe.js.map": "2dc8a2f3937657ce31ca30f0354c481fd6f2da9010b0a5246b0def1f47fd77d4",
+      "bench/b1-bot-3.json": "c9b4293a8e8f698aaa48f6a674eef0daa470c28eb1ab921ec6b52ce5a216b8fe",
+      "fonts/BarlowCondensed-BlackItalic.woff2": "83282bcfc9df534b070d8231f10e511ba0c60ae63af9b5e096e4de089454bc88",
+      "fonts/BarlowCondensed-Bold.woff2": "e3e520cb7468f2efd60bc2ce96694567c3312f4ef414fffbe605e3ad146b24e6",
+      "fonts/BarlowCondensed-Medium.woff2": "31ff5e6e96a096fde4d78bc838719e69b093db2d0b062b96e423c065a6d1b2b1",
+      "fonts/LICENSE.txt": "74f4d5bb5ab5fe306120a2174f0fd3dbde3b0e8a6a78f7f5b74f6af0774179e0",
+      "index.html": "6f4951cfde50eb9fe5874361ac7cc3ea32804f00a818fbd0b833060597e6bd4a",
+      "load-manifest.json": "438fee0c1c7184788339bfb2e8e3b4daedaea076d2cb5bf79f8b7a34623c8956",
+      "manifest.webmanifest": "ab1315c46a69c33839955ccba821970a219e19bf360f405a3c025f546c4a04ca",
+      "model-catalog.json": "11f1653061ab812089ca8e54dbd726382a5b0baf57cb6c333330272c0ee3e6eb",
+      "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
+      "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb": "fbbae43691569760a6ee0b4385533536b986dd5e7697bf48f4c32cbb4810cf5d",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+      "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82",
+      "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb": "ad1907131d0de127ec7900f0543ac413dd5d81c0f562a9d9dded7bf7747634e0",
+      "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515",
+      "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
+      "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb": "3ae6a8d20fccb0273d2ee00fb2ced3d92fd5ae4c80aa925a293975b42aaa2c6b",
+      "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb": "95acaf16925f55abd0ce4446c3c8418f385079d7e2b60db697d53a9fd01e8aa0",
+      "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb": "fb3780c48f5c5083ac0410fe17f9245f64830a7b42577f666915f16857e09910",
+      "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+      "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb": "a535485d70b6ecd4874f204162e338d9ac3ae9d67f335b041170b556793f4ff5",
+      "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a",
+      "offline.html": "23c24d4b9f01f18c80ae905b5d178ff832c24845643b02c44af88b121c68979a",
+      "sw.js": "b5519beda7dfe47c56be9a72e5acbd10599e984fe9245ea8a498783574523d43"
+    },
+    "errors": [],
+    "captureWallMs": 1735.7301669999997,
+    "clip": "harness/out/render-aa-round1/phone-high.mp4",
+    "clipSHA256": "e9cb08e420689cddf2afd2c96c8d6c5225e43f863235f320f107deffef76f9db",
+    "recordingSHA256": "a22550453addbd5dbbb274a0ef16841f40d0873eaef2b9e6cf0d243a91e90198",
+    "synchronizedRenderP50Ms": 5.149999999999864,
+    "synchronizedRenderP95Ms": 5.900000000000091,
+    "ticks": [
+      {
+        "tick": 4,
+        "hash": "10073b7534e4e173"
+      },
+      {
+        "tick": 8,
+        "hash": "cfe42f0ae7d2990e"
+      },
+      {
+        "tick": 12,
+        "hash": "9e0605d6b03777a7"
+      },
+      {
+        "tick": 16,
+        "hash": "394e6f594aa66ef8"
+      },
+      {
+        "tick": 20,
+        "hash": "3074f689adff139c"
+      },
+      {
+        "tick": 24,
+        "hash": "6de197cef6576e87"
+      },
+      {
+        "tick": 28,
+        "hash": "915955205966ab9f"
+      },
+      {
+        "tick": 32,
+        "hash": "3bbfac1b961cbda5"
+      },
+      {
+        "tick": 36,
+        "hash": "84d12ddc205ebe98"
+      },
+      {
+        "tick": 40,
+        "hash": "45468289a4b6da00"
+      },
+      {
+        "tick": 44,
+        "hash": "772f1ec917cd3170"
+      },
+      {
+        "tick": 48,
+        "hash": "435d4c872e7bbe05"
+      },
+      {
+        "tick": 52,
+        "hash": "900880e77116fbdd"
+      },
+      {
+        "tick": 56,
+        "hash": "19deee0ac8c100a2"
+      },
+      {
+        "tick": 60,
+        "hash": "326a4279788b17a1"
+      },
+      {
+        "tick": 64,
+        "hash": "08b6324e3719b198"
+      },
+      {
+        "tick": 68,
+        "hash": "df23b45f1f4d3fbb"
+      },
+      {
+        "tick": 72,
+        "hash": "35dfce06fb59bedb"
+      },
+      {
+        "tick": 76,
+        "hash": "2a40236a53cc5732"
+      },
+      {
+        "tick": 80,
+        "hash": "24f394ceb8805ff6"
+      },
+      {
+        "tick": 84,
+        "hash": "a823d9abd17423ee"
+      },
+      {
+        "tick": 88,
+        "hash": "47b783f7895215cd"
+      },
+      {
+        "tick": 92,
+        "hash": "c0bd6dd103c6f913"
+      },
+      {
+        "tick": 96,
+        "hash": "5e8af56639a6570f"
+      },
+      {
+        "tick": 100,
+        "hash": "6e652577726dc66f"
+      },
+      {
+        "tick": 104,
+        "hash": "3cb6c4858d1b13bd"
+      },
+      {
+        "tick": 108,
+        "hash": "efa33f5bdac142af"
+      },
+      {
+        "tick": 112,
+        "hash": "89b5668c7ca8188c"
+      },
+      {
+        "tick": 116,
+        "hash": "53dfdfc2ff11d292"
+      },
+      {
+        "tick": 120,
+        "hash": "d2be23d22ab4bd72"
+      },
+      {
+        "tick": 124,
+        "hash": "316a8c325c844e8d"
+      },
+      {
+        "tick": 128,
+        "hash": "948f89b59e88ac3e"
+      },
+      {
+        "tick": 132,
+        "hash": "830b8816bf118f20"
+      },
+      {
+        "tick": 136,
+        "hash": "91a9effc57f0eefc"
+      },
+      {
+        "tick": 140,
+        "hash": "0b2a8e2665723a55"
+      },
+      {
+        "tick": 144,
+        "hash": "d23460d0c3050e9d"
+      },
+      {
+        "tick": 148,
+        "hash": "e343298f8ce936cb"
+      },
+      {
+        "tick": 152,
+        "hash": "dd937e99fbdfc75f"
+      },
+      {
+        "tick": 156,
+        "hash": "5e5006ff3757b4f5"
+      },
+      {
+        "tick": 160,
+        "hash": "f737d1720c0b25e3"
+      },
+      {
+        "tick": 164,
+        "hash": "9055a1ddfd49224b"
+      },
+      {
+        "tick": 168,
+        "hash": "1d589fe55c52258e"
+      },
+      {
+        "tick": 172,
+        "hash": "7bb951e56a602ec3"
+      },
+      {
+        "tick": 176,
+        "hash": "d6e32c5c246d856a"
+      },
+      {
+        "tick": 180,
+        "hash": "3b47f4ac2e36ca9e"
+      },
+      {
+        "tick": 184,
+        "hash": "6b050ec41639e575"
+      },
+      {
+        "tick": 188,
+        "hash": "df986803a5b96436"
+      },
+      {
+        "tick": 192,
+        "hash": "0946d7d0b9413a42"
+      },
+      {
+        "tick": 196,
+        "hash": "225b6701137da4b7"
+      },
+      {
+        "tick": 200,
+        "hash": "38a008e9d37392fb"
+      },
+      {
+        "tick": 204,
+        "hash": "c5fe7961442b0031"
+      },
+      {
+        "tick": 208,
+        "hash": "82110ffbd7715ab8"
+      },
+      {
+        "tick": 212,
+        "hash": "9a9df20e66626100"
+      },
+      {
+        "tick": 216,
+        "hash": "b67e723d7f5da5e4"
+      },
+      {
+        "tick": 220,
+        "hash": "69249ff89ea3e279"
+      },
+      {
+        "tick": 224,
+        "hash": "592c39445212b34b"
+      },
+      {
+        "tick": 228,
+        "hash": "673f263cba75e327"
+      },
+      {
+        "tick": 232,
+        "hash": "41d44957363fb64e"
+      },
+      {
+        "tick": 236,
+        "hash": "ac6e89c85cfe6922"
+      },
+      {
+        "tick": 240,
+        "hash": "b56996ff36d78518"
+      }
+    ]
+  },
+  "aaPreservesAll90SampledStates": true
+}

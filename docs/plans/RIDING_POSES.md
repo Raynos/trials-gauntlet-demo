@@ -5,7 +5,43 @@ Split out of `project/archive/HERO_OPEN_WORK.md` §1–2 on 2026-09-16. Owner: t
 priority. Sibling plans: [HERO_ART_INTEGRATION.md](../../project/archive/HERO_ART_INTEGRATION.md) (the new assets),
 `project/archive/CHROMIUM_METAL_SHADER_INIT.md` (startup bug, closed as non-repro). The tracker is [README.md](README.md).
 
-## Where it stands (R9, `f00724e`)
+## Current-build audit — 2026-09-21 (ask 73)
+
+Audited source at `7784f731`. The user prioritizes broken forward lean, requests riding-style research across three Trials games,
+and authorizes physics changes. Confirmed reference set: Trials Evolution / Trials Fusion / Trials Rising. The original requirements below remain open; this audit does not
+accept the existing poses or narrow the completion bar.
+
+- **The render description below is historical.** `GltfRider.poseFromStance()` now blends the authored
+  `sit_cruise`, `forward_attack` and `hang_back` holds, plus landing/extension, before solving contacts. The
+  physics COM inverse path is a fallback, not the normal live Astra path. Editing authored stances can now
+  affect gameplay rendering, although it cannot by itself align physical mass or crash sensors.
+- **Two-segment arms already exist.** `solveArm()` uses the blended clip's elbow as its pole. Sequence step 4
+  must audit and improve that implementation rather than introduce a duplicate solver. Bone-level checks do
+  not establish a natural shoulder/elbow silhouette or garment integrity.
+- **Visual/physical disagreement is still real.** Physics retains the standing target table and a separate
+  `DRAWN` seated table. The normal render path additionally clamps vertical excursion to ±0.12 m and torso
+  lag to ±0.35 rad, then reduces that excursion until contacts are reachable. The stance test explicitly
+  requires this behavior. This conflicts with sequence step 2's prohibition on hiding physical excursions
+  only in the drawn body; it is an open design/implementation issue, not evidence of completion.
+- **The stance transition has a deliberate dead zone.** Half back lean and small forward lean retain the
+  seated clip until the drawn hips leave the seat span/rise threshold. Measure the resulting responsiveness
+  and transitions in motion against the user's desired riding style.
+- **Crash release has infrastructure but is unproven.** The renderer re-parents the rider into a ragdoll and
+  blends the previous pose over two or three frames. Physics seeds the crash from its physical chain, so a
+  visible handoff mismatch remains possible; capture impacts and over-reach before calling release done.
+- **Current coverage:** five outfit IDs × full/LOD assets; both bike classes. The targeted baseline command
+  below passes **121/121** tests. The stance tests cover synthetic pose/load/excursion combinations on all ten
+  rider assets, but complete B1 ridden-tick checks use only full-detail Street Mustard on both classes. They
+  measure bones/sockets, not skinned cloth or human visual quality. No fresh played-clip, cloth, browser
+  determinism, handling-suite or stranger completion evidence was produced by this baseline audit.
+
+Baseline: `pnpm exec vitest run src/render/hero/gltfRiderPhysical.test.ts src/render/hero/gltfRiderStance.test.ts
+src/render/hero/gltfRiderAdditive.test.ts src/physics/v2/r9.test.ts` (4 files, 121 tests, passed).
+
+Next: resolve the requested user decisions; measure current poses/COM/reach/seat and crash handoff; capture
+headless baseline motion; update implementation steps without dropping any of the six required behaviors.
+
+## Historical starting point (R9, `f00724e`)
 
 Astra's seated pose landed as a **drawn / physical split**: `riderBody.drawn` (`drawnBody()` in `rider.ts`) is a pure
 function of (pose id, blend) plus the body's excursion, unhashed; the servo keeps R8's target table, so every golden

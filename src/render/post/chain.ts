@@ -1,16 +1,5 @@
-/**
- * Post chain: RenderPass (HalfFloat) → UnrealBloom (HDR threshold, point
- * sources only) → Composite (speed smear masked around the bike, ACES, per-
- * biome grade, saturation, vignette, chromatic aberration, flash, dither,
- * sRGB). Quality tiers scale resolution and switch bloom.
- *
- * Round 12 (mobile budget): `low` **bypasses the chain** — the scene draws straight to the
- * canvas at ≤ 1.0 DPR (≤ 1600 px wide) with three's CustomToneMapping carrying the grade
- * (`lighting/environment.ts gradeUniforms`); no HDR target, no bloom, no composite pass.
- * `medium` keeps the HDR chain at ≤ 1.25 DPR with the bloom mips at a quarter of the frame
- * and no SSAO. On every tier with bloom the bloom result is sampled *by the composite*
- * (`tBloom`) instead of UnrealBloomPass's full-resolution additive blend back into the HDR
- * buffer — one full-frame HalfFloat read + write fewer per frame, same maths.
+/** HDR scene → optional AO / bloom → ACES biome grade → SMAA on every tier.
+ * Phone-high retains the small emissive-only bloom; low omits bloom and AO.
  */
 import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -22,6 +11,7 @@ import type { QualityTier } from '../../core/types';
 import type { Biome } from '../biomes';
 import { gradeUniforms } from '../lighting/environment';
 import { EmissiveBloom } from './emissiveBloom';
+import { FinalSMAA } from './finalSMAA';
 
 const COMPOSITE = {
   uniforms: {
@@ -42,6 +32,7 @@ const COMPOSITE = {
     /** Bloom mips composite (UnrealBloomPass's `renderTargetsHorizontal[0]`, strength baked in); black when bloom is off. */
     tBloom: { value: null as THREE.Texture | null },
     uBloom: { value: 0.0 },
+    uBloomStrength: { value: 1.0 },
     /** Heat haze: x = amplitude (uv), y = screen-v where it fades in (from the bottom), z = time. */
     uHaze: { value: new THREE.Vector3(0, 0.45, 0) },
   },
@@ -65,6 +56,7 @@ const COMPOSITE = {
     uniform float uAO;
     uniform sampler2D tBloom;
     uniform float uBloom;
+    uniform float uBloomStrength;
     uniform vec3 uHaze;
     varying vec2 vUv;
 
@@ -78,7 +70,7 @@ const COMPOSITE = {
     vec3 scene(vec2 uv) {
       // HDR scene + the bloom composite (was added into the HDR buffer by a full-res pass).
       vec3 c = texture2D(tDiffuse, uv).rgb;
-      if (uBloom > 0.0) c += texture2D(tBloom, uv).rgb;
+      if (uBloom > 0.0) c += texture2D(tBloom, uv).rgb * uBloomStrength;
       // Round 14 guard: a non-finite or runaway texel (a half-float overflow, an undefined
       // sample) is dropped to black rather than allowed to paint the frame; 64× white is
       // already fully white after ACES, so the cap changes no visible frame.
@@ -379,11 +371,10 @@ class BloomPass extends UnrealBloomPass {
   }
 }
 
-/** Pixel-ratio cap per tier: low ≤ 1.0 and ≤ 1600 px wide (a 2000-CSS-px phone renders 1600×736), medium ≤ 1.25, high ≤ 2. */
+/** Low retains a 1600 px width budget; mobile detail targets Wildshard's 1.5 DPR. */
 export function tierPixelRatio(tier: QualityTier, devicePixelRatio: number, cssWidth: number, phoneHigh = false): number {
-  if (tier === 'low') return Math.min(devicePixelRatio, 1, 1600 / Math.max(1, cssWidth));
-  if (phoneHigh) return Math.min(devicePixelRatio, 1.5); // perf cut #3: phone-high draws LDR at ≤ 1.5 (874 CSS px → 1311×495)
-  if (tier === 'medium') return Math.min(devicePixelRatio, 1.25);
+  if (tier === 'low') return Math.min(devicePixelRatio, 1.5, 1600 / Math.max(1, cssWidth));
+  if (phoneHigh || tier === 'medium') return Math.min(devicePixelRatio, 1.5);
   return Math.min(devicePixelRatio, 2);
 }
 
@@ -402,14 +393,15 @@ export class PostChain {
   private bloom: BloomPass;
   private readonly ao: AOPass;
   readonly composite: ShaderPass;
+  private readonly aa: FinalSMAA;
   private tier: QualityTier = 'high';
   private width = 1280;
   private height = 720;
   private pixelRatio = 1;
   private target: THREE.WebGLRenderTarget;
-  /** `low`: no chain at all — `render()` draws the scene to the canvas (three tone-maps + grades in-material). */
+  /** Retained for diagnostics: every tier now uses the HDR chain. */
   bypass = false;
-  /** Perf cut #3: `high` on a phone — the bypass path plus an emissive-only bloom (`post/emissiveBloom.ts`). */
+  /** High on a phone uses the smaller emissive-only bloom. */
   phoneHigh = false;
   private emissive: EmissiveBloom | null = null;
 
@@ -432,6 +424,8 @@ export class PostChain {
     this.composer.addPass(this.ao);
     this.composer.addPass(this.bloom);
     this.composer.addPass(this.composite);
+    this.aa = new FinalSMAA();
+    this.composer.addPass(this.aa);
     this.composite.uniforms.tAO!.value = this.ao.texture;
     this.composite.uniforms.tBloom!.value = this.bloom.texture;
   }
@@ -444,10 +438,13 @@ export class PostChain {
   setQuality(tier: QualityTier, phoneHigh = false): void {
     this.tier = tier;
     this.phoneHigh = phoneHigh && tier === 'high';
-    this.bypass = tier === 'low' || this.phoneHigh;
-    this.bloom.enabled = !this.bypass;
-    this.composite.uniforms.uBloom!.value = this.bloom.enabled ? 1.0 : 0.0;
+    this.bypass = false;
+    this.aa.setLow(tier !== 'high' || this.phoneHigh);
+    this.bloom.enabled = tier !== 'low' && !this.phoneHigh;
+    this.composite.uniforms.uBloom!.value = this.bloom.enabled || this.phoneHigh ? 1.0 : 0.0;
     if (this.phoneHigh && !this.emissive) this.emissive = new EmissiveBloom(this.renderer);
+    this.composite.uniforms.tBloom!.value = this.phoneHigh ? this.emissive!.texture : this.bloom.texture;
+    this.composite.uniforms.uBloomStrength!.value = this.phoneHigh ? this.bloom.strength : 1;
     const high = tier === 'high' && !this.phoneHigh;
     this.ao.enabled = high;
     this.composite.uniforms.uAO!.value = high ? 1.0 : 0.0;
@@ -460,30 +457,19 @@ export class PostChain {
     this.setSize(this.width, this.height, this.pixelRatio);
   }
 
-  /**
-   * `pixelRatio` is the renderer's effective ratio for the tier (`tierPixelRatio`; the canvas is
-   * already sized by it). The composer runs at the same ratio; on the bypass tier its buffers
-   * shrink to 2×2 so no HDR memory sits behind a tier that never reads it.
-   */
+  /** Composer and AA use the effective canvas resolution on every tier. */
   setSize(width: number, height: number, pixelRatio: number): void {
     this.width = width;
     this.height = height;
     this.pixelRatio = pixelRatio;
     const pw = Math.max(1, Math.floor(width * pixelRatio));
     const ph = Math.max(1, Math.floor(height * pixelRatio));
-    if (this.bypass) {
-      this.composer.setPixelRatio(1);
-      this.composer.setSize(2, 2);
-      this.emissive?.setSize(pw, ph);
-    } else {
-      this.composer.setPixelRatio(pixelRatio);
-      this.composer.setSize(width, height);
-      // EffectComposer.setSize hands every pass the full frame and UnrealBloomPass halves it for
-      // mip 0 (the `resolution` it was built with is overwritten — the old "480×270 on medium" was
-      // really 1500×690 on a phone). Bloom mips start at 1/2 of the frame on high, 1/4 on medium.
-      if (this.tier === 'medium') this.bloom.setSize(Math.floor(pw / 2), Math.floor(ph / 2));
-    }
-    this.ao.setSize(pw, ph);
+    this.composer.setPixelRatio(pixelRatio);
+    this.composer.setSize(width, height);
+    if (this.tier === 'medium') this.bloom.setSize(Math.floor(pw / 2), Math.floor(ph / 2));
+    if (!this.bloom.enabled) this.bloom.setSize(2, 2);
+    this.emissive?.setSize(this.phoneHigh ? pw : 2, this.phoneHigh ? ph : 2);
+    this.ao.setSize(this.ao.enabled ? pw : 2, this.ao.enabled ? ph : 2);
     this.composite.uniforms.uAspect!.value = width / height;
     (gradeUniforms.uGradeC.value as THREE.Vector4).y = 1 / pw;
     (gradeUniforms.uGradeC.value as THREE.Vector4).z = 1 / ph;
@@ -498,11 +484,6 @@ export class PostChain {
     const out: PassWrite[] = [];
     const pw = Math.max(1, Math.floor(this.width * this.pixelRatio));
     const ph = Math.max(1, Math.floor(this.height * this.pixelRatio));
-    if (this.bypass) {
-      out.push({ name: 'scene→canvas', width: pw, height: ph, bytesPerPixel: 8 });
-      if (this.phoneHigh && this.emissive) out.push(...this.emissive.passes, { name: 'bloom:add→canvas', width: pw, height: ph, bytesPerPixel: 4 });
-      return out;
-    }
     const rt = this.composer.renderTarget1;
     out.push({ name: 'scene:hdr', width: rt.width, height: rt.height, bytesPerPixel: 12 });
     if (this.ao.enabled) {
@@ -519,7 +500,11 @@ export class PostChain {
       }
       out.push({ name: 'bloom:composite', width: b.renderTargetsHorizontal[0]!.width, height: b.renderTargetsHorizontal[0]!.height, bytesPerPixel: 8 });
     }
-    out.push({ name: 'composite→canvas', width: pw, height: ph, bytesPerPixel: 4 });
+    if (this.phoneHigh && this.emissive) out.push(...this.emissive.passes);
+    out.push({ name: 'composite:graded', width: pw, height: ph, bytesPerPixel: 12 },
+      { name: 'smaa:edges', width: pw, height: ph, bytesPerPixel: 8 },
+      { name: 'smaa:weights', width: pw, height: ph, bytesPerPixel: 8 },
+      { name: 'smaa→canvas', width: pw, height: ph, bytesPerPixel: 8 });
     return out;
   }
 
@@ -532,12 +517,9 @@ export class PostChain {
     u.uContrast!.value = b.contrast ?? 1.0;
     u.uVignette!.value = b.vignette;
     this.bloom.strength = b.bloomStrength;
-    if (this.emissive) {
-      this.emissive.strength = b.bloomStrength;
-      this.emissive.exposure = b.exposure;
-    }
+    this.composite.uniforms.uBloomStrength!.value = this.phoneHigh ? b.bloomStrength : 1;
     (u.uHaze!.value as THREE.Vector3).set(b.heatHaze ?? 0, b.heatHazeV ?? 0.45, 0);
-    // Same grade for the direct-to-canvas tier (deltas from neutral, see `gradeUniforms`).
+    // Keep shared grade uniforms current for auxiliary material consumers.
     this.renderer.toneMappingExposure = b.exposure;
     (gradeUniforms.uGradeA.value as THREE.Vector4).set(b.gradeLift[0], b.gradeLift[1], b.gradeLift[2], b.saturation - 1);
     (gradeUniforms.uGradeB.value as THREE.Vector4).set(b.gradeGain[0] - 1, b.gradeGain[1] - 1, b.gradeGain[2] - 1, (b.contrast ?? 1.0) - 1);
@@ -555,9 +537,12 @@ export class PostChain {
     // Round 14: every per-frame uniform is finite and in range before it reaches a shader — a
     // NaN bike UV (the bike behind a replay camera) or a flash > 1 must never paint the frame.
     const fin = (v: number, lo: number, hi: number, d: number): number => (Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d);
-    u.uChroma!.value = 0.003 * fin((speed - 8) / 8, 0, 1, 0); // round 14: halved
+    // These tiers previously used the direct graded path: keep their edges clean,
+    // rather than introducing colored fringes as a side effect of enabling HDR/AA.
+    const clean = this.tier === 'low' || this.phoneHigh;
+    u.uChroma!.value = clean ? 0 : 0.003 * fin((speed - 8) / 8, 0, 1, 0);
     (u.uBikeUV!.value as THREE.Vector2).set(fin(bikeU, -2, 3, 0.5), fin(1 - bikeV, -2, 3, 0.5));
-    const px = this.tier === 'low' ? 0 : fin(smearPx, 0, 64, 0);
+    const px = clean ? 0 : fin(smearPx, 0, 64, 0);
     (u.uSmear!.value as THREE.Vector2).set(fin((px * dirX) / this.width, -0.1, 0.1, 0), fin((px * dirY) / this.height, -0.1, 0.1, 0));
     const fl = fin(flash, 0, 1, 0);
     u.uFlash!.value = fl;
@@ -565,12 +550,7 @@ export class PostChain {
   }
 
   render(): void {
-    if (this.bypass) {
-      this.renderer.setRenderTarget(null);
-      this.renderer.render(this.scene, this.camera);
-      if (this.phoneHigh && this.emissive) this.emissive.render(this.scene, this.camera);
-      return;
-    }
+    if (this.phoneHigh && this.emissive) this.emissive.render(this.scene, this.camera);
     this.composer.render();
   }
 
@@ -579,9 +559,9 @@ export class PostChain {
    * same programs the real frame uses (a draw to the canvas would compile a second, sRGB-output
    * variant of every material: +19 programs for nothing).
    */
-  /** The target the real frame's scene pass draws into (bind it while pre-compiling so the programs match): the HDR target, or the canvas on the bypass tier. */
+  /** Bind the actual HDR scene target during material warm-up. */
   get sceneTarget(): THREE.WebGLRenderTarget | null {
-    return this.bypass ? null : this.composer.renderTarget1;
+    return this.composer.renderTarget1;
   }
 
   renderSceneOnly(): void {
@@ -591,15 +571,15 @@ export class PostChain {
   }
 
   get info(): { passes: number } {
-    return { passes: this.bypass ? (this.phoneHigh ? 5 : 1) : this.composer.passes.filter((p) => p.enabled).length };
+    return { passes: this.passWrites().length };
   }
 
   dispose(): void {
     this.composer.dispose();
-    this.target.dispose();
     this.ao.dispose();
     this.bloom.dispose();
     this.emissive?.dispose();
+    this.aa.dispose();
     this.composite.dispose(); // merge #3 (blender-work): the composite ShaderPass material was never released
     this.renderer.setRenderTarget(null);
   }

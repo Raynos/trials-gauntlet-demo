@@ -5,7 +5,7 @@ import type { FrameBuilder } from '../src/render/frame';
 import type { GltfBike } from '../src/render/hero/gltfBike';
 import type { GltfRider } from '../src/render/hero/gltfRider';
 
-type RendererProbe = Pick<ThreeRenderer, 'whenReady' | 'render' | 'debugInfo' | 'setRiderLod' | 'setQuality'> & {
+type RendererProbe = Pick<ThreeRenderer, 'whenReady' | 'render' | 'debugInfo' | 'setRiderLod' | 'setQuality' | 'resize' | 'setDeviceClass'> & {
   readonly frames: FrameBuilder;
   readonly debug: Omit<ThreeRenderer['debug'], 'rider' | 'bike'> & { rider: GltfRider; bike: GltfBike };
 };

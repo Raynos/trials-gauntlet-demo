@@ -372,7 +372,7 @@ export class ThreeRenderer implements GameRenderer {
     parent.appendChild(this.canvas);
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
-      antialias: options.antialias ?? false, // MSAA happens in the composer target when supported
+      antialias: options.antialias ?? false, // Final SMAA handles edges after HDR tone mapping on every tier.
       powerPreference: 'high-performance',
       preserveDrawingBuffer: options.preserveDrawingBuffer ?? false,
     });
@@ -1952,7 +1952,7 @@ export class ThreeRenderer implements GameRenderer {
     if (pixelRatio !== undefined) this.devicePixelRatio = pixelRatio;
     this.width = width;
     this.height = height;
-    // Round 12: the tier caps the host's ratio — low ≤ 1.0 and ≤ 1600 px wide, medium ≤ 1.25,
+    // Tier caps: low/medium ≤ 1.5 (low ≤ 1600 px wide), phone-high ≤ 1.5,
     // high ≤ 2 — and the canvas itself is sized by it (the browser upscales the canvas; the
     // composite no longer writes a full-DPR frame).
     const pr = tierPixelRatio(this.tier, this.devicePixelRatio, width, this.phoneHigh);

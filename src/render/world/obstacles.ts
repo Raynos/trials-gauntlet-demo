@@ -29,6 +29,10 @@ function num(p: Record<string, unknown>, key: string, def: number): number {
 
 function push(b: Bucket, mat: string, g: THREE.BufferGeometry, m?: THREE.Matrix4): void {
   if (m) g.applyMatrix4(m);
+  // Extruded ramps/planks are non-indexed, while crates and trestles are indexed.
+  // Give the extrusions identity indices so a shared material can merge both without
+  // welding seams, changing normals/UVs, or expanding the indexed primitives.
+  if (!g.index) g.setIndex(Array.from({ length: g.getAttribute('position').count }, (_, i) => i));
   const l = b.get(mat) ?? [];
   l.push(g);
   b.set(mat, l);
@@ -388,7 +392,7 @@ export function buildObstacles(track: CompiledTrack, lib: MaterialLibrary): Obst
   let drawCalls = drums.size + seesaws.size;
   for (const [matName, geos] of buckets) {
     const merged = geos.length === 1 ? geos[0]! : mergeGeometries(geos, false);
-    if (!merged) continue;
+    if (!merged) throw new Error(`Obstacle material batch could not merge: ${matName}`);
     const mesh = new THREE.Mesh(merged, fogify(lib.get(matName)));
     mesh.castShadow = true;
     mesh.receiveShadow = true;

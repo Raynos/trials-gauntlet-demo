@@ -5,7 +5,7 @@ import { decodeJSON, iterateFrames } from '../src/core/replay';
 import type { QualityTier } from '../src/core/types';
 import type { HeroHarnessWindow } from './hero-browser';
 // Played hero capture with full prefix rendering, exact timestamps and consumed-model byte proofs.
-// Run: tsx harness/hero-capture.mts build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal|webkit]
+// Run: tsx harness/hero-capture.mts build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal|webkit] [deviceDpr=1] [phone|desktop]
 import { createServer } from 'node:http';
 import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -13,11 +13,13 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { chromium, webkit } from 'playwright';
 
-const [buildArg, recordingArg, outArg, fromArg, toArg, quality = 'high', outfit = 'street', fpsArg = '60', size = '1280x720', angleBackend = 'swiftshader'] = process.argv.slice(2);
-if (!buildArg || !recordingArg || !outArg) throw new Error('build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal|webkit]');
+const [buildArg, recordingArg, outArg, fromArg, toArg, quality = 'high', outfit = 'street', fpsArg = '60', size = '1280x720', angleBackend = 'swiftshader', dprArg = '1', deviceClass = 'desktop'] = process.argv.slice(2);
+if (!buildArg || !recordingArg || !outArg) throw new Error('build recording output fromTick toTick [quality] [outfit] [fps] [widthxheight] [swiftshader|metal|webkit] [deviceDpr=1] [phone|desktop]');
 const normalizedOutfit = normalizeRiderOutfit(outfit);
 if (!normalizedOutfit || !['low', 'medium', 'high'].includes(quality)) throw new Error('invalid outfit or quality');
 if (!['swiftshader', 'metal', 'webkit'].includes(angleBackend)) throw new Error('unsupported graphics backend');
+const devicePixelRatio = Number(dprArg);
+if (!Number.isFinite(devicePixelRatio) || devicePixelRatio < 1 || devicePixelRatio > 4 || !['phone', 'desktop'].includes(deviceClass)) throw new Error('DPR 1..4 and phone|desktop required');
 const [width, height] = size.split('x').map(Number);
 if (!width || !height || ![width, height].every(Number.isSafeInteger)) throw new Error('integer widthxheight required');
 const build = path.resolve(buildArg), out = path.resolve(outArg);
@@ -79,8 +81,13 @@ const servedFiles: Record<string, string> = {};
 const responseFailures: string[] = [];
 const executionErrors: string[] = [];
 try {
-  const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: devicePixelRatio });
   await page.addInitScript(() => {
+    const originalError = console.error.bind(console);
+    console.error = (...args: unknown[]) => {
+      originalError(...args);
+      if (args.some(a => typeof a === 'string' && a.includes('mergeGeometries'))) originalError(new Error('geometry merge call stack').stack);
+    };
     const proof = { hashes: {} as Record<string, string>, pending: [] as Promise<void>[], errors: [] as string[] };
     (window as unknown as HeroHarnessWindow).__assetProof = proof;
     const originalFetch = window.fetch.bind(window);
@@ -138,11 +145,13 @@ try {
     const expectedFactory = (header.physics ?? 'v1') === 'v2' ? 'createBikePhysicsV2' : 'createBikePhysicsV1';
     if (t.info().modules?.physics !== expectedFactory) throw new Error('recording solver does not match running simulation');
   }, recording.header);
-  await page.evaluate(async ({ tier, width, height }) => {
+  await page.evaluate(async ({ tier, width, height, devicePixelRatio, deviceClass }) => {
     const t = window.__trials!, r = (window as unknown as HeroHarnessWindow).__render;
     if (!r) throw new Error('missing renderer inspection handle');
     t.resize(width, height);
+    r.setDeviceClass(deviceClass as 'phone' | 'desktop');
     t.setQuality(tier);
+    r.resize(width, height, devicePixelRatio);
     await r.whenReady();
     const d = r.debug;
     if (!d.rider.source?.scene || !d.bike.source?.scene) throw new Error('procedural fallback, no parsed asset');
@@ -154,7 +163,7 @@ try {
     // Override only interpolation here, explicitly, to make measured and displayed time agree.
     const render = r.render.bind(r);
     r.render = state => render(state, 1);
-  }, { tier: quality as QualityTier, width, height });
+  }, { tier: quality as QualityTier, width, height, devicePixelRatio, deviceClass });
   const graphics = await page.evaluate(() => {
     const r = (window as unknown as HeroHarnessWindow).__render;
     const gl = r.debug.renderer.getContext();
@@ -165,6 +174,7 @@ try {
       renderer: String(gl.getParameter(extension.UNMASKED_RENDERER_WEBGL)),
       version: String(gl.getParameter(gl.VERSION)),
       userAgent: navigator.userAgent,
+      renderSettings: r.debugInfo(),
     };
   });
   if (angleBackend !== 'webkit' && !(angleBackend === 'metal' ? /Metal/ : /SwiftShader/i).test(graphics.renderer)) throw new Error(`requested ${angleBackend}, received ${graphics.renderer}`);
@@ -176,8 +186,12 @@ try {
     const sample = await page.evaluate(batch => {
       const t = window.__trials!, r = (window as unknown as HeroHarnessWindow).__render;
       for (const input of batch) { t.setInput(input); t.step(1); }
+      const renderStart = performance.now();
       t.render(true);
+      const renderMs = performance.now() - renderStart;
       const d = r.debug, gl = d.renderer.getContext();
+      gl.finish();
+      const renderSyncedMs = performance.now() - renderStart;
       const glError = gl.getError();
       if (glError !== gl.NO_ERROR) throw new Error(`WebGL error ${glError} at simulation tick ${t.getState().tick}`);
       const state = t.getState();
@@ -190,11 +204,11 @@ try {
           contacts[o.name] = point.toArray();
         }
       });
-      return { segmentTick: state.tick, stateTime: state.time, renderedTime, runTime: t.runTime(), phase: t.phase(), stateHash: t.hashState(), stateJson: JSON.stringify(state), boneOrigins: contacts, rider: structuredClone(d.rider.debug), camera: t.camera(), heroDoc: r.debugInfo().heroDoc };
+      return { renderMs, renderSyncedMs, segmentTick: state.tick, stateTime: state.time, renderedTime, runTime: t.runTime(), phase: t.phase(), stateHash: t.hashState(), stateJson: JSON.stringify(state), boneOrigins: contacts, rider: structuredClone(d.rider.debug), camera: t.camera(), heroDoc: r.debugInfo().heroDoc };
     }, inputs.slice(tick, tick + ticksPerFrame));
     trace.push({ inputTick: tick + ticksPerFrame, ...sample });
     if (tick >= from) {
-      await page.screenshot({ path: path.join(out, 'frames', `frame-${String(frame++).padStart(5, '0')}.png`), animations: 'disabled' });
+      await page.screenshot({ scale: 'css', path: path.join(out, 'frames', `frame-${String(frame++).padStart(5, '0')}.png`), animations: 'disabled' });
     }
   }
   await Promise.all(responses);
@@ -208,7 +222,7 @@ try {
   if (modelProof.errors.length) throw new Error(modelProof.errors.join('\n'));
   Object.assign(downloads, modelProof.hashes);
   for (const name of Object.keys(assetBytes)) if (downloads[name] !== assetBytes[name]) throw new Error(`download bytes differ for ${name}`);
-  const report = { build, buildFiles, servedFiles, recording: path.resolve(recordingArg), recordingSha256: sha(recordingBytes), assetBytes, downloads, physics, hz, fps, from, to, firstFrameInputTick: from + ticksPerFrame, interval: '(from,to]', frames: frame, prefixRendered: true, renderAlpha: 1, setup: 'await scene readiness between class, track and quality changes', quality, outfit, width, height, graphics: { requestedBackend: angleBackend, launchArgs, ...browserIdentity, hostPlatform: process.platform, ...graphics }, captureWallMs: performance.now() - captureStarted, errors, trace };
+  const report = { build, buildFiles, servedFiles, recording: path.resolve(recordingArg), recordingSha256: sha(recordingBytes), assetBytes, downloads, physics, hz, fps, from, to, firstFrameInputTick: from + ticksPerFrame, interval: '(from,to]', frames: frame, prefixRendered: true, renderAlpha: 1, setup: 'await scene readiness between class, track and quality changes', quality, outfit, width, height, devicePixelRatio, deviceClass, graphics: { requestedBackend: angleBackend, launchArgs, ...browserIdentity, hostPlatform: process.platform, ...graphics }, captureWallMs: performance.now() - captureStarted, errors, trace };
   await writeFile(path.join(out, 'evidence.json'), JSON.stringify(report, null, 2));
   const ff = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-framerate', String(fps), '-i', path.join(out, 'frames', 'frame-%05d.png'), '-frames:v', String(frame), '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', path.join(out, 'clip.mp4')], { encoding: 'utf8' });
   if (ff.status !== 0) throw new Error(ff.stderr);

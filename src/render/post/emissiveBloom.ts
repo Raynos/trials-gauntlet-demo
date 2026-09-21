@@ -1,16 +1,6 @@
-/**
- * Emissive-only bloom for the phone-high tier (docs/plans/PERF.md §3.1, cut #3).
- *
- * Desktop `high` blooms from a full-frame HalfFloat scene through a bright pass and five mips
- * (13 passes, 0.7 Mpx on the phone geometry). On a phone the scene is drawn LDR straight to the
- * canvas, so the bloom sources are drawn again — only the objects on `BLOOM_LAYER` (materials with
- * `emissiveIntensity ≥ BLOOM_EMISSIVE`, the spark / flame particles; `tagBloomers`) — into a
- * HalfFloat target at 1/8 of the canvas (≈ 160×60 px), thresholded exactly like the bright pass,
- * blurred once in each axis, and added back over the canvas by one full-screen quad. Four small
- * writes plus one trivial additive pass; no HDR scene target, no composite.
- *
- * Known approximation: the sources are not depth-tested against the rest of the world (a lamp
- * behind a container blooms through its edge, softly — 1/8-res blur). Judged by the clip.
+/** Small emissive-only bloom for phone-high: sources at 1/8 resolution, threshold,
+ * horizontal and vertical blur. The HDR composite adds this texture before grading.
+ * Sources are not occluded by non-bloom geometry; this approximation needs clip review.
  */
 import * as THREE from 'three';
 import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
@@ -59,26 +49,10 @@ const BLUR = {
     }`,
 };
 
-const ADD = {
-  uniforms: { tBloom: { value: null as THREE.Texture | null }, uStrength: { value: 0.6 }, uExposure: { value: 1.0 } },
-  vertexShader: /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
-  fragmentShader: /* glsl */ `
-    uniform sampler2D tBloom; uniform float uStrength; uniform float uExposure;
-    varying vec2 vUv;
-    // The canvas already holds tone-mapped sRGB; the bloom is linear HDR — tone-map + encode it the same way before the add.
-    vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
-    void main() {
-      vec3 b = texture2D(tBloom, vUv).rgb * uStrength * uExposure;
-      vec3 c = aces(b);
-      gl_FragColor = vec4(pow(c, vec3(1.0 / 2.2)), 1.0);
-    }`,
-};
-
 export class EmissiveBloom {
   private readonly src: THREE.WebGLRenderTarget;
   private readonly ping: THREE.WebGLRenderTarget;
   private readonly blurMat: THREE.ShaderMaterial;
-  private readonly addMat: THREE.ShaderMaterial;
   private readonly quad: FullScreenQuad;
   private readonly clear = new THREE.Color(0, 0, 0);
   private readonly savedLayers = new THREE.Layers();
@@ -86,18 +60,18 @@ export class EmissiveBloom {
   private savedAlpha = 1;
   private w = 160;
   private h = 60;
-  strength = 0.6;
   threshold = 1.6;
-  exposure = 1.0;
 
   constructor(private readonly renderer: THREE.WebGLRenderer) {
     const opts = { type: THREE.HalfFloatType, depthBuffer: false, stencilBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter } as const;
     this.src = new THREE.WebGLRenderTarget(this.w, this.h, { ...opts, depthBuffer: true });
     this.ping = new THREE.WebGLRenderTarget(this.w, this.h, opts);
     this.blurMat = new THREE.ShaderMaterial({ uniforms: THREE.UniformsUtils.clone(BLUR.uniforms), vertexShader: BLUR.vertexShader, fragmentShader: BLUR.fragmentShader, depthTest: false, depthWrite: false });
-    this.addMat = new THREE.ShaderMaterial({ uniforms: THREE.UniformsUtils.clone(ADD.uniforms), vertexShader: ADD.vertexShader, fragmentShader: ADD.fragmentShader, depthTest: false, depthWrite: false, transparent: true, blending: THREE.AdditiveBlending });
+
     this.quad = new FullScreenQuad(this.blurMat);
   }
+
+  get texture(): THREE.Texture { return this.src.texture; }
 
   /** Canvas drawing-buffer size; the bloom runs at 1/8. */
   setSize(pw: number, ph: number): void {
@@ -115,7 +89,7 @@ export class EmissiveBloom {
     ];
   }
 
-  /** After the scene has been drawn to the canvas: sources → threshold + blur → additive quad over the canvas. */
+  /** Sources → threshold + blur; the HDR composite consumes the linear texture before tone mapping. */
   render(scene: THREE.Scene, camera: THREE.Camera): void {
     const r = this.renderer;
     // 1. Sources only, HDR, no tone mapping (an off-screen target), into the 1/8 buffer.
@@ -133,7 +107,7 @@ export class EmissiveBloom {
     scene.background = bg;
     camera.layers.mask = this.savedLayers.mask;
     // 2. Threshold + horizontal blur, then vertical. `renderer.render` clears its target when `autoClear`
-    //    is on — the quads must not (the last one draws over the finished canvas).
+    //    is on; every blur quad fully overwrites its small target.
     const autoClear = r.autoClear;
     r.autoClear = false;
     const u = this.blurMat.uniforms;
@@ -149,14 +123,7 @@ export class EmissiveBloom {
     u.uFirst!.value = 0.0;
     r.setRenderTarget(this.src);
     this.quad.render(r);
-    // 3. Add over the canvas.
-    const a = this.addMat.uniforms;
-    a.tBloom!.value = this.src.texture;
-    a.uStrength!.value = this.strength;
-    a.uExposure!.value = this.exposure;
-    this.quad.material = this.addMat;
     r.setRenderTarget(null);
-    this.quad.render(r);
     r.autoClear = autoClear;
   }
 
@@ -164,7 +131,6 @@ export class EmissiveBloom {
     this.src.dispose();
     this.ping.dispose();
     this.blurMat.dispose();
-    this.addMat.dispose();
     this.quad.dispose();
   }
 }
