@@ -28,7 +28,7 @@ try {
   page.on('pageerror', e => console.error('pageerror', e.message));
   page.on('console', m => { if (m.type() === 'error') console.error('console', m.text()); });
   await page.goto(`http://127.0.0.1:${port}/`);
-  await page.waitForFunction(() => window.__ready, null, { timeout: 60000 });
+  await page.waitForFunction(() => globalThis.__ready, null, { timeout: 60000 });
   for (const spec of specs) {
     const [label, file] = spec.split('=');
     const n = await page.evaluate(`window.__load('/abs${path.resolve(file)}')`);

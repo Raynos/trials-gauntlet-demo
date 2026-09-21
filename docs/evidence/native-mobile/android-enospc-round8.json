@@ -1,0 +1,251 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T11:19:48.296Z",
+  "finishedAt": "2026-09-21T11:20:17.100Z",
+  "pass": true,
+  "apkSha256": "d7ad7b0049807212cfd38ab97396b5a35371fc0f07c4e54d34ab57de8f744921",
+  "capBytes": 262144,
+  "environment": {
+    "identity": "uid=10213(u0_a213) gid=10213(u0_a213) groups=10213(u0_a213),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),1078(ext_data_rw),1079(ext_obb_rw),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc),3011(uhid),3012(readtracefs),50213(all_a213) context=u:r:runas_app:s0:c213,c256,c512,c768",
+    "appUid": 10213,
+    "appGid": 10213,
+    "appPid": "3566",
+    "rootPath": "/data/data/com.trialsgauntlet.game/files",
+    "originalDirectoryMode": "771",
+    "originalSlotModes": [
+      "600",
+      "600"
+    ],
+    "selinux": "Enforcing",
+    "appNamespace": "mnt:[4026533014]",
+    "initNamespace": "mnt:[4026532292]"
+  },
+  "coveringMounts": [
+    "10022 10021 254:0 / / ro,relatime master:1 - ext4 /dev/block/dm-0 ro,seclabel",
+    "10162 10022 254:53 / /data rw,nosuid,nodev,noatime master:35 - ext4 /dev/block/dm-53 rw,seclabel,resgid=1065,errors=panic",
+    "10175 10162 0:278 / /data/data rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,seclabel,mode=751",
+    "10179 10175 254:53 /data/com.trialsgauntlet.game /data/data/com.trialsgauntlet.game rw,nosuid,nodev,noatime master:35 - ext4 /dev/block/dm-53 rw,seclabel,resgid=1065,errors=panic"
+  ],
+  "mountedContext": "u:object_r:app_data_file:s0:c213,c256,c512,c768 /data/data/com.trialsgauntlet.game/files/native-enospc-01542fb5",
+  "parentFs": {
+    "type": "ext3/4",
+    "blockSize": 4096,
+    "blocks": 2541783,
+    "availableBlocks": 2128427,
+    "capacityBytes": 10411143168,
+    "availableBytes": 8718036992,
+    "device": "65077"
+  },
+  "emptyFs": {
+    "type": "tmpfs",
+    "blockSize": 4096,
+    "blocks": 64,
+    "availableBlocks": 64,
+    "capacityBytes": 262144,
+    "availableBytes": 262144,
+    "device": "1048608"
+  },
+  "fullFs": {
+    "type": "tmpfs",
+    "blockSize": 4096,
+    "blocks": 64,
+    "availableBlocks": 0,
+    "capacityBytes": 262144,
+    "availableBytes": 0,
+    "device": "1048608"
+  },
+  "directTargetWrite": {
+    "result": {
+      "uri": "file:///data/user/0/com.trialsgauntlet.game/files/native-enospc-01542fb5/pending.json"
+    }
+  },
+  "preFillWrite": {
+    "result": {
+      "uri": "file:///data/user/0/com.trialsgauntlet.game/files/native-enospc-probe-01542fb5"
+    }
+  },
+  "preFillRead": {
+    "data": "native app uid can write this isolated target"
+  },
+  "fillOutput": "dd: /data/data/com.trialsgauntlet.game/files/native-enospc-01542fb5/fill: write error: No space left on device\n65+0 records in\n64+0 records out\n262144 bytes (256 K) copied, 0.001 s, 250 M/s\n",
+  "savePathResolved": "/data/data/com.trialsgauntlet.game/files/native-enospc-01542fb5/pending.json",
+  "savePathDiagnostic": {
+    "error": {
+      "code": "OS-PLUG-FILE-0013",
+      "message": "'writeFile' failed with: write failed: ENOSPC (No space left on device)"
+    }
+  },
+  "failure": {
+    "volume": "0.4",
+    "warningVisible": true,
+    "text": "Progress isn\u2019t saved. Retry before closing the app.",
+    "retry": "Retry save",
+    "ready": true
+  },
+  "pendingLinkRemovedBeforeRetry": true,
+  "coldLaunch": {
+    "volume": "0.4",
+    "ready": true,
+    "warningVisible": false,
+    "online": false,
+    "current": {
+      "checksum": "",
+      "id": "builtin",
+      "version": "1.0.0",
+      "downloaded": "1970-01-01T00:00:00.000Z",
+      "status": "success"
+    }
+  },
+  "cleanup": {
+    "mounted": false,
+    "pendingLinked": false,
+    "probeLinked": false,
+    "directoryCreated": false,
+    "directoryMode": "771",
+    "slotModes": [
+      "600",
+      "600"
+    ],
+    "selinux": "Enforcing",
+    "emulatorPid": 98562,
+    "emulatorStopped": true,
+    "initMountTableHadNoFixtureBeforeShutdown": true,
+    "privateFilesListingBeforeShutdown": [
+      "profileInstalled",
+      "trials-save-a.json",
+      "trials-save-b.json"
+    ],
+    "sdkAndIgnoredArtifactsPreserved": true
+  },
+  "cleanupErrors": [],
+  "limitations": [
+    "Task-owned API36 headless Debug emulator. Mounted tmpfs is limited to256KiB in the app mount namespace; no host or global partition exhaustion.",
+    "Root is used only to provision/inspect/remove the isolated filesystem. Real app UID performs plugin writes and normal Settings save/retry.",
+    "This verifies ENOSPC at the real native pending-save path, not behavior under a completely full Android user-data partition."
+  ],
+  "runner": "scripts/native-android-enospc.mjs",
+  "rawReport": ".native-build/enospc-round8/report.json",
+  "frozenArtifact": ".native-build/error-page-round7/app-debug.apk",
+  "cases": [
+    {
+      "name": "Baseline preference reaches committed native snapshot",
+      "pass": true
+    },
+    {
+      "name": "Mounted capacity is distinct tmpfs capped at256KiB",
+      "pass": true
+    },
+    {
+      "name": "Real app plugin can create target on bounded filesystem",
+      "pass": true
+    },
+    {
+      "name": "Real app plugin writes through in-files symlink before filling",
+      "pass": true
+    },
+    {
+      "name": "Only bounded tmpfs is full and reports ENOSPC",
+      "pass": true
+    },
+    {
+      "name": "Real native pending-save path reports ENOSPC",
+      "pass": true
+    },
+    {
+      "name": "Normal Settings save warns while committed snapshots stay unchanged",
+      "pass": true
+    },
+    {
+      "name": "Retry commits to original filesystem preserving other entries",
+      "pass": true
+    },
+    {
+      "name": "Retried preference survives offline cold launch after unmount",
+      "pass": true
+    }
+  ],
+  "device": {
+    "avd": "trials_gauntlet_api36",
+    "serial": "emulator-5554",
+    "api": 36,
+    "cores": 2,
+    "headless": true,
+    "gpu": "swiftshader"
+  },
+  "snapshots": {
+    "before": [
+      {
+        "slot": "a",
+        "generation": 17,
+        "sha256": "3518e7a2459347bd01a790bda66c47dcafebaca6c53ab87aac229275318eb2ee",
+        "volume": "0.3",
+        "entryCount": 17
+      },
+      {
+        "slot": "b",
+        "generation": 16,
+        "sha256": "97cea16202d583261f9d5d757c65938e86ff49bff29f8ee1bf7e6f276c9d4801",
+        "volume": "0.3",
+        "entryCount": 17
+      }
+    ],
+    "duringFailure": [
+      {
+        "slot": "a",
+        "generation": 17,
+        "sha256": "3518e7a2459347bd01a790bda66c47dcafebaca6c53ab87aac229275318eb2ee",
+        "volume": "0.3",
+        "entryCount": 17
+      },
+      {
+        "slot": "b",
+        "generation": 16,
+        "sha256": "97cea16202d583261f9d5d757c65938e86ff49bff29f8ee1bf7e6f276c9d4801",
+        "volume": "0.3",
+        "entryCount": 17
+      }
+    ],
+    "afterRetry": [
+      {
+        "slot": "b",
+        "generation": 18,
+        "sha256": "1d92c0b7ae9b0475c7c9e6640487bd9b5ffb9191b0359bf459e1fd265b1d393d",
+        "volume": "0.4",
+        "entryCount": 17
+      },
+      {
+        "slot": "a",
+        "generation": 17,
+        "sha256": "3518e7a2459347bd01a790bda66c47dcafebaca6c53ab87aac229275318eb2ee",
+        "volume": "0.3",
+        "entryCount": 17
+      }
+    ]
+  },
+  "guards": {
+    "nonRootAppUid": true,
+    "differentAppAndInitNamespaces": true,
+    "noSharedAncestorMount": true,
+    "fixtureType": "tmpfs",
+    "capacityBytes": 262144,
+    "deviceDistinctFromParent": true,
+    "fillRequestedMaximumBytes": 266240,
+    "filledFilesystemAvailableBytes": 0,
+    "realAppWriteWorkedBeforeFill": true,
+    "symlinkTargetInsidePrivateFiles": true,
+    "pendingLinkRemovedBeforeRetry": true
+  },
+  "preservation": {
+    "bothCommittedSlotsByteIdenticalDuringFailure": true,
+    "allOtherEntriesPreservedAfterRetry": true,
+    "directoryModeRestored": true,
+    "slotModesRestored": true,
+    "selinuxUnchanged": true
+  },
+  "failedPreflight": {
+    "rawReport": ".native-build/enospc-round8/dangling-target-before.json",
+    "classification": "Harness setup failure, not ENOSPC or application-save failure.",
+    "finding": "First diagnostic symlink pointed to a nonexistent target. Pluginwrite returned0013unknown and read0008missing. No fill occurred. Mount/links/fixture directory were removed successfully.",
+    "correction": "Final run first created the target through the real app plugin, then verified write/read through the symlink before filling the guarded tmpfs."
+  }
+}

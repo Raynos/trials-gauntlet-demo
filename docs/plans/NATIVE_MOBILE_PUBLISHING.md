@@ -248,6 +248,33 @@ selecting Retry commits the pending setting, which survives cold launch. The vol
 removed afterward. This proves the native save path handles ENOSPC; it does not prove whole-device
 storage-pressure behavior, Android ENOSPC, or low-space OTA download/activation.
 
+Round 8 adds [Android ENOSPC qualification](../evidence/native-mobile/android-enospc-round8.json):
+the real app UID writes through its native save path to a verified 256 KiB tmpfs confined to the app's
+mount namespace. With SELinux still enforcing, disk-full errors preserve both committed saves and show
+the warning; removing the temporary path redirection lets Retry commit and survive an offline cold
+launch. Mounts and links are removed afterward. Both platforms now have real save-path ENOSPC evidence;
+whole-device pressure and low-space OTA remain separate open gates.
+
+The same round's [installed iOS recovery suite](../evidence/native-mobile/ios-save-recovery-round8.json)
+proves a bad latest checksum selects the committed backup over an uncommitted WebView mirror; two bad
+slots stop boot without overwrite; an unknown version in either slot prevents downgrade even when
+another slot is valid; and an uncommitted higher-generation pending file is ignored. Exact original
+save bytes/modes are restored and cold recovery is verified. This is corruption/interruption-state
+and future-version rejection evidence, not a schema migration or an actual mid-write process kill.
+
+The round8 repository gate passes `pnpm check`: app/harness types, full ESLint, 94 test files
+(1,156 tests passed; two existing LOD fork-surface cases skipped), and the production web build.
+Nine pre-existing lint errors were corrected in art/evidence/harness scripts without changing game
+behavior or disabling rules. Local publication readiness was rechecked: `security find-identity -v -p
+codesigning` found no valid signing identities, and `xcrun devicectl list devices` found no physical
+devices. HR-14 and the physical/store gates remain open.
+
+The existing headless offline PWA suite also passes 10/10 after the counter callback cleanup:
+origin-down cold boot reaches 100/100, all ten garage combinations load offline, the recorded finish
+matches exactly, and a worker update retains all 14 models with zero model bytes fetched. The slow-link
+warm-start check passes with zero bytes transferred. [Round8 evidence](../evidence/native-mobile/round8.json)
+retains the results and artifact/log hashes; these browser timings do not establish phone performance.
+
 ### P0 — Freeze scope and build requirements
 
 - [ ] Record publisher identity, permanent bundle/application IDs, countries, device support and distribution

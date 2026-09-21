@@ -80,7 +80,6 @@ class CountingServer {
 
   async start(): Promise<string> {
     const wire = this.wire;
-    const self = this;
     this.server = await preview({
       root: REPO_ROOT,
       configFile: path.join(REPO_ROOT, 'vite.config.ts'),
@@ -90,13 +89,13 @@ class CountingServer {
       plugins: [
         {
           name: 'trials:offline-e2e',
-          configurePreviewServer(server) {
+          configurePreviewServer: (server) => {
             server.middlewares.use((req, res, next) => {
               const url = (req.url ?? '').split('?')[0] ?? '';
               // A "new build": the same worker with a different stamp. The browser sees a byte-different
               // sw.js, installs it, and the boot adopts it — no second `vite build` needed.
-              if (self.bumpBuild && url === '/sw.js') {
-                const src = fs.readFileSync(path.join(DIST_DIR, 'sw.js'), 'utf8').replace(/^const BUILD = '([^']+)';/m, `const BUILD = '$1-${self.bumpBuild}';`);
+              if (this.bumpBuild && url === '/sw.js') {
+                const src = fs.readFileSync(path.join(DIST_DIR, 'sw.js'), 'utf8').replace(/^const BUILD = '([^']+)';/m, `const BUILD = '$1-${this.bumpBuild}';`);
                 const buf = Buffer.from(src);
                 wire.bytes += buf.length;
                 wire.requests++;

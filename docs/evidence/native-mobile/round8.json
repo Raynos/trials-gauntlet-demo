@@ -1,0 +1,264 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T11:25:20.116Z",
+  "baseRevision": "617ca7ec",
+  "finding": "Installed Android save-path ENOSPC preserves committed data and recovers through Retry/offline cold launch. iOS corruption, future-format rejection and uncommitted-pending recovery pass. Existing lint errors are corrected and the full repository check plus offline PWA suite pass.",
+  "sourceHashes": {
+    "assets/blender/hero_art_build.mjs": "90a3228628f66f7b910b7bb34dd1371c61c1e61d2fc3026124ac514b4a41f8f1",
+    "assets/blender/hero_art_pack.mjs": "f4309b71b8e33a63e0327d2abe5a08202759e79735880117380e438bfd60b0b5",
+    "docs/evidence/boot-bytes/round1/measure.mts": "82125659ebca9945428863591337a792512b078cf8c04702c67962fa1ecd759f",
+    "docs/evidence/hero-art/fixlist/bike-look/shoot.mjs": "a2ed241d1278b5665cfe731cb522dc4a96f1d7b8d357a11f8ef24079fe5e8221",
+    "docs/evidence/hero-delta-v010-v021/shoot.ts": "d412171641dd985d7add0bd684efa6042c09ea9343f898fdc567563a8ebd9aec",
+    "docs/evidence/hero-delta-v010-v021/turntable.ts": "ca212a48acf223ad00479ef58e72d02f1000feafdfd69ad79538651261e73ea0",
+    "harness/e2e/offline.mts": "7d0a67eeb15a3bcc64a5dbfe7f039054f78bd599bbe806adc1eb1dfd285a6213",
+    "scripts/native-ios-save-recovery.mjs": "cbcffb759fdd1c15a70031a5753673ca2ac20c65b78512b04025eff14311fb3f",
+    "scripts/native-android-enospc.mjs": "f4d2b14ec891949aff204cb6ce27c2c2f9c460d212f9fa6d26166e69c932c301"
+  },
+  "nativeArtifacts": {
+    "iosIndex": "9c7382ff6f1923b20857b315a3f63c8c018a40302c5f691c7ca1946f5da26097",
+    "iosDebugLibrary": "d6ce2194cc4b0e380b66139e57471f4412a6796860370e3e9cea9f1e7b34fff3",
+    "androidApk": "d7ad7b0049807212cfd38ab97396b5a35371fc0f07c4e54d34ab57de8f744921"
+  },
+  "validation": {
+    "repository": {
+      "command": "pnpm check",
+      "exitCode": 0,
+      "types": "App and harness passed",
+      "lint": "Full ESLint passed, no rule disabled",
+      "testFilesPassed": 94,
+      "testsPassed": 1156,
+      "testsSkipped": 2,
+      "skipReason": "Existing gltfBike fork-surface probes skip the two decimated LOD models whose authored tube rings are absent; other LOD geometry/replay tests run.",
+      "build": "Production web build passed",
+      "log": ".native-build/check-round8.log",
+      "logSha256": "6b6f888dd3688acd85c7babb1300eb7b76c38c31ec6242c3ce4e556cdd99b2e0"
+    },
+    "additionalTyping": "Changed historical hero capture scripts pass explicit strict TypeScript checks.",
+    "offlinePwa": {
+      "command": "pnpm exec tsx harness/e2e/offline.mts",
+      "exitCode": 0,
+      "checks": [
+        {
+          "id": "offline.cacheAfterFirstLoad",
+          "pass": true,
+          "value": "164 entries · 14 models · 40.02 MB",
+          "note": "need ≥ 14 models, ≥ 5 assets+fonts, ≥ 27 MB; wire 37.08 MB"
+        },
+        {
+          "id": "offline.coldStartPlayable",
+          "pass": true,
+          "value": "100/100 done=true in 16861 ms",
+          "note": "0 origin requests, transferSize 0, workerStart 0.90 ms, crossOriginIsolated true"
+        },
+        {
+          "id": "offline.firstFrame",
+          "pass": true,
+          "value": "canvas / context"
+        },
+        {
+          "id": "offline.worldMapDraws",
+          "pass": true,
+          "value": "tracks: world loaded, 5 region plates, 22 markers",
+          "note": "need the world plate + at least 5 region plates, drawn with the origin unreachable"
+        },
+        {
+          "id": "offline.inboxQueues",
+          "pass": true,
+          "value": "POST /api/inbox → TypeError: Failed to fetch",
+          "note": "the worker bypasses /api/; the queue itself is src/ui/inbox.ts NoteQueue (unit-tested)"
+        },
+        {
+          "id": "offline.garageSwapsOffline",
+          "pass": true,
+          "value": "10/10 combinations",
+          "note": "0 failed /models/ requests"
+        },
+        {
+          "id": "offline.rideFinishes",
+          "pass": true,
+          "value": "40.5583 s · 389a5dc6c07a",
+          "note": "online 40.5583 · 389a5dc6c07a"
+        },
+        {
+          "id": "offline.noPageErrors",
+          "pass": true,
+          "value": 0
+        },
+        {
+          "id": "offline.slowStart",
+          "pass": true,
+          "value": "20471 ms at 50 kbps / 400 ms RTT",
+          "note": "offline was 16861 ms; limit ×1.6 = 26978 ms; 0 B over the wire"
+        },
+        {
+          "id": "offline.updateSurvives",
+          "pass": true,
+          "value": "14 models kept · 39.9 KB re-fetched",
+          "note": "0 B of models off the wire (must be 0); loader 100/100"
+        }
+      ],
+      "raw": ".native-build/offline-round8.json",
+      "rawSha256": "8412b244606d2351630dd7e55467e8cc5701192449fb050a762190c77d82d7e7",
+      "log": ".native-build/offline-round8.log",
+      "scope": "Server-side byte counters, origin-down cold boot, all10 garage combinations, exact replay finish, slow-link warm start and update asset retention. Headless browser evidence, not physical-phone performance."
+    },
+    "iosSaveRecovery": {
+      "cases": {
+        "latestCorrupt": true,
+        "bothCorrupt": true,
+        "unknownVersion": true,
+        "interruptedPending": true
+      },
+      "restoredCold": {
+        "durable": {
+          "characters": 17603,
+          "checksum": "4369473d",
+          "generation": 14,
+          "name": "trials-save-b.json",
+          "valid": true,
+          "version": 1,
+          "volume": "0.6"
+        },
+        "failureText": null,
+        "gameVolume": 0.6,
+        "hasGame": true,
+        "loaderFailed": false,
+        "mirrorVolume": "0.6",
+        "origin": "capacitor://localhost",
+        "ready": true,
+        "screen": "menu",
+        "settingsVolumeText": "60%",
+        "slots": [
+          {
+            "characters": 17578,
+            "checksum": "48332268",
+            "generation": 13,
+            "name": "trials-save-a.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.6"
+          },
+          {
+            "characters": 17603,
+            "checksum": "4369473d",
+            "generation": 14,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.6"
+          }
+        ]
+      },
+      "cleanup": {
+        "restoredSlots": [
+          {
+            "name": "trials-save-a.json",
+            "sha256": "6c788eb7bb8c03a9c18f2ba3aaf006c4b7e1a5cdca87062abd03ea563b588fd8",
+            "bytes": 17587,
+            "version": 1,
+            "generation": 13,
+            "volume": "0.6",
+            "checksum": "48332268",
+            "mode": "644"
+          },
+          {
+            "name": "trials-save-b.json",
+            "sha256": "fc75606f46a2ec58a7b8bf00d6bc723eb827b21176f25c6262df06449152c2b8",
+            "bytes": 17612,
+            "version": 1,
+            "generation": 14,
+            "volume": "0.6",
+            "checksum": "4369473d",
+            "mode": "644"
+          }
+        ],
+        "exactOriginalBytes": true,
+        "pendingAbsent": true,
+        "simulatorShutdown": true
+      },
+      "evidence": "ios-save-recovery-round8.json"
+    },
+    "androidEnospc": {
+      "cases": [
+        {
+          "name": "Baseline preference reaches committed native snapshot",
+          "pass": true
+        },
+        {
+          "name": "Mounted capacity is distinct tmpfs capped at256KiB",
+          "pass": true
+        },
+        {
+          "name": "Real app plugin can create target on bounded filesystem",
+          "pass": true
+        },
+        {
+          "name": "Real app plugin writes through in-files symlink before filling",
+          "pass": true
+        },
+        {
+          "name": "Only bounded tmpfs is full and reports ENOSPC",
+          "pass": true
+        },
+        {
+          "name": "Real native pending-save path reports ENOSPC",
+          "pass": true
+        },
+        {
+          "name": "Normal Settings save warns while committed snapshots stay unchanged",
+          "pass": true
+        },
+        {
+          "name": "Retry commits to original filesystem preserving other entries",
+          "pass": true
+        },
+        {
+          "name": "Retried preference survives offline cold launch after unmount",
+          "pass": true
+        }
+      ],
+      "capBytes": 262144,
+      "error": {
+        "error": {
+          "code": "OS-PLUG-FILE-0013",
+          "message": "'writeFile' failed with: write failed: ENOSPC (No space left on device)"
+        }
+      },
+      "cleanup": {
+        "mounted": false,
+        "pendingLinked": false,
+        "probeLinked": false,
+        "directoryCreated": false,
+        "directoryMode": "771",
+        "slotModes": [
+          "600",
+          "600"
+        ],
+        "selinux": "Enforcing",
+        "emulatorPid": 98562,
+        "emulatorStopped": true,
+        "initMountTableHadNoFixtureBeforeShutdown": true,
+        "privateFilesListingBeforeShutdown": [
+          "profileInstalled",
+          "trials-save-a.json",
+          "trials-save-b.json"
+        ],
+        "sdkAndIgnoredArtifactsPreserved": true
+      },
+      "evidence": "android-enospc-round8.json"
+    }
+  },
+  "releaseAccess": {
+    "signingIdentityCommand": "security find-identity -v -p codesigning",
+    "validSigningIdentities": 0,
+    "physicalDeviceCommand": "xcrun devicectl list devices --json-output .native-build/physical-devices-round8.json",
+    "physicalDevices": 0
+  },
+  "limitations": [
+    "Native tests use the frozen round7 artifacts; no gameplay runtime/native-shell changes or new native builds this round.",
+    "Synthetic future-format and pending-file fixtures are not migration or actual mid-write process-kill qualification.",
+    "Bounded tmpfs ENOSPC is not whole-device pressure or low-space OTA qualification.",
+    "Physical device, older runtime/provider, final signing/production-channel/store gates remain open.",
+    "Initial full check encountered an in-progress new runner at lint; it was rerun successfully after sources were finalized."
+  ]
+}

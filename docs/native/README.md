@@ -177,6 +177,24 @@ never substitute filling the host disk. [Evidence](../evidence/native-mobile/ios
 records the actual ENOSPC error and cold recovery. Whole-device pressure, Android ENOSPC and low-space
 OTA remain separate gates.
 
+`node scripts/native-android-enospc.mjs --serial emulator-5554` adds the corresponding real Android
+save-path ENOSPC check on a task emulator. A private 256 KiB tmpfs exists only in the app's mount
+namespace; type, capacity, mount propagation and path checks precede filling. SELinux remains enforcing.
+The app first proves it can write through the bounded path, then a normal Settings save must return
+ENOSPC, preserve both committed snapshots and show the warning. Retry returns to the original filesystem
+before an offline cold launch. The mount, links and directory are removed in cleanup. Root provisions
+the fixture; the actual game/plugin saves run as the app UID. This does not fill the device partition
+or qualify low-space OTA. [Android evidence](../evidence/native-mobile/android-enospc-round8.json).
+
+`node scripts/native-ios-save-recovery.mjs` tests committed save corruption and interrupted staging.
+It backs up exact original bytes, seeds distinct settings through game handlers, and checks recovery
+from a corrupt latest slot, safe failure with two corrupt slots, rejection of an unknown future format,
+and refusal to adopt an uncommitted higher-generation pending file. It restores original saves and
+permissions before shutting down its simulator. `TRIALS_SAVE_RECOVERY_APP` optionally selects a frozen
+Debug app; otherwise it uses the current local build. [Evidence](../evidence/native-mobile/ios-save-recovery-round8.json)
+uses the round7 frozen app. Synthetic future-version rejection does not qualify an implemented migration;
+the pending-file fixture models interruption without claiming a process was killed during a write.
+
 Graphics recovery and the native ship gate have dedicated installed-app runners:
 
 ```sh

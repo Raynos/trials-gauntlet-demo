@@ -1,0 +1,837 @@
+{
+  "schema": 1,
+  "startedAt": "2026-09-21T11:18:09.616Z",
+  "pass": true,
+  "device": {
+    "udid": "F3058DD5-DCB6-4D86-93CC-6E56A785B788",
+    "name": "trials-iphone",
+    "model": "iPhone 16 Pro",
+    "runtime": "iOS Simulator 26.5"
+  },
+  "steps": [
+    {
+      "name": "seed-and-uncommitted-mirror",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/seed-and-uncommitted-mirror.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/seed-and-uncommitted-mirror.json",
+      "report": {
+        "probeAt": 1789989507271,
+        "state": {
+          "durable": {
+            "characters": 17603,
+            "checksum": "8f05acf7",
+            "generation": 16,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.6"
+          },
+          "failureText": null,
+          "gameVolume": 0.6,
+          "hasGame": true,
+          "loaderFailed": false,
+          "mirrorVolume": "0.6",
+          "origin": "capacitor://localhost",
+          "ready": true,
+          "screen": "menu",
+          "settingsVolumeText": "60%",
+          "slots": [
+            {
+              "characters": 17603,
+              "checksum": "9e54a3fc",
+              "generation": 15,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "version": 1,
+              "volume": "0.2"
+            },
+            {
+              "characters": 17603,
+              "checksum": "8f05acf7",
+              "generation": 16,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "version": 1,
+              "volume": "0.6"
+            }
+          ]
+        },
+        "token": "c41263d6-5bb6-49f4-bc4e-134d2450e11d",
+        "uncommittedMirrorVolume": "0.9"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "latest-corrupt-recovers-backup",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/latest-corrupt-recovers-backup.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/latest-corrupt-recovers-backup.json",
+      "report": {
+        "probeAt": 1789989516107,
+        "state": {
+          "durable": {
+            "characters": 17603,
+            "checksum": "9e54a3fc",
+            "generation": 15,
+            "name": "trials-save-a.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.2"
+          },
+          "failureText": null,
+          "gameVolume": 0.2,
+          "hasGame": true,
+          "loaderFailed": false,
+          "mirrorVolume": "0.2",
+          "origin": "capacitor://localhost",
+          "ready": true,
+          "screen": "menu",
+          "settingsVolumeText": "20%",
+          "slots": [
+            {
+              "characters": 17603,
+              "checksum": "9e54a3fc",
+              "generation": 15,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "version": 1,
+              "volume": "0.2"
+            },
+            {
+              "characters": 17603,
+              "checksum": "00000000",
+              "generation": 16,
+              "name": "trials-save-b.json",
+              "valid": false,
+              "version": 1,
+              "volume": "0.6"
+            }
+          ]
+        },
+        "token": "0b74a9e8-a528-4ec4-bd1b-99bef9f88540"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "both-corrupt-blocks-boot",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/both-corrupt-blocks-boot.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/both-corrupt-blocks-boot.json",
+      "report": {
+        "probeAt": 1789989519117,
+        "state": {
+          "durable": null,
+          "failureText": "Save files could not be read safely. Existing files were preserved.⟳ Retry",
+          "gameVolume": null,
+          "hasGame": false,
+          "loaderFailed": true,
+          "mirrorVolume": "0.2",
+          "origin": "capacitor://localhost",
+          "ready": false,
+          "screen": null,
+          "settingsVolumeText": null,
+          "slots": [
+            {
+              "characters": 26,
+              "checksum": null,
+              "generation": null,
+              "name": "trials-save-a.json",
+              "valid": false,
+              "version": null,
+              "volume": null
+            },
+            {
+              "characters": 17603,
+              "checksum": "00000000",
+              "generation": 16,
+              "name": "trials-save-b.json",
+              "valid": false,
+              "version": 1,
+              "volume": "0.6"
+            }
+          ]
+        },
+        "token": "0b9f3b99-dcc8-4b4e-9da3-0421010b74b3"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "unknown-version-blocks-downgrade",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/unknown-version-blocks-downgrade.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/unknown-version-blocks-downgrade.json",
+      "report": {
+        "probeAt": 1789989521910,
+        "state": {
+          "durable": {
+            "characters": 17603,
+            "checksum": "8f05acf7",
+            "generation": 16,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.6"
+          },
+          "failureText": "This save needs a newer app version. Existing save files were preserved.⟳ Retry",
+          "gameVolume": null,
+          "hasGame": false,
+          "loaderFailed": true,
+          "mirrorVolume": "0.2",
+          "origin": "capacitor://localhost",
+          "ready": false,
+          "screen": null,
+          "settingsVolumeText": null,
+          "slots": [
+            {
+              "characters": 17603,
+              "checksum": "9e65363f",
+              "generation": 15,
+              "name": "trials-save-a.json",
+              "valid": false,
+              "version": 2,
+              "volume": "0.2"
+            },
+            {
+              "characters": 17603,
+              "checksum": "8f05acf7",
+              "generation": 16,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "version": 1,
+              "volume": "0.6"
+            }
+          ]
+        },
+        "token": "a05d740e-71f5-49ec-a9bf-1957bbddc3f3"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "interrupted-pending-not-adopted",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/interrupted-pending-not-adopted.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/interrupted-pending-not-adopted.json",
+      "report": {
+        "probeAt": 1789989531501,
+        "state": {
+          "durable": {
+            "characters": 17603,
+            "checksum": "8f05acf7",
+            "generation": 16,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.6"
+          },
+          "failureText": null,
+          "gameVolume": 0.6,
+          "hasGame": true,
+          "loaderFailed": false,
+          "mirrorVolume": "0.6",
+          "origin": "capacitor://localhost",
+          "ready": true,
+          "screen": "menu",
+          "settingsVolumeText": "60%",
+          "slots": [
+            {
+              "characters": 17603,
+              "checksum": "9e54a3fc",
+              "generation": 15,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "version": 1,
+              "volume": "0.2"
+            },
+            {
+              "characters": 17603,
+              "checksum": "8f05acf7",
+              "generation": 16,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "version": 1,
+              "volume": "0.6"
+            }
+          ]
+        },
+        "token": "8b17205b-822a-4720-850d-9bc3fb543396"
+      },
+      "exitCode": 0
+    },
+    {
+      "name": "original-saves-restored-cold",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/original-saves-restored-cold.log",
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/original-saves-restored-cold.json",
+      "report": {
+        "probeAt": 1789989540612,
+        "state": {
+          "durable": {
+            "characters": 17603,
+            "checksum": "4369473d",
+            "generation": 14,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.6"
+          },
+          "failureText": null,
+          "gameVolume": 0.6,
+          "hasGame": true,
+          "loaderFailed": false,
+          "mirrorVolume": "0.6",
+          "origin": "capacitor://localhost",
+          "ready": true,
+          "screen": "menu",
+          "settingsVolumeText": "60%",
+          "slots": [
+            {
+              "characters": 17578,
+              "checksum": "48332268",
+              "generation": 13,
+              "name": "trials-save-a.json",
+              "valid": true,
+              "version": 1,
+              "volume": "0.6"
+            },
+            {
+              "characters": 17603,
+              "checksum": "4369473d",
+              "generation": 14,
+              "name": "trials-save-b.json",
+              "valid": true,
+              "version": 1,
+              "volume": "0.6"
+            }
+          ]
+        },
+        "token": "99381169-4bfc-46fd-972b-669720b47a93"
+      },
+      "exitCode": 0
+    }
+  ],
+  "cases": {
+    "latestCorrupt": {
+      "injected": [
+        {
+          "name": "trials-save-a.json",
+          "sha256": "5c841a20b7c8e2945fc39ef666b87621d3577d1046367014ecc7c9cacc30850f",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 15,
+          "volume": "0.2",
+          "checksum": "9e54a3fc",
+          "mode": "644"
+        },
+        {
+          "name": "trials-save-b.json",
+          "sha256": "d72c0be9f80cce7c07853ac08ae43194bc5a22caf3f9b592e473799b3f3b84e1",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 16,
+          "volume": "0.6",
+          "checksum": "00000000",
+          "mode": "644"
+        }
+      ],
+      "uncommittedMirrorVolume": "0.9",
+      "expectedBackup": {
+        "name": "trials-save-a.json",
+        "sha256": "5c841a20b7c8e2945fc39ef666b87621d3577d1046367014ecc7c9cacc30850f",
+        "bytes": 17612,
+        "version": 1,
+        "generation": 15,
+        "volume": "0.2",
+        "checksum": "9e54a3fc",
+        "mode": "644"
+      },
+      "result": {
+        "durable": {
+          "characters": 17603,
+          "checksum": "9e54a3fc",
+          "generation": 15,
+          "name": "trials-save-a.json",
+          "valid": true,
+          "version": 1,
+          "volume": "0.2"
+        },
+        "failureText": null,
+        "gameVolume": 0.2,
+        "hasGame": true,
+        "loaderFailed": false,
+        "mirrorVolume": "0.2",
+        "origin": "capacitor://localhost",
+        "ready": true,
+        "screen": "menu",
+        "settingsVolumeText": "20%",
+        "slots": [
+          {
+            "characters": 17603,
+            "checksum": "9e54a3fc",
+            "generation": 15,
+            "name": "trials-save-a.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.2"
+          },
+          {
+            "characters": 17603,
+            "checksum": "00000000",
+            "generation": 16,
+            "name": "trials-save-b.json",
+            "valid": false,
+            "version": 1,
+            "volume": "0.6"
+          }
+        ]
+      },
+      "after": [
+        {
+          "name": "trials-save-a.json",
+          "sha256": "5c841a20b7c8e2945fc39ef666b87621d3577d1046367014ecc7c9cacc30850f",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 15,
+          "volume": "0.2",
+          "checksum": "9e54a3fc",
+          "mode": "644"
+        },
+        {
+          "name": "trials-save-b.json",
+          "sha256": "d72c0be9f80cce7c07853ac08ae43194bc5a22caf3f9b592e473799b3f3b84e1",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 16,
+          "volume": "0.6",
+          "checksum": "00000000",
+          "mode": "644"
+        }
+      ],
+      "pass": true
+    },
+    "bothCorrupt": {
+      "injected": [
+        {
+          "name": "trials-save-a.json",
+          "sha256": "ac913839e298f3c630d20e6bd407d37609b96d402b961c6a69233a399f7bc3e2",
+          "bytes": 26,
+          "version": null,
+          "generation": null,
+          "volume": null,
+          "checksum": null,
+          "mode": "644"
+        },
+        {
+          "name": "trials-save-b.json",
+          "sha256": "d72c0be9f80cce7c07853ac08ae43194bc5a22caf3f9b592e473799b3f3b84e1",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 16,
+          "volume": "0.6",
+          "checksum": "00000000",
+          "mode": "644"
+        }
+      ],
+      "result": {
+        "durable": null,
+        "failureText": "Save files could not be read safely. Existing files were preserved.⟳ Retry",
+        "gameVolume": null,
+        "hasGame": false,
+        "loaderFailed": true,
+        "mirrorVolume": "0.2",
+        "origin": "capacitor://localhost",
+        "ready": false,
+        "screen": null,
+        "settingsVolumeText": null,
+        "slots": [
+          {
+            "characters": 26,
+            "checksum": null,
+            "generation": null,
+            "name": "trials-save-a.json",
+            "valid": false,
+            "version": null,
+            "volume": null
+          },
+          {
+            "characters": 17603,
+            "checksum": "00000000",
+            "generation": 16,
+            "name": "trials-save-b.json",
+            "valid": false,
+            "version": 1,
+            "volume": "0.6"
+          }
+        ]
+      },
+      "after": [
+        {
+          "name": "trials-save-a.json",
+          "sha256": "ac913839e298f3c630d20e6bd407d37609b96d402b961c6a69233a399f7bc3e2",
+          "bytes": 26,
+          "version": null,
+          "generation": null,
+          "volume": null,
+          "checksum": null,
+          "mode": "644"
+        },
+        {
+          "name": "trials-save-b.json",
+          "sha256": "d72c0be9f80cce7c07853ac08ae43194bc5a22caf3f9b592e473799b3f3b84e1",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 16,
+          "volume": "0.6",
+          "checksum": "00000000",
+          "mode": "644"
+        }
+      ],
+      "pass": true
+    },
+    "unknownVersion": {
+      "injected": [
+        {
+          "name": "trials-save-a.json",
+          "sha256": "534a5c45f599f106605474e601e8a1274c32a56a5dc4b9ba6a67d26ccf51c4c2",
+          "bytes": 17612,
+          "version": 2,
+          "generation": 15,
+          "volume": "0.2",
+          "checksum": "9e65363f",
+          "mode": "644"
+        },
+        {
+          "name": "trials-save-b.json",
+          "sha256": "8200ce33e7068bb93c54cf64908aecffb9483a8fd3a70b4fd91a9580f68469c0",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 16,
+          "volume": "0.6",
+          "checksum": "8f05acf7",
+          "mode": "644"
+        }
+      ],
+      "futureSlot": "trials-save-a.json",
+      "otherValidSlot": "trials-save-b.json",
+      "result": {
+        "durable": {
+          "characters": 17603,
+          "checksum": "8f05acf7",
+          "generation": 16,
+          "name": "trials-save-b.json",
+          "valid": true,
+          "version": 1,
+          "volume": "0.6"
+        },
+        "failureText": "This save needs a newer app version. Existing save files were preserved.⟳ Retry",
+        "gameVolume": null,
+        "hasGame": false,
+        "loaderFailed": true,
+        "mirrorVolume": "0.2",
+        "origin": "capacitor://localhost",
+        "ready": false,
+        "screen": null,
+        "settingsVolumeText": null,
+        "slots": [
+          {
+            "characters": 17603,
+            "checksum": "9e65363f",
+            "generation": 15,
+            "name": "trials-save-a.json",
+            "valid": false,
+            "version": 2,
+            "volume": "0.2"
+          },
+          {
+            "characters": 17603,
+            "checksum": "8f05acf7",
+            "generation": 16,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.6"
+          }
+        ]
+      },
+      "after": [
+        {
+          "name": "trials-save-a.json",
+          "sha256": "534a5c45f599f106605474e601e8a1274c32a56a5dc4b9ba6a67d26ccf51c4c2",
+          "bytes": 17612,
+          "version": 2,
+          "generation": 15,
+          "volume": "0.2",
+          "checksum": "9e65363f",
+          "mode": "644"
+        },
+        {
+          "name": "trials-save-b.json",
+          "sha256": "8200ce33e7068bb93c54cf64908aecffb9483a8fd3a70b4fd91a9580f68469c0",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 16,
+          "volume": "0.6",
+          "checksum": "8f05acf7",
+          "mode": "644"
+        }
+      ],
+      "pass": true
+    },
+    "interruptedPending": {
+      "before": [
+        {
+          "name": "trials-save-a.json",
+          "sha256": "5c841a20b7c8e2945fc39ef666b87621d3577d1046367014ecc7c9cacc30850f",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 15,
+          "volume": "0.2",
+          "checksum": "9e54a3fc",
+          "mode": "644"
+        },
+        {
+          "name": "trials-save-b.json",
+          "sha256": "8200ce33e7068bb93c54cf64908aecffb9483a8fd3a70b4fd91a9580f68469c0",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 16,
+          "volume": "0.6",
+          "checksum": "8f05acf7",
+          "mode": "644"
+        }
+      ],
+      "pending": {
+        "sha256": "cce776a3e61d5487a35f8ed12850c235b584cd4bd24ff030b935619cee978980",
+        "bytes": 17614,
+        "generation": 1016,
+        "volume": "0.9"
+      },
+      "result": {
+        "durable": {
+          "characters": 17603,
+          "checksum": "8f05acf7",
+          "generation": 16,
+          "name": "trials-save-b.json",
+          "valid": true,
+          "version": 1,
+          "volume": "0.6"
+        },
+        "failureText": null,
+        "gameVolume": 0.6,
+        "hasGame": true,
+        "loaderFailed": false,
+        "mirrorVolume": "0.6",
+        "origin": "capacitor://localhost",
+        "ready": true,
+        "screen": "menu",
+        "settingsVolumeText": "60%",
+        "slots": [
+          {
+            "characters": 17603,
+            "checksum": "9e54a3fc",
+            "generation": 15,
+            "name": "trials-save-a.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.2"
+          },
+          {
+            "characters": 17603,
+            "checksum": "8f05acf7",
+            "generation": 16,
+            "name": "trials-save-b.json",
+            "valid": true,
+            "version": 1,
+            "volume": "0.6"
+          }
+        ]
+      },
+      "after": [
+        {
+          "name": "trials-save-a.json",
+          "sha256": "5c841a20b7c8e2945fc39ef666b87621d3577d1046367014ecc7c9cacc30850f",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 15,
+          "volume": "0.2",
+          "checksum": "9e54a3fc",
+          "mode": "644"
+        },
+        {
+          "name": "trials-save-b.json",
+          "sha256": "8200ce33e7068bb93c54cf64908aecffb9483a8fd3a70b4fd91a9580f68469c0",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 16,
+          "volume": "0.6",
+          "checksum": "8f05acf7",
+          "mode": "644"
+        }
+      ],
+      "pendingAfterSha256": "cce776a3e61d5487a35f8ed12850c235b584cd4bd24ff030b935619cee978980",
+      "pass": true
+    }
+  },
+  "scope": "Real committed/pending files and native cold startup. Original slot bytes backed up before faults, restored in finally; no uninstall, reset, mocks, or native plugin changes.",
+  "limits": [
+    "Unknown version2 is a synthetic future-format rejection fixture, not a schema2 migration implementation or migration qualification.",
+    "Debug probe reads game state and invokes routes; this is not native touch, visual or audio judgement.",
+    "Bundled local-origin simulator boot, not network-disabled iOS, physical hardware or store distribution.",
+    "A complete higher-generation pending snapshot models interruption after staging and before commit; no actual process kill during a write is claimed."
+  ],
+  "previousAttempt": {
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/previous-attempt.json",
+    "error": "Baseline did not load newest committed game volume",
+    "cleanup": {
+      "restoredSlots": [
+        {
+          "name": "trials-save-a.json",
+          "sha256": "6c788eb7bb8c03a9c18f2ba3aaf006c4b7e1a5cdca87062abd03ea563b588fd8",
+          "bytes": 17587,
+          "version": 1,
+          "generation": 13,
+          "volume": "0.6",
+          "checksum": "48332268",
+          "mode": "644"
+        },
+        {
+          "name": "trials-save-b.json",
+          "sha256": "fc75606f46a2ec58a7b8bf00d6bc723eb827b21176f25c6262df06449152c2b8",
+          "bytes": 17612,
+          "version": 1,
+          "generation": 14,
+          "volume": "0.6",
+          "checksum": "4369473d",
+          "mode": "644"
+        }
+      ],
+      "exactOriginalBytes": true,
+      "pendingAbsent": true,
+      "simulatorShutdown": true
+    }
+  },
+  "artifact": {
+    "version": "1.0.0",
+    "build": "1",
+    "id": "com.trialsgauntlet.game",
+    "indexSha256": "9c7382ff6f1923b20857b315a3f63c8c018a40302c5f691c7ca1946f5da26097",
+    "contract": {
+      "schema": 1,
+      "target": "native",
+      "runtime": "native-v1",
+      "saveSchema": 1,
+      "sourceRevision": "157f9ed3",
+      "production": false,
+      "channels": null,
+      "publicKeyFingerprint": null
+    },
+    "debugLibrarySha256": "d6ce2194cc4b0e380b66139e57471f4412a6796860370e3e9cea9f1e7b34fff3",
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-save-recovery/2026-09-21T11-18-09.615Z/App.app"
+  },
+  "container": "/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/63375339-2E96-4200-AF8D-7DB5A90DD170",
+  "originalSlots": [
+    {
+      "name": "trials-save-a.json",
+      "sha256": "6c788eb7bb8c03a9c18f2ba3aaf006c4b7e1a5cdca87062abd03ea563b588fd8",
+      "bytes": 17587,
+      "version": 1,
+      "generation": 13,
+      "volume": "0.6",
+      "checksum": "48332268",
+      "mode": "644"
+    },
+    {
+      "name": "trials-save-b.json",
+      "sha256": "fc75606f46a2ec58a7b8bf00d6bc723eb827b21176f25c6262df06449152c2b8",
+      "bytes": 17612,
+      "version": 1,
+      "generation": 14,
+      "volume": "0.6",
+      "checksum": "4369473d",
+      "mode": "644"
+    }
+  ],
+  "seededSlots": [
+    {
+      "name": "trials-save-a.json",
+      "sha256": "5c841a20b7c8e2945fc39ef666b87621d3577d1046367014ecc7c9cacc30850f",
+      "bytes": 17612,
+      "version": 1,
+      "generation": 15,
+      "volume": "0.2",
+      "checksum": "9e54a3fc",
+      "mode": "644"
+    },
+    {
+      "name": "trials-save-b.json",
+      "sha256": "8200ce33e7068bb93c54cf64908aecffb9483a8fd3a70b4fd91a9580f68469c0",
+      "bytes": 17612,
+      "version": 1,
+      "generation": 16,
+      "volume": "0.6",
+      "checksum": "8f05acf7",
+      "mode": "644"
+    }
+  ],
+  "restoredCold": {
+    "durable": {
+      "characters": 17603,
+      "checksum": "4369473d",
+      "generation": 14,
+      "name": "trials-save-b.json",
+      "valid": true,
+      "version": 1,
+      "volume": "0.6"
+    },
+    "failureText": null,
+    "gameVolume": 0.6,
+    "hasGame": true,
+    "loaderFailed": false,
+    "mirrorVolume": "0.6",
+    "origin": "capacitor://localhost",
+    "ready": true,
+    "screen": "menu",
+    "settingsVolumeText": "60%",
+    "slots": [
+      {
+        "characters": 17578,
+        "checksum": "48332268",
+        "generation": 13,
+        "name": "trials-save-a.json",
+        "valid": true,
+        "version": 1,
+        "volume": "0.6"
+      },
+      {
+        "characters": 17603,
+        "checksum": "4369473d",
+        "generation": 14,
+        "name": "trials-save-b.json",
+        "valid": true,
+        "version": 1,
+        "volume": "0.6"
+      }
+    ]
+  },
+  "cleanup": {
+    "restoredSlots": [
+      {
+        "name": "trials-save-a.json",
+        "sha256": "6c788eb7bb8c03a9c18f2ba3aaf006c4b7e1a5cdca87062abd03ea563b588fd8",
+        "bytes": 17587,
+        "version": 1,
+        "generation": 13,
+        "volume": "0.6",
+        "checksum": "48332268",
+        "mode": "644"
+      },
+      {
+        "name": "trials-save-b.json",
+        "sha256": "fc75606f46a2ec58a7b8bf00d6bc723eb827b21176f25c6262df06449152c2b8",
+        "bytes": 17612,
+        "version": 1,
+        "generation": 14,
+        "volume": "0.6",
+        "checksum": "4369473d",
+        "mode": "644"
+      }
+    ],
+    "exactOriginalBytes": true,
+    "pendingAbsent": true,
+    "simulatorShutdown": true
+  },
+  "finishedAt": "2026-09-21T11:19:04.553Z"
+}

@@ -88,7 +88,6 @@ class CountingServer {
     this.byUrl = {};
   }
   async start(): Promise<string> {
-    const self = this;
     this.server = await preview({
       root: ROOT,
       configFile: path.join(ROOT, 'vite.config.ts'),
@@ -98,7 +97,7 @@ class CountingServer {
       plugins: [
         {
           name: 'boot-bytes:count',
-          configurePreviewServer(server) {
+          configurePreviewServer: (server) => {
             server.middlewares.use((req, res, next) => {
               const url = (req.url ?? '').split('?')[0] ?? '';
               let n = 0;
@@ -110,9 +109,9 @@ class CountingServer {
               }) as typeof res.write;
               res.end = ((chunk: unknown, ...rest: unknown[]) => {
                 if (chunk && typeof chunk !== 'function') n += Buffer.byteLength(chunk as Buffer | string);
-                self.requests++;
-                self.bytes += n;
-                self.byUrl[url] = (self.byUrl[url] ?? 0) + n;
+                this.requests++;
+                this.bytes += n;
+                this.byUrl[url] = (this.byUrl[url] ?? 0) + n;
                 return (end as (...a: unknown[]) => unknown)(chunk, ...rest) as ReturnType<typeof res.end>;
               }) as typeof res.end;
               next();
