@@ -1,0 +1,47 @@
+[
+  {
+    "file": "hero-r15/seated-forward-back.json",
+    "inputSha256": "a22550453addbd5dbbb274a0ef16841f40d0873eaef2b9e6cf0d243a91e90198",
+    "ticks": 720,
+    "traceSha256": "6df5e3913b37812721aac629d681180c7df1a7ac8d7875f3544393766dfda2f3",
+    "stateHash": "8267fdbefa15df29",
+    "time": 6,
+    "faults": 0
+  },
+  {
+    "file": "h2-gap-chain/bot-3.json",
+    "inputSha256": "3ae8850060ab6d0ee41294e95ef1c5add0a16acd02d1580f07ac97722e12d534",
+    "ticks": 5608,
+    "traceSha256": "17be212aedd436998b78ed1ee3ef6b566533486657d54be5c2f66d0111fb61b4",
+    "stateHash": "e08dc924865aa0b0",
+    "time": 46.733333333333334,
+    "faults": 18
+  },
+  {
+    "file": "h2-gap-chain/bot-3-pro.json",
+    "inputSha256": "53d5d41d0fd0072ec1dea219376412ad3d388acdbb7ce823cd242d685a8fbcef",
+    "ticks": 5131,
+    "traceSha256": "fa1dcadb2b20b11142c5d9f4e070bb0d75676af294bd6631a95edc99408543ca",
+    "stateHash": "3edd7be52842e858",
+    "time": 42.75833333333333,
+    "faults": 17
+  },
+  {
+    "file": "x3-gauntlet/bot-3.json",
+    "inputSha256": "22fcb3118922059ce9545005cf93de37efc7e2e795b44bfdb92cf61ca74e4e7e",
+    "ticks": 5269,
+    "traceSha256": "53fdaf1cd1888be88f1daa5ec4d75de934b965af6d0da3eaf9a2792c2c9d4d94",
+    "stateHash": "ee3d1237ef770055",
+    "time": 43.90833333333333,
+    "faults": 12
+  },
+  {
+    "file": "x3-gauntlet/bot-3-pro.json",
+    "inputSha256": "d4c86b09c73dad7c21fe1b6d83fdedb03719f9b6fb61a13a2290bd6c1c139ef0",
+    "ticks": 5208,
+    "traceSha256": "adf3b0fffb070af03cd8a0b082ca42e705a8a32ad32635b70c3e2370407042c5",
+    "stateHash": "e05bc442078c1479",
+    "time": 43.4,
+    "faults": 12
+  }
+]

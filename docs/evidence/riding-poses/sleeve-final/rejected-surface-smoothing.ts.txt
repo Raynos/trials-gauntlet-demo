@@ -1,0 +1,158 @@
+import * as THREE from 'three';
+
+interface Entry { geometry: THREE.BufferGeometry; users: number; owned: boolean }
+const conditioned = new WeakMap<THREE.BufferGeometry, Map<string, Entry>>();
+
+/** Smooth chest/upper-arm/forearm sleeve transitions in a local spatial
+ * neighborhood. UV-split vertices share a neighborhood, so smoothing cannot open seams.
+ * Geometry and source GLB weights remain immutable; neck/head influence and other joint regions are unchanged.
+ */
+export function conditionSleeveSkin(mesh: THREE.SkinnedMesh): () => void {
+  const source = mesh.geometry;
+  const signature = mesh.skeleton.bones.map(b => b.name).join('\0');
+  const entries = conditioned.get(source) ?? new Map<string, Entry>();
+  const acquire = (entry: Entry): (() => void) => {
+    entry.users++; mesh.geometry = entry.geometry;
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      if (--entry.users === 0 && entry.owned) { entry.geometry.dispose(); entries.delete(signature); }
+    };
+  };
+  const cached = entries.get(signature);
+  if (cached) return acquire(cached);
+  const indices = source.getAttribute('skinIndex'), weights = source.getAttribute('skinWeight'), positions = source.getAttribute('position');
+  if (!indices || !weights) return () => {};
+  const canonical = new Map<string, number>();
+  const groups: number[][] = [], side: number[] = [], values: number[] = [], distalValues: number[] = [];
+  const chest = mesh.skeleton.bones.findIndex(b => b.name === 'chest');
+  if (chest < 0) return () => {};
+  const arms = ['L', 'R'].map(s => mesh.skeleton.bones.findIndex(b => b.name === `upperArm${s}` || b.name === `upperArm.${s}`));
+  const forearms = ['L', 'R'].map(s => mesh.skeleton.bones.findIndex(b => b.name === `forearm${s}` || b.name === `forearm.${s}`));
+  const retained = ['neck', 'head'].map(name => mesh.skeleton.bones.findIndex(b => b.name === name));
+  const extras: [number, number][][] = [];
+  for (let i = 0; i < positions.count; i++) {
+    let arm = -1, allowed = true, total = 0, value = 0, distal = 0;
+    const extra: [number, number][] = []; extras.push(extra);
+    for (let j = 0; j < 4; j++) {
+      const w = weights.getComponent(i, j), b = indices.getComponent(i, j);
+      if (w <= 1e-6) continue;
+      total += w;
+      if (retained.includes(b)) { extra.push([b, w]); continue; }
+      if (b !== chest) {
+        const s = Math.max(arms.indexOf(b), forearms.indexOf(b));
+        if (s < 0 || (arm >= 0 && arm !== s)) allowed = false;
+        arm = s; if (forearms.includes(b)) distal += w; else value += w;
+      }
+    }
+    const remainder = Math.max(0, 1 - extra.reduce((sum, pair) => sum + pair[1], 0));
+    value = remainder > 1e-6 ? Math.min(1, value / remainder) : 0;
+    distal = remainder > 1e-6 ? Math.min(1, distal / remainder) : 0;
+    // Pure chest vertices are assigned to the anatomical side by their original lateral position.
+    if (arm < 0) arm = positions.getZ(i) >= 0 ? 0 : 1;
+    const tag = allowed && total > .999 ? arm : -1;
+    const key = [positions.getX(i), positions.getY(i), positions.getZ(i)].map(v => Math.round(v * 1e6)).join(',') + ':' + tag;
+    let id = canonical.get(key);
+    if (id === undefined) { id = groups.length; canonical.set(key, id); groups.push([]); side.push(tag); values.push(value); distalValues.push(distal); }
+    groups[id]!.push(i);
+  }
+  // A 25mm Gaussian removes millimetre-scale weight noise across duplicated topology;
+  // left/right anatomy remains separate and source positions never move.
+  const radius = .05, sigma = .025;
+  const cells = new Map<string, number[]>();
+  const points = groups.map(g => new THREE.Vector3().fromBufferAttribute(positions, g[0]!));
+  const affected = [new THREE.Box3(), new THREE.Box3()];
+  for (let i = 0; i < points.length; i++) if (side[i]! >= 0 && (values[i]! + distalValues[i]!) > 1e-7) affected[side[i]!]!.expandByPoint(points[i]!);
+  if (affected.every(box => box.isEmpty())) {
+    const entry = { geometry: source, users: 0, owned: false };
+    entries.set(signature, entry); conditioned.set(source, entries);
+    return acquire(entry);
+  }
+  affected.forEach(box => { if (!box.isEmpty()) box.expandByScalar(radius); });
+  const cellKey = (x: number, y: number, z: number, s: number) => [x, y, z, s].join(',');
+  for (let i = 0; i < points.length; i++) {
+    if (side[i]! < 0) continue;
+    const p = points[i]!, key = cellKey(Math.floor(p.x / radius), Math.floor(p.y / radius), Math.floor(p.z / radius), side[i]!);
+    const cell = cells.get(key) ?? []; cell.push(i); cells.set(key, cell);
+  }
+  const smoothed = values.map((w, i): [number, number] => {
+    if (side[i]! < 0 || !affected[side[i]!]!.containsPoint(points[i]!)) return [w, distalValues[i]!];
+    const p = points[i]!, x = Math.floor(p.x / radius), y = Math.floor(p.y / radius), z = Math.floor(p.z / radius);
+    let total = 0, sum = 0, distalSum = 0;
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+      for (const n of cells.get(cellKey(x + dx, y + dy, z + dz, side[i]!)) ?? []) {
+        const d = p.distanceToSquared(points[n]!);
+        if (d > radius * radius) continue;
+        const weight = Math.exp(-d / (2 * sigma * sigma)); total += weight; sum += weight * values[n]!; distalSum += weight * distalValues[n]!;
+      }
+    }
+    return total ? [sum / total, distalSum / total] : [w, distalValues[i]!];
+  });
+  const current = smoothed.map(w => w[0]), currentDistal = smoothed.map(w => w[1]);
+  const geometry = source.clone();
+  const outWeights = geometry.getAttribute('skinWeight'), outIndices = geometry.getAttribute('skinIndex');
+  for (let i = 0; i < groups.length; i++) {
+    if (side[i]! < 0 || (Math.abs(current[i]! - values[i]!) + Math.abs(currentDistal[i]! - distalValues[i]!)) < 1e-7) continue;
+    for (const vertex of groups[i]!) {
+      const extra = extras[vertex]!, remainder = Math.max(0, 1 - extra.reduce((sum, pair) => sum + pair[1], 0));
+      const entries: [number, number][] = [
+        [chest, Math.max(0, 1 - current[i]! - currentDistal[i]!) * remainder],
+        [arms[side[i]!]!, current[i]! * remainder],
+        [forearms[side[i]!]!, currentDistal[i]! * remainder],
+        ...extra,
+      ].filter(pair => pair[1]! > 1e-8) as [number, number][];
+      // The kernel cannot bridge the anatomical neck-to-elbow separation.
+      if (entries.length > 4) continue;
+      for (let k = 0; k < 4; k++) {
+        outIndices.setComponent(vertex, k, entries[k]?.[0] ?? 0);
+        outWeights.setComponent(vertex, k, entries[k]?.[1] ?? 0);
+      }
+    }
+  }
+  // The source sculpt has millimetre-scale sleeve dimples which become prominent
+  // when the arm turns inward. A volume-preserving Taubin pass removes that noise
+  // on the riding clone; authored garage geometry stays untouched.
+  const vertexGroup = new Int32Array(positions.count);
+  groups.forEach((group, id) => group.forEach(vertex => { vertexGroup[vertex] = id; }));
+  const neighbors = groups.map(() => new Set<number>());
+  const index = source.index;
+  if (index) for (let i = 0; i < index.count; i += 3) {
+    const ids = [0, 1, 2].map(k => vertexGroup[index.getX(i + k)]!);
+    for (let k = 0; k < 3; k++) {
+      neighbors[ids[k]!]!.add(ids[(k + 1) % 3]!);
+      neighbors[ids[k]!]!.add(ids[(k + 2) % 3]!);
+    }
+  }
+  const surface = points.map(p => p.clone());
+  const strength = values.map((value, i) => side[i]! < 0 ? 0 : THREE.MathUtils.smoothstep(value + distalValues[i]!, .5, .9));
+  for (let step = 0; step < 100; step++) {
+    const factor = .5;
+    const next = surface.map((p, i) => {
+      if (!strength[i] || !neighbors[i]!.size) return p.clone();
+      const average = new THREE.Vector3();
+      for (const n of neighbors[i]!) average.add(surface[n]!);
+      average.multiplyScalar(1 / neighbors[i]!.size).sub(p);
+      return p.clone().addScaledVector(average, factor * strength[i]!);
+    });
+    next.forEach((p, i) => surface[i]!.copy(p));
+  }
+  surface.forEach((p, i) => { const delta = p.clone().sub(points[i]!); if (delta.length() > .035) p.copy(points[i]!).add(delta.setLength(.035)); });
+  const outPositions = geometry.getAttribute('position');
+  groups.forEach((group, id) => group.forEach(vertex => outPositions.setXYZ(vertex, surface[id]!.x, surface[id]!.y, surface[id]!.z)));
+  const previousNormals = geometry.getAttribute('normal').clone();
+  geometry.setAttribute('normal', new THREE.Float32BufferAttribute(new Float32Array(positions.count * 3), 3));
+  geometry.computeVertexNormals();
+  const normals = geometry.getAttribute('normal');
+  groups.forEach((group, id) => {
+    const normal = new THREE.Vector3();
+    if (strength[id]) { group.forEach(vertex => normal.add(new THREE.Vector3().fromBufferAttribute(normals, vertex))); normal.normalize(); }
+    group.forEach(vertex => {
+      if (!strength[id]) normal.fromBufferAttribute(previousNormals, vertex);
+      normals.setXYZ(vertex, normal.x, normal.y, normal.z);
+    });
+  });
+  const entry = { geometry, users: 0, owned: true };
+  entries.set(signature, entry); conditioned.set(source, entries);
+  return acquire(entry);
+}

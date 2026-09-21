@@ -1,0 +1,152 @@
+--- before/src/physics/v2/bike.ts
++++ after/src/physics/v2/bike.ts
+@@ -136,6 +136,12 @@
+   'leanEdgeAir',
+   'gripJ',
+   'reverseT',
++  'transferBlend',
++  'transferLean',
++  'transferHipX',
++  'transferHipY',
++  'transferTorso',
++  'transferProgress',
+ ] as const;
+ const S_TICK = 0;
+ const S_TIME = 1;
+@@ -167,7 +173,13 @@
+ const S_LEAN_EDGE_AIR = 35; // R7: 1 when the last lean edge was made with both wheels off the ground (its travel earns no intent once a wheel is down)
+ const S_GRIP_J = 36; // R8: the reach-limit (hands + feet) impulse, N s, averaged over hold.gripTau (exponential memory); / gripTau > gripN = thrown
+ const S_REVERSE_T = 37; // R10 reverse (ask 35): seconds the reverse gate has held (brake, no throttle, rear down, ~standstill), capped at engageS + rampS; decays on release
+-export const NSCALAR = F_SLOTS.length; // 38
++const S_TRANSFER_BLEND = 38; // active extension strength, 0..1
++const S_TRANSFER_LEAN = 39; // applied input when the ground-started transfer began
++const S_TRANSFER_HIP_X = 40; // captured physical hips in axle coordinates
++const S_TRANSFER_HIP_Y = 41;
++const S_TRANSFER_TORSO = 42; // captured physical torso angle, radians
++const S_TRANSFER_PROGRESS = 43; // normalized forward input travel, 0..1
++export const NSCALAR = F_SLOTS.length; // 44
+ 
+ /** Flags (physics-v2.md §12). */
+ export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid'] as const;
+@@ -315,6 +327,8 @@
+   private rotationSin = 0;
+   private readonly riderGeometry = makeRiderRigPose();
+   private readonly geometryDerivativeScratch = makeRiderRigPose();
++  private readonly transferGeometry = makeRiderRigPose();
++  private readonly transferTarget = { x: 0, y: 0, psi: 0 };
+   private readonly geometryDerivativeKey = new Float64Array(3).fill(NaN);
+   private readonly geometryDerivative = new Float64Array(6);
+   private readonly riderGeometryKey = new Float64Array(6).fill(NaN);
+@@ -441,7 +455,9 @@
+     if (!input.restart) U[U_RESTART_LATCH] = 0;
+ 
+     // 1 input (already quantised by the caller; stored as applied)
+-    const leanEdge = F[S_IN_L] !== input.lean;
++    const previousLean = F[S_IN_L]!;
++    const leanVelocity = (input.lean - previousLean) / dt;
++    const leanEdge = previousLean !== input.lean;
+     F[S_IN_T] = input.throttle;
+     F[S_IN_B] = input.brake;
+     F[S_IN_L] = input.lean;
+@@ -503,6 +519,48 @@
+       // A brace is a reaction to the deceleration through the wheels: with both wheels off the ground there is none,
+       // and the brace is exactly 0 (the R4 / R5 air-brake nudges stay the declared air control, identical per class).
+       const poseLean = input.lean - r.brakeBrace * F[S_BRAKE_EFF]! * (1 - Math.max(0, input.lean)) * (1 - bothAir);
++      // A ground-started weight transfer extends directly from the physical preload. Passing
++      // through neutral during a throw does not command a seated pause. Every cross-tick
++      // value is snapshot-owned; held input smoothly returns to its ordinary static target.
++      if (leanVelocity > 2 && previousLean < -0.25 && F[S_TRANSFER_BLEND]! === 0 && !bothAir) {
++        const p = this.currentRiderGeometry();
++        F[S_TRANSFER_LEAN] = previousLean;
++        F[S_TRANSFER_HIP_X] = p.hips.x;
++        F[S_TRANSFER_HIP_Y] = p.hips.y;
++        F[S_TRANSFER_TORSO] = p.torsoAngle;
++        F[S_TRANSFER_PROGRESS] = 0;
++        F[S_TRANSFER_BLEND] = 1e-9;
++      }
++      let requested: { x: number; y: number; psi: number } | undefined;
++      if (F[S_TRANSFER_BLEND]! > 0) {
++        const increasing = leanVelocity > 2;
++        poseAt(r.poses, poseLean, this.transferTarget);
++        // A rate-limited target must finish its travel before the extension relaxes.
++        const tracking = clamp((input.lean - 0.8) / 0.2, 0, 1) *
++          clamp(Math.hypot(this.transferTarget.x - F[S_TGT_X]!, this.transferTarget.y - F[S_TGT_Y]!) / 0.01, 0, 1);
++        const speed = clamp((leanVelocity - 2) / 4, 0, 1);
++        const depth = clamp((-F[S_TRANSFER_LEAN]! - 0.25) / 0.25, 0, 1);
++        const strength = speed * speed * (3 - 2 * speed) * depth * depth * (3 - 2 * depth);
++        // Smooth velocity/depth eligibility excludes single input-quanta and shallow balance
++        // corrections. Reverse input cancels the throw; held input relaxes over 0.3 s.
++        F[S_TRANSFER_BLEND] = increasing
++          ? Math.max(strength, F[S_TRANSFER_BLEND]! - dt / 0.3)
++          : Math.max(0, F[S_TRANSFER_BLEND]! - (1 - tracking) * dt / 0.3 - clamp((-leanVelocity - 2) / 14, 0, 1));
++        if (increasing) F[S_TRANSFER_PROGRESS] = clamp((input.lean - F[S_TRANSFER_LEAN]!) / (1 - F[S_TRANSFER_LEAN]!), 0, 1);
++        const u = 1 - (1 - F[S_TRANSFER_PROGRESS]!) ** 4;
++        const p = this.transferGeometry,
++          forward = RIDER_PROFILE.poses[2];
++        riderRigFromCOM(this.transferTarget.x - this.axleOrgX, this.transferTarget.y - this.axleOrgY, this.transferTarget.psi + RIDER_TORSO_REST, p);
++        const blend = F[S_TRANSFER_BLEND]!;
++        const hx = F[S_TRANSFER_HIP_X]! + (forward.hipX - F[S_TRANSFER_HIP_X]!) * u;
++        const hy = F[S_TRANSFER_HIP_Y]! + (forward.hipY - F[S_TRANSFER_HIP_Y]!) * u;
++        const torso = F[S_TRANSFER_TORSO]! + (forward.torso * PI / 180 - F[S_TRANSFER_TORSO]!) * u;
++        riderRigFromHips(p.hips.x + (hx - p.hips.x) * blend, p.hips.y + (hy - p.hips.y) * blend, p.torsoAngle + (torso - p.torsoAngle) * blend, p);
++        this.transferTarget.x = p.com.x + this.axleOrgX;
++        this.transferTarget.y = p.com.y + this.axleOrgY;
++        this.transferTarget.psi = p.torsoAngle - RIDER_TORSO_REST;
++        requested = this.transferTarget;
++      }
+       advanceTarget(
+         r,
+         dt,
+@@ -513,6 +571,7 @@
+         this.poseTmp,
+         r.targetRateLin + (r.airRateLin - r.targetRateLin) * lim,
+         r.targetRateAng + (r.airRateAng - r.targetRateAng) * lim,
++        requested,
+       );
+       // intent (R3): how far the target itself has travelled lately. A rider who is MOVING his pose (the hop's
+       // snap) may push at F_max whichever way the gap is closing; a rider holding a pose (a landing) has only the
+@@ -940,6 +999,7 @@
+    * neutral target with zero relative velocity.
+    */
+   private placeBike(rx: number, ry: number, angle: number, velX: number, velY: number, angVel: number): void {
++    this.F.fill(0, S_TRANSFER_BLEND, S_TRANSFER_PROGRESS + 1);
+     const t = this.tuning;
+     const R = t.wheel.radius;
+     const sr = t.suspension.rear;
+@@ -1365,15 +1425,19 @@
+       const pxx = rty;
+       const pyy = -rtx;
+       const kI = ii[CHASSIS]!;
+-      const a = r.kd * dt;
++      // An active, ground-started extension relaxes damping to one twelfth (350 N s/m);
++      // ordinary riding and absorption retain the full 4200 N s/m. The force remains a
++      // bounded equal/opposite physical pair, never a separate hop impulse.
++      const servoKd = r.kd * (1 - (11 / 12) * F[S_TRANSFER_BLEND]!);
++      const a = servoKd * dt;
+       // M = I + a A, A = mRed I + kI p q^T  (2x2)
+       const m11 = 1 + a * (mRed + kI * pxx * qx);
+       const m12 = a * kI * pxx * qy;
+       const m21 = a * kI * pyy * qx;
+       const m22 = 1 + a * (mRed + kI * pyy * qy);
+       // damping part implicit (F_d (I + a A) = -kd v_rel0), spring part explicit (omega dt = 0.31)
+-      const bx = -r.kd * vrx;
+-      const by = -r.kd * vry;
++      const bx = -servoKd * vrx;
++      const by = -servoKd * vry;
+       const det = m11 * m22 - m12 * m21;
+       let Fx = r.kp * ex + (bx * m22 - m12 * by) / det;
+       let Fy = r.kp * ey + (m11 * by - m21 * bx) / det;
+--- before/src/physics/v2/rider.ts
++++ after/src/physics/v2/rider.ts
+@@ -64,8 +64,10 @@
+   out: { x: number; y: number; psi: number },
+   rateLin: number = r.targetRateLin,
+   rateAng: number = r.targetRateAng,
++  requested?: { x: number; y: number; psi: number },
+ ): void {
+-  poseAt(r.poses, lean, out);
++  if (requested) Object.assign(out, requested);
++  else poseAt(r.poses, lean, out);
+   const dx = out.x - tx;
+   const dy = out.y - ty;
+   const dl = Math.sqrt(dx * dx + dy * dy);

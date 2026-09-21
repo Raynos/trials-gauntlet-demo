@@ -1,0 +1,452 @@
+[
+  {
+    "cReb": 350,
+    "kp": 40000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.1683493972002476
+      }
+    ]
+  },
+  {
+    "cReb": 350,
+    "kp": 42000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.16763319553265027
+      }
+    ]
+  },
+  {
+    "cReb": 350,
+    "kp": 43000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.16731258281599742
+      }
+    ]
+  },
+  {
+    "cReb": 350,
+    "kp": 44000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.1670214411093242
+      }
+    ]
+  },
+  {
+    "cReb": 350,
+    "kp": 45000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.1667609815443481
+      }
+    ]
+  },
+  {
+    "cReb": 375,
+    "kp": 40000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.1567176255621069
+      }
+    ]
+  },
+  {
+    "cReb": 375,
+    "kp": 42000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.15592762698113927
+      }
+    ]
+  },
+  {
+    "cReb": 375,
+    "kp": 43000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.15564627689469224
+      }
+    ]
+  },
+  {
+    "cReb": 375,
+    "kp": 44000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.1553790828716322
+      }
+    ]
+  },
+  {
+    "cReb": 375,
+    "kp": 45000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.15512360004275594
+      }
+    ]
+  },
+  {
+    "cReb": 400,
+    "kp": 40000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.14562769615757287
+      }
+    ]
+  },
+  {
+    "cReb": 400,
+    "kp": 42000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.14477868929900234
+      }
+    ]
+  },
+  {
+    "cReb": 400,
+    "kp": 43000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.14444320078183231
+      }
+    ]
+  },
+  {
+    "cReb": 400,
+    "kp": 44000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.14412052866484748
+      }
+    ]
+  },
+  {
+    "cReb": 400,
+    "kp": 45000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.1438719682754429
+      }
+    ]
+  },
+  {
+    "cReb": 425,
+    "kp": 40000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.13487363946584358
+      }
+    ]
+  },
+  {
+    "cReb": 425,
+    "kp": 42000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.13402592626988152
+      }
+    ]
+  },
+  {
+    "cReb": 425,
+    "kp": 43000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.13368276777083432
+      }
+    ]
+  },
+  {
+    "cReb": 425,
+    "kp": 44000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.13333573760318818
+      }
+    ]
+  },
+  {
+    "cReb": 425,
+    "kp": 45000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.13311877691129198
+      }
+    ]
+  },
+  {
+    "cReb": 450,
+    "kp": 40000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.1244410438790513
+      }
+    ]
+  },
+  {
+    "cReb": 450,
+    "kp": 42000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.12361514510075644
+      }
+    ]
+  },
+  {
+    "cReb": 450,
+    "kp": 43000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": "crash",
+        "cause": "sensor",
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.12328835503830698
+      }
+    ]
+  },
+  {
+    "cReb": 450,
+    "kp": 44000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.12301373759599099
+      }
+    ]
+  },
+  {
+    "cReb": 450,
+    "kp": 45000,
+    "outcomes": [
+      {
+        "mild": true,
+        "fault": null,
+        "cause": null,
+        "rebound": 0
+      },
+      {
+        "mild": false,
+        "fault": null,
+        "cause": null,
+        "rebound": 0.12280699445118815
+      }
+    ]
+  }
+]

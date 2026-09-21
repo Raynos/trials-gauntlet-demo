@@ -1,0 +1,49 @@
+[
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 4200,
+        "Fmax": 4000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.45562149307673533,
+        "first": "front",
+        "landPitch": 0.3494808235637586,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      {
+        "apexR": 0.37859476631246275,
+        "first": "front",
+        "landPitch": -6.764581644221672,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.46008687273163357,
+        "first": "front",
+        "landPitch": -12.272738851065274,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      {
+        "apexR": 0.08030609318232723,
+        "first": "front",
+        "landPitch": -1.3584444124910173,
+        "bothOff": 0.058333333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.12087357904455887,
+        "first": "front",
+        "landPitch": 2.169534640892059,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.37859476631246275
+  }
+]

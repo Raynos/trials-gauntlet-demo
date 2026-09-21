@@ -239,16 +239,16 @@ export interface RiderBody {
   vel: Vec2;
   angVel: number;
   /**
-   * Physics v2 R9 (additive, optional; not hashed): the DRAWN pose for the hero, split from the physical body above.
-   * The servo holds a standing table (the one the hop / landing rows are green on); this is Astra's seated table at
-   * the same effective lean with the physical body's excursion added, in the bike's axle frame (origin = the axle
-   * midpoint at static sag, x forward, y up; metres / radians). A rig that draws it draws the rider seated at neutral,
-   * rising forward and hanging back, while the physics is byte-identical.
+   * Derived compatibility view of the physical body through the shared rider geometry.
+   * Hips and angles come from the same COM inverse used by contacts, sensors and the hero;
+   * this is not a separate authored stance or a clamped visual excursion. Coordinates
+   * use the authored axle frame, x forward and y up (metres/radians). The source physical
+   * body is hashed; this redundant derived view is not.
    */
   drawn?: RiderDrawnPose;
 }
 
-/** Physics v2 R9: the drawn rider pose (see `RiderBody.drawn`). */
+/** Derived physical pose for compatibility consumers (see `RiderBody.drawn`). */
 export interface RiderDrawnPose {
   /** The lean as a pose id and a 0..1 blend from `seated` toward it (`seated` has blend 0). */
   pose: 'seated' | 'back' | 'forward';

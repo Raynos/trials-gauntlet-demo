@@ -1,0 +1,90 @@
+{
+  "generated": "2026-09-21T09:08:04.988Z",
+  "sourceHashes": {
+    "src/render/hero/gltfRider.ts": "a9f47e3c701784e336841601707310c7d32c95a163203b1dd82af28df9d6c7e1",
+    "src/render/hero/sleeveSkin.ts": "3c0c5898dd736d811388fdd4e102b2c51ffffd59bb48ad4377551d9dff43a6b6"
+  },
+  "subjects": [
+    {
+      "file": "rider-street-mustard.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.000044556191216119976,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.00004455148435373246,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.000044556191216119976,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.00004455148435373246,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.00004446213447665438,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.00004427726090832544,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.000044556191216119976,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.00004455148435373246,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.00004446213447665438,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.00004427726090832544,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": []
+    }
+  ],
+  "codeStableDuringRun": true
+}

@@ -1,0 +1,49 @@
+{
+  "magic": "TRIN",
+  "header": {
+    "version": 1,
+    "trackId": "flat-test",
+    "seed": 1,
+    "physicsHz": 120,
+    "bike": "rookie",
+    "physics": "v2",
+    "note": "Played controls: settle seated 2 s, hold forward 1 s, neutral 1 s, hold back 1 s, neutral 1 s. No synthetic posing. R15 intent review, not a track-clear golden."
+  },
+  "runs": [
+    [
+      240,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      120,
+      0,
+      0,
+      127,
+      0
+    ],
+    [
+      120,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      120,
+      0,
+      0,
+      -127,
+      0
+    ],
+    [
+      120,
+      0,
+      0,
+      0,
+      0
+    ]
+  ]
+}

@@ -1,0 +1,47 @@
+--- /tmp/impact-bike-original.ts	2026-09-21 04:27:15
++++ src/physics/v2/bike.ts	2026-09-21 04:39:18
+@@ -1425,10 +1425,20 @@
+       const pxx = rty;
+       const pyy = -rtx;
+       const kI = ii[CHASSIS]!;
+-      // An active, ground-started extension relaxes damping to one twelfth (350 N s/m);
+-      // ordinary riding and absorption retain the full 4200 N s/m. The force remains a
+-      // bounded equal/opposite physical pair, never a separate hop impulse.
+-      const servoKd = r.kd * (1 - (11 / 12) * F[S_TRANSFER_BLEND]!);
++      // A seated rider yields at the hips under impact load. With independent stiff COM/angle
++      // springs, the seat prevented pelvic travel while the COM spring lifted the pelvis as
++      // the torso folded: a 1.5 m landing absorbed only 15 mm. Yield both springs together as
++      // suspension compression rises 35→60%, only for the upright 55→65° seated target and
++      // without a deliberate pose throw. This changes physical compliance, not the target,
++      // anatomical lengths, collision envelope or exported crouch normalization.
++      const loaded = clamp((Math.max(this.sComp[0]! / t.suspension.rear.travel, this.sComp[1]! / t.suspension.front.travel) - 0.35) / 0.25, 0, 1);
++      const seated = clamp((F[S_TGT_PSI]! + (10 * PI) / 180) / ((10 * PI) / 180), 0, 1);
++      const absorption = loaded * (1 - clamp(F[S_TGT_MOVE]! / r.servoIntentM, 0, 1)) * seated;
++      // The active ground-started throw retains its one-twelfth damping. Impact
++      // damping yields only while compressing; full damping opposes re-extension. All
++      // forces/couples remain bounded equal/opposite pairs on the real bodies.
++      const servoKp = r.kp * (1 - 0.8 * absorption);
++      const servoKd = r.kd * (1 - (11 / 12) * F[S_TRANSFER_BLEND]!) * (1 - 0.85 * absorption * clamp(-(vrx * -s + vry * c) / 0.3, 0, 1));
+       const a = servoKd * dt;
+       // M = I + a A, A = mRed I + kI p q^T  (2x2)
+       const m11 = 1 + a * (mRed + kI * pxx * qx);
+@@ -1439,8 +1449,8 @@
+       const bx = -servoKd * vrx;
+       const by = -servoKd * vry;
+       const det = m11 * m22 - m12 * m21;
+-      let Fx = r.kp * ex + (bx * m22 - m12 * by) / det;
+-      let Fy = r.kp * ey + (m11 * by - m21 * bx) / det;
++      let Fx = servoKp * ex + (bx * m22 - m12 * by) / det;
++      let Fy = servoKp * ey + (m11 * by - m21 * bx) / det;
+       // force-velocity (R2, Hill-like): the servo can pull the body toward its target at full F_max only
+       // while the gap is opening or closing slowly; the cap falls linearly with the closing speed to
+       // `servoMinFrac` F_max at `servoCloseV0`. The hop's push is an opening gap (the target runs ahead of
+@@ -1481,7 +1491,7 @@
+       av[CHASSIS] = av[CHASSIS]! + mPair * dt * ii[CHASSIS]!;
+       // angular servo
+       const errA = this.an[CHASSIS]! + F[S_TGT_PSI]! - this.an[RIDER]!;
+-      const tq = clamp(r.kpsi * errA + r.cpsi * (wC0 - wR0), -r.tauMax, r.tauMax);
++      const tq = clamp(r.kpsi * (1 - absorption) * errA + r.cpsi * (1 - 0.85 * absorption * clamp((wC0 - wR0) / 0.5, 0, 1)) * (wC0 - wR0), -r.tauMax, r.tauMax);
+       this.dServoTq = tq;
+       av[RIDER] = av[RIDER]! + tq * dt * ii[RIDER]!;
+       av[CHASSIS] = av[CHASSIS]! - tq * dt * ii[CHASSIS]!;

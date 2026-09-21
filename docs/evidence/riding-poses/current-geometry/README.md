@@ -1,0 +1,28 @@
+# Current geometry measurement (2026-09-21)
+
+Source revision: `7784f731928a54a25ef58fed275abeac80293a90`. This is mechanical evidence, not approval of the riding appearance.
+
+Run `pnpm exec tsx docs/evidence/riding-poses/current-geometry/measure.ts`. It loads all five shipped outfits, full and LOD, through the production GLB decoder; poses them through `GltfRider.update()`'s normal authored-stance/contact-IK path for both bikes; and measures actual bone matrices. No textures/GPU are loaded. The frame uses the exact physical target with zero physical lag or landing/extension offset, rather than claiming to reproduce a dynamic equilibrium. `measurements.json` contains all 100 combinations. Points are axle-local metres; angle is the pelvis-to-neck direction. COM uses the declared segment mass fractions, not the renderer's self-reported zero residual. All outfits and both bikes agree to the reported precision (head distance differs at most 1 micrometre).
+
+| Lean | Stance weight | Actual hips x/y | Actual torso | Visible vs physical COM | Head vs sensor center |
+| --- | ---: | --- | ---: | ---: | ---: |
+| -1 | 1 | -.499 / .716 | 58.0° | .310 m | .019 m |
+| -.5 | 0 | -.300 / .735 | 51.9° | .256 m | .095 m |
+| 0 | 0 | -.300 / .735 | 51.9° | .098 m | .213 m |
+| +.5 | .409 | -.259 / .787 | 44.2° | .063 m | .189 m |
+| +1 | 1 | -.200 / .860 | 33.0° | .036 m | .136 m |
+
+These are three disagreeing geometries: the physical servo target; `canonicalPose/buildChain` for sensors; and the authored GLB stance. `DRAWN` adds a fourth nominal pose, used to choose/weight the clip and draw limited excursions rather than set the measured hips directly. At full forward DRAWN says hip y .910, torso 28°; actual hip y .860, torso 33°. At neutral DRAWN says (-.340,.715),65°; the rig measures (-.300,.735),51.9°. Half back has no visible hip shift despite a 15 cm physical COM shift from neutral. `debug.comResidual = 0` on this path is not a measured error.
+
+## Concrete implementation recommendation
+
+1. Establish one shared *forward geometry function*, returning hips, neck/head centers, shoulders, elbows, wrists, knees, ankles, and mass COM. The existing `riderRigFromHips`/`riderRigFromCOM` is a starting point, but its straight-trunk/head convention does not exactly describe the articulated authored clips above. Either drive the rig from that canonical geometry or encode the authored trunk/head articulation in the shared map. Do not declare them identical based on target inputs.
+2. Place servo targets from that shared mass map in the **chassis** frame (axle COM plus (.065,-.210)). As a measured reference only, current visible-clip endpoint COMs imply chassis targets back (-.2073,.5951), seated (-.0282,.5851), forward (.0774,.6390), rather than current (-.42,.37),(-.12,.62),(.06,.67). Blindly adopting these would remove the old back-to-neutral 25 cm rise and drastically weaken loading/hopping: the back pose needs redesigned hips/crouch or a physically modeled load/extend target, not merely new servo gains. Do not ship this endpoint table unchanged.
+3. Use the same inverse geometry for `holdRider` hip/chest anchors, the leg force-length function, crash sensors, ragdoll spawn and render. Today hold anchors are `COM - rotate(.03,.1)` and `COM + rotate(.368,.234)` while the chain separately interpolates old canonical hips; changing only the pose table leaves all these wrong. Any reach/seat limit must act on the physical state. Rendering should measure unresolved residuals and explicitly release contacts on failure, without ±12 cm / ±20° draw-only suppression or reducing physical excursion to preserve contact.
+4. Retune one parameter family at a time with the existing test bounds: first target pose geometry and available vertical travel; then `targetRateLin` (baseline 5 m/s), `Fmax` (3200 N) and `kp/kd` (45000/4200) for snap height/timing; then closing-speed cap and intent thresholds (1 m/s, .3 fraction, .2 s/.05 m) for landing survival. Preserve the opposed physical impulse and angular authority. `airRateLin=.8`/`airRateAng=1` on Rookie already limit midair kicks, so ground retuning must not silently change them. Avoid adjusting `Katt` to disguise a grounded COM error.
+5. Update physical torso zero consistently (currently 40°), including `psi`, chest/hip anchors and inertia interpretation. A seated 52–65° visible torso cannot be represented by current neutral psi=0 plus a fixed 40° geometry without an explicit mapping. Implement natural elbow/knee poles in the shared solver and verify actual skinned cloth in motion; the bone/socket measurements cannot prove garment integrity.
+6. Preserve deterministic inputs/replays; old goldens must be re-searched if physics changes, not assigned new expected values to conceal failures. Play the neutral/forward/back/landing/crash/restart sequence on all families/LODs, then the complete bot/stranger gate. Static samples cannot establish those requirements.
+
+Baseline targeted handling checks: `pnpm exec vitest run src/physics/v2/feel.test.ts src/physics/v2/r8.test.ts src/physics/v2/r9.test.ts` passed 22/22 (3 files), recorded in `baseline-tests.log`. The R9 tests intentionally assert the split/clamps being replaced; a future failure of that obsolete behavior is distinct from relaxing a handling performance bound.
+
+Full physics baseline: `pnpm exec vitest run src/physics/v2` passed **106/106 tests across 12 files** in 1.82 s; recorded in `full-physics-baseline.log`. This includes existing hop/landing/climbing/response/golden/snapshot/property coverage. No runtime sources or test tolerances were changed for this measurement.

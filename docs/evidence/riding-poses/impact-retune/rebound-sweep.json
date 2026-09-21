@@ -1,0 +1,488 @@
+[
+  {
+    "cReb": 350,
+    "servoMinFrac": 0.3,
+    "hop": {
+      "apexR": 0.5177661019672422,
+      "first": "front",
+      "landPitch": 2.5924965491371843,
+      "bothOff": 0.175,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.4620000990620979,
+      "first": "front",
+      "landPitch": -9.583533322916999,
+      "bothOff": 0.19166666666666668,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -9.012630085464158,
+      "maxPitch": 15.98313464615825,
+      "fault": null,
+      "rebound": 0.1667609815443481,
+      "airAfter": 0.15833333333333333,
+      "endV": 7.785032678794736
+    }
+  },
+  {
+    "cReb": 350,
+    "servoMinFrac": 0.2,
+    "hop": {
+      "apexR": 0.5177661019672422,
+      "first": "front",
+      "landPitch": 2.5924965491371843,
+      "bothOff": 0.175,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.4620000990620979,
+      "first": "front",
+      "landPitch": -9.583533322916999,
+      "bothOff": 0.19166666666666668,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -9.012630085464158,
+      "maxPitch": 15.98313464615825,
+      "fault": null,
+      "rebound": 0.1667609815443481,
+      "airAfter": 0.15833333333333333,
+      "endV": 7.785032678794736
+    }
+  },
+  {
+    "cReb": 350,
+    "servoMinFrac": 0.1,
+    "hop": {
+      "apexR": 0.5177661019672422,
+      "first": "front",
+      "landPitch": 2.5924965491371843,
+      "bothOff": 0.175,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.46205099682203327,
+      "first": "front",
+      "landPitch": -9.583533322916999,
+      "bothOff": 0.19166666666666668,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -9.013249820427777,
+      "maxPitch": 15.98313464615825,
+      "fault": null,
+      "rebound": 0.16677182214140301,
+      "airAfter": 0.15833333333333333,
+      "endV": 7.785022121672727
+    }
+  },
+  {
+    "cReb": 400,
+    "servoMinFrac": 0.3,
+    "hop": {
+      "apexR": 0.500265671304499,
+      "first": "front",
+      "landPitch": 2.2368230658983497,
+      "bothOff": 0.18333333333333332,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.4417805883773199,
+      "first": "front",
+      "landPitch": -7.833682133951305,
+      "bothOff": 0.2,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -8.374590744050442,
+      "maxPitch": 15.983652599935821,
+      "fault": null,
+      "rebound": 0.1438719682754429,
+      "airAfter": 0.14166666666666666,
+      "endV": 7.788113943111945
+    }
+  },
+  {
+    "cReb": 400,
+    "servoMinFrac": 0.2,
+    "hop": {
+      "apexR": 0.500265671304499,
+      "first": "front",
+      "landPitch": 2.2368230658983497,
+      "bothOff": 0.18333333333333332,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.4418217281734821,
+      "first": "front",
+      "landPitch": -7.833682133951305,
+      "bothOff": 0.2,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -8.374590744050442,
+      "maxPitch": 15.983652599935821,
+      "fault": null,
+      "rebound": 0.1438719682754429,
+      "airAfter": 0.14166666666666666,
+      "endV": 7.788113943111945
+    }
+  },
+  {
+    "cReb": 400,
+    "servoMinFrac": 0.1,
+    "hop": {
+      "apexR": 0.500265671304499,
+      "first": "front",
+      "landPitch": 2.2368230658983497,
+      "bothOff": 0.18333333333333332,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.44191860940631855,
+      "first": "front",
+      "landPitch": -7.833682133951305,
+      "bothOff": 0.2,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -8.375138077175432,
+      "maxPitch": 15.983652599935821,
+      "fault": null,
+      "rebound": 0.1438814863341044,
+      "airAfter": 0.14166666666666666,
+      "endV": 7.788099458895756
+    }
+  },
+  {
+    "cReb": 450,
+    "servoMinFrac": 0.3,
+    "hop": {
+      "apexR": 0.4874972591150361,
+      "first": "front",
+      "landPitch": 3.5306015110915396,
+      "bothOff": 0.19166666666666668,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.424606624520764,
+      "first": "front",
+      "landPitch": -6.227590073890953,
+      "bothOff": 0.2,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -7.766106110685697,
+      "maxPitch": 15.983798848347334,
+      "fault": null,
+      "rebound": 0.12280699445118815,
+      "airAfter": 0.11666666666666667,
+      "endV": 7.788247767676958
+    }
+  },
+  {
+    "cReb": 450,
+    "servoMinFrac": 0.2,
+    "hop": {
+      "apexR": 0.4874972591150361,
+      "first": "front",
+      "landPitch": 3.5306015110915396,
+      "bothOff": 0.19166666666666668,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.42469316338646373,
+      "first": "front",
+      "landPitch": -6.227590073890953,
+      "bothOff": 0.2,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -7.766106110685697,
+      "maxPitch": 15.983798848347334,
+      "fault": null,
+      "rebound": 0.12280699445118815,
+      "airAfter": 0.11666666666666667,
+      "endV": 7.788247767676958
+    }
+  },
+  {
+    "cReb": 450,
+    "servoMinFrac": 0.1,
+    "hop": {
+      "apexR": 0.4874972591150361,
+      "first": "front",
+      "landPitch": 3.5306015110915396,
+      "bothOff": 0.19166666666666668,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.42480896648477456,
+      "first": "front",
+      "landPitch": -6.227590073890953,
+      "bothOff": 0.2,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -7.766616525334434,
+      "maxPitch": 15.983798848347334,
+      "fault": null,
+      "rebound": 0.12281627386057159,
+      "airAfter": 0.11666666666666667,
+      "endV": 7.788234267183483
+    }
+  },
+  {
+    "cReb": 500,
+    "servoMinFrac": 0.3,
+    "hop": {
+      "apexR": 0.47588681412689204,
+      "first": "front",
+      "landPitch": 3.1768408927165956,
+      "bothOff": 0.2,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.4073826233394223,
+      "first": "front",
+      "landPitch": -4.936513983350718,
+      "bothOff": 0.21666666666666667,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -7.180949280310619,
+      "maxPitch": 15.983476781574577,
+      "fault": null,
+      "rebound": 0.10297857223568296,
+      "airAfter": 0.1,
+      "endV": 7.789737161766054
+    }
+  },
+  {
+    "cReb": 500,
+    "servoMinFrac": 0.2,
+    "hop": {
+      "apexR": 0.47588681412689204,
+      "first": "front",
+      "landPitch": 3.1768408927165956,
+      "bothOff": 0.2,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.4073826233394223,
+      "first": "front",
+      "landPitch": -4.936513983350718,
+      "bothOff": 0.21666666666666667,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -7.180949280310619,
+      "maxPitch": 15.983476781574577,
+      "fault": null,
+      "rebound": 0.10297857223568296,
+      "airAfter": 0.1,
+      "endV": 7.789737161766054
+    }
+  },
+  {
+    "cReb": 500,
+    "servoMinFrac": 0.1,
+    "hop": {
+      "apexR": 0.47588681412689204,
+      "first": "front",
+      "landPitch": 3.1768408927165956,
+      "bothOff": 0.2,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.4073826233394223,
+      "first": "front",
+      "landPitch": -4.936513983350718,
+      "bothOff": 0.21666666666666667,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -7.181395013123593,
+      "maxPitch": 15.983476781574577,
+      "fault": null,
+      "rebound": 0.10298646124336158,
+      "airAfter": 0.1,
+      "endV": 7.789724724778941
+    }
+  },
+  {
+    "cReb": 600,
+    "servoMinFrac": 0.3,
+    "hop": {
+      "apexR": 0.45582184232861245,
+      "first": "front",
+      "landPitch": 4.421268519110985,
+      "bothOff": 0.20833333333333334,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.36810554063599277,
+      "first": "front",
+      "landPitch": -2.282066336633668,
+      "bothOff": 0.20833333333333334,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -6.07523148390334,
+      "maxPitch": 15.982493625103217,
+      "fault": null,
+      "rebound": 0.0677676487161652,
+      "airAfter": 0.058333333333333334,
+      "endV": 7.791075803288634
+    }
+  },
+  {
+    "cReb": 600,
+    "servoMinFrac": 0.2,
+    "hop": {
+      "apexR": 0.45582184232861245,
+      "first": "front",
+      "landPitch": 4.421268519110985,
+      "bothOff": 0.20833333333333334,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.36810554063599277,
+      "first": "front",
+      "landPitch": -2.282066336633668,
+      "bothOff": 0.20833333333333334,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -6.07523148390334,
+      "maxPitch": 15.982493625103217,
+      "fault": null,
+      "rebound": 0.0677676487161652,
+      "airAfter": 0.058333333333333334,
+      "endV": 7.791075803288634
+    }
+  },
+  {
+    "cReb": 600,
+    "servoMinFrac": 0.1,
+    "hop": {
+      "apexR": 0.45582184232861245,
+      "first": "front",
+      "landPitch": 4.421268519110985,
+      "bothOff": 0.20833333333333334,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.36810554063599277,
+      "first": "front",
+      "landPitch": -2.282066336633668,
+      "bothOff": 0.20833333333333334,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -6.075589448578778,
+      "maxPitch": 15.982493625103217,
+      "fault": null,
+      "rebound": 0.06777470057347817,
+      "airAfter": 0.058333333333333334,
+      "endV": 7.79106104817537
+    }
+  },
+  {
+    "cReb": 800,
+    "servoMinFrac": 0.3,
+    "hop": {
+      "apexR": 0.42793113522326665,
+      "first": "front",
+      "landPitch": 3.890338047297205,
+      "bothOff": 0.23333333333333334,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.3140919453159259,
+      "first": "front",
+      "landPitch": 1.2095636471169169,
+      "bothOff": 0.15833333333333333,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -4.217573909393892,
+      "maxPitch": 15.97983180772667,
+      "fault": null,
+      "rebound": 0.018742394339459456,
+      "airAfter": 0,
+      "endV": 7.824580127554273
+    }
+  },
+  {
+    "cReb": 800,
+    "servoMinFrac": 0.2,
+    "hop": {
+      "apexR": 0.42793113522326665,
+      "first": "front",
+      "landPitch": 3.890338047297205,
+      "bothOff": 0.23333333333333334,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.3140919453159259,
+      "first": "front",
+      "landPitch": 1.2095636471169169,
+      "bothOff": 0.15833333333333333,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -4.217573909393892,
+      "maxPitch": 15.97983180772667,
+      "fault": null,
+      "rebound": 0.018742394339459456,
+      "airAfter": 0,
+      "endV": 7.824580127554273
+    }
+  },
+  {
+    "cReb": 800,
+    "servoMinFrac": 0.1,
+    "hop": {
+      "apexR": 0.42793113522326665,
+      "first": "front",
+      "landPitch": 3.890338047297205,
+      "bothOff": 0.23333333333333334,
+      "fault": null
+    },
+    "slow": {
+      "apexR": 0.3140919453159259,
+      "first": "front",
+      "landPitch": 1.2095636471169169,
+      "bothOff": 0.15833333333333333,
+      "fault": null
+    },
+    "drop": {
+      "maxRear": 1,
+      "minPitch": -4.217831495190371,
+      "maxPitch": 15.97983180772667,
+      "fault": null,
+      "rebound": 0.01874627920882066,
+      "airAfter": 0,
+      "endV": 7.824566797209455
+    }
+  }
+]

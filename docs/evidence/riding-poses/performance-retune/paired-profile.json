@@ -1,0 +1,146 @@
+[
+  {
+    "round": 0,
+    "warmup": true,
+    "name": "baseline",
+    "meanUs": 6.08920827777775
+  },
+  {
+    "round": 0,
+    "warmup": true,
+    "name": "retained",
+    "meanUs": 4.980291833333329
+  },
+  {
+    "round": 1,
+    "warmup": true,
+    "name": "retained",
+    "meanUs": 4.315175916666655
+  },
+  {
+    "round": 1,
+    "warmup": true,
+    "name": "baseline",
+    "meanUs": 4.6620115833333475
+  },
+  {
+    "round": 2,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 4.586858583333309
+  },
+  {
+    "round": 2,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 4.104633083333342
+  },
+  {
+    "round": 3,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 5.433439888888851
+  },
+  {
+    "round": 3,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 4.510921222222336
+  },
+  {
+    "round": 4,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 4.47539716666663
+  },
+  {
+    "round": 4,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 4.0210391388888205
+  },
+  {
+    "round": 5,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 4.1346309166666
+  },
+  {
+    "round": 5,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 4.778487222222189
+  },
+  {
+    "round": 6,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 6.122150305555465
+  },
+  {
+    "round": 6,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 4.796940861111098
+  },
+  {
+    "round": 7,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 4.617318277777791
+  },
+  {
+    "round": 7,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 5.634854499999973
+  },
+  {
+    "round": 8,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 5.4951596666666465
+  },
+  {
+    "round": 8,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 4.207995249999916
+  },
+  {
+    "round": 9,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 4.713646916666626
+  },
+  {
+    "round": 9,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 5.782760500000122
+  },
+  {
+    "round": 10,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 4.857416638888933
+  },
+  {
+    "round": 10,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 4.873369472222421
+  },
+  {
+    "round": 11,
+    "warmup": false,
+    "name": "retained",
+    "meanUs": 4.052718694444543
+  },
+  {
+    "round": 11,
+    "warmup": false,
+    "name": "baseline",
+    "meanUs": 4.557775499999982
+  }
+]

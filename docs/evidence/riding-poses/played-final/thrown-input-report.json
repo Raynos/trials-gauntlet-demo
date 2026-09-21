@@ -1,0 +1,22 @@
+[
+  {
+    "bike": "rookie",
+    "track": "h2-gap-chain",
+    "tries": 69,
+    "prefixTicks": 649,
+    "faultTick": 703,
+    "totalTicks": 763,
+    "cause": "thrown",
+    "exactReplay": true
+  },
+  {
+    "bike": "pro",
+    "track": "h2-gap-chain",
+    "tries": 277,
+    "prefixTicks": 2065,
+    "faultTick": 2139,
+    "totalTicks": 2199,
+    "cause": "thrown",
+    "exactReplay": true
+  }
+]

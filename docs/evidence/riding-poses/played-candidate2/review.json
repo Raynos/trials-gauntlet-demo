@@ -1,0 +1,304 @@
+{
+  "build": "/tmp/trials-poses-visual2/dist",
+  "recording": "/Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/inputs/riding-poses/lean-transitions-rookie.json",
+  "recordingSha256": "8cabf8c22d7c5cb8dcf2c2fa6b8a3d2df2ec9f47a8df0f5f5bd4c5d0c0e7a678",
+  "assetBytes": {
+    "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+    "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e",
+    "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+    "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82"
+  },
+  "servedFiles": {
+    "index.html": "e8116a368ed8d20437c140d2b4d1afe86e46b9e9c0fd43ea712ff5b7bbb8f8ed",
+    "assets/index-BFtwjYCn.js": "47ed08a3e9435eede20601f8ba173230915899e69cd8bf5084d5a228c1165681",
+    "assets/three-BY89xK9L.js": "caf8d02741a0b66ade62d91b1006c842c9ccf0b82229d338c4c7c9ee6ce082c9",
+    "fonts/BarlowCondensed-Bold.woff2": "e3e520cb7468f2efd60bc2ce96694567c3312f4ef414fffbe605e3ad146b24e6",
+    "fonts/BarlowCondensed-Medium.woff2": "31ff5e6e96a096fde4d78bc838719e69b093db2d0b062b96e423c065a6d1b2b1",
+    "fonts/BarlowCondensed-BlackItalic.woff2": "83282bcfc9df534b070d8231f10e511ba0c60ae63af9b5e096e4de089454bc88",
+    "art/manifest.json": "298405c3bfeb6cb63a73fd8ef8fb200cb076872ba487d17ff3b6e70818f06f8b",
+    "art/world/banner-vortex-oil.webp": "2fea659f77c0b2f7a0320451af2ee2be4f0209a93cf7e8f357d6bb62dbf51f56",
+    "art/world/banner-apex-suspension.webp": "1a7dd09b2dd8ab3de22751a56334e8793e188bd406a39e9909f858de39e1b282",
+    "art/world/banner-kestrel-tyres.webp": "9e22bb9741e8b5e37d684734612e8d8f4968dfa8679dce5ed0be9e63e68e6468",
+    "art/world/banner-nordvik.webp": "bdd15aa45d2d21214bc2e4c24a351c345869819321f53a667ee6019d6211e424",
+    "art/world/banner-bolt-energy.webp": "130c65d046130e7cadc52fb8d2ceb54aba1c34ce4da2052b189cb881f321c3c3",
+    "art/world/banner-ironworks-series.webp": "a4361a0b8c8118d049ac3a094017f993e6a67f1604ffc934bd9c8ab30f90e1c9",
+    "art/world/tyremark-arc.webp": "925fae78ab1bc39cc535757da3e1e8e79651cbc1d4c6177c2b34592a7bf9cb1b",
+    "art/world/stencil-nordvik.webp": "95925305aa7a7dcef5b7cf60bc2359dd3521113589770c1bbafc820a62c69521",
+    "art/world/stencil-hkr.webp": "481d1378596de6787b99eb03709f845c6ef8323ada137127e0ce469e79f4d29d",
+    "art/world/stencil-weights.webp": "ff5a353824ec0bbbf7edd83e2c4c7c44fbe20789e4ac733df5c240f1e3aa2065",
+    "art/world/stencil-serial.webp": "c3539b3920bd9b26ef47982033f45aa1fe3c01c0ea3f59c95c60e54c1425ab74",
+    "art/world/stencil-hazard.webp": "0148c9937e3377033bfe97ea14bf48ebd9faa7491c9acf6c7e8e096f57d9348a",
+    "art/world/stencil-arrows.webp": "a0c7300aff015ea18a5e9b593b7108555d8be8f70dcd6297545d0b2a02605a8d",
+    "art/world/mask-edge-grime.webp": "5512e0a93eeeb2eb4642ee9226d9fb5e03df86ee218e5061291a2718c3bf7806",
+    "art/plates/plate-industrial.webp": "dee7b119a7c41d9b305265178698e44b5ae7464f0d5fa2c63274954518733cf5",
+    "art/world/mask-grime-spatter.webp": "1ffdb30c0b4684c93c9696a8a1957ef232e70f1cb24f2639c407f54572fa0e79",
+    "art/world/poster-trials-night.webp": "be7251ac3acc36d455136c9f34a8ae779c959da089564c692713465717fb6a14",
+    "art/world/poster-tyres.webp": "9fe1b890bc51d033ccab0c1bf55584880adc8980116098b33189b2f89e4bcb4d",
+    "art/world/sign-hard-hat.webp": "b710c9868379ee3d7323c9dec0f575cc9101f123ec78a7311adc25f09f35086f",
+    "art/world/sign-overhead-crane.webp": "ebba5c576c4b32c52d46f3d0dfcb7afbd638b4fc156673bda1c596086c0f29ed",
+    "art/world/sign-forklift.webp": "674eadbd3dbe9b0f58e11d8c446e743abf69f00bb960b5471323023d9c8fe76e",
+    "art/world/sign-exit.webp": "160bed9f19c006c3070a0a16260d9b75d044a9fe01e87c632ebb733229639825",
+    "art/world/graffiti-rise.webp": "b3b865f7e8c3dafc50bb886ec71ed14abaa0c5fcabca7062ee6cf58dfd77b484",
+    "art/world/graffiti-grind.webp": "1f75a1ce90f7d5393b39796b2dd12341b4d3258e08e3aa0e6f3bd1695bc2b01f",
+    "art/world/graffiti-skull.webp": "b10d2418cc34353f13e037c65ce7e78eccefda003b7f710e3770bf15ce29b449",
+    "art/world/graffiti-nofear.webp": "672578e679a1a2044de87f234a8edf3e6a43b07d80dbf915332841cd1c905c1a",
+    "art/world/graffiti-wheel.webp": "1a1b02decbaa81fecdfbf4c827a9b5e0cce8817de37ed142cc29bbbdbd517a2f",
+    "art/world/graffiti-tag-wall.webp": "d9f5531e47b1799133aa17d0a9de66356f3d66e44cf38ac07d892433833c1e5d"
+  },
+  "physics": "v2",
+  "hz": 120,
+  "fps": 30,
+  "from": 180,
+  "to": 840,
+  "frames": 165,
+  "prefixRendered": true,
+  "renderAlpha": 1,
+  "quality": "high",
+  "outfit": "street",
+  "graphics": {
+    "requestedBackend": "metal",
+    "launchArgs": [
+      "--use-angle=metal",
+      "--enable-webgl",
+      "--ignore-gpu-blocklist",
+      "--mute-audio"
+    ],
+    "browser": "chromium",
+    "browserVersion": "151.0.7922.34",
+    "chromium": "151.0.7922.34",
+    "hostPlatform": "darwin",
+    "vendor": "Google Inc. (Apple)",
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36",
+    "renderSettings": {
+      "prepare": [],
+      "biome": "industrial",
+      "zoom": "idle",
+      "occluder": {
+        "ms": 0,
+        "tested": 0,
+        "hits": 0,
+        "count": 5,
+        "override": null
+      },
+      "garage": {
+        "on": false,
+        "draws": 0,
+        "hidden": 0,
+        "textureMB": 0,
+        "reflection": false
+      },
+      "phase": "menu",
+      "tier": "high",
+      "dpr": 1,
+      "devicePixelRatio": 1,
+      "canvasW": 1280,
+      "canvasH": 720,
+      "calls": 602,
+      "tris": 462822,
+      "rtMpx": 10.34,
+      "rtMB": 84.1,
+      "rtPasses": "shadow 2048\u00d72048 | scene:hdr 1280\u00d7720 | ao 640\u00d7360 | ao:blur 640\u00d7360 | bloom:bright 640\u00d7360 | bloom:h0 640\u00d7360 | bloom:v0 640\u00d7360 | bloom:h1 320\u00d7180 | bloom:v1 320\u00d7180 | bloom:h2 160\u00d790 | bloom:v2 160\u00d790 | bloom:h3 80\u00d745 | bloom:v3 80\u00d745 | bloom:h4 40\u00d723 | bloom:v4 40\u00d723 | bloom:composite 640\u00d7360 | composite:graded 1280\u00d7720 | smaa:edges 1280\u00d7720 | smaa:weights 1280\u00d7720 | smaa\u2192canvas 1280\u00d7720",
+      "shadowMap": 2048,
+      "heroTris": 92171,
+      "heroDoc": "bike rider",
+      "riderOutfit": "street-mustard",
+      "riderMaterialVariant": null,
+      "heroShadow": "world",
+      "trackCalls": 9,
+      "trackTris": 48516,
+      "textureGenMs": 0,
+      "passes": 19,
+      "stalePrograms": 0,
+      "stabilized": {
+        "singlePass": 4,
+        "split": 51,
+        "depth": 377
+      },
+      "skippedFrames": 0,
+      "deviceClass": "desktop",
+      "profile": "high",
+      "bloomers": 0,
+      "entryMs": 363.1,
+      "entry": {
+        "biome": "industrial",
+        "ms": 363.1,
+        "compileMs": 108.88000082969666,
+        "textureMs": 31.669999837875366,
+        "warmMs": 9.6,
+        "textures": 36,
+        "texturesMB": 57.4,
+        "materials": 68,
+        "programs": 29,
+        "programsBefore": 20
+      },
+      "heroSwap": {
+        "loads": [
+          {
+            "url": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
+            "bytes": 870440,
+            "fetchMs": 188.1050000190735,
+            "parseMs": 112.82500004768372,
+            "prepareMs": 0.47499990463256836,
+            "at": 91.42499995231628
+          },
+          {
+            "url": "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb",
+            "bytes": 864848,
+            "fetchMs": 188.625,
+            "parseMs": 120.26500010490417,
+            "prepareMs": 0.2049999237060547,
+            "at": 91.61500000953674
+          },
+          {
+            "url": "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb",
+            "bytes": 1480204,
+            "fetchMs": 189.79500007629395,
+            "parseMs": 124.44000005722046,
+            "prepareMs": 0.559999942779541,
+            "at": 91.52999997138977
+          },
+          {
+            "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb",
+            "bytes": 1753256,
+            "fetchMs": 192.93499994277954,
+            "parseMs": 123.47000002861023,
+            "prepareMs": 0.16000008583068848,
+            "at": 91.67499995231628
+          },
+          {
+            "url": "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb",
+            "bytes": 1706124,
+            "fetchMs": 195.59499979019165,
+            "parseMs": 122.6100001335144,
+            "prepareMs": 0.1099998950958252,
+            "at": 91.75500011444092
+          },
+          {
+            "url": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
+            "bytes": 2283040,
+            "fetchMs": 203.4800000190735,
+            "parseMs": 124.66000008583069,
+            "prepareMs": 0.10500001907348633,
+            "at": 90.75999999046326
+          },
+          {
+            "url": "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb",
+            "bytes": 3015120,
+            "fetchMs": 219.22500014305115,
+            "parseMs": 119.49000000953674,
+            "prepareMs": 0.15999984741210938,
+            "at": 91.49499988555908
+          },
+          {
+            "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb",
+            "bytes": 3616252,
+            "fetchMs": 228.07500004768372,
+            "parseMs": 119.0699999332428,
+            "prepareMs": 0.17499995231628418,
+            "at": 91.64499998092651
+          },
+          {
+            "url": "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb",
+            "bytes": 2270544,
+            "fetchMs": 191.8550000190735,
+            "parseMs": 163.52499985694885,
+            "prepareMs": 0.10000014305114746,
+            "at": 91.57500004768372
+          },
+          {
+            "url": "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb",
+            "bytes": 3486940,
+            "fetchMs": 230.3899998664856,
+            "parseMs": 136.67500019073486,
+            "prepareMs": 0.14499998092651367,
+            "at": 91.71000003814697
+          },
+          {
+            "url": "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb",
+            "bytes": 2448152,
+            "fetchMs": 237.17499995231628,
+            "parseMs": 141.4150002002716,
+            "prepareMs": 0.15999984741210938,
+            "at": 91.79999995231628
+          },
+          {
+            "url": "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb",
+            "bytes": 946824,
+            "fetchMs": 250.33000016212463,
+            "parseMs": 139.41499996185303,
+            "prepareMs": 0.08999991416931152,
+            "at": 91.83999991416931
+          },
+          {
+            "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb",
+            "bytes": 912696,
+            "fetchMs": 255.3199999332428,
+            "parseMs": 135.9800000190735,
+            "prepareMs": 0.04499983787536621,
+            "at": 91.90000009536743
+          },
+          {
+            "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb",
+            "bytes": 2355380,
+            "fetchMs": 284.8400001525879,
+            "parseMs": 125.52999997138977,
+            "prepareMs": 0.125,
+            "at": 91.86999988555908
+          }
+        ],
+        "swaps": []
+      },
+      "entering": false,
+      "retirement": {
+        "requested": 4,
+        "released": 4,
+        "deferred": 0,
+        "pending": 0,
+        "maxPending": 0,
+        "contextLosses": 0
+      },
+      "terminalPrograms": {
+        "deleted": 0,
+        "contextReleased": 0
+      },
+      "art": {
+        "settled": true,
+        "ok": true,
+        "loadMs": 380,
+        "deliveredMB": 1.11,
+        "inWorld": true,
+        "trackComplete": true,
+        "trackIds": 28,
+        "builtAtFrame": 0,
+        "frames": 0
+      }
+    }
+  },
+  "errors": [],
+  "review": {
+    "status": "not accepted; further cloth and handling fixes in progress",
+    "method": "parent inspected sequential samples from an input-driven capture; not human continuous playback",
+    "framesReviewed": [
+      10,
+      34,
+      56,
+      96,
+      117,
+      130
+    ],
+    "findings": [
+      "Seated neutral and distinct raised/forward posture are visible.",
+      "Half forward has a pointed shoulder seam at frame34; full forward has bulky/pinched elbow folds at frame56.",
+      "Back lean no longer shows the previous deep rear-fender intersection at the ordinary held angle. This does not prove dynamic clearance for all states/outfits.",
+      "Fast back-to-forward reversal visibly pitches the bike and lifts its rear wheel. Physics state is not visually clamped."
+    ],
+    "next": "Re-record after the renderer neck-weight fix and final physical support retune; review all outfits and both classes."
+  },
+  "measured": {
+    "faultFrames": 0,
+    "maxGripErrorM": 7.486389960446704e-07,
+    "maxSoleErrorM": 5.962171473710995e-07
+  }
+}

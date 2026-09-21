@@ -38,8 +38,76 @@ accept the existing poses or narrow the completion bar.
 Baseline: `pnpm exec vitest run src/render/hero/gltfRiderPhysical.test.ts src/render/hero/gltfRiderStance.test.ts
 src/render/hero/gltfRiderAdditive.test.ts src/physics/v2/r9.test.ts` (4 files, 121 tests, passed).
 
-Next: resolve the requested user decisions; measure current poses/COM/reach/seat and crash handoff; capture
-headless baseline motion; update implementation steps without dropping any of the six required behaviors.
+This audit records the starting build. User decisions are resolved and the implementation below supersedes
+its next steps, while preserving all six required behaviors.
+
+## Active implementation — ask 73
+
+Decisions resolved: **forward lean first**, style grounded in **Evolution / Fusion / Rising**, physics changes
+authorized. [Research](../research/riding-poses-trials.md) includes primary developer/manual/tutorial sources and
+timestamped sequences from the local recorded-play corpus. Their common cue is substantial whole-body movement:
+pelvis off the saddle and chest over the bars, rearward compression, then extension. Numerical targets below are
+our geometry requirements, not purported measurements of the reference games.
+
+[Current-geometry evidence](../evidence/riding-poses/current-geometry/README.md) measures all ten shipped rider
+assets on both classes: visible forward rise is only 12.5 cm; neutral head/sensor mismatch is 21.3 cm; half-back
+input leaves the visible rider seated while the physical COM shifts 15 cm. Existing physics baseline is 106/106.
+
+1. **Shared geometry and handling (implemented, qualification in progress):** one segment-mass map for servo targets, contact anchors,
+   sensor chain, ragdoll spawn and render. Neutral stays seated; rearward motion clears the seat before lowering;
+   forward rises at least 15 cm and moves the chest forward. Reach remains a physical constraint, with explicit
+   fault/release when exceeded. Retune force, response, hop, brake and landing without weakening handling bars.
+2. **Runtime rig (implemented, appearance review in progress):** use the shared physical COM/angle and fixed bone lengths; remove the authored
+   stance dead zone and draw-only excursion clipping. Preserve the authored garage display. Verify actual posed
+   bone matrices and skinned surfaces, not renderer debug claims or the authored clips alone.
+3. **Contacts and cloth:** both classes × five outfits × full/LOD, through neutral/forward/back, rapid reversals,
+   hops, flat/sloped impacts, crash and restart. Contacts must remain within the existing 2 cm ordinary-riding
+   bar, with tighter numerical checks wherever reachable; no scaling limbs or hiding the physical excursion.
+   Review shoulders, hood, elbow fold, waist, boots and bike intersections in the actual runtime garment.
+4. **Handling and evidence:** refresh affected goldens only from real clears; exact browser/node replay including
+   finish time; bot and fresh strangers on b1–e3 (at least two independent sessions per track); record attempts,
+   failures and restart latency. Preserve unsuccessful runs in the evidence. Run the full ship gate every third
+   implementation round and before final delivery. Test desktop Chromium and headless WebKit phone geometry.
+5. **Completion audit:** every required-behavior checkbox below needs its own evidence, including parent review
+   of input-driven moving sequences. Geometry tests and stills do not close appearance or cloth. No old evidence
+   is relabeled as verification of the new physics. Actual iPhone claims require an actual device reading.
+
+Round 1 (`4fa79c3e`) separately addresses ask 74's pixelation with HDR/SMAA and repairs Snow Line's missing
+obstacle batch; [evidence](../evidence/render-aa/round1/README.md). It does not close any pose requirement.
+
+## Current qualification findings — round 2, not completion
+
+Latest frozen simulation: `1255af7f`. The final one-sided support and suspension
+closure fixes invalidate earlier `ae2c0bca` golden/stranger qualification. Eight of
+48 old controls still clear; the remainder require fresh played controls. Final
+qualification lives in `qualification-round3/`, `goldens-round3/` and
+`strangers-round3/` under the riding-poses evidence directory. Earlier numbers below
+are explicitly historical where source hashes differ.
+
+The Race sleeve collapse was traced to directed arm-plane twists and corrected with
+a continuous bounded alignment plus anatomical elbow skin conditioning. The strict
+cloth/physical/release suite passes 94/94; all-outfit played appearance review remains
+a separate requirement. The parent reviewed the latest Race forward/back sequence
+without the previously rejected outer-arm craters.
+
+- One physical segment/mass model now drives servo targets, anatomy, sensors, render and crash spawn.
+  Forward hips rise 20.8 cm from the neutral target; rearward input has no authored-clip dead zone.
+  Real hands/soles and snapshot restoration have independent actual-GLB coverage on both classes.
+- Continuous rear-to-forward transfer and landing compliance preserve the positive hop, mild-impact,
+  air-control, equilibrium, conservation and handling requirements. Obsolete assertions that required
+  a bad response were reviewed explicitly in [handling-review.md](../evidence/riding-poses/handling-review.md);
+  the new positive bars were not lowered.
+- Fresh input-only production recordings produce 0.477 m Rookie / 0.501 m Pro rear-wheel hop height,
+  actual crashes, and one-input-tick restart. Recorded Node snapshots match byte for byte.
+- Twenty outfit/detail/class transition playbacks (1,700 actual-skin samples) retain at least 8.197 mm
+  sampled rear-fender clearance. Parent still rejected the Race sleeve surface in fresh forward motion;
+  neither bone agreement nor triangle strain closes clothing.
+- Exact CPU optimizations preserve 21,936 recorded full snapshots. R5 5.042µs and R3 5.861µs remain
+  over their unchanged 5µs timing bar on this shared host. All 47 old golden recordings became stale;
+  fresh bot searches and browser finish-clock verification are underway. No old clear is relabeled.
+- Typecheck/build pass. Full lint also finds preexisting errors in art/offline evidence scripts; new
+  evidence-script lint errors are being removed. Full fresh suite, strangers, ship gate and garment
+  completion review are still required.
 
 ## Historical starting point (R9, `f00724e`)
 

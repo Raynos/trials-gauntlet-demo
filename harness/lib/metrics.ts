@@ -128,8 +128,8 @@ export function gitHead(): string {
  * comparable.
  *
  * Round 12 (harness-metrics.md Round 11 open item): the hash covers only what the sim IMPORTS —
- * `src/physics/**`, `src/tracks/**`, `src/game/rules.ts` and the three runtime core modules
- * (`hash.ts`, `replay.ts`, `rng.ts`). Not `src/core/types.ts` / `global.d.ts` / `loop.ts` /
+ * `src/physics/**`, `src/tracks/**`, `src/game/rules.ts` and the runtime core modules
+ * (`hash.ts`, `replay.ts`, `rng.ts`, `riderGeometry.ts`). Not `src/core/types.ts` / `global.d.ts` / `loop.ts` /
  * `index.ts`: a hook-interface type (cfc98f8) cannot change a physics result, yet it restamped
  * 36 goldens and 22 stranger sessions stale in round 11. `.test.ts` and `.d.ts` are skipped.
  * `SIM_IDENTICAL_STAMPS` lists earlier stamps PROVEN sim-identical to the current one (a golden
@@ -137,7 +137,7 @@ export function gitHead(): string {
  * consumer uses, so a change of the hashed set never orphans a proven session.
  */
 export const SIM_FINGERPRINT_DIRS = ['src/physics', 'src/tracks'] as const;
-export const SIM_FINGERPRINT_FILES = ['src/game/rules.ts', 'src/core/hash.ts', 'src/core/replay.ts', 'src/core/rng.ts'] as const;
+export const SIM_FINGERPRINT_FILES = ['src/game/rules.ts', 'src/core/hash.ts', 'src/core/replay.ts', 'src/core/rng.ts', 'src/core/riderGeometry.ts'] as const;
 /**
  * current fingerprint -> earlier stamps proven identical. `6412a755` was the round-12 stamp of this
  * same tree under the old hash (all of src/core): 19/19 Rookie goldens node == browser, the same

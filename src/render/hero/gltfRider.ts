@@ -27,8 +27,8 @@ import type { MaterialLibrary } from '../materials/library';
 import { newChain, solveChain, type Chain } from '../rider/riderModel';
 import { countTriangles, prepareHeroMaterials } from './gltf';
 import { makeRiderRigPose, riderRigFromCOM, RIDER_PROFILE, RIDER_TORSO_REST } from './riderRig';
+import { conditionSleeveSkin } from './sleeveSkin';
 import { clipWindows, type ClipWindow } from './clipAliases';
-import { DRAWN, DRAWN_SEAT } from '../../physics/v2/rider';
 
 const SHIFT = 0.65; // axle-midpoint frame → file frame (rear axle origin)
 /** Landing squash weight from the summed grounded compression: 0 at the ridden sag, `max` at sag + span. */
@@ -47,39 +47,6 @@ const STAGE_CLIP = 'sit_cruise';
 const STAGE_BLEND_S = 0.25;
 /** The sole socket rests 11 mm above the peg axis (RIG_CONTRACT.md), in the bike frame. */
 const SOLE_ON_PEG = { x: RIDER_PROFILE.peg.x, y: RIDER_PROFILE.peg.y + 0.011, z: RIDER_PROFILE.peg.z };
-/**
- * Ask 51 step 3 (docs/plans/RIDING_POSES.md): in level the BASE pose is Astra's authored stances, selected and blended
- * by the physics — `riderBody.drawn` (R9's seated / forward / back id + blend) picks between `sit_cruise`,
- * `forward_attack` and `hang_back`; the suspension load (`LAND`) blends toward `landing_absorption`'s absorbed hold
- * and the body's rise (`EXTEND`) toward `extension`'s; every intermediate is a slerp between authored on-grip poses.
- * The physical body's own excursion (its height below / above the drawn table, its torso lag) is added, clamped, and
- * then limited to the arms' / legs' reach. IK is only the bounded correction that puts the sockets back on the grips
- * and pegs, with each elbow / knee pole taken from the blended clip's own elbow / knee — never a fixed direction, never
- * inverted. Before this (cb9ab93) the base was the mass map's inverse of the standing servo body with a fixed
- * forward/up/out elbow pole: hands 16.8 cm off the grips and elbows above the shoulders on 77 % of the b1 golden
- * (docs/evidence/hero-art/pose-compare/trace-before.json).
- */
-const STANCE_CLIPS = {
-  seated: { source: 'sit_cruise', t: 0 }, // a static hold (0.000 mm over 1.967 s)
-  forward: { source: 'forward_attack', t: 1.75 }, // held 1.5–2.0 s (0.0 cm joint travel)
-  back: { source: 'hang_back', t: 1.75 }, // held 1.5–2.0 s
-  land: { source: 'landing_absorption', t: 2.5 }, // absorbed hold 2.5–2.75 s
-  extend: { source: 'extension', t: 2.25 }, // extended hold 2.25–2.5 s
-} as const;
-type StanceId = keyof typeof STANCE_CLIPS;
-/**
- * Ask 51 round 2: the drawn table's lean blend is NOT the stance weight. The bot rides b1 holding half back lean on
- * 53 % of the rookie golden (input −63/127) and full on 24 %, so physics reports `back` on 90 % of frames and its
- * seated id on 11 % — at half lean the drawn hips (x −0.52) are still on the seat (`DRAWN_SEAT` rear edge −0.54), and
- * drawing `hang_back` at 50 % there perched the rider behind the seat. The stance weight is how far the drawn hips
- * are OFF the seat: for `back` the x behind the seat's rear edge up to the full back row (leaves the seat at lean
- * 0.556); for `forward` the rise above the seated hip height past `SEAT_RISE` up to the forward row. The seated
- * clip holds while physics says the pelvis is on the seat; the excursion (`dy`, `lag`) still reads the raw table.
- */
-const SEAT_RISE = 0.03;
-/** The physical excursion drawn on top of the stance: hips ±12 cm, torso ±20° — then the reach limit. */
-const EXCURSION = { dy: 0.12, lag: 0.35 };
-const Z_AXIS = new THREE.Vector3(0, 0, 1);
 /** Bones the arm IK owns; additive clips leave them alone so the hands stay on the grips. */
 const ARM_CHAIN = /^(shoulder|upperArm|forearm|hand)\./;
 const ORDER = ['pelvis', 'spine', 'chest', 'neck', 'head', 'shoulder.L', 'upperArm.L', 'forearm.L', 'hand.L', 'shoulder.R', 'upperArm.R', 'forearm.R', 'hand.R', 'thigh.L', 'shin.L', 'foot.L', 'thigh.R', 'shin.R', 'foot.R'] as const;
@@ -130,7 +97,9 @@ export class GltfRider {
   readonly root = new THREE.Group();
   readonly triangles: number;
   readonly materials: THREE.MeshStandardMaterial[];
-  readonly debug = { armStretch: [1, 1], legStretch: [1, 1], handOnGrip: [true, true], wristErr: [0, 0], gripErr: [0, 0], gripAngleErr: [0, 0], ankleErr: [0, 0], armLen: [0, 0], additiveWeight: 1, physicalPose: false, comResidual: 0, ragdollResidual: -1, ragdollBlend: 0, ragdollDetail: [] as string[], bones: 0, clips: [] as string[], stageClip: null as string | null, stageBlend: 0, soleErr: [0, 0], stance: { on: false, pose: 'seated' as 'seated' | 'back' | 'forward', blend: 0, lean: 0, land: 0, extend: 0, dy: 0, lag: 0, limit: 1 } };
+  private readonly releaseSleeveGeometry: (() => void)[] = [];
+  private readonly sleeveGeometry: { mesh: THREE.SkinnedMesh; authored: THREE.BufferGeometry; riding: THREE.BufferGeometry }[] = [];
+  readonly debug = { armStretch: [1, 1], legStretch: [1, 1], handOnGrip: [true, true], footOnPeg: [true, true], wristErr: [0, 0], gripErr: [0, 0], gripAngleErr: [0, 0], ankleErr: [0, 0], armLen: [0, 0], additiveWeight: 1, physicalPose: false, comResidual: 0, ragdollResidual: -1, ragdollBlend: 0, ragdollDetail: [] as string[], bones: 0, clips: [] as string[], stageClip: null as string | null, stageBlend: 0, soleErr: [0, 0], stance: { on: false, pose: 'seated' as 'seated' | 'back' | 'forward', blend: 0, lean: 0, land: 0, extend: 0, dy: 0, lag: 0, limit: 1 } };
   private readonly scene: THREE.Object3D;
   private readonly bones = new Map<string, THREE.Bone>();
   private readonly q0 = new Map<string, THREE.Quaternion>();
@@ -157,14 +126,22 @@ export class GltfRider {
   private readonly gripRestQ = [new THREE.Quaternion(), new THREE.Quaternion()];
   private readonly wristTarget = new THREE.Vector3();
   private readonly physicalRig = makeRiderRigPose();
-  /** Ragdoll hand-over (round 9): last posed bone-local quaternions + pelvis world pose, blended out over 2–5 frames. */
-  private readonly handover = { q: new Map<string, THREE.Quaternion>(), pelvisQ: new THREE.Quaternion(), pelvisP: new THREE.Vector3(), t0: -1, dur: 0, active: false };
+  /** Authored sleeve roll is retained while IK owns every joint position and segment length. */
+  private readonly sleeveReferences = new Map<string, [THREE.Quaternion, THREE.Quaternion, THREE.Quaternion]>();
+  private readonly sleeveAxis = new THREE.Vector3();
+  private readonly sleeveCross = new THREE.Vector3();
+  private readonly sleeveNormalRef = new THREE.Vector3();
+  private readonly sleeveNormalTarget = new THREE.Vector3();
+  private readonly sleeveProjectedTarget = new THREE.Vector3();
+  private sleeveBlend = 0;
+  private sleevePose = 1;
+  private useSleeveRoll = false;
+  /** The 2D ragdoll retains the visible limb's lateral articulation and twist at release. */
+  private readonly released = new Map<string, { direction: THREE.Vector3; world: THREE.Quaternion; local: THREE.Quaternion; planarOffset: number }>();
   /** Ask 51: the garage stage (`setStage`) and the bone-local snapshot the physics pose blends out of on leaving it. */
   private stage = false;
   private readonly stageBlend = { q: new Map<string, THREE.Quaternion>(), p: new Map<string, THREE.Vector3>(), t: 0, active: false };
   private readonly soleSockets: (THREE.Object3D | null)[] = [null, null];
-  /** Ask 51: the authored stance holds, bone-local (`STANCE_CLIPS`); null when the file lacks any of them (the mass-map path then). */
-  private readonly stances: Record<StanceId, { q: Map<string, THREE.Quaternion>; p: Map<string, THREE.Vector3> }> | null;
   private armQ = new THREE.Quaternion();
   private readonly armInv = new THREE.Matrix4();
   private readonly chain = newChain();
@@ -198,6 +175,11 @@ export class GltfRider {
     this.scene.traverse((o) => {
       const m = o as THREE.Mesh;
       if (!m.isMesh) return;
+      if ((m as THREE.SkinnedMesh).isSkinnedMesh) {
+        const mesh = m as THREE.SkinnedMesh, authored = mesh.geometry;
+        this.releaseSleeveGeometry.push(conditionSleeveSkin(mesh));
+        this.sleeveGeometry.push({ mesh, authored, riding: mesh.geometry });
+      }
       const src = m.material as THREE.Material;
       let c = matMap.get(src);
       if (!c) {
@@ -267,7 +249,7 @@ export class GltfRider {
       }
     }
     for (const name of ORDER) {
-      this.handover.q.set(name, new THREE.Quaternion());
+      this.released.set(name, { direction: new THREE.Vector3(), world: new THREE.Quaternion(), local: new THREE.Quaternion(), planarOffset: 0 });
       this.stageBlend.q.set(name, new THREE.Quaternion());
       this.stageBlend.p.set(name, new THREE.Vector3());
     }
@@ -281,6 +263,25 @@ export class GltfRider {
       this.clips.set(name, sampler(byName.get(w.source)!, w));
       this.debug.clips.push(name);
     }
+    const referenceScene = cloneSkeleton(gltf.scene);
+    const referenceBones = new Map<string, THREE.Bone>();
+    referenceScene.traverse(o => { if ((o as THREE.Bone).isBone) referenceBones.set(boneName(o.name), o as THREE.Bone); });
+    const mixer = new THREE.AnimationMixer(referenceScene);
+    for (const [index, clipName] of ['sit_cruise', 'hang_back', 'forward_attack'].entries()) {
+      const clip = byName.get(clipName);
+      if (!clip) continue;
+      mixer.stopAllAction();
+      mixer.clipAction(clip).play(); mixer.setTime(1.75);
+      referenceScene.updateMatrixWorld(true);
+      for (const name of ['upperArm.L', 'upperArm.R', 'forearm.L', 'forearm.R']) {
+        const bone = referenceBones.get(name);
+        if (!bone) continue;
+        const refs = this.sleeveReferences.get(name) ?? [new THREE.Quaternion(), new THREE.Quaternion(), new THREE.Quaternion()];
+        bone.getWorldQuaternion(refs[index]!).normalize();
+        this.sleeveReferences.set(name, refs);
+      }
+    }
+    mixer.stopAllAction(); mixer.uncacheRoot(referenceScene);
     // These are full pose clips, with crouch/extension as their opening poses. Subtracting those
     // openings adds a whole crouch->extension or extension->landing transition to an unrelated
     // live pose. Both layers need the same neutral reference; idle keeps its authored zero frame.
@@ -299,36 +300,6 @@ export class GltfRider {
         if (pelvis && reference) pelvis.rest.copy(reference.rest);
       }
     }
-    this.stances = this.sampleStances();
-  }
-
-  /** Every stance hold sampled once, bone-local, from the whole-clip samplers (`clipWindows` passes every authored clip through under its own name). */
-  private sampleStances(): Record<StanceId, { q: Map<string, THREE.Quaternion>; p: Map<string, THREE.Vector3> }> | null {
-    const out = {} as Record<StanceId, { q: Map<string, THREE.Quaternion>; p: Map<string, THREE.Vector3> }>;
-    for (const id of Object.keys(STANCE_CLIPS) as StanceId[]) {
-      const { source, t } = STANCE_CLIPS[id];
-      const s = this.clips.get(source);
-      if (!s || !s.pos.has('pelvis')) return null;
-      const tt = Math.min(t, s.duration - 1e-4);
-      const q = new Map<string, THREE.Quaternion>();
-      const p = new Map<string, THREE.Vector3>();
-      for (const name of ORDER) {
-        const r = s.rot.get(name);
-        if (!r) return null;
-        const v = r.interp.evaluate(tt) as Float32Array;
-        q.set(name, new THREE.Quaternion(v[0], v[1], v[2], v[3]).normalize());
-        // Only the pelvis carries its authored translation; every other joint keeps its bind offset. Astra's spine
-        // socket sits 4.9 mm off its bind offset in every clip, and the WebKit hero gate reads any non-pelvis
-        // bone-local translation as accumulation (`hero-webkit.mts` drift floor 0.5 mm) — so the in-level stance
-        // draws the clip's rotations on the bind skeleton (torso joints ≤ 5 mm off the mixer's evaluation, hands and
-        // soles exact through the IK); the garage stage (`poseStage`) plays the file whole, as the prototype did.
-        const pt = name === 'pelvis' ? s.pos.get(name) : undefined;
-        const pv = pt ? (pt.interp.evaluate(tt) as Float32Array) : null;
-        p.set(name, pv ? new THREE.Vector3(pv[0], pv[1], pv[2]) : this.restLocalP.get(name)!.clone());
-      }
-      out[id] = { q, p };
-    }
-    return out;
   }
 
   /** Ask 43: the outfit is the file (`urls.ts`); the kit's per-class livery is a no-op on the glTF rider. */
@@ -354,6 +325,7 @@ export class GltfRider {
   setStage(on: boolean): void {
     if (this.stage === on) return;
     this.stage = on;
+    for (const item of this.sleeveGeometry) item.mesh.geometry = on ? item.authored : item.riding;
     const B = this.stageBlend;
     if (on || !this.clips.has(STAGE_CLIP)) {
       B.active = false;
@@ -415,6 +387,7 @@ export class GltfRider {
           this.bike.frame.worldToLocal(this.va);
           d.soleErr[i] = +this.va.distanceTo(this.vb.set(SOLE_ON_PEG.x, SOLE_ON_PEG.y, sign * SOLE_ON_PEG.z)).toFixed(4);
           d.ankleErr[i] = d.soleErr[i]!;
+          d.footOnPeg[i] = d.soleErr[i]! < .001;
         }
       }
     }
@@ -468,39 +441,52 @@ export class GltfRider {
       this.pushT = -1;
     }
     if (f.ragdoll && f.ragdoll.length > 0) {
+      this.stageBlend.active = false;
+      this.debug.stageBlend = 0;
+      this.debug.physicalPose = false;
+      this.debug.stance.on = false;
+      this.debug.handOnGrip.fill(false);
+      this.debug.footOnPeg.fill(false);
       if (!this.inRagdoll) {
-        // Hand-over (round 9): snapshot the last posed pose — bone-local quaternions (frame
-        // independent) and the pelvis' world pose (its parent changes frame) — before the
-        // re-parent, then blend it out over 2–5 frames by the pelvis residual.
-        const H = this.handover;
+        // The frozen physical body is the actual spawn pose, including this tick's motion.
+        // Reconstruct it before detaching; the previous frame carried by the moving bike is
+        // not a valid spawn endpoint. No temporal pose blend hides a geometry discontinuity.
+        if (f.riderBody.present && this.bike) this.poseFromChain(this.chainFromBody(f));
+        this.scene.updateWorldMatrix(true, true);
         for (const name of ORDER) {
-          const b = this.bones.get(name);
-          if (b) H.q.get(name)!.copy(b.quaternion);
+          const bone = this.bones.get(name), saved = this.released.get(name)!;
+          if (!bone) continue;
+          bone.getWorldQuaternion(saved.world);
+          saved.direction.set(0, 1, 0).applyQuaternion(saved.world);
+          saved.local.copy(bone.quaternion);
+          const bodyId = name === 'spine' || name === 'chest' ? 'torso'
+            : name === 'neck' ? 'head' : name.split('.')[0];
+          const body = f.ragdoll.find(b => b.id === bodyId);
+          // The real GLB's hip socket is offset from the planar pelvis center.
+          // Preserve that articulated direction at release, then follow the
+          // ragdoll body's angular displacement, rather than snapping it onto
+          // the center-to-center segment's slightly different absolute angle.
+          const down = /^(upperArm|forearm|thigh|shin)\./.test(name);
+          saved.planarOffset = body ? Math.atan2(saved.direction.y, saved.direction.x)
+            - (body.angle + (down ? -Math.PI / 2 : Math.PI / 2)) : 0;
         }
         const pelvis = this.bones.get('pelvis');
-        if (pelvis && !f.cut) {
-          pelvis.updateWorldMatrix(true, false);
-          pelvis.getWorldQuaternion(H.pelvisQ);
-          pelvis.getWorldPosition(H.pelvisP);
-          const pb = f.ragdoll.find((b) => b.id === 'pelvis');
-          const residual = pb ? Math.hypot(pb.pos.x - H.pelvisP.x, pb.pos.y - H.pelvisP.y) : 0;
-          this.debug.ragdollResidual = +residual.toFixed(3);
-          // Round 10: physics' crash chain is now a port of pose.ts (residual ≤ 1 cm on flat-test), so the hand-over is a fixed 2-frame slerp; anything longer read as the rider sliding into the ragdoll.
-          const frames = residual < 0.25 ? 2 : 3;
-          H.dur = frames / 60;
-          H.t0 = f.tSim;
-          H.active = true;
-        } else H.active = false;
+        if (pelvis) {
+          pelvis.getWorldPosition(this.va);
+          const pb = f.ragdoll.find(b => b.id === 'pelvis');
+          this.debug.ragdollResidual = pb ? Math.hypot(pb.pos.x - Math.sin(pb.angle) * .08 - this.va.x, pb.pos.y + Math.cos(pb.angle) * .08 - this.va.y) : 0;
+        }
+        this.debug.ragdollBlend = 1;
         this.root.add(this.scene);
         this.scene.position.set(0, 0, 0);
         this.inRagdoll = true;
       }
       this.poseRagdoll(f.ragdoll);
-      this.blendHandover(f.tSim);
+      this.debug.handOnGrip.fill(false);
+      this.debug.footOnPeg.fill(false);
       return;
     }
     if (this.inRagdoll && this.bike) this.attach(this.bike);
-    this.handover.active = false;
     // Exported clips contain translations on the shoulders as well as the pelvis. A clip is a
     // delta from this frame's base pose, never from the previous frame: accumulating a sub-mm
     // breathing key moved the shoulders 27 cm in a minute, even while handOnGrip stayed true.
@@ -510,15 +496,16 @@ export class GltfRider {
     this.debug.physicalPose = f.riderBody.present && this.gripSockets.every(Boolean) && this.bike !== null;
     this.debug.stance.on = false;
     if (this.debug.physicalPose) {
-      // Ask 51: the authored stances under the physics' drawn pose; the mass-map inverse of the physical COM only
-      // where no drawn pose reaches the frame (a body injected without one — gltfRiderPhysical.test's E2 window).
-      if (f.riderBody.drawn.present && this.stances) this.poseFromStance(f);
-      else {
-        this.poseFromChain(this.chainFromBody(f));
-        this.debug.additiveWeight = 0;
-      }
+      // The simulated COM and angle define the visible anatomy, contacts and sensors.
+      // No authored-pose dead zone or draw-only reach clamp hides physical motion.
+      this.poseFromChain(this.chainFromBody(f));
+      this.debug.additiveWeight = 0;
+      const lean = f.rider.lean;
+      Object.assign(this.debug.stance, { on: true, pose: lean < 0 ? 'back' : lean > 0 ? 'forward' : 'seated',
+        blend: Math.abs(lean), lean: Math.abs(lean), land: 0, extend: 0, dy: 0, lag: 0, limit: 1 });
       return;
     }
+    this.useSleeveRoll = false;
     const sim = f.riderBody.present;
     // Round 13 (H2): with physics v2 the drawn rider IS the simulated one — `f.rider` is derived
     // by physics from `riderBody` (lean = body x through the pose table, crouch = height below the
@@ -580,103 +567,6 @@ export class GltfRider {
     if (rest > 0.01 || this.landT >= 0 || this.pushT >= 0) this.resolveContacts(c);
   }
 
-  /** The stance weight from the drawn table row at (pose, blend): how far the drawn hips are off the seat (`SEAT_RISE` note). */
-  private stanceWeight(pose: 'seated' | 'back' | 'forward', b: number): number {
-    if (pose === 'seated' || b <= 0) return 0;
-    const N = DRAWN.seated, T = DRAWN[pose];
-    if (pose === 'back') {
-      const hipX = N.hipX + (T.hipX - N.hipX) * b;
-      return Math.max(0, Math.min(1, (DRAWN_SEAT.rearX - hipX) / (DRAWN_SEAT.rearX - T.hipX)));
-    }
-    const rise = (T.hipY - N.hipY) * b - SEAT_RISE;
-    return Math.max(0, Math.min(1, rise / (T.hipY - N.hipY - SEAT_RISE)));
-  }
-
-  /**
-   * The stance base (see the header): seated → lean stance by the drawn blend, then toward the absorbed / extended
-   * holds by the suspension load / body rise; the physical excursion on the pelvis (height) and the spine (torso lag);
-   * the reach limit; then the contact IK with the blended clip's own elbow / knee as each pole.
-   */
-  private poseFromStance(f: RenderFrame): void {
-    const S = this.stances!, d = f.riderBody.drawn, dbg = this.debug.stance;
-    const target = S[d.pose === 'seated' ? 'seated' : d.pose];
-    const b = d.pose === 'seated' ? 0 : Math.max(0, Math.min(1, d.blend));
-    const w = this.stanceWeight(d.pose, b);
-    const load = (f.rear.grounded ? f.rear.compression : 0) + (f.front.grounded ? f.front.compression : 0);
-    const wLand = Math.min(1, Math.max(0, (load - LAND.sag) / LAND.span)) * LAND.max;
-    const wExt = Math.min(1, Math.max(0, (f.riderBody.relUp - EXTEND.v0) / EXTEND.span)) * EXTEND.max;
-    for (const name of ORDER) {
-      const bone = this.bones.get(name);
-      if (!bone) continue;
-      bone.quaternion.copy(S.seated.q.get(name)!);
-      bone.position.copy(S.seated.p.get(name)!);
-      if (w > 0) {
-        bone.quaternion.slerp(target.q.get(name)!, w);
-        bone.position.lerp(target.p.get(name)!, w);
-      }
-      if (wLand > 0.005) {
-        bone.quaternion.slerp(S.land.q.get(name)!, wLand);
-        bone.position.lerp(S.land.p.get(name)!, wLand);
-      }
-      if (wExt > 0.005) {
-        bone.quaternion.slerp(S.extend.q.get(name)!, wExt);
-        bone.position.lerp(S.extend.p.get(name)!, wExt);
-      }
-    }
-    const pelvis = this.bones.get('pelvis')!;
-    this.debug.comResidual = 0; // the drawn body is not the physical body (R9's split): no COM to land on
-    dbg.on = true;
-    dbg.pose = d.pose;
-    dbg.blend = w;
-    dbg.lean = b;
-    dbg.land = +wLand.toFixed(3);
-    dbg.extend = +wExt.toFixed(3);
-    for (const p of this.additiveBasis) {
-      p.baseP.copy(p.bone.position);
-      p.baseQ.copy(p.bone.quaternion);
-    }
-    // The physical body's excursion against R9's drawn table at this blend: its height below / above (the landing
-    // sit, the hop) on the pelvis along the bike's up; its angle behind / ahead (the whip) on the spine about the
-    // bike's z — clamped, and below limited to what keeps every socket in reach.
-    const T = DRAWN[d.pose], N = DRAWN.seated;
-    const dy = Math.max(-EXCURSION.dy, Math.min(EXCURSION.dy, d.hipY - (N.hipY + (T.hipY - N.hipY) * b)));
-    const lag = Math.max(-EXCURSION.lag, Math.min(EXCURSION.lag, d.torso - (N.torso + (T.torso - N.torso) * b) * (Math.PI / 180)));
-    dbg.dy = +dy.toFixed(4);
-    dbg.lag = +lag.toFixed(4);
-    if (dy !== 0) pelvis.position.add(this.vb.set(0, 1, 0).transformDirection(this.armInv).multiplyScalar(dy)); // file up → the pelvis parent's frame
-    if (lag !== 0) {
-      this.refreshWorldQ();
-      this.qa.setFromAxisAngle(Z_AXIS, lag).multiply(this.worldQ.get('spine')!);
-      this.setWorld('spine', this.qa);
-    }
-    // Contact targets (bike frame): the grips and the ankle-on-peg points are the profile's; the poles come from the
-    // blended pose itself once the reach limit has settled it.
-    const c = this.chain;
-    for (let i = 0; i < 2; i++) {
-      const sign = i === 0 ? 1 : -1;
-      c.hand[i]!.set(RIDER_PROFILE.grip.x, RIDER_PROFILE.grip.y, sign * RIDER_PROFILE.grip.z);
-      c.ankle[i]!.set(RIDER_PROFILE.ankle.x, RIDER_PROFILE.ankle.y, sign * RIDER_PROFILE.ankle.z);
-    }
-    this.debug.additiveWeight = 1; // the excursion's surviving share (`limitAdditiveToReach` lowers it only when it must)
-    this.limitAdditiveToReach(c);
-    dbg.limit = this.debug.additiveWeight;
-    const bike = this.bike!;
-    for (let i = 0; i < 2; i++) {
-      const sd = i === 0 ? 'L' : 'R';
-      for (const [bone, out] of [[`upperArm.${sd}`, c.shoulder[i]!], [`forearm.${sd}`, c.elbow[i]!], [`thigh.${sd}`, c.hip[i]!], [`shin.${sd}`, c.knee[i]!]] as const) {
-        const o = this.bones.get(bone)!;
-        o.updateWorldMatrix(true, false);
-        out.setFromMatrixPosition(o.matrixWorld);
-        bike.frame.worldToLocal(out);
-      }
-    }
-    this.refreshWorldQ();
-    for (let i = 0; i < 2; i++) {
-      this.solveArm(c, i, true);
-      this.solveLeg(c, i);
-    }
-  }
-
   private chainFromBody(f: RenderFrame): Chain {
     const bike = this.bike!;
     const cosine = Math.cos(f.bikeAngle), sine = Math.sin(f.bikeAngle);
@@ -688,6 +578,12 @@ export class GltfRider {
     const relative = f.riderBody.relAngle + f.bikeAngle - frameAngle;
     const torso = RIDER_TORSO_REST + Math.atan2(Math.sin(relative), Math.cos(relative));
     const p = riderRigFromCOM(this.va.x, this.va.y, torso, this.physicalRig);
+    this.useSleeveRoll = true;
+    const neutral = RIDER_PROFILE.poses[1];
+    this.sleevePose = p.hips.x < neutral.hipX ? 1 : 2;
+    this.sleeveBlend = Math.max(0, Math.min(1, this.sleevePose === 1
+      ? (neutral.hipX - p.hips.x) / (neutral.hipX - RIDER_PROFILE.poses[0].hipX)
+      : (neutral.torso - p.torsoAngle * 180 / Math.PI) / (neutral.torso - RIDER_PROFILE.poses[2].torso)));
     const c = this.chain;
     c.hips.set(p.hips.x, p.hips.y, 0);
     c.shoulders.set(p.shoulders.x, p.shoulders.y, 0);
@@ -728,7 +624,24 @@ export class GltfRider {
     const q0 = this.q0.get(name);
     if (!d0 || !q0) return;
     this.va.copy(dir).normalize();
-    this.qa.setFromUnitVectors(d0, this.va).multiply(q0);
+    const refs = this.useSleeveRoll ? this.sleeveReferences.get(name) : null;
+    if (refs) {
+      this.qb.copy(refs[0]).slerp(refs[this.sleevePose]!, this.sleeveBlend);
+      this.sleeveAxis.set(0, 1, 0).applyQuaternion(this.qb);
+      this.qa.setFromUnitVectors(this.sleeveAxis, this.va);
+      // A limb's flexion plane, not an independent shortest swing for each segment,
+      // transports the authored sleeve roll. Independent swings can corkscrew the elbow.
+      this.sleeveAxis.copy(this.sleeveNormalRef).applyQuaternion(this.qa);
+      this.sleeveAxis.addScaledVector(this.va, -this.sleeveAxis.dot(this.va)).normalize();
+      this.sleeveProjectedTarget.copy(this.sleeveNormalTarget).addScaledVector(this.va, -this.sleeveNormalTarget.dot(this.va)).normalize();
+      const sine = this.va.dot(this.sleeveCross.crossVectors(this.sleeveAxis, this.sleeveProjectedTarget));
+      const cosine = this.sleeveAxis.dot(this.sleeveProjectedTarget);
+      // Plane normals have no preferred sign. A bounded, continuous alignment
+      // correction preserves the authored roll and vanishes at the ambiguous
+      // perpendicular case; atan2 would turn the sleeve by almost half a turn.
+      const angle = sine * cosine;
+      this.qa.premultiply(this.qc.setFromAxisAngle(this.va, angle)).multiply(this.qb);
+    } else this.qa.setFromUnitVectors(d0, this.va).multiply(q0);
     this.setWorld(name, this.qa);
   }
 
@@ -802,6 +715,14 @@ export class GltfRider {
       this.vc.setFromMatrixPosition(foot.matrixWorld);
       this.bike.frame.worldToLocal(this.vc);
       this.debug.ankleErr[i] = +this.vc.distanceTo(c.ankle[i]!).toFixed(6);
+      const sole = this.soleSockets[i];
+      if (sole) {
+        sole.updateWorldMatrix(true, false);
+        sole.getWorldPosition(this.va);
+        this.bike.frame.worldToLocal(this.va);
+        this.debug.soleErr[i] = this.va.distanceTo(this.vb.set(SOLE_ON_PEG.x, SOLE_ON_PEG.y, (i === 0 ? 1 : -1) * SOLE_ON_PEG.z));
+        this.debug.footOnPeg[i] = this.debug.soleErr[i]! < .001;
+      } else this.debug.footOnPeg[i] = this.debug.ankleErr[i]! < .001;
     }
   }
 
@@ -810,12 +731,10 @@ export class GltfRider {
    * Round 14: also re-run after the additive clips (`refreshWorldQ` first) so the landing squash
    * and hop extension move the torso and legs while the wrists stay on the grips.
    */
-  private solveArm(c: Chain, i: number, keepShoulder = false): void {
+  private solveArm(c: Chain, i: number): void {
     {
       const s = i === 0 ? 'L' : 'R';
-      // Ask 51: on the stance path the shoulder is the blended clip's own (its world rotation is current from
-      // `refreshWorldQ`); the chain paths keep it rigid on the chest.
-      if (!keepShoulder) this.rigid(`shoulder.${s}` as BoneName);
+      this.rigid(`shoulder.${s}` as BoneName);
       // Arms (round 9): two-bone IK in the RIG's bone lengths from the rig's posed shoulder
       // joint to the chain's grip point, with the chain's elbow as the pole — the wrist lands
       // on the grip whenever it is reachable (round 8 aimed the fixed-length bones along the
@@ -836,15 +755,23 @@ export class GltfRider {
         // Pole: the chain elbow's component perpendicular to shoulder→grip.
         const pole = this.ve.subVectors(c.elbow[i]!, S);
         pole.addScaledVector(dir, -pole.dot(dir));
-        if (pole.lengthSq() < 1e-6) pole.set(0, 1, i === 0 ? 0.3 : -0.3);
+        if (pole.lengthSq() < 1e-6) pole.set(0.3, -1, i === 0 ? 0.15 : -0.15);
         pole.normalize();
         const reach = L1 + L2;
         const cosA = d >= reach ? 1 : Math.max(-1, Math.min(1, (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d)));
         const sinA = Math.sqrt(Math.max(0, 1 - cosA * cosA));
         const elbow = this.vf.copy(S).addScaledVector(dir, L1 * cosA).addScaledVector(pole, L1 * sinA);
+        if (this.useSleeveRoll && this.sleeveReferences.has(`upperArm.${s}`) && this.sleeveReferences.has(`forearm.${s}`)) {
+          const upper = this.sleeveReferences.get(`upperArm.${s}`)!;
+          const lower = this.sleeveReferences.get(`forearm.${s}`)!;
+          this.qa.copy(upper[0]).slerp(upper[this.sleevePose]!, this.sleeveBlend);
+          this.qb.copy(lower[0]).slerp(lower[this.sleevePose]!, this.sleeveBlend);
+          this.sleeveNormalRef.crossVectors(this.sleeveAxis.set(0, 1, 0).applyQuaternion(this.qa), this.sleeveCross.set(0, 1, 0).applyQuaternion(this.qb)).normalize();
+          this.sleeveNormalTarget.crossVectors(this.sleeveAxis.subVectors(elbow, S), this.sleeveCross.subVectors(grip, elbow)).normalize();
+        }
         this.aim(`upperArm.${s}` as BoneName, this.vb.subVectors(elbow, S));
         this.aim(`forearm.${s}` as BoneName, this.vb.subVectors(grip, elbow));
-        const err = d > reach ? d - reach : 0;
+        const err = Math.max(0, d - reach, Math.abs(L1 - L2) - d);
         this.debug.wristErr[i] = +err.toFixed(4);
         this.debug.handOnGrip[i] = err < 0.01;
         this.debug.armStretch[i] = +(d / reach).toFixed(3);
@@ -980,34 +907,18 @@ export class GltfRider {
     }
   }
 
-  /** Slerp every bone from the hand-over snapshot toward the ragdoll pose while the blend runs. */
-  private blendHandover(tSim: number): void {
-    const H = this.handover;
-    if (!H.active) return;
-    const k = H.dur > 0 ? Math.min(1, (tSim - H.t0) / H.dur) : 1;
-    this.debug.ragdollBlend = +k.toFixed(3);
-    if (k >= 1) {
-      H.active = false;
-      return;
-    }
-    const w = 1 - k * k * (3 - 2 * k); // weight of the snapshot
-    const pelvis = this.bones.get('pelvis');
-    for (const name of ORDER) {
-      const b = this.bones.get(name);
-      if (!b || b === pelvis) continue;
-      b.quaternion.slerp(H.q.get(name)!, w);
-    }
-    if (pelvis && pelvis.parent) {
-      // The pelvis' parent changed frame (bike → world): blend in world space.
-      pelvis.parent.updateWorldMatrix(true, false);
-      pelvis.parent.getWorldQuaternion(this.qc);
-      this.qa.copy(this.qc).multiply(pelvis.quaternion); // current world
-      this.qa.slerp(H.pelvisQ, w);
-      pelvis.quaternion.copy(this.qc).invert().multiply(this.qa);
-      this.va.copy(pelvis.position).applyMatrix4(pelvis.parent.matrixWorld); // current world position
-      this.va.lerp(H.pelvisP, w);
-      pelvis.position.copy(pelvis.parent.worldToLocal(this.va));
-    }
+  /** Follow a simulated planar angle while retaining its actual released lateral component.
+   * Rotate from the captured orientation, preserving twist instead of choosing a new bind-pose
+   * solution. At the spawn angle this is exactly the riding orientation, without interpolation.
+   */
+  private aimReleased(name: BoneName, planar: THREE.Vector3): void {
+    const saved = this.released.get(name)!;
+    const z = saved.direction.z;
+    const angle = Math.atan2(planar.y, planar.x) + saved.planarOffset;
+    planar.set(Math.cos(angle), Math.sin(angle), 0);
+    planar.normalize().multiplyScalar(Math.sqrt(Math.max(0, 1 - z * z))).setZ(z);
+    this.qa.setFromUnitVectors(saved.direction, planar).multiply(saved.world);
+    this.setWorld(name, this.qa);
   }
 
   private readonly ragTargets = new Map<string, THREE.Vector3 | 'rigid' | 'rest'>();
@@ -1061,13 +972,19 @@ export class GltfRider {
     for (const name of ORDER) {
       const t = T.get(name);
       if (!t) continue;
-      if (t === 'rigid') this.rigid(name);
+      if (t === 'rigid') {
+        // Hands/feet leave their sockets with their current orientation relative to the limb.
+        const parent = this.parentOf.get(name), saved = this.released.get(name)!;
+        const parentWorld = parent ? this.worldQ.get(parent) : this.armQ;
+        this.setWorld(name, this.qa.copy(parentWorld ?? this.ID).multiply(saved.local));
+      }
       else if (t === 'rest') this.setWorld(name, this.q0.get(name)!);
-      else this.aim(name, t);
+      else this.aimReleased(name, t);
     }
   }
 
   dispose(): void {
     for (const m of this.materials) m.dispose();
+    for (const release of this.releaseSleeveGeometry) release();
   }
 }

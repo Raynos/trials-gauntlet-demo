@@ -1,0 +1,57 @@
+[
+  {
+    "original": "cloth-audit/played-candidate-report.json",
+    "stored": "cloth-audit/played-candidate-report.json.gz",
+    "uncompressedBytes": 11737928
+  },
+  {
+    "original": "cloth-audit/report.json",
+    "stored": "cloth-audit/report.json.gz",
+    "uncompressedBytes": 1806867
+  },
+  {
+    "original": "cloth-audit/played-2026-09-21-pre-cache-optimization.json",
+    "stored": "cloth-audit/played-2026-09-21-pre-cache-optimization.json.gz",
+    "uncompressedBytes": 11737929
+  },
+  {
+    "original": "cloth-audit/report-support-pre-twist-unverified.json",
+    "stored": "cloth-audit/report-support-pre-twist-unverified.json.gz",
+    "uncompressedBytes": 1805251
+  },
+  {
+    "original": "cloth-audit/report-2026-09-21-roll-shoulder-candidate.json",
+    "stored": "cloth-audit/report-2026-09-21-roll-shoulder-candidate.json.gz",
+    "uncompressedBytes": 1805356
+  },
+  {
+    "original": "cloth-audit/report-pre-support-failed.json",
+    "stored": "cloth-audit/report-pre-support-failed.json.gz",
+    "uncompressedBytes": 1945624
+  },
+  {
+    "original": "cloth-audit/report-2026-09-21-neck-seam-candidate.json",
+    "stored": "cloth-audit/report-2026-09-21-neck-seam-candidate.json.gz",
+    "uncompressedBytes": 1806867
+  },
+  {
+    "original": "sleeve-final/surface-neck-spine.json",
+    "stored": "sleeve-final/surface-neck-spine.json.gz",
+    "uncompressedBytes": 5789630
+  },
+  {
+    "original": "current-geometry/lab-technique-recordings-support-angle.json",
+    "stored": "current-geometry/lab-technique-recordings-support-angle.json.gz",
+    "uncompressedBytes": 1191690
+  },
+  {
+    "original": "current-geometry/lab-technique-recordings.json",
+    "stored": "current-geometry/lab-technique-recordings.json.gz",
+    "uncompressedBytes": 1191215
+  },
+  {
+    "original": "cloth-final/transitions.json",
+    "stored": "cloth-final/transitions.json.gz",
+    "uncompressedBytes": 11936296
+  }
+]

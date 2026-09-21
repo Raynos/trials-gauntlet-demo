@@ -1,0 +1,1034 @@
+[
+  {
+    "neutralAngle": 40,
+    "fwdY": 0.96,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.5110325909444966,
+        "first": "front",
+        "landPitch": -23.280410242824622,
+        "bothOff": 0.325,
+        "fault": null
+      },
+      {
+        "apexR": 0.2723127261061374,
+        "first": "front",
+        "landPitch": 3.520835486410946,
+        "bothOff": 0.35,
+        "fault": null
+      },
+      {
+        "apexR": 0.3027113046116762,
+        "first": "front",
+        "landPitch": 10.015385852691647,
+        "bothOff": 0.18333333333333332,
+        "fault": null
+      },
+      {
+        "apexR": 0.2101378525490762,
+        "first": "front",
+        "landPitch": 10.699499172986766,
+        "bothOff": 0.18333333333333332,
+        "fault": null
+      },
+      {
+        "apexR": 0.16012554332944823,
+        "first": "front",
+        "landPitch": 6.489045164830456,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.2723127261061374
+  },
+  {
+    "neutralAngle": 40,
+    "fwdY": 0.94,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.49231558342715515,
+        "first": "front",
+        "landPitch": -22.378738207469933,
+        "bothOff": 0.31666666666666665,
+        "fault": null
+      },
+      {
+        "apexR": 0.26771639785528095,
+        "first": "front",
+        "landPitch": 4.349357870842624,
+        "bothOff": 0.3416666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.28823524207313295,
+        "first": "front",
+        "landPitch": 9.945201059053275,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.2027743635428249,
+        "first": "front",
+        "landPitch": 11.202808406301159,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      {
+        "apexR": 0.14468889192856965,
+        "first": "front",
+        "landPitch": 5.041857079797411,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.26771639785528095
+  },
+  {
+    "neutralAngle": 45,
+    "fwdY": 0.96,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.532960472457251,
+        "first": "front",
+        "landPitch": -24.324270402112383,
+        "bothOff": 0.26666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.2673520348724088,
+        "first": "front",
+        "landPitch": -3.1214965238541286,
+        "bothOff": 0.30833333333333335,
+        "fault": null
+      },
+      {
+        "apexR": 0.30303507253535344,
+        "first": "front",
+        "landPitch": 7.943350690149138,
+        "bothOff": 0.18333333333333332,
+        "fault": null
+      },
+      {
+        "apexR": 0.209331987044296,
+        "first": "front",
+        "landPitch": 1.5441519954058804,
+        "bothOff": 0.19166666666666668,
+        "fault": null
+      },
+      {
+        "apexR": 0.16690328354164707,
+        "first": "front",
+        "landPitch": 5.510818376602358,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.2673520348724088
+  },
+  {
+    "neutralAngle": 45,
+    "fwdY": 0.94,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.5121782725580591,
+        "first": "front",
+        "landPitch": -23.335212161211274,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      {
+        "apexR": 0.26246452653441477,
+        "first": "front",
+        "landPitch": -2.5519990050479318,
+        "bothOff": 0.30833333333333335,
+        "fault": null
+      },
+      {
+        "apexR": 0.2884284211607657,
+        "first": "front",
+        "landPitch": 7.968377465108649,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.20147837207063024,
+        "first": "front",
+        "landPitch": 2.4390035345707033,
+        "bothOff": 0.18333333333333332,
+        "fault": null
+      },
+      {
+        "apexR": 0.15138912051993697,
+        "first": "front",
+        "landPitch": 4.213507155834059,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.26246452653441477
+  },
+  {
+    "neutralAngle": 50,
+    "fwdY": 0.96,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.5304700120124581,
+        "first": "front",
+        "landPitch": -20.575654998479315,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.26089480013497685,
+        "first": "front",
+        "landPitch": -6.6588555931187345,
+        "bothOff": 0.25,
+        "fault": null
+      },
+      {
+        "apexR": 0.29955338260077374,
+        "first": "front",
+        "landPitch": 6.238867096409912,
+        "bothOff": 0.18333333333333332,
+        "fault": null
+      },
+      {
+        "apexR": 0.20620334623968778,
+        "first": "front",
+        "landPitch": -8.063396468839512,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.17508229957451998,
+        "first": "front",
+        "landPitch": 4.585691583425195,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.26089480013497685
+  },
+  {
+    "neutralAngle": 50,
+    "fwdY": 0.94,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.5089681226188878,
+        "first": "front",
+        "landPitch": -20.645218963353013,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.2557082878698384,
+        "first": "front",
+        "landPitch": -6.14988404897299,
+        "bothOff": 0.25,
+        "fault": null
+      },
+      {
+        "apexR": 0.28540955226011416,
+        "first": "front",
+        "landPitch": 7.04533006013794,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      {
+        "apexR": 0.1980299607451565,
+        "first": "front",
+        "landPitch": -7.691543827228839,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.15956001482733861,
+        "first": "front",
+        "landPitch": 3.4306716051938206,
+        "bothOff": 0.025,
+        "fault": null
+      }
+    ],
+    "score": 0.2557082878698384
+  },
+  {
+    "neutralAngle": 55,
+    "fwdY": 0.96,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.5407629357246944,
+        "first": "front",
+        "landPitch": -18.359134371865487,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.2535780747116878,
+        "first": "front",
+        "landPitch": -7.594415612149284,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      {
+        "apexR": 0.2926490519822371,
+        "first": "front",
+        "landPitch": 4.925782258182359,
+        "bothOff": 0.18333333333333332,
+        "fault": null
+      },
+      {
+        "apexR": 0.19146620887951527,
+        "first": "front",
+        "landPitch": -6.531976752155707,
+        "bothOff": 0.08333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.18503570230476796,
+        "first": "front",
+        "landPitch": 3.5440358368549476,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.2535780747116878
+  },
+  {
+    "neutralAngle": 55,
+    "fwdY": 0.94,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.5190350039416148,
+        "first": "front",
+        "landPitch": -18.40568682985523,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.24804375319067407,
+        "first": "front",
+        "landPitch": -7.131936404265396,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      {
+        "apexR": 0.2774471384916758,
+        "first": "front",
+        "landPitch": 5.100749028426178,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.18289629696229115,
+        "first": "front",
+        "landPitch": -6.195247915181282,
+        "bothOff": 0.08333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.16930891358363886,
+        "first": "front",
+        "landPitch": 4.42981019277294,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.24804375319067407
+  },
+  {
+    "neutralAngle": 40,
+    "fwdY": 0.96,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.4855554933002603,
+        "first": "front",
+        "landPitch": -19.988764491948988,
+        "bothOff": 0.19166666666666668,
+        "fault": null
+      },
+      {
+        "apexR": 0.2460194855397802,
+        "first": "front",
+        "landPitch": -5.223374850303932,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      {
+        "apexR": 0.2895084032546836,
+        "first": "front",
+        "landPitch": 7.351484658672803,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.19270555347817336,
+        "first": "front",
+        "landPitch": -7.671695750882442,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.1585741893466111,
+        "first": "front",
+        "landPitch": 4.146946885954472,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.2460194855397802
+  },
+  {
+    "neutralAngle": 40,
+    "fwdY": 0.94,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.4603603792788152,
+        "first": "front",
+        "landPitch": -18.26524204418144,
+        "bothOff": 0.19166666666666668,
+        "fault": null
+      },
+      {
+        "apexR": 0.24118687094914698,
+        "first": "front",
+        "landPitch": -4.69936756722798,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      {
+        "apexR": 0.27525026630687205,
+        "first": "front",
+        "landPitch": 8.10996811089682,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.18500758028199765,
+        "first": "front",
+        "landPitch": -7.304477018350933,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.14404188617675573,
+        "first": "front",
+        "landPitch": 4.961289468617848,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.24118687094914698
+  },
+  {
+    "neutralAngle": 45,
+    "fwdY": 0.96,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.4795414994522198,
+        "first": "front",
+        "landPitch": -15.978393752154634,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.2404932919297742,
+        "first": "front",
+        "landPitch": -7.66393311419217,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      {
+        "apexR": 0.28976035146069345,
+        "first": "front",
+        "landPitch": 6.214030223821758,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      {
+        "apexR": 0.17634586206616476,
+        "first": "front",
+        "landPitch": -5.532097222980313,
+        "bothOff": 0.08333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.16561907395025444,
+        "first": "front",
+        "landPitch": 5.001956295790297,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.2404932919297742
+  },
+  {
+    "neutralAngle": 45,
+    "fwdY": 0.94,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.4618987841184854,
+        "first": "front",
+        "landPitch": -15.804411066976979,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.23533416265527707,
+        "first": "front",
+        "landPitch": -7.207607719614502,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      {
+        "apexR": 0.27498820372548816,
+        "first": "front",
+        "landPitch": 6.287065250925857,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.16844947964468981,
+        "first": "front",
+        "landPitch": -5.227763664471254,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.1510225263695013,
+        "first": "front",
+        "landPitch": 4.074213960557691,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.23533416265527707
+  },
+  {
+    "neutralAngle": 60,
+    "fwdY": 0.96,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.5377732828385542,
+        "first": "front",
+        "landPitch": -12.48407057324573,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      {
+        "apexR": 0.23080983215648937,
+        "first": "front",
+        "landPitch": -7.489291846307236,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.28268903676195317,
+        "first": "front",
+        "landPitch": 3.927327998081527,
+        "bothOff": 0.18333333333333332,
+        "fault": null
+      },
+      {
+        "apexR": 0.15840637814012148,
+        "first": "front",
+        "landPitch": 1.3919013076121443,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      {
+        "apexR": 0.19656123444462098,
+        "first": "front",
+        "landPitch": 3.782656982457526,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.23080983215648937
+  },
+  {
+    "neutralAngle": 50,
+    "fwdY": 0.96,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.48843837538710416,
+        "first": "front",
+        "landPitch": -11.921343373821914,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.23038622067371967,
+        "first": "front",
+        "landPitch": -8.094050560846084,
+        "bothOff": 0.15,
+        "fault": null
+      },
+      {
+        "apexR": 0.28632688543553025,
+        "first": "front",
+        "landPitch": 4.6182403580161235,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      {
+        "apexR": 0.16289388749587147,
+        "first": "front",
+        "landPitch": -0.7680603182066027,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.17384060053613531,
+        "first": "front",
+        "landPitch": 3.935579017976202,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.23038622067371967
+  },
+  {
+    "neutralAngle": 60,
+    "fwdY": 0.94,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.507247617705886,
+        "first": "front",
+        "landPitch": -12.377141064459543,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      {
+        "apexR": 0.22509252789728657,
+        "first": "front",
+        "landPitch": -7.26017989808599,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.26769800614581823,
+        "first": "front",
+        "landPitch": 4.142562482811512,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.1490578913401051,
+        "first": "front",
+        "landPitch": 0.3513674893304491,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.18092460847829367,
+        "first": "front",
+        "landPitch": 3.2293849704430353,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.22509252789728657
+  },
+  {
+    "neutralAngle": 50,
+    "fwdY": 0.94,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.46947641811356194,
+        "first": "front",
+        "landPitch": -11.682755796912579,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.2250704050317785,
+        "first": "front",
+        "landPitch": -8.80515402222597,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.2719402883661603,
+        "first": "front",
+        "landPitch": 5.440081742219271,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.15426347069259755,
+        "first": "front",
+        "landPitch": -0.517798402533375,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.15922872656926051,
+        "first": "front",
+        "landPitch": 3.106359138850114,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.2250704050317785
+  },
+  {
+    "neutralAngle": 55,
+    "fwdY": 0.96,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.49288230939789135,
+        "first": "front",
+        "landPitch": -11.63733179720493,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      {
+        "apexR": 0.2182995563296859,
+        "first": "front",
+        "landPitch": -6.857162003027536,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.27972424580341615,
+        "first": "front",
+        "landPitch": 3.2978318385726255,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      {
+        "apexR": 0.15166978037057377,
+        "first": "front",
+        "landPitch": 1.1123328269966468,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.1836785271844127,
+        "first": "front",
+        "landPitch": 2.7093756528821427,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.2182995563296859
+  },
+  {
+    "neutralAngle": 55,
+    "fwdY": 0.94,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.47331446332260796,
+        "first": "front",
+        "landPitch": -11.466475160811457,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      {
+        "apexR": 0.21234967029832186,
+        "first": "front",
+        "landPitch": -6.636461615991922,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.2645320448273558,
+        "first": "front",
+        "landPitch": 4.208996729427277,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.1419880807424771,
+        "first": "front",
+        "landPitch": 0.32706207431991946,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      {
+        "apexR": 0.16888021054389724,
+        "first": "front",
+        "landPitch": 3.5897948811168408,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.21234967029832186
+  },
+  {
+    "neutralAngle": 60,
+    "fwdY": 0.96,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.49495415114584124,
+        "first": "front",
+        "landPitch": -8.765271721772718,
+        "bothOff": 0.08333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.20552818961056857,
+        "first": "front",
+        "landPitch": -4.1009500732978825,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.2704370440645643,
+        "first": "front",
+        "landPitch": 2.2929712288111745,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      {
+        "apexR": 0.14918395889915936,
+        "first": "front",
+        "landPitch": 1.3927848266881626,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.19490377690583044,
+        "first": "rear",
+        "landPitch": 2.6459372509150745,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.20552818961056857
+  },
+  {
+    "neutralAngle": 65,
+    "fwdY": 0.96,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.5220573876041579,
+        "first": "front",
+        "landPitch": -0.982048680227584,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.20074996268237782,
+        "first": "front",
+        "landPitch": -1.5336877398838693,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.2712189633628998,
+        "first": "front",
+        "landPitch": 2.517952344945184,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      {
+        "apexR": 0.1671804521011629,
+        "first": "front",
+        "landPitch": 2.710922814863976,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      {
+        "apexR": 0.20931179271868477,
+        "first": "rear",
+        "landPitch": 2.4150142433758726,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.20074996268237782
+  },
+  {
+    "neutralAngle": 60,
+    "fwdY": 0.94,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.4755621386809206,
+        "first": "front",
+        "landPitch": -8.589757273650426,
+        "bothOff": 0.08333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.1992219229468279,
+        "first": "front",
+        "landPitch": -3.8940857781270175,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.2549498068107064,
+        "first": "front",
+        "landPitch": 2.60746355782268,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.13877047798885828,
+        "first": "front",
+        "landPitch": 0.6043303749516232,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      {
+        "apexR": 0.1797727417928962,
+        "first": "rear",
+        "landPitch": 2.3396679319360385,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.1992219229468279
+  },
+  {
+    "neutralAngle": 65,
+    "fwdY": 0.94,
+    "rearX": -0.7,
+    "hops": [
+      {
+        "apexR": 0.4985892451593475,
+        "first": "front",
+        "landPitch": -2.209501472156819,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.1927604063327935,
+        "first": "front",
+        "landPitch": -0.9255617492813883,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      {
+        "apexR": 0.25585970635826744,
+        "first": "front",
+        "landPitch": 2.9017223404051635,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.15613265722483355,
+        "first": "front",
+        "landPitch": 2.149148712385479,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.19325135560505718,
+        "first": "front",
+        "landPitch": 1.890519653514977,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.1927604063327935
+  },
+  {
+    "neutralAngle": 65,
+    "fwdY": 0.96,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.47710864025936767,
+        "first": "front",
+        "landPitch": 0.22585063153441592,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.18103148206222758,
+        "first": "front",
+        "landPitch": -1.193682620838786,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.2591634447476034,
+        "first": "front",
+        "landPitch": 0.8694410649677592,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.16538133138792316,
+        "first": "front",
+        "landPitch": 1.4948364434479655,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      {
+        "apexR": 0.2082148307216643,
+        "first": "rear",
+        "landPitch": 2.2201253279233795,
+        "bothOff": 0.05,
+        "fault": null
+      }
+    ],
+    "score": 0.18103148206222758
+  },
+  {
+    "neutralAngle": 65,
+    "fwdY": 0.94,
+    "rearX": -0.66,
+    "hops": [
+      {
+        "apexR": 0.4556489286967114,
+        "first": "front",
+        "landPitch": 0.34281807212715726,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.17307028626883197,
+        "first": "front",
+        "landPitch": -0.5830392357921419,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.24379887086329216,
+        "first": "front",
+        "landPitch": 1.2982551989398685,
+        "bothOff": 0.15,
+        "fault": null
+      },
+      {
+        "apexR": 0.1543809069741955,
+        "first": "front",
+        "landPitch": 1.0767192305287205,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.19207837728569482,
+        "first": "front",
+        "landPitch": 2.1649107226453794,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      }
+    ],
+    "score": 0.17307028626883197
+  }
+]

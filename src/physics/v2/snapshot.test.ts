@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { hashPhysicsState } from '../../core/hash';
 import { quantizeInput } from '../../core/replay';
 import type { InputFrame, PhysicsSnapshot, PhysicsState } from '../../core/types';
-import { createBikePhysicsV2 as createBikePhysics, type BikePhysicsWorldV2 as BikePhysicsWorld } from './bike';
+import { F_SLOTS, createBikePhysicsV2 as createBikePhysics, type BikePhysicsWorldV2 as BikePhysicsWorld } from './bike';
 import { makeTrack, seesawTrack } from '../testTracks';
 
 const HZ = 120;
@@ -232,4 +232,41 @@ describe('snapshot fidelity under search load (CONTRACT 2.3)', () => {
       expect(hash(used), `reset replay tick ${i}`).toBe(hash(again));
     }
   });
+});
+
+
+describe('ground-started rider transfer snapshots', () => {
+  for (const bike of ['rookie', 'pro'] as const) {
+    it(`${bike}: midpoint, reverse cancellation and reset retain exact state bytes`, () => {
+      const a = createBikePhysics(HZ), b = createBikePhysics(HZ);
+      const track = makeTrack({ finishX: 1e9 });
+      a.loadTrack(track, 31, { bike }); b.loadTrack(track, 31, { bike });
+      const blend = F_SLOTS.indexOf('transferBlend');
+      for (let i=0;i<60;i++) a.step(quantizeInput({}));
+      for (let i=0;i<36;i++) a.step(quantizeInput({lean:-1,throttle:.3}));
+      for (let i=1;i<=8;i++) a.step(quantizeInput({lean:-1+i/15,throttle:.3}));
+      const midpoint = a.snapshot();
+      expect(midpoint.f64[blend]).toBeGreaterThan(.9);
+      for (const root of [midpoint]) {
+        b.restore(root);
+        for (let i=0;i<100;i++) {
+          const input=quantizeInput(i<6?{lean:-.4+i/15,throttle:.3}:i<18?{lean:-1,throttle:.2}:{lean:0,throttle:.2});
+          a.step(input); b.step(input);
+          expect(b.snapshot().f64).toEqual(a.snapshot().f64);
+          expect(b.snapshot().u8).toEqual(a.snapshot().u8);
+          if(i===6) {
+            const cancelled=a.snapshot();
+            expect(cancelled.f64[blend]).toBe(0);
+            b.step(quantizeInput({lean:1,throttle:1}));
+            b.restore(cancelled);
+          }
+        }
+      }
+      a.restore(midpoint);
+      a.step(quantizeInput({restart:true}));
+      expect(a.snapshot().f64.slice(blend,blend+6)).toEqual(new Float64Array(6));
+      a.loadTrack(track,31,{bike});
+      expect(a.snapshot().f64.slice(blend,blend+6)).toEqual(new Float64Array(6));
+    });
+  }
 });

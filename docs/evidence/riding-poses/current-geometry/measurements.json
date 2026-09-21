@@ -1,0 +1,4605 @@
+{
+  "method": "Static zero-excursion exact pose targets through production GLB decoder and production stance+IK path, all ten assets and both bikes. All points axle-local metres. Head bone origin is authored head center.",
+  "rows": [
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        2.8288833398820814e-7,
+        2.6458259773557845e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0.000001
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188606,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        2.5601249221521097e-7,
+        2.4099819117074596e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        2.511767073234002e-7,
+        2.5802194114461624e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        2.8288833398820814e-7,
+        2.6458259773557845e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0.000001
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188606,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        2.5601249221521097e-7,
+        2.4099819117074596e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        2.511767073234002e-7,
+        2.5802194114461624e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        2.8288833398820814e-7,
+        2.6458259773557845e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0.000001
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188606,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        2.5601249221521097e-7,
+        2.4099819117074596e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        2.511767073234002e-7,
+        2.5802194114461624e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        2.8288833398820814e-7,
+        2.6458259773557845e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0.000001
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188606,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        2.5601249221521097e-7,
+        2.4099819117074596e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        2.511767073234002e-7,
+        2.5802194114461624e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        7.550848047045674e-7,
+        3.2056822476532506e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054175,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        7.644363938265569e-7,
+        2.796878771769743e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188605,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        7.619017330417651e-7,
+        2.8903092963642183e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        7.385515703332939e-7,
+        3.1368403009735457e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        2.8288833398820814e-7,
+        2.6458259773557845e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0.000001
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188606,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        2.5601249221521097e-7,
+        2.4099819117074596e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        2.511767073234002e-7,
+        2.5802194114461624e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        2.8288833398820814e-7,
+        2.6458259773557845e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0.000001
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188606,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        2.5601249221521097e-7,
+        2.4099819117074596e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        2.511767073234002e-7,
+        2.5802194114461624e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "rookie",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        2.8288833398820814e-7,
+        2.6458259773557845e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "rookie",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "rookie",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "rookie",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0.000001
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188606,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        2.5601249221521097e-7,
+        2.4099819117074596e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "rookie",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        2.511767073234002e-7,
+        2.5802194114461624e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "pro",
+      "lean": -1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.499357,
+        0.715814,
+        0
+      ],
+      "actualHead": [
+        -0.204738,
+        1.254972,
+        -0.000013
+      ],
+      "torsoDegrees": 58.002,
+      "measuredCOM": [
+        -0.27229,
+        0.805071,
+        -0.000007
+      ],
+      "physicalCOM": [
+        -0.485,
+        0.58,
+        0
+      ],
+      "comError": 0.309682,
+      "sensorHead": [
+        -0.2148,
+        1.238463,
+        0
+      ],
+      "headSensorError": 0.019334,
+      "physicalChainHips": [
+        -0.57,
+        0.6
+      ],
+      "gripError": [
+        2.8288833398820814e-7,
+        2.6458259773557845e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "pro",
+      "lean": -0.5,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.335,
+        0.71,
+        0
+      ],
+      "comError": 0.256314,
+      "sensorHead": [
+        -0.000256,
+        1.315765,
+        0
+      ],
+      "headSensorError": 0.095489,
+      "physicalChainHips": [
+        -0.425,
+        0.725
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "pro",
+      "lean": 0,
+      "stanceWeight": 0,
+      "authoredHips": [
+        -0.300004,
+        0.735002,
+        0
+      ],
+      "actualHead": [
+        0.054174,
+        1.237308,
+        0.000006
+      ],
+      "torsoDegrees": 51.917,
+      "measuredCOM": [
+        -0.093222,
+        0.795089,
+        0.000002
+      ],
+      "physicalCOM": [
+        -0.185,
+        0.83,
+        0
+      ],
+      "comError": 0.098193,
+      "sensorHead": [
+        0.207825,
+        1.38523,
+        0
+      ],
+      "headSensorError": 0.213282,
+      "physicalChainHips": [
+        -0.28,
+        0.85
+      ],
+      "gripError": [
+        2.496837482353804e-7,
+        2.2622484469434464e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "pro",
+      "lean": 0.5,
+      "stanceWeight": 0.4090909090909091,
+      "authoredHips": [
+        -0.258731,
+        0.786536,
+        0
+      ],
+      "actualHead": [
+        0.152733,
+        1.240778,
+        0
+      ],
+      "torsoDegrees": 44.18,
+      "measuredCOM": [
+        -0.047413,
+        0.818312,
+        0.000001
+      ],
+      "physicalCOM": [
+        -0.095,
+        0.86,
+        0
+      ],
+      "comError": 0.063265,
+      "sensorHead": [
+        0.315421,
+        1.336196,
+        0
+      ],
+      "headSensorError": 0.188606,
+      "physicalChainHips": [
+        -0.25,
+        0.875
+      ],
+      "gripError": [
+        2.5601249221521097e-7,
+        2.4099819117074596e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "cls": "pro",
+      "lean": 1,
+      "stanceWeight": 1,
+      "authoredHips": [
+        -0.199999,
+        0.860014,
+        0
+      ],
+      "actualHead": [
+        0.281509,
+        1.232326,
+        -0.000008
+      ],
+      "torsoDegrees": 33,
+      "measuredCOM": [
+        0.012354,
+        0.84896,
+        -0.000002
+      ],
+      "physicalCOM": [
+        -0.005,
+        0.88,
+        0
+      ],
+      "comError": 0.035562,
+      "sensorHead": [
+        0.410865,
+        1.275162,
+        0
+      ],
+      "headSensorError": 0.136264,
+      "physicalChainHips": [
+        -0.22,
+        0.9
+      ],
+      "gripError": [
+        2.511767073234002e-7,
+        2.5802194114461624e-7
+      ],
+      "soleError": [
+        0,
+        0
+      ]
+    }
+  ]
+}

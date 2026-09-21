@@ -1,0 +1,4590 @@
+{
+  "rows": [
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46533307943579927,
+        "first": "front",
+        "landPitch": -4.3285002924960665,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49681961070673064,
+        "first": "front",
+        "landPitch": -11.889388456387815,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46533307943579927,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4653130699359269,
+        "first": "front",
+        "landPitch": -4.346523044309356,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49657435273007394,
+        "first": "front",
+        "landPitch": -11.890536310821707,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4653130699359269,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4653054740913999,
+        "first": "front",
+        "landPitch": -4.341851563478769,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4967790643414395,
+        "first": "front",
+        "landPitch": -11.898390829878041,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4653054740913999,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46525080362501237,
+        "first": "front",
+        "landPitch": -4.364408295599473,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4965441500187439,
+        "first": "front",
+        "landPitch": -11.898542258991723,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46525080362501237,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46504787200497866,
+        "first": "front",
+        "landPitch": -4.339876216895732,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49701713636686434,
+        "first": "front",
+        "landPitch": -11.945016225524594,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46504787200497866,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4650206223719774,
+        "first": "front",
+        "landPitch": -4.329330683584223,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49701375147613874,
+        "first": "front",
+        "landPitch": -11.938066213401124,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4650206223719774,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4648368104044171,
+        "first": "front",
+        "landPitch": -4.443508045296073,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.496101200404936,
+        "first": "front",
+        "landPitch": -12.106096766657787,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4648368104044171,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46468153142230045,
+        "first": "front",
+        "landPitch": -4.3096499182603045,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.496087837348819,
+        "first": "front",
+        "landPitch": -11.865144980268859,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46468153142230045,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46467180537244945,
+        "first": "front",
+        "landPitch": -4.280690243947003,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4962795556716582,
+        "first": "front",
+        "landPitch": -11.846027339186818,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46467180537244945,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4645135963667691,
+        "first": "front",
+        "landPitch": -3.127858544367318,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49607710584303966,
+        "first": "front",
+        "landPitch": -12.113770089301111,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4645135963667691,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46417978076487887,
+        "first": "front",
+        "landPitch": -4.365344580337948,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4964081682190218,
+        "first": "front",
+        "landPitch": -11.859942768902519,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46417978076487887,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4628040816862009,
+        "first": "front",
+        "landPitch": -3.007700122726708,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4962456802888581,
+        "first": "front",
+        "landPitch": -12.107635884029452,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4628040816862009,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.45398410452693116,
+        "first": "front",
+        "landPitch": -3.1526379656841224,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4869336612461284,
+        "first": "front",
+        "landPitch": -11.900973958414466,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.45398410452693116,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.45388809661689855,
+        "first": "front",
+        "landPitch": -3.1508212207784574,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.48689062369595887,
+        "first": "front",
+        "landPitch": -11.903455758224744,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.45388809661689855,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.45375489115746925,
+        "first": "front",
+        "landPitch": -3.1580766661598494,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.48622958665115024,
+        "first": "front",
+        "landPitch": -11.82126319737103,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.45375489115746925,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4534915904848327,
+        "first": "front",
+        "landPitch": -3.151886285902077,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4860757887287529,
+        "first": "front",
+        "landPitch": -11.828050631628477,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4534915904848327,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.45316104729371043,
+        "first": "front",
+        "landPitch": -3.1489414513644984,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.48572236777646677,
+        "first": "front",
+        "landPitch": -11.81501523811064,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.45316104729371043,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4531467601135736,
+        "first": "front",
+        "landPitch": -3.1250156187604734,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4857130798867321,
+        "first": "front",
+        "landPitch": -11.775710117319072,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4531467601135736,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4526909786302241,
+        "first": "front",
+        "landPitch": -3.1190465675517185,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4861448010745335,
+        "first": "front",
+        "landPitch": -11.797776358820073,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4526909786302241,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.45261513872657466,
+        "first": "front",
+        "landPitch": -3.150777400195931,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4855943040585344,
+        "first": "front",
+        "landPitch": -11.821026708841208,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.45261513872657466,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4522917548823954,
+        "first": "front",
+        "landPitch": -3.1218399232751666,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4853025737413761,
+        "first": "front",
+        "landPitch": -11.788831907821411,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4522917548823954,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.45206235268933204,
+        "first": "front",
+        "landPitch": -3.231077170667533,
+        "bothOff": 0.058333333333333334,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.48632887419836873,
+        "first": "front",
+        "landPitch": -12.08824834884705,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      "score": 0.45206235268933204,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.45169416189044337,
+        "first": "front",
+        "landPitch": -3.1702498082278496,
+        "bothOff": 0.058333333333333334,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.48499317346305193,
+        "first": "front",
+        "landPitch": -11.975412560952885,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.45169416189044337,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.45146390779499984,
+        "first": "front",
+        "landPitch": -3.1811488250448012,
+        "bothOff": 0.058333333333333334,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4848528420631637,
+        "first": "front",
+        "landPitch": -11.98018853904442,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.45146390779499984,
+      "pass": true
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.42833682236049775,
+        "first": "front",
+        "landPitch": -2.015293398283594,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45698934978346867,
+        "first": "front",
+        "landPitch": -8.847527224679899,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.42833682236049775,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4277713937883479,
+        "first": "front",
+        "landPitch": -2.105287402463462,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4589267339353066,
+        "first": "front",
+        "landPitch": -11.076356851184881,
+        "bothOff": 0.08333333333333333,
+        "fault": null
+      },
+      "score": 0.4277713937883479,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4271018967662922,
+        "first": "front",
+        "landPitch": -2.163551413052455,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4584014347403737,
+        "first": "front",
+        "landPitch": -8.43433233863882,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4271018967662922,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.42669929982880606,
+        "first": "front",
+        "landPitch": -2.191239964962635,
+        "bothOff": 0.058333333333333334,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45765617098300004,
+        "first": "front",
+        "landPitch": -8.516562606187867,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.42669929982880606,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4228772820070891,
+        "first": "front",
+        "landPitch": -2.165610575334066,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4513746777173198,
+        "first": "front",
+        "landPitch": -8.868149038867948,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      "score": 0.4228772820070891,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4220316555287124,
+        "first": "front",
+        "landPitch": -2.248377605492479,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4532704942866195,
+        "first": "front",
+        "landPitch": -11.022483026856401,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      "score": 0.4220316555287124,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.421474780963617,
+        "first": "front",
+        "landPitch": -2.3047402543560476,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4527699578076249,
+        "first": "front",
+        "landPitch": -8.40424743499049,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "score": 0.421474780963617,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.42061051156471674,
+        "first": "front",
+        "landPitch": -1.0317990946149944,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4520005280016559,
+        "first": "front",
+        "landPitch": -8.51121775840372,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "score": 0.42061051156471674,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41824030201503726,
+        "first": "front",
+        "landPitch": -1.4258408999084307,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4542980236059315,
+        "first": "front",
+        "landPitch": -9.401819147923238,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41824030201503726,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4181660531496363,
+        "first": "front",
+        "landPitch": -2.7100669723660435,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45372777363429545,
+        "first": "front",
+        "landPitch": -9.242435519151403,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4181660531496363,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4180718934719875,
+        "first": "front",
+        "landPitch": -2.6849339921188813,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45338767836512384,
+        "first": "front",
+        "landPitch": -9.169727377774002,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4180718934719875,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41807058096647987,
+        "first": "front",
+        "landPitch": -2.685186995258278,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45338767836512384,
+        "first": "front",
+        "landPitch": -9.169727377774002,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41807058096647987,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4180232993628542,
+        "first": "front",
+        "landPitch": -2.6941260974112162,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.453444284417167,
+        "first": "front",
+        "landPitch": -9.148126290945351,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4180232993628542,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41795401322211345,
+        "first": "front",
+        "landPitch": -2.7265262435408015,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4537423703061016,
+        "first": "front",
+        "landPitch": -9.174544432981365,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41795401322211345,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41795337815567335,
+        "first": "front",
+        "landPitch": -1.4365251151324416,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45424538300242606,
+        "first": "front",
+        "landPitch": -9.272024271264742,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41795337815567335,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41779641705577497,
+        "first": "front",
+        "landPitch": -2.7477420775350714,
+        "bothOff": 0.08333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45371721891454814,
+        "first": "front",
+        "landPitch": -9.181116990612448,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41779641705577497,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4170224778468169,
+        "first": "front",
+        "landPitch": -1.3913021938590553,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4547250379057151,
+        "first": "front",
+        "landPitch": -9.442716456012896,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4170224778468169,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41505289738625206,
+        "first": "front",
+        "landPitch": -2.7531355525660506,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4511771048766056,
+        "first": "front",
+        "landPitch": -9.221727042905606,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41505289738625206,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41474910909560914,
+        "first": "front",
+        "landPitch": -2.7615985315177998,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45105821912420646,
+        "first": "front",
+        "landPitch": -9.14266983478065,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41474910909560914,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41474351495588824,
+        "first": "front",
+        "landPitch": -1.4184135247730232,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45080155012103384,
+        "first": "front",
+        "landPitch": -9.35225528053399,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41474351495588824,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4147365946333841,
+        "first": "front",
+        "landPitch": -1.4350714376752687,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4509882052927651,
+        "first": "front",
+        "landPitch": -9.145811727716419,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4147365946333841,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41467000635914925,
+        "first": "front",
+        "landPitch": -1.5950900788888578,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4523150686188441,
+        "first": "front",
+        "landPitch": -7.60320236346242,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      "score": 0.41467000635914925,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4145637646985634,
+        "first": "front",
+        "landPitch": -2.711221487007351,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4504802342519989,
+        "first": "front",
+        "landPitch": -9.078723306424015,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4145637646985634,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41448107811167134,
+        "first": "front",
+        "landPitch": -1.427573772326854,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45062715612591614,
+        "first": "front",
+        "landPitch": -9.202353434655631,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41448107811167134,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.414453376434264,
+        "first": "front",
+        "landPitch": -1.5663207398121677,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4516168506973586,
+        "first": "front",
+        "landPitch": -9.802372677086833,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.414453376434264,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41436573540280563,
+        "first": "front",
+        "landPitch": -1.5671359735752772,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45149378850819416,
+        "first": "front",
+        "landPitch": -7.603142410978917,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      "score": 0.41436573540280563,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.414326204500463,
+        "first": "front",
+        "landPitch": -2.7019660757582162,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4501780472428262,
+        "first": "front",
+        "landPitch": -9.091732752396656,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.414326204500463,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4143211550947048,
+        "first": "front",
+        "landPitch": -2.7022889954967293,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4501780472428262,
+        "first": "front",
+        "landPitch": -9.091732752396656,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4143211550947048,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41428670213134433,
+        "first": "front",
+        "landPitch": -1.6028598073365887,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45146351958284653,
+        "first": "front",
+        "landPitch": -7.604740559162663,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      "score": 0.41428670213134433,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41423877776443596,
+        "first": "front",
+        "landPitch": -1.625026295877661,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4513949453835721,
+        "first": "front",
+        "landPitch": -7.6055371737084565,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      "score": 0.41423877776443596,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4142347200948843,
+        "first": "front",
+        "landPitch": -1.6166388473867956,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4515584933936144,
+        "first": "front",
+        "landPitch": -9.819607854692315,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4142347200948843,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41377256676525886,
+        "first": "front",
+        "landPitch": -1.4076963481897882,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.45162295101822764,
+        "first": "front",
+        "landPitch": -9.44038669552451,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41377256676525886,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41376534327847697,
+        "first": "front",
+        "landPitch": -1.6912048282338847,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4515314693008702,
+        "first": "front",
+        "landPitch": -9.831880452696913,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.41376534327847697,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41087832523924744,
+        "first": "front",
+        "landPitch": -1.6562443452912017,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4485169226678737,
+        "first": "front",
+        "landPitch": -7.55785666165976,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      "score": 0.41087832523924744,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4105894482102108,
+        "first": "front",
+        "landPitch": -1.628689510741637,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.44834960897976744,
+        "first": "front",
+        "landPitch": -7.5596503425866395,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      "score": 0.4105894482102108,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4102465887973116,
+        "first": "front",
+        "landPitch": -1.6736487220034653,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4481936749200928,
+        "first": "front",
+        "landPitch": -7.556408077063002,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      "score": 0.4102465887973116,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.41001823443505847,
+        "first": "front",
+        "landPitch": -1.707805376344778,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.44807777499869345,
+        "first": "front",
+        "landPitch": -7.5551232548383425,
+        "bothOff": 0.06666666666666667,
+        "fault": null
+      },
+      "score": 0.41001823443505847,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4099620887563529,
+        "first": "front",
+        "landPitch": -1.6707100318839534,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.448275238513277,
+        "first": "front",
+        "landPitch": -9.707587603214087,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4099620887563529,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.40957126315739295,
+        "first": "front",
+        "landPitch": -1.6949499275358784,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4479326285913827,
+        "first": "front",
+        "landPitch": -9.717098678552071,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.40957126315739295,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4092806465059056,
+        "first": "front",
+        "landPitch": -1.7167443545990124,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4477182341130693,
+        "first": "front",
+        "landPitch": -9.725545035687645,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "score": 0.4092806465059056,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4077932389758544,
+        "first": "front",
+        "landPitch": -3.3132092978971883,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.44369405210318386,
+        "first": "front",
+        "landPitch": -10.626316738480917,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.4077932389758544,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.40608498344045796,
+        "first": "front",
+        "landPitch": -3.2896492246035955,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.44295416004611127,
+        "first": "front",
+        "landPitch": -10.580591320887237,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.40608498344045796,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.40551303450880993,
+        "first": "front",
+        "landPitch": -3.31982814406899,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.44257134146682214,
+        "first": "front",
+        "landPitch": -10.592767587732036,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.40551303450880993,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4047266021573056,
+        "first": "front",
+        "landPitch": -3.327076970927962,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4418409179600806,
+        "first": "front",
+        "landPitch": -10.544712408077952,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.4047266021573056,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4042155463532985,
+        "first": "front",
+        "landPitch": -3.3743170885005225,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4418800245311585,
+        "first": "front",
+        "landPitch": -10.536235249523527,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.4042155463532985,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.40418635224791255,
+        "first": "front",
+        "landPitch": -3.3474524451932606,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4416486863785641,
+        "first": "front",
+        "landPitch": -10.503493355410296,
+        "bothOff": 0.25,
+        "fault": null
+      },
+      "score": 0.40418635224791255,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.40392518760697693,
+        "first": "front",
+        "landPitch": -2.043105310111081,
+        "bothOff": 0.20833333333333334,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.44163783825159053,
+        "first": "front",
+        "landPitch": -10.552717781977712,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.40392518760697693,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4039058838065513,
+        "first": "front",
+        "landPitch": -3.353289948906669,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4412533830488088,
+        "first": "front",
+        "landPitch": -10.547521248853513,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.4039058838065513,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.40387452314010497,
+        "first": "front",
+        "landPitch": -3.370678378402829,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.44139626587868414,
+        "first": "front",
+        "landPitch": -10.572072092301703,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.40387452314010497,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.40339056946369933,
+        "first": "front",
+        "landPitch": -2.0289021616343703,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4411750138603748,
+        "first": "front",
+        "landPitch": -10.586992783357319,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.40339056946369933,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.40309388925870965,
+        "first": "front",
+        "landPitch": -2.0106279541109986,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4408862589736787,
+        "first": "front",
+        "landPitch": -10.590558870619125,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.40309388925870965,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4027354626205963,
+        "first": "front",
+        "landPitch": -2.002629566746041,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4406093247707017,
+        "first": "front",
+        "landPitch": -10.610243231561041,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.4027354626205963,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.39291063871852383,
+        "first": "front",
+        "landPitch": -2.3273954999079947,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.42508593033405945,
+        "first": "front",
+        "landPitch": -9.775748069117524,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      "score": 0.39291063871852383,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.3875287001814928,
+        "first": "front",
+        "landPitch": -1.1605505722023488,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.425415909945286,
+        "first": "front",
+        "landPitch": -9.253409038631522,
+        "bothOff": 0.25,
+        "fault": null
+      },
+      "score": 0.3875287001814928,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.3870423832270208,
+        "first": "front",
+        "landPitch": -1.1434733116344338,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4247051917309091,
+        "first": "front",
+        "landPitch": -9.322797493144025,
+        "bothOff": 0.25,
+        "fault": null
+      },
+      "score": 0.3870423832270208,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 7,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.38692871270342055,
+        "first": "front",
+        "landPitch": -1.106775241749605,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.42416606415788294,
+        "first": "front",
+        "landPitch": -9.457801098696113,
+        "bothOff": 0.25,
+        "fault": null
+      },
+      "score": 0.38692871270342055,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.38084997712971347,
+        "first": "front",
+        "landPitch": -2.2325824681721427,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.41832086605728996,
+        "first": "front",
+        "landPitch": -9.421961422600546,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "score": 0.38084997712971347,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.3785810877287322,
+        "first": "front",
+        "landPitch": -2.0132932950829843,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.416698094152446,
+        "first": "front",
+        "landPitch": -9.175741589779957,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "score": 0.3785810877287322,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.37815611122640636,
+        "first": "front",
+        "landPitch": -2.0297711443537065,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4163707059409811,
+        "first": "front",
+        "landPitch": -9.156855215464285,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "score": 0.37815611122640636,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.37805525885366276,
+        "first": "front",
+        "landPitch": -2.1504350420680574,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.41634615453358137,
+        "first": "front",
+        "landPitch": -9.207655706180843,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "score": 0.37805525885366276,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.37786493278722333,
+        "first": "front",
+        "landPitch": -2.043172379008329,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.41615972296578946,
+        "first": "front",
+        "landPitch": -9.154940832339856,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "score": 0.37786493278722333,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.37701956122421854,
+        "first": "front",
+        "landPitch": -2.127478930007868,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4155640987388642,
+        "first": "front",
+        "landPitch": -9.09525549576451,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "score": 0.37701956122421854,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.3765025281930845,
+        "first": "front",
+        "landPitch": -2.103392637609082,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.41484187864616473,
+        "first": "front",
+        "landPitch": -9.158977020420403,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "score": 0.3765025281930845,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.37581248059716377,
+        "first": "front",
+        "landPitch": -2.1583132093636372,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.41436328991211535,
+        "first": "front",
+        "landPitch": -9.196606256067858,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "score": 0.37581248059716377,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.3757182676252925,
+        "first": "front",
+        "landPitch": -2.1664775125939535,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4143134362585592,
+        "first": "front",
+        "landPitch": -9.200361900482129,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      "score": 0.3757182676252925,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.37228914890941217,
+        "first": "front",
+        "landPitch": -1.1069603846641662,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4127819536193943,
+        "first": "front",
+        "landPitch": -7.563491865161572,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      "score": 0.37228914890941217,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.3719230009544159,
+        "first": "front",
+        "landPitch": -1.0684002512143524,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.41225742558407513,
+        "first": "front",
+        "landPitch": -7.540189177901955,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      "score": 0.3719230009544159,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.3713320939220463,
+        "first": "front",
+        "landPitch": -1.0733526230570296,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.41235035108074525,
+        "first": "front",
+        "landPitch": -7.526813703361268,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "score": 0.3713320939220463,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.371231746690428,
+        "first": "front",
+        "landPitch": -1.1104029891324265,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.41176833561119824,
+        "first": "front",
+        "landPitch": -7.542164933725145,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      "score": 0.371231746690428,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.3708635557113168,
+        "first": "front",
+        "landPitch": -1.1398978511607745,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.411577002516795,
+        "first": "front",
+        "landPitch": -7.559856191889477,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      "score": 0.3708635557113168,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.3707177021562201,
+        "first": "front",
+        "landPitch": -1.130800977068585,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4117000048386935,
+        "first": "front",
+        "landPitch": -7.512860676551275,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      "score": 0.3707177021562201,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 5,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.37035209424639565,
+        "first": "front",
+        "landPitch": -1.1708398937623612,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4113416851465328,
+        "first": "front",
+        "landPitch": -7.506233032505089,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      "score": 0.37035209424639565,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2725155175379742,
+        "first": "front",
+        "landPitch": 2.597090235822535,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.309835460554208,
+        "first": "front",
+        "landPitch": -3.213408243654154,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.2725155175379742,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2725155175379742,
+        "first": "front",
+        "landPitch": 2.597090235822535,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.309835460554208,
+        "first": "front",
+        "landPitch": -3.213408243654154,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.2725155175379742,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2725072798822727,
+        "first": "front",
+        "landPitch": 2.61166169194859,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3096724911648381,
+        "first": "front",
+        "landPitch": -5.037307993037666,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      "score": 0.2725072798822727,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2725072798822727,
+        "first": "front",
+        "landPitch": 2.61166169194859,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3096724911648381,
+        "first": "front",
+        "landPitch": -5.037307993037666,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      "score": 0.2725072798822727,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.27248635392859033,
+        "first": "front",
+        "landPitch": 2.5886107494422457,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3097368954817016,
+        "first": "front",
+        "landPitch": -3.1878545678525674,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.27248635392859033,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.27248635392859033,
+        "first": "front",
+        "landPitch": 2.5886107494422457,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3097368954817016,
+        "first": "front",
+        "landPitch": -3.1878545678525674,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.27248635392859033,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.27243735222093346,
+        "first": "front",
+        "landPitch": 2.606205728467438,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.30961075760314444,
+        "first": "front",
+        "landPitch": -3.197710405025884,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.27243735222093346,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.27242880726519364,
+        "first": "front",
+        "landPitch": 2.620134572177729,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.30964036865792743,
+        "first": "front",
+        "landPitch": -3.2240479842964,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.27242880726519364,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2723784794531657,
+        "first": "front",
+        "landPitch": 2.6253366789545707,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3095511807052188,
+        "first": "front",
+        "landPitch": -3.2143036528621387,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.2723784794531657,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2723754271782539,
+        "first": "front",
+        "landPitch": 2.6111472602290853,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.309695597045566,
+        "first": "front",
+        "landPitch": -3.19855369378495,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.2723754271782539,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2720546170429625,
+        "first": "front",
+        "landPitch": 2.6150047287285028,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3098356478500184,
+        "first": "front",
+        "landPitch": -3.212696587844705,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.2720546170429625,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2719596306654577,
+        "first": "front",
+        "landPitch": 2.626420612287915,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3097647366079095,
+        "first": "front",
+        "landPitch": -3.2029742121471343,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      "score": 0.2719596306654577,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.27139192828654246,
+        "first": "front",
+        "landPitch": 2.6347779854338347,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.31002788142447585,
+        "first": "front",
+        "landPitch": -3.3044416486720354,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      "score": 0.27139192828654246,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.27135041231330803,
+        "first": "front",
+        "landPitch": 2.6372971522117883,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3100220740596909,
+        "first": "front",
+        "landPitch": -3.307413091781836,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      "score": 0.27135041231330803,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.27111570488805425,
+        "first": "front",
+        "landPitch": 2.653333695484349,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3099889134785008,
+        "first": "front",
+        "landPitch": -3.325005167044948,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      "score": 0.27111570488805425,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.270992302520786,
+        "first": "front",
+        "landPitch": 2.6636051600931863,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3100513915212613,
+        "first": "front",
+        "landPitch": -3.3391666376698543,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      "score": 0.270992302520786,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2702729829392737,
+        "first": "front",
+        "landPitch": 1.201459439938656,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.30657665855541727,
+        "first": "front",
+        "landPitch": -3.1777285659720906,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "score": 0.2702729829392737,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2702729829392737,
+        "first": "front",
+        "landPitch": 1.201459439938656,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.30657665855541727,
+        "first": "front",
+        "landPitch": -3.1777285659720906,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "score": 0.2702729829392737,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.27009276694314743,
+        "first": "front",
+        "landPitch": 1.2373352896168777,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3065436958718129,
+        "first": "front",
+        "landPitch": -3.200838672487997,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "score": 0.27009276694314743,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.27009276694314743,
+        "first": "front",
+        "landPitch": 1.2373352896168777,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3065436958718129,
+        "first": "front",
+        "landPitch": -3.200838672487997,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "score": 0.27009276694314743,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2700743387213488,
+        "first": "front",
+        "landPitch": 1.238920553057172,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.30637308655927703,
+        "first": "front",
+        "landPitch": -3.1867824535458134,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "score": 0.2700743387213488,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2700678145520624,
+        "first": "front",
+        "landPitch": 1.237810861620104,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.30653410410279375,
+        "first": "front",
+        "landPitch": -3.1905269778641,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "score": 0.2700678145520624,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2700174796064536,
+        "first": "front",
+        "landPitch": 1.2231402226226789,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.30665849222924957,
+        "first": "front",
+        "landPitch": -3.1796479139412015,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "score": 0.2700174796064536,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2698815889790122,
+        "first": "front",
+        "landPitch": 1.2766349898392084,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3062364649327586,
+        "first": "front",
+        "landPitch": -5.016920994437001,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      "score": 0.2698815889790122,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2698719405757322,
+        "first": "front",
+        "landPitch": 1.2760343489595063,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3063214659848996,
+        "first": "front",
+        "landPitch": -3.2013129337890676,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "score": 0.2698719405757322,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2698668225177892,
+        "first": "front",
+        "landPitch": 1.2784196907485026,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3062469653560099,
+        "first": "front",
+        "landPitch": -4.993157522414542,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      "score": 0.2698668225177892,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2698668225177892,
+        "first": "front",
+        "landPitch": 1.2784196907485026,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3062469653560099,
+        "first": "front",
+        "landPitch": -4.993157522414542,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      "score": 0.2698668225177892,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.26980689284842885,
+        "first": "front",
+        "landPitch": 1.2474234051868156,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.30654498887031245,
+        "first": "front",
+        "landPitch": -3.173343452607441,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      "score": 0.26980689284842885,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2696478659213699,
+        "first": "front",
+        "landPitch": 1.2274785557279662,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3069209882402765,
+        "first": "front",
+        "landPitch": -3.2820929627348434,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      "score": 0.2696478659213699,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2696178280251914,
+        "first": "front",
+        "landPitch": 1.229849062337316,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3069189258416191,
+        "first": "front",
+        "landPitch": -3.285459149778278,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      "score": 0.2696178280251914,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.26939149075401503,
+        "first": "front",
+        "landPitch": 1.2496092569368171,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3069083888851079,
+        "first": "front",
+        "landPitch": -3.305471427415554,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      "score": 0.26939149075401503,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 500,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.26927948425500636,
+        "first": "front",
+        "landPitch": 1.2597681834262602,
+        "bothOff": 0.075,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.3070211021195088,
+        "first": "front",
+        "landPitch": -3.327554378141451,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      "score": 0.26927948425500636,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2521662449739457,
+        "first": "front",
+        "landPitch": -0.5073889400763957,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2868084877251372,
+        "first": "front",
+        "landPitch": -4.42174432193146,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.2521662449739457,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.25064939659502705,
+        "first": "front",
+        "landPitch": -0.3337852666840098,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.28465640386931873,
+        "first": "front",
+        "landPitch": -4.356125030663879,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.25064939659502705,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24966420109731202,
+        "first": "front",
+        "landPitch": -0.21466834763819378,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.28385525494341085,
+        "first": "front",
+        "landPitch": -4.311643767158358,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24966420109731202,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24950440224394022,
+        "first": "front",
+        "landPitch": -0.19682430815912047,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2836991931494179,
+        "first": "front",
+        "landPitch": -4.307465716804699,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24950440224394022,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24852503127728887,
+        "first": "front",
+        "landPitch": -0.07383418183489214,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.282396884496364,
+        "first": "front",
+        "landPitch": -4.231984922962016,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24852503127728887,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.247027560492177,
+        "first": "front",
+        "landPitch": -0.6346712172448022,
+        "bothOff": 0.008333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.28167834005278247,
+        "first": "front",
+        "landPitch": -4.244687046050144,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.247027560492177,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2467024042334125,
+        "first": "front",
+        "landPitch": -0.6217715701184023,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2814885949401434,
+        "first": "front",
+        "landPitch": -4.232009302449017,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.2467024042334125,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24664913206133798,
+        "first": "front",
+        "landPitch": -0.6083789942146791,
+        "bothOff": 0.008333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2814276996870527,
+        "first": "front",
+        "landPitch": -4.246624106573823,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24664913206133798,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24664913206133798,
+        "first": "front",
+        "landPitch": -0.6083789942146791,
+        "bothOff": 0.008333333333333333,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2814276996870527,
+        "first": "front",
+        "landPitch": -4.246624106573823,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24664913206133798,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24577241691367657,
+        "first": "front",
+        "landPitch": 0.17080864306684548,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2809946988563085,
+        "first": "front",
+        "landPitch": -4.2413922331215685,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24577241691367657,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24560137239478208,
+        "first": "front",
+        "landPitch": 0.19399201979607483,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2807968807394838,
+        "first": "front",
+        "landPitch": -4.22813468573271,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24560137239478208,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24560137239478208,
+        "first": "front",
+        "landPitch": 0.19399201979607483,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2807968807394838,
+        "first": "front",
+        "landPitch": -4.22813468573271,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24560137239478208,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 3200,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.2454184249905223,
+        "first": "front",
+        "landPitch": 0.20206884481534718,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2806996845817864,
+        "first": "front",
+        "landPitch": -4.244660824428358,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.2454184249905223,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24487046421649333,
+        "first": "front",
+        "landPitch": 0.25311660249551987,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.2802286977861447,
+        "first": "front",
+        "landPitch": -4.271433615549187,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24487046421649333,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24466147124202026,
+        "first": "front",
+        "landPitch": 0.2710497299302284,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.27992264980793724,
+        "first": "front",
+        "landPitch": -4.327268912674044,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24466147124202026,
+      "pass": false
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 3,
+          "tauMax": 300,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.24466147124202026,
+        "first": "front",
+        "landPitch": 0.2710497299302284,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.27992264980793724,
+        "first": "front",
+        "landPitch": -4.327268912674044,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "score": 0.24466147124202026,
+      "pass": false
+    }
+  ],
+  "best": [
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46533307943579927,
+        "first": "front",
+        "landPitch": -4.3285002924960665,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49681961070673064,
+        "first": "front",
+        "landPitch": -11.889388456387815,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46533307943579927,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -3.958559075489499,
+        "maxPitch": 9.22916598198428,
+        "fault": null,
+        "rebound": 0.1027094716225212,
+        "airAfter": 0.23333333333333334,
+        "endV": 11.858264635095239
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.270739794317131,
+        "maxPitch": 11.265982401259818,
+        "fault": null,
+        "rebound": 0.16160489294867086,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.108945862885712
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4653130699359269,
+        "first": "front",
+        "landPitch": -4.346523044309356,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49657435273007394,
+        "first": "front",
+        "landPitch": -11.890536310821707,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4653130699359269,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -4.063863608801694,
+        "maxPitch": 9.22227728075293,
+        "fault": null,
+        "rebound": 0.10385391358640272,
+        "airAfter": 0.23333333333333334,
+        "endV": 11.858187410730201
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.347754898482981,
+        "maxPitch": 11.25805687193138,
+        "fault": null,
+        "rebound": 0.16280483770471094,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.109075103542063
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4653054740913999,
+        "first": "front",
+        "landPitch": -4.341851563478769,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4967790643414395,
+        "first": "front",
+        "landPitch": -11.898390829878041,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4653054740913999,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -3.9250309818698303,
+        "maxPitch": 9.22916598198428,
+        "fault": null,
+        "rebound": 0.10261444873793008,
+        "airAfter": 0.23333333333333334,
+        "endV": 11.858181829758191
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.2182445944799705,
+        "maxPitch": 11.265982401259818,
+        "fault": null,
+        "rebound": 0.1613526602401154,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.108965704074583
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46525080362501237,
+        "first": "front",
+        "landPitch": -4.364408295599473,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4965441500187439,
+        "first": "front",
+        "landPitch": -11.898542258991723,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46525080362501237,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -4.028712800644537,
+        "maxPitch": 9.22227728075293,
+        "fault": null,
+        "rebound": 0.10366890700122966,
+        "airAfter": 0.23333333333333334,
+        "endV": 11.85820943156523
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.301029387585232,
+        "maxPitch": 11.25805687193138,
+        "fault": null,
+        "rebound": 0.16260125281364396,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.10914214845183
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46504787200497866,
+        "first": "front",
+        "landPitch": -4.339876216895732,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49701713636686434,
+        "first": "front",
+        "landPitch": -11.945016225524594,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46504787200497866,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -3.807639375916633,
+        "maxPitch": 9.243270397827208,
+        "fault": null,
+        "rebound": 0.10158738981909932,
+        "airAfter": 0.23333333333333334,
+        "endV": 11.857993308632022
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.130764038111771,
+        "maxPitch": 11.282065233564621,
+        "fault": null,
+        "rebound": 0.159995186516388,
+        "airAfter": 0.3,
+        "endV": 12.10870867274917
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4650206223719774,
+        "first": "front",
+        "landPitch": -4.329330683584223,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49701375147613874,
+        "first": "front",
+        "landPitch": -11.938066213401124,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4650206223719774,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -3.8528445053902325,
+        "maxPitch": 9.243270397827208,
+        "fault": null,
+        "rebound": 0.10174928389826621,
+        "airAfter": 0.23333333333333334,
+        "endV": 11.85797246483877
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.190463644849551,
+        "maxPitch": 11.282065233564621,
+        "fault": null,
+        "rebound": 0.1601903250297103,
+        "airAfter": 0.3,
+        "endV": 12.108657915354105
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4800,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4648368104044171,
+        "first": "front",
+        "landPitch": -4.443508045296073,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.496101200404936,
+        "first": "front",
+        "landPitch": -12.106096766657787,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4648368104044171,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -4.187382364737649,
+        "maxPitch": 9.21548487994327,
+        "fault": null,
+        "rebound": 0.10514577494254818,
+        "airAfter": 0.24166666666666667,
+        "endV": 11.858172897582367
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.532300001260295,
+        "maxPitch": 11.250194523672937,
+        "fault": null,
+        "rebound": 0.16499312406555006,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.1085945323766
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46468153142230045,
+        "first": "front",
+        "landPitch": -4.3096499182603045,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.496087837348819,
+        "first": "front",
+        "landPitch": -11.865144980268859,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46468153142230045,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -4.231610680234027,
+        "maxPitch": 9.21548487994327,
+        "fault": null,
+        "rebound": 0.10537048472770921,
+        "airAfter": 0.24166666666666667,
+        "endV": 11.8580131788981
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.626949160859875,
+        "maxPitch": 11.250194523672937,
+        "fault": null,
+        "rebound": 0.1654481169848699,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.108337563736143
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.05
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46467180537244945,
+        "first": "front",
+        "landPitch": -4.280690243947003,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4962795556716582,
+        "first": "front",
+        "landPitch": -11.846027339186818,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46467180537244945,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -4.1110932828436395,
+        "maxPitch": 9.22227728075293,
+        "fault": null,
+        "rebound": 0.10408566495144755,
+        "airAfter": 0.23333333333333334,
+        "endV": 11.858196882383313
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.379652762739238,
+        "maxPitch": 11.25805687193138,
+        "fault": null,
+        "rebound": 0.16294155282579464,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.109000341252738
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 6000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4645135963667691,
+        "first": "front",
+        "landPitch": -3.127858544367318,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.49607710584303966,
+        "first": "front",
+        "landPitch": -12.113770089301111,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4645135963667691,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -4.158580023259404,
+        "maxPitch": 9.21548487994327,
+        "fault": null,
+        "rebound": 0.1049454681110471,
+        "airAfter": 0.24166666666666667,
+        "endV": 11.858278537344864
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.494200587368816,
+        "maxPitch": 11.250194523672937,
+        "fault": null,
+        "rebound": 0.16485536247342986,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.108682380845442
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.1
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.46417978076487887,
+        "first": "front",
+        "landPitch": -4.365344580337948,
+        "bothOff": 0.05,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4964081682190218,
+        "first": "front",
+        "landPitch": -11.859942768902519,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.46417978076487887,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -4.012452791363129,
+        "maxPitch": 9.22916598198428,
+        "fault": null,
+        "rebound": 0.10289916265421994,
+        "airAfter": 0.23333333333333334,
+        "endV": 11.85826964060053
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.304520437769493,
+        "maxPitch": 11.265982401259818,
+        "fault": null,
+        "rebound": 0.1617635143857481,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.108933075748492
+      }
+    },
+    {
+      "over": {
+        "rider": {
+          "Fmax": 4000,
+          "targetRateLin": 7,
+          "tauMax": 800,
+          "hold": {
+            "mu": 0.2
+          }
+        }
+      },
+      "rookie": {
+        "apexR": 0.4628040816862009,
+        "first": "front",
+        "landPitch": -3.007700122726708,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      "pro": {
+        "apexR": 0.4962456802888581,
+        "first": "front",
+        "landPitch": -12.107635884029452,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      "score": 0.4628040816862009,
+      "pass": true,
+      "dropRookie": {
+        "maxRear": 1,
+        "minPitch": -3.9068593644451863,
+        "maxPitch": 9.243270397827208,
+        "fault": null,
+        "rebound": 0.10192494164006893,
+        "airAfter": 0.23333333333333334,
+        "endV": 11.857977205738738
+      },
+      "dropPro": {
+        "maxRear": 1,
+        "minPitch": -4.23060438231721,
+        "maxPitch": 11.282065233564621,
+        "fault": null,
+        "rebound": 0.16032589090495108,
+        "airAfter": 0.30833333333333335,
+        "endV": 12.108642621869736
+      }
+    }
+  ]
+}

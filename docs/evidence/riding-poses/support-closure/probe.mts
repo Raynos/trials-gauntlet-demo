@@ -1,0 +1,24 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import { gunzipSync } from 'node:zlib';
+import { createBikePhysicsV2 } from '../../../../src/physics/v2/bike';
+import { decodeJSON, expandFrames } from '../../../../src/core/replay';
+import { compileTrack, getTrack } from '../../../../src/tracks';
+import { RunRules } from '../../../../harness/lib/rules';
+const baselineSource=gunzipSync(fs.readFileSync(new URL('./baseline-bike.ts.gz',import.meta.url))).toString();
+const rewritten=baselineSource.replace(/from '([^']+)'/g,(all,specifier:string)=>specifier.startsWith('.') ? `from '${path.resolve('src/physics/v2',specifier)}'` : all);
+const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'support-closure-'));
+const baselinePath=path.join(temporary,'baseline.mts');fs.writeFileSync(baselinePath,rewritten);
+const {createBikePhysicsV2:baselineFactory}=await import(baselinePath) as {createBikePhysicsV2:typeof createBikePhysicsV2};
+const rec=decodeJSON(gunzipSync(fs.readFileSync(new URL('./h1-pro-input.json.gz',import.meta.url))).toString());
+const track=compileTrack(getTrack(rec.header.trackId)!);
+const old=baselineFactory(120),current=createBikePhysicsV2(120);
+for(const w of [old,current])w.loadTrack(track,rec.header.seed,{bike:'pro'});
+const rules=new RunRules(old,120);old.drainEvents();rules.go();rules.drainEvents();
+const inputs=[...expandFrames(rec)];for(let i=0;i<3918;i++)rules.tick(inputs[i]!);
+const snap=old.snapshot();current.restore(snap);
+const measure=(w:ReturnType<typeof createBikePhysicsV2>)=>{const s=w.getState(),d=w.debug();return {hips:s.riderBody!.drawn!.hips,comLag:Math.hypot(d.rider.lag.x,d.rider.lag.y),seatJ:d.rider.hold.seatJ,force:d.rider.servoForce,fault:s.faulted};};
+const results=[];
+for(let i=0;i<180;i++){old.step(inputs[3918]!);current.step(inputs[3918]!);if(i%15===0||i===179)results.push({ticks:i+1,baseline:measure(old),candidate:measure(current)});}
+fs.writeFileSync(new URL('./recovery-isolation.json',import.meta.url),JSON.stringify(results,null,2)+'\n');console.log(results);fs.rmSync(temporary,{recursive:true});

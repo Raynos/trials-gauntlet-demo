@@ -110,7 +110,9 @@ try {
     if (m.type() !== 'error' && m.type() !== 'warning') return;
     const message = `${m.type()}: ${m.text()}`;
     errors.push(message);
-    const knownWarning = m.type() === 'warning' && /GPU stall due to ReadPixels|KHR_parallel_shader_compile extension not supported|\[render\] track budget:/.test(m.text());
+    // Browser readback optimization advice is retained in evidence, but is not
+    // a rendering failure. Screenshot capture itself exercises readback.
+    const knownWarning = m.type() === 'warning' && /GPU stall due to ReadPixels|KHR_parallel_shader_compile extension not supported|\[render\] track budget:|^Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute/.test(m.text());
     if (!knownWarning) executionErrors.push(message);
   });
   page.on('response', response => {
@@ -204,7 +206,17 @@ try {
           contacts[o.name] = point.toArray();
         }
       });
-      return { renderMs, renderSyncedMs, segmentTick: state.tick, stateTime: state.time, renderedTime, runTime: t.runTime(), phase: t.phase(), stateHash: t.hashState(), stateJson: JSON.stringify(state), boneOrigins: contacts, rider: structuredClone(d.rider.debug), camera: t.camera(), heroDoc: r.debugInfo().heroDoc };
+      // Actual skinned skeleton joints in world space, including the detached crash body.
+      // This is measured after drawing and can be compared with independently replayed sensors.
+      const jointWorld: Record<string, number[]> = {};
+      d.scene.traverse(o => {
+        const mesh = o as SkinnedMesh;
+        if (!mesh.isSkinnedMesh || mesh.skeleton.bones.length !== 19) return;
+        for (const bone of mesh.skeleton.bones) {
+          if (!(bone.name in jointWorld)) jointWorld[bone.name] = bone.getWorldPosition(new d.THREE.Vector3()).toArray();
+        }
+      });
+      return { jointWorld, renderMs, renderSyncedMs, segmentTick: state.tick, stateTime: state.time, renderedTime, runTime: t.runTime(), phase: t.phase(), stateHash: t.hashState(), stateJson: JSON.stringify(state), boneOrigins: contacts, rider: structuredClone(d.rider.debug), camera: t.camera(), heroDoc: r.debugInfo().heroDoc };
     }, inputs.slice(tick, tick + ticksPerFrame));
     trace.push({ inputTick: tick + ticksPerFrame, ...sample });
     if (tick >= from) {

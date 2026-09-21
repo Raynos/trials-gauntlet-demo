@@ -1,0 +1,102 @@
+--- /tmp/pose-support-before.ts	2026-09-21 06:03:17
++++ src/physics/v2/bike.ts	2026-09-21 06:06:17
+@@ -2101,28 +2101,30 @@
+           if (k !== 0) ga = gx * (-RIDER_PROFILE.torso * torsoSin) + gy * (RIDER_PROFILE.torso * torsoCos);
+         } else if (k === 2) {
+           // A rounded pelvis against the finite seat: corner normals change continuously as the hips
+-          // shuffle behind its rear edge. A binary x-span switch introduced a discontinuous hop impulse.
++          // shuffle behind its rear edge. Support extends downwards so impact penetration cannot
++          // put the rider underneath a thin box and make the support oppose upward recovery.
++          // A binary x-span switch introduced a discontinuous hop impulse.
+           const centreDrop = 0.08,
+             radius = 0.09;
+           const cx = p.hips.x - centreDrop * torsoCos,
+             cy = p.hips.y - centreDrop * torsoSin;
+           const mx = (RIDER_SEAT.rearX + RIDER_SEAT.frontX) * 0.5,
+-            my = RIDER_SEAT.topY - 0.02;
++            top = RIDER_SEAT.topY;
+           const qx = Math.abs(cx - mx) - (RIDER_SEAT.frontX - RIDER_SEAT.rearX) * 0.5,
+-            qy = Math.abs(cy - my) - 0.02;
++            qy = cy - top;
+           const ex = Math.max(0, qx),
+             ey = Math.max(0, qy),
+             len = Math.sqrt(ex * ex + ey * ey);
+           C = Math.min(Math.max(qx, qy), 0) + len - radius;
+           if (len > 1e-9) {
+             gx = ((cx < mx ? -1 : 1) * ex) / len;
+-            gy = ((cy < my ? -1 : 1) * ey) / len;
++            gy = ey / len;
+           } else if (qx > qy) {
+             gx = cx < mx ? -1 : 1;
+             gy = 0;
+           } else {
+             gx = 0;
+-            gy = cy < my ? -1 : 1;
++            gy = 1;
+           }
+           // CPU-skinned garment probe: rear fender envelope tops at .5504m; pelvis/thigh support
+           // needs an additional 30mm radius beyond the seat proxy (Openface limits clearance) (cloth-audit/rear-support.json).
+@@ -2131,12 +2133,12 @@
+           // tapering smoothly to the proven40° support. Its derivative is part of the joint.
+           const supportBlend = clamp((40 - (torso * 180) / PI) / 20, 0, 1);
+           const fmx = -0.725,
+-            fmy = 0.5304,
++            ftop = 0.5504,
+             fr = 0.12 + 0.03 * supportBlend * supportBlend * (3 - 2 * supportBlend);
+           const radiusDerivative = (-0.03 * 6 * supportBlend * (1 - supportBlend) * 180) / (20 * PI);
+           let supportAngleGradient = 0;
+           const fqx = Math.abs(cx - fmx) - 0.225,
+-            fqy = Math.abs(cy - fmy) - 0.02;
++            fqy = cy - ftop;
+           const fex = Math.max(0, fqx),
+             fey = Math.max(0, fqy),
+             fl = Math.sqrt(fex * fex + fey * fey);
+@@ -2146,13 +2148,13 @@
+             supportAngleGradient = -radiusDerivative;
+             if (fl > 1e-9) {
+               gx = ((cx < fmx ? -1 : 1) * fex) / fl;
+-              gy = ((cy < fmy ? -1 : 1) * fey) / fl;
++              gy = fey / fl;
+             } else if (fqx > fqy) {
+               gx = cx < fmx ? -1 : 1;
+               gy = 0;
+             } else {
+               gx = 0;
+-              gy = cy < fmy ? -1 : 1;
++              gy = 1;
+             }
+           }
+           ga = centreDrop * (gx * torsoSin - gy * torsoCos) + supportAngleGradient;
+@@ -2424,6 +2426,32 @@
+         }
+       }
+       if (this.U[U_FAULT] === 0 && this.holdLam.some((v) => v > 0)) this.solveHold(true);
++    }
++    // Contacts and rider support above can move the chassis after the suspension rows.
++    // Close both physical joints together; independent last-row projections would
++    // disturb the other wheel through their shared chassis. This mass-weighted block
++    // preserves the positional centre of mass and changes the physical wheel states.
++    for (let it = 0; it < Math.min(2, t.solver.posIters); it++) {
++      this.suspensionGeometry(0);
++      this.suspensionGeometry(1);
++      const e0 = this.sPerp[0]!, e1 = this.sPerp[1]!;
++      if (Math.max(Math.abs(e0), Math.abs(e1)) < 0.00025) break;
++      const nx0 = this.sNx[0]!, ny0 = this.sNy[0]!, nx1 = this.sNx[1]!, ny1 = this.sNy[1]!;
++      const r0 = (px[REAR]! - px[CHASSIS]!) * ny0 - (py[REAR]! - py[CHASSIS]!) * nx0;
++      const r1 = (px[FRONT]! - px[CHASSIS]!) * ny1 - (py[FRONT]! - py[CHASSIS]!) * nx1;
++      const m0 = im[REAR]! + im[CHASSIS]! + ii[CHASSIS]! * r0 * r0;
++      const m1 = im[FRONT]! + im[CHASSIS]! + ii[CHASSIS]! * r1 * r1;
++      const cross = im[CHASSIS]! * (nx0 * nx1 + ny0 * ny1) + ii[CHASSIS]! * r0 * r1;
++      const det = m0 * m1 - cross * cross;
++      const j0 = (-e0 * m1 + e1 * cross) / det;
++      const j1 = (-e1 * m0 + e0 * cross) / det;
++      px[REAR] = px[REAR]! + j0 * nx0 * im[REAR]!;
++      py[REAR] = py[REAR]! + j0 * ny0 * im[REAR]!;
++      px[FRONT] = px[FRONT]! + j1 * nx1 * im[FRONT]!;
++      py[FRONT] = py[FRONT]! + j1 * ny1 * im[FRONT]!;
++      px[CHASSIS] = px[CHASSIS]! - (j0 * nx0 + j1 * nx1) * im[CHASSIS]!;
++      py[CHASSIS] = py[CHASSIS]! - (j0 * ny0 + j1 * ny1) * im[CHASSIS]!;
++      an[CHASSIS] = an[CHASSIS]! - ii[CHASSIS]! * (r0 * j0 + r1 * j1);
+     }
+   }
+ 

@@ -18,6 +18,7 @@ function fixtureRoot(): string {
   w('src/core/hash.ts', 'export const h = 1;\n');
   w('src/core/replay.ts', 'export const r = 1;\n');
   w('src/core/rng.ts', 'export const rng = 1;\n');
+  w('src/core/riderGeometry.ts', 'export const torso = 0.52;\n');
   w('src/core/types.ts', 'export interface State { x: number }\n');
   w('src/core/loop.ts', 'export const loop = 1;\n');
   w('src/core/global.d.ts', 'declare const x: number;\n');
@@ -34,7 +35,7 @@ describe('srcFingerprint (round 12: sim files only)', () => {
       expect(simFingerprint(root), rel).toBe(base);
     }
     let prev = base;
-    for (const rel of ['src/physics/v2/bike.ts', 'src/tracks/b1.ts', 'src/game/rules.ts', 'src/core/hash.ts', 'src/core/replay.ts', 'src/core/rng.ts']) {
+    for (const rel of ['src/physics/v2/bike.ts', 'src/tracks/b1.ts', 'src/game/rules.ts', 'src/core/hash.ts', 'src/core/replay.ts', 'src/core/rng.ts', 'src/core/riderGeometry.ts']) {
       fs.appendFileSync(path.join(root, rel), '// changed\n');
       const next = simFingerprint(root);
       expect(next, rel).not.toBe(prev);

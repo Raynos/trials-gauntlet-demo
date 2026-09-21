@@ -247,18 +247,37 @@ describe('landing (R3 decision 1): the intent gate separates a landing recovery 
     }
   });
 
-  it('the gate is the difference: with the closing cap off (R2) the 2 m drop at lean 0 pogos > 0.4 m and 3 m loops; with it on the hop keeps >= 97 % of its apex (the snap moves the target, the landing does not)', () => {
+  it('the closing cap bounds force during landing recovery; intended hops retain >= 97 % of the uncapped apex and >= 0.45 m', () => {
     const off2 = drop('rookie', 2, 6, 0, CAP_OFF);
     const off3 = drop('rookie', 3, 6, 0, CAP_OFF);
-    feel('land.capOff.2m.rebound', off2.rebound, '> 0.4 (the R2 pogo)');
-    feel('land.capOff.3m.result', off3.fault ?? 'rides away', 'crash (the R2 loop)');
-    // R7: with the rider body held (linkage couple) the cap-off pogo is 0.247 m at 2 m and the 3 m drop rides away (R3 measured
-    // 0.4+ and a loop: the torso wind-up fed the R2 pogo). The cap still separates a landing from a hop (the on-rows and the
-    // R7 coasting-push row); the control arm is re-derived
-    // R9 (Astra's elbow stop, armMin 0.10 m, physics.md v2 status R9): the cap-off 2 m pogo is 0.204 -> 0.176 m (the folded
-    // arm is a strut on the rebound); the cap-on row is 0.01 m, so the gate still separates a landing from a hop by 17x
-    expect(off2.rebound).toBeGreaterThan(0.15);
+    feel('land.capOff.2m.rebound', off2.rebound, 'informational control; do not require a pogo');
+    feel('land.capOff.3m.result', off3.fault ?? 'rides away', 'no fault');
     expect(off3.fault).toBeNull();
+    // Compare the force law on IDENTICAL pre-tick snapshots. Comparing two full
+    // drop trajectories confounds the cap with different contacts and torso motion.
+    // Safer body geometry must not fail because an uncapped control no longer pogos.
+    const landing = flatWorld('rookie');
+    const rawLanding = flatWorld('rookie', CAP_OFF);
+    const start = landing.getState();
+    landing.teleport({ pos: { x: start.wheels.rear.pos.x, y: start.wheels.rear.pos.y + 2 }, angle: 5 * Math.PI / 180, vel: { x: 6, y: 0 } });
+    const input = quantizeInput({ throttle: .2, lean: 0 });
+    let recoveryCapTicks = 0;
+    for (let tick = 0; tick < 360 && !landing.getState().faulted; tick++) {
+      rawLanding.restore(landing.snapshot());
+      landing.step(input); rawLanding.step(input);
+      const capped = landing.debug().rider, raw = rawLanding.debug().rider;
+      const force = Math.hypot(capped.servoForce.x, capped.servoForce.y);
+      const rawForce = Math.hypot(raw.servoForce.x, raw.servoForce.y);
+      expect(force).toBeLessThanOrEqual(landing.tuning.rider.Fmax * capped.legFrac + 1e-8);
+      expect(rawForce).toBeLessThanOrEqual(rawLanding.tuning.rider.Fmax + 1e-8);
+      expect(force).toBeCloseTo(Math.min(rawForce, landing.tuning.rider.Fmax * capped.legFrac), 7);
+      if (capped.intent < .02 && capped.legFrac < .99) {
+        recoveryCapTicks++;
+        expect(capped.legFrac).toBeLessThan(1);
+        expect(raw.legFrac).toBe(1);
+      }
+    }
+    expect(recoveryCapTicks, 'closing recovery lowers the force ceiling with no input intent').toBeGreaterThan(0);
     const on = hop('rookie').apexR;
     const off = hop('rookie', {}, CAP_OFF).apexR;
     feel('hop.capOn.apex', on, '>= 0.45');

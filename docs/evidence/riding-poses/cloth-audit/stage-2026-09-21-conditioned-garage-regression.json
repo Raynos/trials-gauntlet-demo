@@ -1,0 +1,1803 @@
+{
+  "generated": "2026-09-21T09:04:51.659Z",
+  "sourceHashes": {
+    "src/render/hero/gltfRider.ts": "1591ab66d6d5c16e15d2f133bcfc4cdd5e269ad70196b926a1cb3a3f139d72f9",
+    "src/render/hero/sleeveSkin.ts": "3098d6e531464e1367f256400079ab9759b1644bd006d172eb1cffd9b5e828d5"
+  },
+  "subjects": [
+    {
+      "file": "rider-street-mustard.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.01885992897473543,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 12,
+      "candidates": [
+        {
+          "mesh": "rider_body",
+          "triangle": 1530,
+          "edgeRatio": 1.664349431665275,
+          "originalEdgeRatio": 1.0803421675379956,
+          "center": [
+            -0.09913831321496328,
+            1.0091755663146484,
+            0.21176413369940753
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1531,
+          "edgeRatio": 1.664349431665275,
+          "originalEdgeRatio": 1.0803421675379956,
+          "center": [
+            -0.10883531984911124,
+            1.008962632131996,
+            0.21291486920920724
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 15414,
+          "edgeRatio": 1.6627488054257773,
+          "originalEdgeRatio": 1.0808126590563667,
+          "center": [
+            -0.09906931575342992,
+            1.0099161310898515,
+            0.20992782249355457
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 15415,
+          "edgeRatio": 1.6627488054257773,
+          "originalEdgeRatio": 1.0808126590563667,
+          "center": [
+            -0.1086908856356508,
+            1.0096531361620378,
+            0.2110478177104397
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 280,
+          "edgeRatio": 1.554466539507199,
+          "originalEdgeRatio": 1.0615225530548322,
+          "center": [
+            -0.09890622056347179,
+            1.0067858330290895,
+            -0.21250165424386064
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 5335,
+          "edgeRatio": 1.554466539507199,
+          "originalEdgeRatio": 1.0615225530548322,
+          "center": [
+            -0.08950978519653033,
+            1.0077919947843608,
+            -0.21122789224694874
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 14168,
+          "edgeRatio": 1.5433591104775206,
+          "originalEdgeRatio": 1.0623344726361268,
+          "center": [
+            -0.0988563364904665,
+            1.0074563238710257,
+            -0.21067719958461373
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 19188,
+          "edgeRatio": 1.5433591104775206,
+          "originalEdgeRatio": 1.0623344726361268,
+          "center": [
+            -0.08949492462488987,
+            1.0085220320245063,
+            -0.20945405575713094
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 14120,
+          "edgeRatio": 1.6681835449374467,
+          "originalEdgeRatio": 1.245791737961908,
+          "center": [
+            -0.13820504802497025,
+            1.0661829101927032,
+            -0.20925590683729772
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 14154,
+          "edgeRatio": 1.6681835449374467,
+          "originalEdgeRatio": 1.245791737961908,
+          "center": [
+            -0.13109019986086604,
+            1.0676827890936322,
+            -0.2128359603436302
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 5352,
+          "edgeRatio": 1.566793735865756,
+          "originalEdgeRatio": 1.1725212739941526,
+          "center": [
+            -0.15100306854961767,
+            1.0729044361349227,
+            -0.20186517144850064
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 6932,
+          "edgeRatio": 1.566793735865756,
+          "originalEdgeRatio": 1.1725212739941526,
+          "center": [
+            -0.14049407164277788,
+            1.078805529958917,
+            -0.20903811968086816
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1911,
+          "edgeRatio": 1.5711724930045985,
+          "originalEdgeRatio": 1.2323591485700345,
+          "center": [
+            0.0759524416874084,
+            1.1906850100356758,
+            0.11624374179092475
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1872,
+          "edgeRatio": 1.5523981354669711,
+          "originalEdgeRatio": 1.2224946548245421,
+          "center": [
+            0.06765744593389836,
+            1.198385304558932,
+            0.11388159331077133
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 24602,
+          "edgeRatio": 1.5753642519596107,
+          "originalEdgeRatio": 1.2486922406136431,
+          "center": [
+            0.07258269331907248,
+            1.1905326640960843,
+            0.12517838842935725
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 6735,
+          "edgeRatio": 1.5411485713507695,
+          "originalEdgeRatio": 1.215490860978472,
+          "center": [
+            0.0698429790487058,
+            1.1973799584413432,
+            -0.11178971712412658
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 10841,
+          "edgeRatio": 1.5863721157294408,
+          "originalEdgeRatio": 1.2685554650429904,
+          "center": [
+            0.07775592057873751,
+            1.186933111117113,
+            0.13689484310687774
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 5399,
+          "edgeRatio": 1.5594114453009085,
+          "originalEdgeRatio": 1.255743446050147,
+          "center": [
+            0.07636712355752565,
+            1.1894047769826948,
+            -0.12187104595146292
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 4050,
+          "edgeRatio": 1.347074778246753,
+          "originalEdgeRatio": 1.0442263882976142,
+          "center": [
+            0.055081042428242924,
+            1.0402708475261262,
+            -0.1629699352360228
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 10714,
+          "edgeRatio": 1.5676146452763233,
+          "originalEdgeRatio": 1.2659084945499706,
+          "center": [
+            -0.06468369120241638,
+            1.1811233799074334,
+            0.134226359264215
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 11184,
+          "edgeRatio": 1.5676146452763233,
+          "originalEdgeRatio": 1.2672450684485057,
+          "center": [
+            -0.06594236322944465,
+            1.1832440154281607,
+            0.1486772441023566
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 17897,
+          "edgeRatio": 1.3484462670292197,
+          "originalEdgeRatio": 1.0484924540773275,
+          "center": [
+            0.05496477165489869,
+            1.0414620467146476,
+            -0.16050323783180054
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 17898,
+          "edgeRatio": 1.3484462670292197,
+          "originalEdgeRatio": 1.0484924540773275,
+          "center": [
+            0.054161271791116364,
+            1.0307596505252865,
+            -0.16756996860379605
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 4051,
+          "edgeRatio": 1.347074778246753,
+          "originalEdgeRatio": 1.047694130432061,
+          "center": [
+            0.055747099242325085,
+            1.030255300461747,
+            -0.16837658220205975
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        }
+      ]
+    },
+    {
+      "file": "rider-street-mustard-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.02173216881816055,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 1,
+      "candidates": [
+        {
+          "mesh": "rider_body",
+          "triangle": 213,
+          "edgeRatio": 1.4566457799763997,
+          "originalEdgeRatio": 1.2006196466846066,
+          "center": [
+            0.08450383990562,
+            1.1871438840131339,
+            0.10369015737098392
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        }
+      ]
+    },
+    {
+      "file": "rider-street-openface.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.019052409076047445,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 19,
+      "candidates": [
+        {
+          "mesh": "rider_body",
+          "triangle": 1679,
+          "edgeRatio": 1.6899240419936012,
+          "originalEdgeRatio": 1.0803421675379956,
+          "center": [
+            -0.0992005263397864,
+            1.00940719035372,
+            0.21164794225434336
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1680,
+          "edgeRatio": 1.6899240419936012,
+          "originalEdgeRatio": 1.0803421675379956,
+          "center": [
+            -0.10885375181068035,
+            1.0090464162876054,
+            0.21287592623716511
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 16973,
+          "edgeRatio": 1.6880584473592604,
+          "originalEdgeRatio": 1.0808126590563667,
+          "center": [
+            -0.09912938188927896,
+            1.0101476169337273,
+            0.20981330141241822
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 16974,
+          "edgeRatio": 1.6880584473592604,
+          "originalEdgeRatio": 1.0808126590563667,
+          "center": [
+            -0.10870862077797583,
+            1.0097369413861292,
+            0.21100940258499457
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 305,
+          "edgeRatio": 1.554466539507199,
+          "originalEdgeRatio": 1.0615225530548322,
+          "center": [
+            -0.09890622056347179,
+            1.0067858330290895,
+            -0.21250165424386064
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 5906,
+          "edgeRatio": 1.554466539507199,
+          "originalEdgeRatio": 1.0615225530548322,
+          "center": [
+            -0.08950978519653033,
+            1.0077919947843608,
+            -0.21122789224694874
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 15617,
+          "edgeRatio": 1.5433591104775206,
+          "originalEdgeRatio": 1.0623344726361268,
+          "center": [
+            -0.0988563364904665,
+            1.0074563238710257,
+            -0.21067719958461373
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 21120,
+          "edgeRatio": 1.5433591104775206,
+          "originalEdgeRatio": 1.0623344726361268,
+          "center": [
+            -0.08949492462488987,
+            1.0085220320245063,
+            -0.20945405575713094
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 2037,
+          "edgeRatio": 1.6318855197159927,
+          "originalEdgeRatio": 1.2171642326674714,
+          "center": [
+            0.06948039081412145,
+            1.196539500862563,
+            0.11923365089235585
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 2081,
+          "edgeRatio": 1.6208946786372067,
+          "originalEdgeRatio": 1.2323591485700345,
+          "center": [
+            0.07501909349156069,
+            1.192269240483148,
+            0.11306238148275806
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 27089,
+          "edgeRatio": 1.5668381352207874,
+          "originalEdgeRatio": 1.2336848292956457,
+          "center": [
+            0.07218467180567148,
+            1.1910585333757173,
+            0.12504784675271197
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 5976,
+          "edgeRatio": 1.5901227926281971,
+          "originalEdgeRatio": 1.2710538017332333,
+          "center": [
+            0.0762732495609765,
+            1.1893035024209981,
+            -0.12343130376371586
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 7433,
+          "edgeRatio": 1.531674025949638,
+          "originalEdgeRatio": 1.215490860978472,
+          "center": [
+            0.06970543341076792,
+            1.1974184168456292,
+            -0.11167384385261397
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 11830,
+          "edgeRatio": 1.6144795479709515,
+          "originalEdgeRatio": 1.3000938826529986,
+          "center": [
+            -0.06373441303641625,
+            1.1809525263474598,
+            0.13207970531532945
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 12347,
+          "edgeRatio": 1.6144795479709515,
+          "originalEdgeRatio": 1.3000938826529986,
+          "center": [
+            -0.07266597609866579,
+            1.178704200474473,
+            0.13872995523711049
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 21342,
+          "edgeRatio": 1.5873572055798728,
+          "originalEdgeRatio": 1.2756640297242683,
+          "center": [
+            -0.0812626153172898,
+            1.1769011184636677,
+            -0.15010694726089913
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 21578,
+          "edgeRatio": 1.5873572055798728,
+          "originalEdgeRatio": 1.2756640297242683,
+          "center": [
+            -0.07533032191930777,
+            1.1751290875118166,
+            -0.13279627280531167
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 27088,
+          "edgeRatio": 1.558513348247918,
+          "originalEdgeRatio": 1.2494944010823337,
+          "center": [
+            0.07726053375889108,
+            1.1853476258717124,
+            0.13654697574960498
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 6125,
+          "edgeRatio": 1.5899526110566837,
+          "originalEdgeRatio": 1.2839966536843574,
+          "center": [
+            -0.08068775580448073,
+            1.1791674296698482,
+            -0.15126585558097508
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 6367,
+          "edgeRatio": 1.5899526110566837,
+          "originalEdgeRatio": 1.2839966536843574,
+          "center": [
+            -0.0759047240297587,
+            1.1768548049985745,
+            -0.13263994975993548
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 4455,
+          "edgeRatio": 1.343076752306326,
+          "originalEdgeRatio": 1.0442263882976142,
+          "center": [
+            0.054799012302391925,
+            1.0404670969221863,
+            -0.16269741288810258
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 11594,
+          "edgeRatio": 1.3474111786447418,
+          "originalEdgeRatio": 1.0489566297446418,
+          "center": [
+            0.052917249044566184,
+            1.0353979773131021,
+            0.16910958555615455
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 11595,
+          "edgeRatio": 1.3474111786447418,
+          "originalEdgeRatio": 1.0489566297446418,
+          "center": [
+            0.055406122050981534,
+            1.0398878281670894,
+            0.1635717346659164
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 19681,
+          "edgeRatio": 1.3451138895250467,
+          "originalEdgeRatio": 1.0484924540773275,
+          "center": [
+            0.054660801612108914,
+            1.0416926380520766,
+            -0.16020382353420864
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        }
+      ]
+    },
+    {
+      "file": "rider-street-openface-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.022290925200134717,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 1,
+      "candidates": []
+    },
+    {
+      "file": "rider-race-bluewhite.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.01811129270613229,
+      "newStretchVsOriginal": 3,
+      "newCollapseVsOriginal": 0,
+      "candidates": [
+        {
+          "mesh": "rider_body",
+          "triangle": 3174,
+          "edgeRatio": 1.7305249580502784,
+          "originalEdgeRatio": 1.0576841667836994,
+          "center": [
+            -0.10910712831388454,
+            1.0118702130623958,
+            0.20791687546797893
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3175,
+          "edgeRatio": 1.7305249580502784,
+          "originalEdgeRatio": 1.0576841667836994,
+          "center": [
+            -0.11296600470266649,
+            1.0078049759842815,
+            0.20784018716704059
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 10619,
+          "edgeRatio": 1.6691318579728898,
+          "originalEdgeRatio": 1.053791263434355,
+          "center": [
+            -0.09547139710719568,
+            1.0032386432100076,
+            -0.20755748937519275
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 10620,
+          "edgeRatio": 1.6691318579728898,
+          "originalEdgeRatio": 1.053791263434355,
+          "center": [
+            -0.08822023639119343,
+            1.006474364129132,
+            -0.20731308637609497
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 20725,
+          "edgeRatio": 1.583501430779544,
+          "originalEdgeRatio": 1.0332249595657381,
+          "center": [
+            -0.11822256535849354,
+            1.0094011704157702,
+            0.20753575649939604
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3173,
+          "edgeRatio": 1.5657756306949258,
+          "originalEdgeRatio": 1.0431462758189722,
+          "center": [
+            -0.10395243011305451,
+            1.0054612627894817,
+            0.20775065127463477
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 700,
+          "edgeRatio": 1.525667272677048,
+          "originalEdgeRatio": 1.0336637993846178,
+          "center": [
+            -0.11171313731613067,
+            1.0121705751280488,
+            -0.2080037782989881
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 11760,
+          "edgeRatio": 1.525667272677048,
+          "originalEdgeRatio": 1.0336637993846178,
+          "center": [
+            -0.11850822385276545,
+            1.0086321809096384,
+            -0.2075201169562052
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 21053,
+          "edgeRatio": 1.7244439415377064,
+          "originalEdgeRatio": 1.238141127449262,
+          "center": [
+            -0.07231145546205742,
+            1.207491144339151,
+            0.1633287169307214
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 21054,
+          "edgeRatio": 1.7244439415377064,
+          "originalEdgeRatio": 1.238141127449262,
+          "center": [
+            -0.07386147276073532,
+            1.2074291545807587,
+            0.15613457734679742
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 701,
+          "edgeRatio": 1.5195619371734255,
+          "originalEdgeRatio": 1.034326935544999,
+          "center": [
+            -0.11058318142608366,
+            1.0062818554898296,
+            -0.20787643236903747
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 702,
+          "edgeRatio": 1.5195619371734255,
+          "originalEdgeRatio": 1.034326935544999,
+          "center": [
+            -0.10264428662469097,
+            1.0094977812448223,
+            -0.20788163474761628
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23389,
+          "edgeRatio": 1.5274030339696718,
+          "originalEdgeRatio": 1.0443022226025769,
+          "center": [
+            -0.07193014457794566,
+            1.2133712047554266,
+            0.10122183298982701
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23390,
+          "edgeRatio": 1.5274030339696718,
+          "originalEdgeRatio": 1.0474342072136933,
+          "center": [
+            -0.0720122453353498,
+            1.2137296033558072,
+            0.10498977102965901
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3172,
+          "edgeRatio": 1.522998162637563,
+          "originalEdgeRatio": 1.0431462758189722,
+          "center": [
+            -0.09889714922592614,
+            1.0090150616096276,
+            0.20762059335494515
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23702,
+          "edgeRatio": 1.50308453000489,
+          "originalEdgeRatio": 1.040362643999079,
+          "center": [
+            -0.0925692224767293,
+            1.0044132848842977,
+            0.20637806637411948
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23383,
+          "edgeRatio": 1.4756078484908886,
+          "originalEdgeRatio": 1.040437618526626,
+          "center": [
+            -0.06885606527307693,
+            1.2136440775722683,
+            0.09851719301739327
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23384,
+          "edgeRatio": 1.4756078484908886,
+          "originalEdgeRatio": 1.0443022226025769,
+          "center": [
+            -0.06850060042268465,
+            1.2145302171790426,
+            0.10230553888563815
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 4269,
+          "edgeRatio": 1.7017617785626749,
+          "originalEdgeRatio": 1.2837055683672394,
+          "center": [
+            -0.06252499425468716,
+            1.215386518443165,
+            0.15714017397071192
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 4270,
+          "edgeRatio": 1.7017617785626749,
+          "originalEdgeRatio": 1.2837055683672394,
+          "center": [
+            -0.062131622259232334,
+            1.216717197925044,
+            0.14944203449758175
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23391,
+          "edgeRatio": 1.4495854807730868,
+          "originalEdgeRatio": 1.0444413542080033,
+          "center": [
+            -0.06911124696219018,
+            1.2106536824607435,
+            0.08597424884617577
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23392,
+          "edgeRatio": 1.4495854807730868,
+          "originalEdgeRatio": 1.0454088569073494,
+          "center": [
+            -0.06911205905097398,
+            1.211584094611176,
+            0.08987728352155269
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 8765,
+          "edgeRatio": 1.6269114109409712,
+          "originalEdgeRatio": 1.2388689391218013,
+          "center": [
+            -0.08430365616171046,
+            1.201562763741948,
+            -0.1387268550500807
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 11642,
+          "edgeRatio": 1.6269114109409712,
+          "originalEdgeRatio": 1.2388689391218013,
+          "center": [
+            -0.08199402526908975,
+            1.2020371870045623,
+            -0.1489052523864654
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        }
+      ]
+    },
+    {
+      "file": "rider-race-bluewhite-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.022124296351239043,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": [
+        {
+          "mesh": "rider_body",
+          "triangle": 3095,
+          "edgeRatio": 1.6763402671202625,
+          "originalEdgeRatio": 1.3595983348209675,
+          "center": [
+            -0.0747685506630065,
+            1.209184545933169,
+            0.12755140053302105
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3096,
+          "edgeRatio": 1.6763402671202625,
+          "originalEdgeRatio": 1.3595983348209675,
+          "center": [
+            -0.07265230976268622,
+            1.2082334995475998,
+            0.1491843274801582
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3148,
+          "edgeRatio": 1.2831667509460765,
+          "originalEdgeRatio": 1.0197876505142047,
+          "center": [
+            -0.08386847345681706,
+            1.1999803773218427,
+            0.06048376865567038
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3149,
+          "edgeRatio": 1.2831667509460765,
+          "originalEdgeRatio": 1.0197876505142047,
+          "center": [
+            -0.08470500663138325,
+            1.2023647458447315,
+            0.07321850958610095
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3276,
+          "edgeRatio": 1.5651851493355753,
+          "originalEdgeRatio": 1.305307924217856,
+          "center": [
+            -0.08940785345080615,
+            1.1920736056772192,
+            0.1649218277322374
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3277,
+          "edgeRatio": 1.5651851493355753,
+          "originalEdgeRatio": 1.305307924217856,
+          "center": [
+            -0.09361383010898253,
+            1.1913894238341578,
+            0.1452169418608073
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3437,
+          "edgeRatio": 1.346900661158449,
+          "originalEdgeRatio": 1.090247643558531,
+          "center": [
+            -0.07724834205248643,
+            1.2089215991673143,
+            0.0878272919553803
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3438,
+          "edgeRatio": 1.346900661158449,
+          "originalEdgeRatio": 1.090247643558531,
+          "center": [
+            -0.07432706386734862,
+            1.21183432138245,
+            0.0992793905646403
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1445,
+          "edgeRatio": 1.720684893156561,
+          "originalEdgeRatio": 1.4690752556702353,
+          "center": [
+            -0.009039977438766203,
+            1.2110041735084787,
+            -0.18488477551818455
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1948,
+          "edgeRatio": 1.720684893156561,
+          "originalEdgeRatio": 1.4690752556702353,
+          "center": [
+            0.006097023960918009,
+            1.2056968869776914,
+            -0.20058916894209305
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        }
+      ]
+    },
+    {
+      "file": "rider-street-charcoal.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.01885992897473543,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 12,
+      "candidates": [
+        {
+          "mesh": "rider_body",
+          "triangle": 1530,
+          "edgeRatio": 1.664349431665275,
+          "originalEdgeRatio": 1.0803421675379956,
+          "center": [
+            -0.09913831321496328,
+            1.0091755663146484,
+            0.21176413369940753
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1531,
+          "edgeRatio": 1.664349431665275,
+          "originalEdgeRatio": 1.0803421675379956,
+          "center": [
+            -0.10883531984911124,
+            1.008962632131996,
+            0.21291486920920724
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 15414,
+          "edgeRatio": 1.6627488054257773,
+          "originalEdgeRatio": 1.0808126590563667,
+          "center": [
+            -0.09906931575342992,
+            1.0099161310898515,
+            0.20992782249355457
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 15415,
+          "edgeRatio": 1.6627488054257773,
+          "originalEdgeRatio": 1.0808126590563667,
+          "center": [
+            -0.1086908856356508,
+            1.0096531361620378,
+            0.2110478177104397
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 280,
+          "edgeRatio": 1.554466539507199,
+          "originalEdgeRatio": 1.0615225530548322,
+          "center": [
+            -0.09890622056347179,
+            1.0067858330290895,
+            -0.21250165424386064
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 5335,
+          "edgeRatio": 1.554466539507199,
+          "originalEdgeRatio": 1.0615225530548322,
+          "center": [
+            -0.08950978519653033,
+            1.0077919947843608,
+            -0.21122789224694874
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 14168,
+          "edgeRatio": 1.5433591104775206,
+          "originalEdgeRatio": 1.0623344726361268,
+          "center": [
+            -0.0988563364904665,
+            1.0074563238710257,
+            -0.21067719958461373
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 19188,
+          "edgeRatio": 1.5433591104775206,
+          "originalEdgeRatio": 1.0623344726361268,
+          "center": [
+            -0.08949492462488987,
+            1.0085220320245063,
+            -0.20945405575713094
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 14120,
+          "edgeRatio": 1.6681835449374467,
+          "originalEdgeRatio": 1.245791737961908,
+          "center": [
+            -0.13820504802497025,
+            1.0661829101927032,
+            -0.20925590683729772
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 14154,
+          "edgeRatio": 1.6681835449374467,
+          "originalEdgeRatio": 1.245791737961908,
+          "center": [
+            -0.13109019986086604,
+            1.0676827890936322,
+            -0.2128359603436302
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 5352,
+          "edgeRatio": 1.566793735865756,
+          "originalEdgeRatio": 1.1725212739941526,
+          "center": [
+            -0.15100306854961767,
+            1.0729044361349227,
+            -0.20186517144850064
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 6932,
+          "edgeRatio": 1.566793735865756,
+          "originalEdgeRatio": 1.1725212739941526,
+          "center": [
+            -0.14049407164277788,
+            1.078805529958917,
+            -0.20903811968086816
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1911,
+          "edgeRatio": 1.5711724930045985,
+          "originalEdgeRatio": 1.2323591485700345,
+          "center": [
+            0.0759524416874084,
+            1.1906850100356758,
+            0.11624374179092475
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1872,
+          "edgeRatio": 1.5523981354669711,
+          "originalEdgeRatio": 1.2224946548245421,
+          "center": [
+            0.06765744593389836,
+            1.198385304558932,
+            0.11388159331077133
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 24602,
+          "edgeRatio": 1.5753642519596107,
+          "originalEdgeRatio": 1.2486922406136431,
+          "center": [
+            0.07258269331907248,
+            1.1905326640960843,
+            0.12517838842935725
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 6735,
+          "edgeRatio": 1.5411485713507695,
+          "originalEdgeRatio": 1.215490860978472,
+          "center": [
+            0.0698429790487058,
+            1.1973799584413432,
+            -0.11178971712412658
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 10841,
+          "edgeRatio": 1.5863721157294408,
+          "originalEdgeRatio": 1.2685554650429904,
+          "center": [
+            0.07775592057873751,
+            1.186933111117113,
+            0.13689484310687774
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 5399,
+          "edgeRatio": 1.5594114453009085,
+          "originalEdgeRatio": 1.255743446050147,
+          "center": [
+            0.07636712355752565,
+            1.1894047769826948,
+            -0.12187104595146292
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 4050,
+          "edgeRatio": 1.347074778246753,
+          "originalEdgeRatio": 1.0442263882976142,
+          "center": [
+            0.055081042428242924,
+            1.0402708475261262,
+            -0.1629699352360228
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 10714,
+          "edgeRatio": 1.5676146452763233,
+          "originalEdgeRatio": 1.2659084945499706,
+          "center": [
+            -0.06468369120241638,
+            1.1811233799074334,
+            0.134226359264215
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 11184,
+          "edgeRatio": 1.5676146452763233,
+          "originalEdgeRatio": 1.2672450684485057,
+          "center": [
+            -0.06594236322944465,
+            1.1832440154281607,
+            0.1486772441023566
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 17897,
+          "edgeRatio": 1.3484462670292197,
+          "originalEdgeRatio": 1.0484924540773275,
+          "center": [
+            0.05496477165489869,
+            1.0414620467146476,
+            -0.16050323783180054
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 17898,
+          "edgeRatio": 1.3484462670292197,
+          "originalEdgeRatio": 1.0484924540773275,
+          "center": [
+            0.054161271791116364,
+            1.0307596505252865,
+            -0.16756996860379605
+          ],
+          "visibility": "occluded-from-all-six-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 4051,
+          "edgeRatio": 1.347074778246753,
+          "originalEdgeRatio": 1.047694130432061,
+          "center": [
+            0.055747099242325085,
+            1.030255300461747,
+            -0.16837658220205975
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        }
+      ]
+    },
+    {
+      "file": "rider-street-charcoal-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.02173216881816055,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 1,
+      "candidates": [
+        {
+          "mesh": "rider_body",
+          "triangle": 213,
+          "edgeRatio": 1.4566457799763997,
+          "originalEdgeRatio": 1.2006196466846066,
+          "center": [
+            0.08450383990562,
+            1.1871438840131339,
+            0.10369015737098392
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        }
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.01811129270613229,
+      "newStretchVsOriginal": 3,
+      "newCollapseVsOriginal": 0,
+      "candidates": [
+        {
+          "mesh": "rider_body",
+          "triangle": 3174,
+          "edgeRatio": 1.7305249580502784,
+          "originalEdgeRatio": 1.0576841667836994,
+          "center": [
+            -0.10910712831388454,
+            1.0118702130623958,
+            0.20791687546797893
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3175,
+          "edgeRatio": 1.7305249580502784,
+          "originalEdgeRatio": 1.0576841667836994,
+          "center": [
+            -0.11296600470266649,
+            1.0078049759842815,
+            0.20784018716704059
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 10619,
+          "edgeRatio": 1.6691318579728898,
+          "originalEdgeRatio": 1.053791263434355,
+          "center": [
+            -0.09547139710719568,
+            1.0032386432100076,
+            -0.20755748937519275
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 10620,
+          "edgeRatio": 1.6691318579728898,
+          "originalEdgeRatio": 1.053791263434355,
+          "center": [
+            -0.08822023639119343,
+            1.006474364129132,
+            -0.20731308637609497
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 20725,
+          "edgeRatio": 1.583501430779544,
+          "originalEdgeRatio": 1.0332249595657381,
+          "center": [
+            -0.11822256535849354,
+            1.0094011704157702,
+            0.20753575649939604
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3173,
+          "edgeRatio": 1.5657756306949258,
+          "originalEdgeRatio": 1.0431462758189722,
+          "center": [
+            -0.10395243011305451,
+            1.0054612627894817,
+            0.20775065127463477
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 700,
+          "edgeRatio": 1.525667272677048,
+          "originalEdgeRatio": 1.0336637993846178,
+          "center": [
+            -0.11171313731613067,
+            1.0121705751280488,
+            -0.2080037782989881
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 11760,
+          "edgeRatio": 1.525667272677048,
+          "originalEdgeRatio": 1.0336637993846178,
+          "center": [
+            -0.11850822385276545,
+            1.0086321809096384,
+            -0.2075201169562052
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 21053,
+          "edgeRatio": 1.7244439415377064,
+          "originalEdgeRatio": 1.238141127449262,
+          "center": [
+            -0.07231145546205742,
+            1.207491144339151,
+            0.1633287169307214
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 21054,
+          "edgeRatio": 1.7244439415377064,
+          "originalEdgeRatio": 1.238141127449262,
+          "center": [
+            -0.07386147276073532,
+            1.2074291545807587,
+            0.15613457734679742
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 701,
+          "edgeRatio": 1.5195619371734255,
+          "originalEdgeRatio": 1.034326935544999,
+          "center": [
+            -0.11058318142608366,
+            1.0062818554898296,
+            -0.20787643236903747
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 702,
+          "edgeRatio": 1.5195619371734255,
+          "originalEdgeRatio": 1.034326935544999,
+          "center": [
+            -0.10264428662469097,
+            1.0094977812448223,
+            -0.20788163474761628
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23389,
+          "edgeRatio": 1.5274030339696718,
+          "originalEdgeRatio": 1.0443022226025769,
+          "center": [
+            -0.07193014457794566,
+            1.2133712047554266,
+            0.10122183298982701
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23390,
+          "edgeRatio": 1.5274030339696718,
+          "originalEdgeRatio": 1.0474342072136933,
+          "center": [
+            -0.0720122453353498,
+            1.2137296033558072,
+            0.10498977102965901
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3172,
+          "edgeRatio": 1.522998162637563,
+          "originalEdgeRatio": 1.0431462758189722,
+          "center": [
+            -0.09889714922592614,
+            1.0090150616096276,
+            0.20762059335494515
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23702,
+          "edgeRatio": 1.50308453000489,
+          "originalEdgeRatio": 1.040362643999079,
+          "center": [
+            -0.0925692224767293,
+            1.0044132848842977,
+            0.20637806637411948
+          ],
+          "visibility": "exposed-from-1-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23383,
+          "edgeRatio": 1.4756078484908886,
+          "originalEdgeRatio": 1.040437618526626,
+          "center": [
+            -0.06885606527307693,
+            1.2136440775722683,
+            0.09851719301739327
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23384,
+          "edgeRatio": 1.4756078484908886,
+          "originalEdgeRatio": 1.0443022226025769,
+          "center": [
+            -0.06850060042268465,
+            1.2145302171790426,
+            0.10230553888563815
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 4269,
+          "edgeRatio": 1.7017617785626749,
+          "originalEdgeRatio": 1.2837055683672394,
+          "center": [
+            -0.06252499425468716,
+            1.215386518443165,
+            0.15714017397071192
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 4270,
+          "edgeRatio": 1.7017617785626749,
+          "originalEdgeRatio": 1.2837055683672394,
+          "center": [
+            -0.062131622259232334,
+            1.216717197925044,
+            0.14944203449758175
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23391,
+          "edgeRatio": 1.4495854807730868,
+          "originalEdgeRatio": 1.0444413542080033,
+          "center": [
+            -0.06911124696219018,
+            1.2106536824607435,
+            0.08597424884617577
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 23392,
+          "edgeRatio": 1.4495854807730868,
+          "originalEdgeRatio": 1.0454088569073494,
+          "center": [
+            -0.06911205905097398,
+            1.211584094611176,
+            0.08987728352155269
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 8765,
+          "edgeRatio": 1.6269114109409712,
+          "originalEdgeRatio": 1.2388689391218013,
+          "center": [
+            -0.08430365616171046,
+            1.201562763741948,
+            -0.1387268550500807
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 11642,
+          "edgeRatio": 1.6269114109409712,
+          "originalEdgeRatio": 1.2388689391218013,
+          "center": [
+            -0.08199402526908975,
+            1.2020371870045623,
+            -0.1489052523864654
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        }
+      ]
+    },
+    {
+      "file": "rider-race-charcoalyellow-lod.glb",
+      "originalWeightsUnchanged": true,
+      "maxVertexDelta": 0.022124296351239043,
+      "newStretchVsOriginal": 0,
+      "newCollapseVsOriginal": 0,
+      "candidates": [
+        {
+          "mesh": "rider_body",
+          "triangle": 3095,
+          "edgeRatio": 1.6763402671202625,
+          "originalEdgeRatio": 1.3595983348209675,
+          "center": [
+            -0.0747685506630065,
+            1.209184545933169,
+            0.12755140053302105
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3096,
+          "edgeRatio": 1.6763402671202625,
+          "originalEdgeRatio": 1.3595983348209675,
+          "center": [
+            -0.07265230976268622,
+            1.2082334995475998,
+            0.1491843274801582
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3148,
+          "edgeRatio": 1.2831667509460765,
+          "originalEdgeRatio": 1.0197876505142047,
+          "center": [
+            -0.08386847345681706,
+            1.1999803773218427,
+            0.06048376865567038
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3149,
+          "edgeRatio": 1.2831667509460765,
+          "originalEdgeRatio": 1.0197876505142047,
+          "center": [
+            -0.08470500663138325,
+            1.2023647458447315,
+            0.07321850958610095
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3276,
+          "edgeRatio": 1.5651851493355753,
+          "originalEdgeRatio": 1.305307924217856,
+          "center": [
+            -0.08940785345080615,
+            1.1920736056772192,
+            0.1649218277322374
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3277,
+          "edgeRatio": 1.5651851493355753,
+          "originalEdgeRatio": 1.305307924217856,
+          "center": [
+            -0.09361383010898253,
+            1.1913894238341578,
+            0.1452169418608073
+          ],
+          "visibility": "exposed-from-3-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3437,
+          "edgeRatio": 1.346900661158449,
+          "originalEdgeRatio": 1.090247643558531,
+          "center": [
+            -0.07724834205248643,
+            1.2089215991673143,
+            0.0878272919553803
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 3438,
+          "edgeRatio": 1.346900661158449,
+          "originalEdgeRatio": 1.090247643558531,
+          "center": [
+            -0.07432706386734862,
+            1.21183432138245,
+            0.0992793905646403
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1445,
+          "edgeRatio": 1.720684893156561,
+          "originalEdgeRatio": 1.4690752556702353,
+          "center": [
+            -0.009039977438766203,
+            1.2110041735084787,
+            -0.18488477551818455
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        },
+        {
+          "mesh": "rider_body",
+          "triangle": 1948,
+          "edgeRatio": 1.720684893156561,
+          "originalEdgeRatio": 1.4690752556702353,
+          "center": [
+            0.006097023960918009,
+            1.2056968869776914,
+            -0.20058916894209305
+          ],
+          "visibility": "exposed-from-2-axis-directions"
+        }
+      ]
+    }
+  ],
+  "codeStableDuringRun": true
+}

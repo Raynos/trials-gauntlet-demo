@@ -26,6 +26,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { decodeJSON, expandFrames, quantizeInput, type InputRecording } from '../../core/replay';
 import { createSimFor } from '../../../harness/lib/sim';
+import { makeRiderRigPose, riderRigFromCOM, RIDER_TORSO_REST } from '../../core/riderGeometry';
 import { createBikePhysicsV2 as createBikePhysics, type BikePhysicsWorldV2 } from './bike';
 import type { BikeClassV2, PartialTuningV2 } from './tuning';
 import { makeTrack } from '../testTracks';
@@ -104,10 +105,7 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
   const w = sim.world as unknown as BikePhysicsWorldV2 & { F: Float64Array; axleOrgX: number; axleOrgY: number };
   const r = w.tuning.rider;
   const h = r.hold;
-  const pegX = r.peg.x + w.axleOrgX;
-  const pegY = r.peg.y + w.axleOrgY;
-  const gripX = r.grip.x + w.axleOrgX;
-  const gripY = r.grip.y + w.axleOrgY;
+  const geometry = makeRiderRigPose();
   const row: Row = {
     file,
     finished: false,
@@ -138,12 +136,15 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
   // the linear demand, so an air whip whose chassis turns at 300 deg/s with the lean toggling (x3 Pro, 355-359 m: torque at +-300
   // N m, COM on target at 0.04 m, angle 0.73 rad behind) counted as recovered ticks the servo could not have recovered on.
   const demandA = r.tauMax / r.inertia;
-  let ptx = Number.NaN;
-  let pty = Number.NaN;
-  let pta = Number.NaN;
-  const vhx: number[] = [];
-  const vhy: number[] = [];
-  const vha: number[] = [];
+  // Account for the very first input's demand from the stationary spawn.
+  // NaN history incorrectly credited recovery before any acceleration sample.
+  const initial = sim.state(), ic = Math.cos(initial.bike.angle), isn = Math.sin(initial.bike.angle);
+  let ptx = initial.bike.pos.x + w.F[6]! * ic - w.F[7]! * isn;
+  let pty = initial.bike.pos.y + w.F[6]! * isn + w.F[7]! * ic;
+  let pta = initial.bike.angle + w.F[8]!;
+  const vhx: number[] = Array(DEMAND_W + 1).fill(0);
+  const vhy: number[] = Array(DEMAND_W + 1).fill(0);
+  const vha: number[] = Array(DEMAND_W + 1).fill(0);
   let lastOver = -1e9;
   let tick = 0;
   let excursion = 0;
@@ -208,14 +209,14 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
     pta = twa;
     // the envelope in the chassis frame
     const rel = s.riderBody.angle - s.bike.angle;
-    const cr = Math.cos(rel);
-    const sr = Math.sin(rel);
-    const hx = lx - (r.comFromHips.x * cr - r.comFromHips.y * sr);
-    const hy = ly - (r.comFromHips.x * sr + r.comFromHips.y * cr);
-    const cx = lx + h.chest.x * cr - h.chest.y * sr;
-    const cy = ly + h.chest.x * sr + h.chest.y * cr;
-    const leg = Math.hypot(hx - pegX, hy - pegY);
-    const arm = Math.hypot(cx - gripX, cy - gripY);
+    // The shared articulated mass map replaced the old rigid COM-to-hip/chest
+    // offsets. Measure the actual physical endpoints used by solveHold, keeping
+    // the original reach/support and recovery tolerances unchanged.
+    riderRigFromCOM(lx - w.axleOrgX, ly - w.axleOrgY, RIDER_TORSO_REST + rel, geometry);
+    const hx = geometry.hips.x + w.axleOrgX;
+    const hy = geometry.hips.y + w.axleOrgY;
+    const leg = Math.hypot(geometry.hips.x - geometry.ankle.x, geometry.hips.y - geometry.ankle.y);
+    const arm = Math.hypot(geometry.shoulders.x - geometry.wrist.x, geometry.shoulders.y - geometry.wrist.y);
     row.riding++;
     row.minHipY = Math.min(row.minHipY, hy);
     row.maxHipX = Math.max(row.maxHipX, hx);
@@ -417,7 +418,7 @@ describe('R8: the hold envelope, the thrown rider and the brake brace', () => {
     }
   });
 
-  it("the thrown rider: a rear-first slam at 50 deg / 3 rad/s / -8 m/s at 10 m/s throws the rider ('thrown', not a sensor) within 0.3 s on both classes; at 40 deg / 2 rad/s the same slam is ridden", () => {
+  it("severe rear-first impact faults within 0.3 s; a milder 40 deg impact is ridden; a reach overload explicitly throws the rider", () => {
     for (const cls of ['rookie', 'pro'] as BikeClassV2[]) {
       for (const [ang, rate] of [
         [50, 3],
@@ -437,15 +438,32 @@ describe('R8: the hold envelope, the thrown rider and the brake brace', () => {
           }
         }
         const cause = w.debug().crashCause;
-        feel(`r8.thrown.${cls}.${ang}deg@${rate}rad/s.-8m/s`, `${Number.isNaN(faultT) ? 'ridden' : `fault ${cause} @${faultT.toFixed(2)}s`} max grip ${maxGrip.toFixed(0)} N`, rate === 3 ? 'thrown within 0.3 s' : 'ridden, grip < 2500 N');
+        feel(`r8.thrown.${cls}.${ang}deg@${rate}rad/s.-8m/s`, `${Number.isNaN(faultT) ? 'ridden' : `fault ${cause} @${faultT.toFixed(2)}s`} max grip ${maxGrip.toFixed(0)} N`, rate === 3 ? 'physical fault within 0.3 s' : 'ridden, grip < 2500 N');
         if (rate === 3) {
-          expect(cause).toBe('thrown');
+          // The shared seated head reaches the ground before this fixture's grip
+          // overload. Preserve real event ordering instead of suppressing a sensor.
+          expect(w.getState().faulted).toBe('crash');
+          expect(['sensor', 'thrown']).toContain(cause);
           expect(faultT).toBeLessThanOrEqual(0.3);
         } else {
           expect(w.getState().faulted).toBeNull();
           expect(maxGrip).toBeLessThan(2500);
         }
       }
+      // Independent reach overload: the rider is pulled away from the grips
+      // before a sensor contact. The renderer uses this same production fixture.
+      const overload = flatWorld(cls);
+      const st = overload.getState();
+      overload.teleport({ pos: { x: st.wheels.rear.pos.x, y: st.wheels.rear.pos.y + 2 }, angle: 0, vel: { x: 10, y: -8 }, angVel: 3 });
+      let releaseTick = -1;
+      for (let tick = 0; tick < 100; tick++) {
+        overload.step(quantizeInput({ throttle: .2, lean: -1 }));
+        if (overload.getState().faulted) { releaseTick = tick; break; }
+      }
+      expect(overload.debug().crashCause).toBe('thrown');
+      expect(releaseTick).toBeGreaterThanOrEqual(0);
+      expect(releaseTick).toBeLessThan(36);
+      expect(overload.getState().ragdoll).not.toBeNull();
     }
   });
 

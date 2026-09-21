@@ -1,0 +1,77 @@
+{
+  "magic": "TRIN",
+  "header": {
+    "version": 1,
+    "trackId": "flat-test",
+    "seed": 1,
+    "physicsHz": 120,
+    "bike": "pro",
+    "physics": "v2",
+    "note": "Riding poses ask73: actual input only. Neutral2s; half forward0.75s; full forward0.75s; neutral0.5s; half back0.75s; full back0.75s; forward0.5s; back0.25s; neutral0.75s. Quantized lean64/127. No synthetic posing or state edits."
+  },
+  "runs": [
+    [
+      240,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      90,
+      0,
+      0,
+      64,
+      0
+    ],
+    [
+      90,
+      0,
+      0,
+      127,
+      0
+    ],
+    [
+      60,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      90,
+      0,
+      0,
+      -64,
+      0
+    ],
+    [
+      90,
+      0,
+      0,
+      -127,
+      0
+    ],
+    [
+      60,
+      0,
+      0,
+      127,
+      0
+    ],
+    [
+      30,
+      0,
+      0,
+      -127,
+      0
+    ],
+    [
+      90,
+      0,
+      0,
+      0,
+      0
+    ]
+  ]
+}

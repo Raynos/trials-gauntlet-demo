@@ -1,0 +1,848 @@
+[
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 700,
+        "Fmax": 4000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.5324723678624935,
+        "first": "front",
+        "landPitch": -22.198987248654408,
+        "bothOff": 0.125,
+        "fault": null
+      },
+      {
+        "apexR": 0.33834182209600494,
+        "first": "front",
+        "landPitch": 0.3853648080436288,
+        "bothOff": 0.14166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.4700581560081669,
+        "first": "front",
+        "landPitch": -0.15680561750378338,
+        "bothOff": 0.31666666666666665,
+        "fault": null
+      },
+      {
+        "apexR": 0.1922678228328495,
+        "first": "front",
+        "landPitch": 6.158503703522021,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.1487742466601807,
+        "first": "front",
+        "landPitch": 2.729970519885426,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.33834182209600494
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 90000,
+        "kd": 700,
+        "Fmax": 6000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.800033772133562,
+        "first": "front",
+        "landPitch": 0.9464441656759253,
+        "bothOff": 0.21666666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.33681937350187546,
+        "first": "front",
+        "landPitch": -7.7351871707161255,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      {
+        "apexR": 0.4869752080312267,
+        "first": "front",
+        "landPitch": -7.871503460929874,
+        "bothOff": 0.25833333333333336,
+        "fault": null
+      },
+      {
+        "apexR": 0.2158484991305289,
+        "first": "front",
+        "landPitch": 8.848644557997408,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      {
+        "apexR": 0.15810136955549892,
+        "first": "front",
+        "landPitch": 6.177360004979038,
+        "bothOff": 0.025,
+        "fault": null
+      }
+    ],
+    "score": 0.33681937350187546
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 90000,
+        "kd": 700,
+        "Fmax": 4000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.5449758750817699,
+        "first": "front",
+        "landPitch": 1.0674587431139808,
+        "bothOff": 0.19166666666666668,
+        "fault": null
+      },
+      {
+        "apexR": 0.336554822703305,
+        "first": "front",
+        "landPitch": 0.5152885077199812,
+        "bothOff": 0.2,
+        "fault": null
+      },
+      {
+        "apexR": 0.4735199368310326,
+        "first": "front",
+        "landPitch": -0.34030716340127914,
+        "bothOff": 0.31666666666666665,
+        "fault": null
+      },
+      {
+        "apexR": 0.19220073957068134,
+        "first": "front",
+        "landPitch": 7.780565037127605,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      {
+        "apexR": 0.14266411824291003,
+        "first": "front",
+        "landPitch": 5.821003401311996,
+        "bothOff": 0.025,
+        "fault": null
+      }
+    ],
+    "score": 0.336554822703305
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 90000,
+        "kd": 1400,
+        "Fmax": 4000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.5171044957486151,
+        "first": "front",
+        "landPitch": 2.627728217357998,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.3340933764730135,
+        "first": "front",
+        "landPitch": -7.1539135808024525,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.46048554454915613,
+        "first": "front",
+        "landPitch": -2.040662742546096,
+        "bothOff": 0.2916666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.1917484070501836,
+        "first": "front",
+        "landPitch": 8.447182173758485,
+        "bothOff": 0.041666666666666664,
+        "fault": null
+      },
+      {
+        "apexR": 0.13673234612479113,
+        "first": "front",
+        "landPitch": 2.8336109671710292,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.3340933764730135
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 700,
+        "Fmax": 6000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.657885063051344,
+        "first": "front",
+        "landPitch": 0.2028481305871831,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.3332676297768724,
+        "first": "front",
+        "landPitch": 0.06985286562515886,
+        "bothOff": 0.15,
+        "fault": null
+      },
+      {
+        "apexR": 0.4697484114391972,
+        "first": "front",
+        "landPitch": -2.011975896764488,
+        "bothOff": 0.30833333333333335,
+        "fault": null
+      },
+      {
+        "apexR": 0.19219740616420633,
+        "first": "front",
+        "landPitch": 7.046810057644637,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.1501025351036817,
+        "first": "front",
+        "landPitch": 3.5524479167074166,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.3332676297768724
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 700,
+        "Fmax": 8000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.657885063051344,
+        "first": "front",
+        "landPitch": 0.2028481305871831,
+        "bothOff": 0.11666666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.3332676297768724,
+        "first": "front",
+        "landPitch": 0.06985286562515886,
+        "bothOff": 0.15,
+        "fault": null
+      },
+      {
+        "apexR": 0.4697484114391972,
+        "first": "front",
+        "landPitch": -2.011577429073368,
+        "bothOff": 0.30833333333333335,
+        "fault": null
+      },
+      {
+        "apexR": 0.19219740616420633,
+        "first": "front",
+        "landPitch": 7.223012296770283,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.1501025351036817,
+        "first": "front",
+        "landPitch": 3.8788427848506615,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.3332676297768724
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 90000,
+        "kd": 700,
+        "Fmax": 8000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.7619791239227187,
+        "first": "front",
+        "landPitch": -6.380742481919319,
+        "bothOff": 0.19166666666666668,
+        "fault": null
+      },
+      {
+        "apexR": 0.3264741755132206,
+        "first": "front",
+        "landPitch": -7.681113730606664,
+        "bothOff": 0.175,
+        "fault": null
+      },
+      {
+        "apexR": 0.4821028539740954,
+        "first": "front",
+        "landPitch": -8.205059025695633,
+        "bothOff": 0.25,
+        "fault": null
+      },
+      {
+        "apexR": 0.21670471324298896,
+        "first": "front",
+        "landPitch": 8.520405737208122,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.15700181546512232,
+        "first": "front",
+        "landPitch": 6.350510964927261,
+        "bothOff": 0.025,
+        "fault": null
+      }
+    ],
+    "score": 0.3264741755132206
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 90000,
+        "kd": 1400,
+        "Fmax": 6000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.7229599119821041,
+        "first": "front",
+        "landPitch": -3.646773201981708,
+        "bothOff": 0.15,
+        "fault": null
+      },
+      {
+        "apexR": 0.32380524823740053,
+        "first": "front",
+        "landPitch": -7.499613291941549,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.46597206383376033,
+        "first": "front",
+        "landPitch": -4.747212172246669,
+        "bothOff": 0.275,
+        "fault": null
+      },
+      {
+        "apexR": 0.20551106056812862,
+        "first": "front",
+        "landPitch": 7.225724714809539,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.14721765701672201,
+        "first": "front",
+        "landPitch": 4.788243511017169,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.32380524823740053
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 90000,
+        "kd": 2800,
+        "Fmax": 4000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.5096532872090527,
+        "first": "front",
+        "landPitch": 1.99032853646961,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.32235429449689096,
+        "first": "front",
+        "landPitch": -7.031807115564301,
+        "bothOff": 0.15,
+        "fault": null
+      },
+      {
+        "apexR": 0.44877167398118895,
+        "first": "front",
+        "landPitch": -1.965327157956827,
+        "bothOff": 0.2833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.18959065558225624,
+        "first": "front",
+        "landPitch": 6.097365387259759,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.13539700646190278,
+        "first": "front",
+        "landPitch": 4.082369938693055,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.32235429449689096
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 1400,
+        "Fmax": 4000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.5258236482176037,
+        "first": "front",
+        "landPitch": 0.6249453494934644,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.3180827619238528,
+        "first": "front",
+        "landPitch": -1.3320824061935321,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.4351103580944558,
+        "first": "front",
+        "landPitch": 0.11577366191125642,
+        "bothOff": 0.2916666666666667,
+        "fault": null
+      },
+      {
+        "apexR": 0.17843219741941557,
+        "first": "front",
+        "landPitch": 5.729931913249957,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.1315756977675176,
+        "first": "front",
+        "landPitch": 3.6887665369977145,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.3180827619238528
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 90000,
+        "kd": 1400,
+        "Fmax": 8000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.6988066088867922,
+        "first": "front",
+        "landPitch": -3.610650788189018,
+        "bothOff": 0.15,
+        "fault": null
+      },
+      {
+        "apexR": 0.3171168161108078,
+        "first": "front",
+        "landPitch": -7.343519765046815,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.46495632514553253,
+        "first": "front",
+        "landPitch": -4.866713173703735,
+        "bothOff": 0.275,
+        "fault": null
+      },
+      {
+        "apexR": 0.203984567138763,
+        "first": "front",
+        "landPitch": 7.1209062597180575,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.14533422305885046,
+        "first": "front",
+        "landPitch": 5.138203160500564,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.3171168161108078
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 90000,
+        "kd": 2800,
+        "Fmax": 6000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.6491190481718674,
+        "first": "front",
+        "landPitch": -2.4559475774077706,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.31520680277020113,
+        "first": "front",
+        "landPitch": -7.337872594114433,
+        "bothOff": 0.15833333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.446828242965628,
+        "first": "front",
+        "landPitch": -2.3826801376078595,
+        "bothOff": 0.275,
+        "fault": null
+      },
+      {
+        "apexR": 0.1902641097984034,
+        "first": "front",
+        "landPitch": 5.975812808919141,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      {
+        "apexR": 0.12969808115718684,
+        "first": "front",
+        "landPitch": 3.5170478827897886,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.31520680277020113
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 1400,
+        "Fmax": 6000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.5710036639667786,
+        "first": "front",
+        "landPitch": -0.8104759892887767,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.3150156145857516,
+        "first": "front",
+        "landPitch": -1.7382099057000913,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.4348178529916989,
+        "first": "front",
+        "landPitch": -1.7829640697772586,
+        "bothOff": 0.275,
+        "fault": null
+      },
+      {
+        "apexR": 0.17728533020726273,
+        "first": "front",
+        "landPitch": 4.850769542635893,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      {
+        "apexR": 0.13123777480340498,
+        "first": "front",
+        "landPitch": 2.5797279267524,
+        "bothOff": 0.008333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.3150156145857516
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 1400,
+        "Fmax": 8000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.5710036639667786,
+        "first": "front",
+        "landPitch": -0.8104759892887767,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.3150156145857516,
+        "first": "front",
+        "landPitch": -1.7382099057000913,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.4348178529916989,
+        "first": "front",
+        "landPitch": -1.7829640697772586,
+        "bothOff": 0.275,
+        "fault": null
+      },
+      {
+        "apexR": 0.17728533020726273,
+        "first": "front",
+        "landPitch": 4.850769542635893,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      {
+        "apexR": 0.13123777480340498,
+        "first": "front",
+        "landPitch": 2.5797279267524,
+        "bothOff": 0.008333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.3150156145857516
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 90000,
+        "kd": 2800,
+        "Fmax": 8000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.6415492282725421,
+        "first": "front",
+        "landPitch": -2.4554446990343677,
+        "bothOff": 0.13333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.3123247209290138,
+        "first": "front",
+        "landPitch": -6.939479461481779,
+        "bothOff": 0.16666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.4475320875810708,
+        "first": "front",
+        "landPitch": -3.2700028365440406,
+        "bothOff": 0.275,
+        "fault": null
+      },
+      {
+        "apexR": 0.19112542669259863,
+        "first": "front",
+        "landPitch": 6.020393955041137,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      {
+        "apexR": 0.12886466101635158,
+        "first": "front",
+        "landPitch": 4.015375250029981,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.3123247209290138
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 2800,
+        "Fmax": 4000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.4899405148008693,
+        "first": "front",
+        "landPitch": 0.009307297601299287,
+        "bothOff": 0.09166666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.2890570906435985,
+        "first": "front",
+        "landPitch": -0.6654215612738095,
+        "bothOff": 0.10833333333333334,
+        "fault": null
+      },
+      {
+        "apexR": 0.3904166953778677,
+        "first": "front",
+        "landPitch": 1.3743121926681734,
+        "bothOff": 0.26666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.15558992985175757,
+        "first": "front",
+        "landPitch": 3.81898893983992,
+        "bothOff": 0.03333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.10670593396208006,
+        "first": "rear",
+        "landPitch": 3.271286160112972,
+        "bothOff": 0.016666666666666666,
+        "fault": null
+      }
+    ],
+    "score": 0.2890570906435985
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 2800,
+        "Fmax": 6000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.5039590611825703,
+        "first": "front",
+        "landPitch": -0.4534859463725828,
+        "bothOff": 0.08333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.2873513331840529,
+        "first": "front",
+        "landPitch": -0.7324721309324652,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      {
+        "apexR": 0.3906802069533546,
+        "first": "front",
+        "landPitch": 1.0476283620550146,
+        "bothOff": 0.26666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.15545261635273655,
+        "first": "front",
+        "landPitch": 2.4395946182866575,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      {
+        "apexR": 0.1063504244432617,
+        "first": "rear",
+        "landPitch": 1.2918062317587684,
+        "bothOff": 0.008333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.2873513331840529
+  },
+  {
+    "over": {
+      "rider": {
+        "kp": 45000,
+        "kd": 2800,
+        "Fmax": 8000
+      }
+    },
+    "hops": [
+      {
+        "apexR": 0.5039590611825703,
+        "first": "front",
+        "landPitch": -0.4534859463725828,
+        "bothOff": 0.08333333333333333,
+        "fault": null
+      },
+      {
+        "apexR": 0.2873513331840529,
+        "first": "front",
+        "landPitch": -0.7324721309324652,
+        "bothOff": 0.1,
+        "fault": null
+      },
+      {
+        "apexR": 0.3906802069533546,
+        "first": "front",
+        "landPitch": 1.0476283620550146,
+        "bothOff": 0.26666666666666666,
+        "fault": null
+      },
+      {
+        "apexR": 0.15545261635273655,
+        "first": "front",
+        "landPitch": 2.4395946182866575,
+        "bothOff": 0.025,
+        "fault": null
+      },
+      {
+        "apexR": 0.1063504244432617,
+        "first": "rear",
+        "landPitch": 1.2918062317587684,
+        "bothOff": 0.008333333333333333,
+        "fault": null
+      }
+    ],
+    "score": 0.2873513331840529
+  }
+]

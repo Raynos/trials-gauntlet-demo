@@ -4,6 +4,7 @@
  * Units SI. Chassis frame: origin at the chassis COM, x along the frame axis.
  */
 import type { SurfaceKind, Vec2 } from '../../core/types';
+import { riderTargetTable } from '../../core/riderGeometry';
 import { atan2, cos, sin } from '../dmath';
 
 /**
@@ -265,7 +266,7 @@ const ROOKIE: TuningV2 = {
   gravity: 9.81,
   chassis: {
     mass: 58,
-    inertia: 11,
+    inertia: 11.9,
     comHeight: 0.55,
     circles: [
       { x: -0.05, y: -0.14, r: 0.1 }, // bash plate
@@ -285,12 +286,12 @@ const ROOKIE: TuningV2 = {
       axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.rear.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.rear.y },
       axis: { x: sin(REAR_HINGE.droopAngle), y: -cos(REAR_HINGE.droopAngle) },
       hinge: { pivot: { ...REAR_HINGE.pivot }, radius: REAR_HINGE.radius, droopAngle: REAR_HINGE.droopAngle },
-      travel: 0.26, k: 10500, preload: 0.0, cComp: 650, cReb: 250, kStop: 250e3, stopStart: 0.85,
+      travel: 0.26, k: 10450, preload: 0.0, cComp: 650, cReb: 350, kStop: 250e3, stopStart: 0.85,
     },
     front: {
       axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.front.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.front.y },
       axis: { ...BIKE_GEOMETRY_V2.forkAxis },
-      travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 250, kStop: 250e3, stopStart: 0.85,
+      travel: 0.24, k: 7500, preload: 0.02, cComp: 550, cReb: 350, kStop: 250e3, stopStart: 0.85,
     },
   },
   tyre: {
@@ -318,35 +319,21 @@ const ROOKIE: TuningV2 = {
     // 148 kg Rookie - a gentle ramp that also holds the creep on a ~18 deg backward slope; engage after 0.2 s
     // (a tap is a brake), ramp 0.6 s; steeper than that the calipers come back and cap the roll near 2 x vmax.
     reverse: { vmax: 2.5, engageV: 0.3, engageS: 0.2, rampS: 0.6, F: 450, gain: 700 },
-    wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 1 },
+    wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.25, margin1: 0.4, leanFull: 0.15, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 1 },
   },
   brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03, liftControl: 1, liftLookahead: 0.15 },
   aero: { cda: 0.75, rho: 1.225, chassisShare: 0.6 },
   rider: {
     mass: 75,
     inertia: 9,
-    poses: [
-      // x column: the toy's (docs/research/toy-v2, riderTarget), which is what §10's ladder was measured
-      // with; the printed §9.1 column (-0.44/-0.30/-0.15/-0.12/-0.09) puts d/h at neutral ON a_peak/g and
-      // full gas at lean 0 becomes a coin flip between no lift and a 3 s loop (physics.md v2 status).
-      // R3 measured and REJECTED two forward tables (physics.md v2 status R3): over the bars at +1 (x 0.42,
-      // d/h 1.13, the 48 deg crawl geometry) turns the snap to +1 into a 1.3-1.5 m throw with a 0.36 m knife
-      // between lean quanta and unloads the rear at +0.5; a moderate one (0 -> -0.06, +1 -> 0.24) still costs
-      // the half-rate snap (55 -> 22 %) and the knife row (0.03 -> 0.07 m) for ~3 deg of crawl geometry the
-      // climb bench cannot see (45 deg from a crawl tops on THIS table with the lift-then-throw technique).
-      { lean: -1, x: -0.42, y: 0.37, psi: 0.17 },
-      { lean: -0.5, x: -0.27, y: 0.5, psi: 0.08 },
-      { lean: 0, x: -0.12, y: 0.62, psi: 0 },
-      { lean: 0.5, x: -0.03, y: 0.65, psi: -0.12 },
-      { lean: 1, x: 0.06, y: 0.67, psi: -0.24 },
-    ],
+    poses: riderTargetTable(BIKE_GEOMETRY_V2.chassisToAxle.x, BIKE_GEOMETRY_V2.chassisToAxle.y),
     comFromHips: { x: 0.03, y: 0.1 },
-    targetRateLin: 5.0,
-    targetRateAng: 6.0,
+    targetRateLin: 7.0,
+    targetRateAng: 3.3,
     brakeBrace: 0.5,
-    kp: 45000,
-    kd: 4200,
-    Fmax: 3200,
+    kp: 42000,
+    kd: 4400,
+    Fmax: 4000,
     // R3: ON, gated by intent. The concentric (closing) cap falls to 0.3 F_max = 960 N at 1 m/s of closing speed
     // while the pose target is still (a landing: the legs absorb, the 2-3 m drops ride away, R2's pogo loop is
     // gone); a target that has moved >= 5 cm in the last ~0.2 s (the hop's snap) lifts the cap back to F_max,
@@ -367,12 +354,12 @@ const ROOKIE: TuningV2 = {
     airCattAdd: 0,
     kpsi: 2500,
     cpsi: 180,
-    tauMax: 300,
+    tauMax: 800,
     peg: { x: -0.14, y: 0.02 },
     grip: { x: 0.27, y: 0.78 },
     // §13 initial 180 / 20 gave +16 / -22 deg of air authority in 0.5 s against the §14.2 band of 25-40;
     // 300 / 33 (K/c = 9 rad/s kept) meets it (physics.md v2 status)
-    Katt: 300,
+    Katt: 280,
     cAtt: 33,
     headRadius: 0.15,
     torsoRadius: 0.13,
@@ -390,7 +377,7 @@ const ROOKIE: TuningV2 = {
     // armMinFade 0.05 (R9): with the chest under the grip line the strut's push points down and, against the linear servo's pull
     // on the COM, forms a couple the 300 N m torque cap cannot break (x3 Pro 74-81 m: torso flat, 0.6 s); the stop is off at and
     // below the bar and full 5 cm above it - a front slam onto the bars from above is still caught, the tank collapse is R8's.
-    hold: { legReach: 0.876, armReach: 0.62, armMin: 0.1, armMinFade: 0.05, seatY: 0.2, tankX: 0.25, chest: { x: 0.368, y: 0.234 }, posBeta: 0.4, mu: 0.8, gripN: 2500, gripTau: 0.05 },
+    hold: { legReach: 0.870, armReach: 0.573, armMin: 0.1, armMinFade: 0.05, seatY: 0.2, tankX: 0.25, chest: { x: 0.368, y: 0.234 }, posBeta: 0.4, mu: 0.2, gripN: 2500, gripTau: 0.05 },
   },
   solver: { velIters: 6, posIters: 2, slop: 0.005, specMargin: 0.02, posBeta: 0.5, jointBaumgarte: 0.3 },
   ragdoll: { sleepAfter: 3.0, restitution: 0.15, mu: 0.6, spread: 0.3, jointDamping: 3, crashRearBrake: 1, crashFrontBrake: 0.5 },
@@ -439,12 +426,12 @@ export const BIKE_PRESETS_V2: Readonly<Record<BikeClassV2, PartialTuningV2>> = O
   // (F(4-8) 0.85 loops at 1.0 s, 0.80 lifts 8 deg) and a speed fade of the trim loops at the release (R6 status).
   pro: {
     brakes: { liftControl: 0 },
-    chassis: { mass: 54 },
+    chassis: { mass: 54, inertia: 11 },
     // R8 Astra port: one asset, one geometry - the Pro rides the same swingarm arc and fork line (wheelbase 1.30;
     // R3's 1.28 put its axles 1.0 / 1.1 cm inboard of the glb's markers and its rear 37 mm off the arm's end).
-    suspension: { rear: { k: 12000 }, front: { k: 9000 } },
-    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), reverse: { vmax: 3, engageV: 0.3, engageS: 0.2, rampS: 0.5, F: 500, gain: 800 }, wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
-    rider: { Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
+    suspension: { rear: { k: 12000, cReb: 425 }, front: { k: 9000, cReb: 425 } },
+    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), reverse: { vmax: 3, engageV: 0.3, engageS: 0.2, rampS: 0.5, F: 500, gain: 800 }, wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.25, margin1: 0.4, leanFull: 0.15, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
+    rider: { kp: 45000, Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
   },
 });
 

@@ -166,7 +166,7 @@ export function lipHopper(lipX: number, speed = 8.5, preloadS = 0.3, snapS = 0.2
   const preLean = o.preLean ?? -0.8;
   const snapLean = o.snapLean ?? 1;
   const thrSnap = o.thrSnap ?? 0.5;
-  const snapLead = o.snapLead ?? 1.0; // the REAR wheel this far before the lip's edge: the push leaves the ramp through the rear
+  const snapLead = o.snapLead ?? 0.8; // the REAR wheel this far before the lip's edge: the push leaves the ramp through the rear
   let snapT = NaN;
   let preT = NaN;
   return (ob) => {
@@ -187,7 +187,9 @@ export function lipHopper(lipX: number, speed = 8.5, preloadS = 0.3, snapS = 0.2
     if (t < snapS) return { throttle: thrSnap, lean: snapLean };
     if (t < snapS + tuckS) return { throttle: 0.3, lean: -1 };
     // fly it: hold the lean back (K_att nose-up) while the nose is dropping, forward against a rising nose
-    if (ob.airborne) return { throttle: 0.3, lean: ob.pitchRateDeg < -30 || ob.pitchDeg < -5 ? -1 : ob.pitchDeg > 25 || ob.pitchRateDeg > 60 ? 0.6 : 0 };
+    // Keep landing recovery through a front-wheel-only touchdown: straightening the rider before
+    // the rear wheel arrives transfers the torso's angular momentum into a forward endo.
+    if (ob.airborne || !ob.state.wheels.rear.grounded) return { throttle: 0.3, lean: ob.pitchRateDeg < -30 || ob.pitchDeg < -5 ? -1 : ob.pitchDeg > 25 || ob.pitchRateDeg > 60 ? 0.6 : 0 };
     return { throttle: 0.3, lean: ob.pitchDeg > 15 ? 0.8 : 0 };
   };
 }

@@ -135,7 +135,7 @@ describe('launch, top speed, the lean ladder (§7, §10, §14.2)', () => {
     for (const r of rows) expect(r.maxPitch).toBeGreaterThan(60);
   });
 
-  it('snap-forward corrects a rising front: from a 20 deg wheelie with the throttle HELD the snap to +1 brings the pitch below 15 deg within 0.5 s and never loops; from 30 deg it needs the throttle closed with the snap (spec asked for 30 deg with the throttle held - not reachable: at 30 deg nose-up every pose has d/h(theta) < a/g); from 40 deg nothing saves it', () => {
+  it('snap-forward recovers a 20 deg wheelie with throttle held: <= 30 deg after 0.5 s and no loop; from 30 deg with throttle cut: < 60 deg at 0.5 s, < 15 deg at 1 s and no loop', () => {
     function snap(fromDeg: number, thrAfter: number): { at05: number; at10: number; max: number; loop: boolean } {
       const w = flatWorld();
       let snapped = false;
@@ -170,13 +170,11 @@ describe('launch, top speed, the lean ladder (§7, §10, §14.2)', () => {
     feel('snap.from30.throttle0.pitchAt1.0s', cut30.at10, '< 15 deg');
     feel('snap.from30.throttle0.3.pitchAt0.5s', half30.at05, 'info (hovers near the throttle-0.3 balance ~27 deg first)');
     feel('snap.from40.throttle0.loops', cut40.loop ? 1 : 0, 'info (1 = loops: past the recovery envelope)');
-    // R7: with the rider body held by the linkage couple the snap from 20 deg WITH THE THROTTLE HELD no longer saves it (44.6 deg
-    // at 0.5 s, then a loop; R3's 24.6 came from the torso spinning 2.5 rad back while the rider snapped forward). Closing the
-    // throttle with the snap recovers from 30 deg as before (-6.6 deg at 1.0 s). Envelope change for the parent, physics.md R7.
-    expect(held20.loop).toBe(true);
-    // R3: 24.6 deg at 0.5 s (R2: 3.2). The Rookie's 0.15 s throttle no longer matters here (the throttle is held) - the
-    // low-speed knot 1.07 pushes the nose harder through the correction; the snap still brings it down and never loops
-    expect(held20.at05).toBeGreaterThan(30); // R7: 44.6 (was 24.6) - the held-throttle snap correction is gone with the torso spin; see the R7 note above
+    // The standing R7 mass frame lost this recovery and required a loop here.
+    // Shared seated geometry restores the R3 recovery bar. Never tune a failure
+    // back into the game to preserve that historical characterization.
+    expect(held20.loop).toBe(false);
+    expect(held20.at05).toBeLessThanOrEqual(30);
     expect(cut30.loop).toBe(false);
     // R3: 24.6 at 0.5 s (R2: 0.0): the Rookie's 0.15 s throttle lag keeps the thrust on for ~0.3 s after the cut, so
     // the 30 deg save is slower - it still comes down and never loops (the cost of the forgiving throttle)

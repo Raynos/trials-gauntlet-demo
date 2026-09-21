@@ -1,0 +1,69 @@
+--- /tmp/impact-tuning-original.ts	2026-09-21 04:27:15
++++ src/physics/v2/tuning.ts	2026-09-21 04:38:09
+@@ -266,7 +266,7 @@
+   gravity: 9.81,
+   chassis: {
+     mass: 58,
+-    inertia: 11,
++    inertia: 11.9,
+     comHeight: 0.55,
+     circles: [
+       { x: -0.05, y: -0.14, r: 0.1 }, // bash plate
+@@ -286,7 +286,7 @@
+       axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.rear.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.rear.y },
+       axis: { x: sin(REAR_HINGE.droopAngle), y: -cos(REAR_HINGE.droopAngle) },
+       hinge: { pivot: { ...REAR_HINGE.pivot }, radius: REAR_HINGE.radius, droopAngle: REAR_HINGE.droopAngle },
+-      travel: 0.26, k: 10500, preload: 0.0, cComp: 650, cReb: 350, kStop: 250e3, stopStart: 0.85,
++      travel: 0.26, k: 10450, preload: 0.0, cComp: 650, cReb: 350, kStop: 250e3, stopStart: 0.85,
+     },
+     front: {
+       axle: { x: BIKE_GEOMETRY_V2.chassisToAxle.x + BIKE_GEOMETRY_V2.front.x, y: BIKE_GEOMETRY_V2.chassisToAxle.y + BIKE_GEOMETRY_V2.front.y },
+@@ -319,7 +319,7 @@
+     // 148 kg Rookie - a gentle ramp that also holds the creep on a ~18 deg backward slope; engage after 0.2 s
+     // (a tap is a brake), ramp 0.6 s; steeper than that the calipers come back and cap the roll near 2 x vmax.
+     reverse: { vmax: 2.5, engageV: 0.3, engageS: 0.2, rampS: 0.6, F: 450, gain: 700 },
+-    wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 1 },
++    wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.25, margin1: 0.4, leanFull: 0.15, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 1 },
+   },
+   brakes: { totalNm: 560, frontFrac: 0.55, brakeTau: 0.03, liftControl: 1, liftLookahead: 0.15 },
+   aero: { cda: 0.75, rho: 1.225, chassisShare: 0.6 },
+@@ -329,10 +329,10 @@
+     poses: riderTargetTable(BIKE_GEOMETRY_V2.chassisToAxle.x, BIKE_GEOMETRY_V2.chassisToAxle.y),
+     comFromHips: { x: 0.03, y: 0.1 },
+     targetRateLin: 7.0,
+-    targetRateAng: 6.0,
++    targetRateAng: 3.3,
+     brakeBrace: 0.5,
+-    kp: 45000,
+-    kd: 4200,
++    kp: 42000,
++    kd: 4400,
+     Fmax: 4000,
+     // R3: ON, gated by intent. The concentric (closing) cap falls to 0.3 F_max = 960 N at 1 m/s of closing speed
+     // while the pose target is still (a landing: the legs absorb, the 2-3 m drops ride away, R2's pogo loop is
+@@ -359,7 +359,7 @@
+     grip: { x: 0.27, y: 0.78 },
+     // §13 initial 180 / 20 gave +16 / -22 deg of air authority in 0.5 s against the §14.2 band of 25-40;
+     // 300 / 33 (K/c = 9 rad/s kept) meets it (physics.md v2 status)
+-    Katt: 300,
++    Katt: 280,
+     cAtt: 33,
+     headRadius: 0.15,
+     torsoRadius: 0.13,
+@@ -426,12 +426,12 @@
+   // (F(4-8) 0.85 loops at 1.0 s, 0.80 lifts 8 deg) and a speed fade of the trim loops at the release (R6 status).
+   pro: {
+     brakes: { liftControl: 0 },
+-    chassis: { mass: 54 },
++    chassis: { mass: 54, inertia: 11 },
+     // R8 Astra port: one asset, one geometry - the Pro rides the same swingarm arc and fork line (wheelbase 1.30;
+     // R3's 1.28 put its axles 1.0 / 1.1 cm inboard of the glb's markers and its rear 37 mm off the arm's end).
+-    suspension: { rear: { k: 12000 }, front: { k: 9000 } },
+-    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), reverse: { vmax: 3, engageV: 0.3, engageS: 0.2, rampS: 0.5, F: 500, gain: 800 }, wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.2, margin1: 0.4, leanFull: 0.2, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
+-    rider: { Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
++    suspension: { rear: { k: 12000, cReb: 425 }, front: { k: 9000, cReb: 425 } },
++    engine: { Fpeak: 1000, curveV: [0, 3, 5, 8, 12.6, 17.85, 21], curveF: [1.0, 1.0, 1.0, 1.0, 0.7, 0.48, 0.35], throttleTau: 0.08, gear: gearFor(21), reverse: { vmax: 3, engageV: 0.3, engageS: 0.2, rampS: 0.5, F: 500, gain: 800 }, wheelieControl: { gain: 1, rate0: 0.5, rate1: 1.2, topOut: 0.03, margin0: 0.25, margin1: 0.4, leanFull: 0.15, leanOff: 0.5, leanFwdFull: 0.6, leanFwdOff: 0.9, airGain: 0 } },
++    rider: { kp: 45000, Katt: 260, cAtt: 29, airRateGain: 0, airCattAdd: 0 },
+   },
+ });
+ 

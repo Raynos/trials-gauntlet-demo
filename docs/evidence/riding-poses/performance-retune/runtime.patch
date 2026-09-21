@@ -1,0 +1,238 @@
+--- before/src/core/riderGeometry.ts
++++ after/src/core/riderGeometry.ts
+@@ -297,7 +297,9 @@
+     }
+     if (bestError < 1e-16) break;
+   }
+-  riderRigFromHips(bestX, bestY, torso, out);
++  // A converged iterate already contains the complete forward map. Only a failed
++  // search/backtrack needs to reconstruct its best earlier iterate.
++  if (out.hips.x !== bestX || out.hips.y !== bestY) riderRigFromHips(bestX, bestY, torso, out);
+   out.residual = Math.sqrt((out.com.x - comX) ** 2 + (out.com.y - comY) ** 2);
+   return out;
+ }
+--- before/src/physics/v2/bike.ts
++++ after/src/physics/v2/bike.ts
+@@ -326,6 +326,12 @@
+   private rotationCos = 1;
+   private rotationSin = 0;
+   private readonly riderGeometry = makeRiderRigPose();
++  // Exact pure-function cache: foreign snapshot restores select by the full angle.
++  // Rebuilt at the first velocity iteration; never read across a step/restore.
++  private readonly holdRows = new Float64Array(20);
++  private holdTorsoAngle = NaN;
++  private holdTorsoSin = 0;
++  private holdTorsoCos = 0;
+   private readonly geometryDerivativeScratch = makeRiderRigPose();
+   private readonly transferGeometry = makeRiderRigPose();
+   private readonly transferTarget = { x: 0, y: 0, psi: 0 };
+@@ -1835,7 +1841,7 @@
+       // body 1.25 m through the chassis and a whipped bike left it hanging 2 m off on the servo's Hill cap (physics.md
+       // R7 "COM band"). The reach impulses (leg, arm) are what the hands and feet hold: summed into S_GRIP_J for the
+       // thrown-rider fault in derive().
+-      if (riding) this.solveHold();
++      if (riding) this.solveHold(false, it > 0);
+ 
+       // --- seesaw angle limits
+       for (let sI = 0; sI < this.nSeesaw; sI++) {
+@@ -2045,7 +2051,7 @@
+ 
+   /** Anatomical limits act on the physical mass/angle using the SAME geometry as drawing and sensors.
+    * Generalized gradients include joint articulation: an aggregate COM is not a rigid hip anchor. */
+-  private solveHold(position = false): void {
++  private solveHold(position = false, reuseRows = false): void {
+     const r = this.tuning.rider,
+       h = r.hold,
+       p = this.currentRiderGeometry();
+@@ -2056,87 +2062,111 @@
+     const rx = this.px[RIDER]! - this.px[CHASSIS]!,
+       ry = this.py[RIDER]! - this.py[CHASSIS]!;
+     const torso = p.torsoAngle;
++    if (torso !== this.holdTorsoAngle) {
++      this.holdTorsoAngle = torso;
++      this.holdTorsoSin = sin(torso);
++      this.holdTorsoCos = cos(torso);
++    }
++    const torsoSin = this.holdTorsoSin,
++      torsoCos = this.holdTorsoCos;
+     for (let k = 0; k < 5; k++) {
+       let C: number,
+         gx: number,
+         gy: number,
+         ga = 0;
+-      if (k === 0 || k === 1 || k === 4) {
+-        const a = k === 0 ? p.hips : p.shoulders,
+-          b = k === 0 ? p.ankle : p.wrist;
+-        const dx = a.x - b.x,
+-          dy = a.y - b.y,
+-          d = Math.sqrt(dx * dx + dy * dy);
+-        if (d < 1e-6) continue;
+-        const sign = k === 4 ? 1 : -1;
+-        gx = (sign * dx) / d;
+-        gy = (sign * dy) / d;
+-        if (k === 4) {
+-          if (h.armMin <= 0) continue;
+-          C = d - h.armMin;
+-        } else C = (k === 0 ? h.legReach : h.armReach) - d;
+-        if (k !== 0) ga = gx * (-RIDER_PROFILE.torso * sin(torso)) + gy * (RIDER_PROFILE.torso * cos(torso));
+-      } else if (k === 2) {
+-        // A rounded pelvis against the finite seat: corner normals change continuously as the hips
+-        // shuffle behind its rear edge. A binary x-span switch introduced a discontinuous hop impulse.
+-        const centreDrop = 0.08,
+-          radius = 0.09;
+-        const cx = p.hips.x - centreDrop * cos(torso),
+-          cy = p.hips.y - centreDrop * sin(torso);
+-        const mx = (RIDER_SEAT.rearX + RIDER_SEAT.frontX) * 0.5,
+-          my = RIDER_SEAT.topY - 0.02;
+-        const qx = Math.abs(cx - mx) - (RIDER_SEAT.frontX - RIDER_SEAT.rearX) * 0.5,
+-          qy = Math.abs(cy - my) - 0.02;
+-        const ex = Math.max(0, qx),
+-          ey = Math.max(0, qy),
+-          len = Math.sqrt(ex * ex + ey * ey);
+-        C = Math.min(Math.max(qx, qy), 0) + len - radius;
+-        if (len > 1e-9) {
+-          gx = ((cx < mx ? -1 : 1) * ex) / len;
+-          gy = ((cy < my ? -1 : 1) * ey) / len;
+-        } else if (qx > qy) {
+-          gx = cx < mx ? -1 : 1;
+-          gy = 0;
+-        } else {
+-          gx = 0;
+-          gy = cy < my ? -1 : 1;
+-        }
+-        // CPU-skinned garment probe: rear fender envelope tops at .5504m; pelvis/thigh support
+-        // needs an additional 30mm radius beyond the seat proxy (Openface limits clearance) (cloth-audit/rear-support.json).
+-        // Low torso angles deepen the trouser/thigh surface below the pelvis proxy.
+-        // The Openface sweep measured up to 21.2mm deficit at20°; add30mm there,
+-        // tapering smoothly to the proven40° support. Its derivative is part of the joint.
+-        const supportBlend = clamp((40 - (torso * 180) / PI) / 20, 0, 1);
+-        const fmx = -0.725,
+-          fmy = 0.5304,
+-          fr = 0.12 + 0.03 * supportBlend * supportBlend * (3 - 2 * supportBlend);
+-        const radiusDerivative = (-0.03 * 6 * supportBlend * (1 - supportBlend) * 180) / (20 * PI);
+-        let supportAngleGradient = 0;
+-        const fqx = Math.abs(cx - fmx) - 0.225,
+-          fqy = Math.abs(cy - fmy) - 0.02;
+-        const fex = Math.max(0, fqx),
+-          fey = Math.max(0, fqy),
+-          fl = Math.sqrt(fex * fex + fey * fey);
+-        const fc = Math.min(Math.max(fqx, fqy), 0) + fl - fr;
+-        if (fc < C) {
+-          C = fc;
+-          supportAngleGradient = -radiusDerivative;
+-          if (fl > 1e-9) {
+-            gx = ((cx < fmx ? -1 : 1) * fex) / fl;
+-            gy = ((cy < fmy ? -1 : 1) * fey) / fl;
+-          } else if (fqx > fqy) {
+-            gx = cx < fmx ? -1 : 1;
++      const row = k * 4;
++      if (reuseRows) {
++        C = this.holdRows[row]!;
++        gx = this.holdRows[row + 1]!;
++        gy = this.holdRows[row + 2]!;
++        ga = this.holdRows[row + 3]!;
++      } else {
++        // All solve iterations use the same positions, angles and tuning. The position
++        // pass recomputes each row because earlier projections may move the bodies.
++        if (!position) this.holdRows[row] = Infinity;
++        if (k === 0 || k === 1 || k === 4) {
++          const a = k === 0 ? p.hips : p.shoulders,
++            b = k === 0 ? p.ankle : p.wrist;
++          const dx = a.x - b.x,
++            dy = a.y - b.y,
++            d = Math.sqrt(dx * dx + dy * dy);
++          if (d < 1e-6) continue;
++          const sign = k === 4 ? 1 : -1;
++          gx = (sign * dx) / d;
++          gy = (sign * dy) / d;
++          if (k === 4) {
++            if (h.armMin <= 0) continue;
++            C = d - h.armMin;
++          } else C = (k === 0 ? h.legReach : h.armReach) - d;
++          if (k !== 0) ga = gx * (-RIDER_PROFILE.torso * torsoSin) + gy * (RIDER_PROFILE.torso * torsoCos);
++        } else if (k === 2) {
++          // A rounded pelvis against the finite seat: corner normals change continuously as the hips
++          // shuffle behind its rear edge. A binary x-span switch introduced a discontinuous hop impulse.
++          const centreDrop = 0.08,
++            radius = 0.09;
++          const cx = p.hips.x - centreDrop * torsoCos,
++            cy = p.hips.y - centreDrop * torsoSin;
++          const mx = (RIDER_SEAT.rearX + RIDER_SEAT.frontX) * 0.5,
++            my = RIDER_SEAT.topY - 0.02;
++          const qx = Math.abs(cx - mx) - (RIDER_SEAT.frontX - RIDER_SEAT.rearX) * 0.5,
++            qy = Math.abs(cy - my) - 0.02;
++          const ex = Math.max(0, qx),
++            ey = Math.max(0, qy),
++            len = Math.sqrt(ex * ex + ey * ey);
++          C = Math.min(Math.max(qx, qy), 0) + len - radius;
++          if (len > 1e-9) {
++            gx = ((cx < mx ? -1 : 1) * ex) / len;
++            gy = ((cy < my ? -1 : 1) * ey) / len;
++          } else if (qx > qy) {
++            gx = cx < mx ? -1 : 1;
+             gy = 0;
+           } else {
+             gx = 0;
+-            gy = cy < fmy ? -1 : 1;
++            gy = cy < my ? -1 : 1;
+           }
++          // CPU-skinned garment probe: rear fender envelope tops at .5504m; pelvis/thigh support
++          // needs an additional 30mm radius beyond the seat proxy (Openface limits clearance) (cloth-audit/rear-support.json).
++          // Low torso angles deepen the trouser/thigh surface below the pelvis proxy.
++          // The Openface sweep measured up to 21.2mm deficit at20°; add30mm there,
++          // tapering smoothly to the proven40° support. Its derivative is part of the joint.
++          const supportBlend = clamp((40 - (torso * 180) / PI) / 20, 0, 1);
++          const fmx = -0.725,
++            fmy = 0.5304,
++            fr = 0.12 + 0.03 * supportBlend * supportBlend * (3 - 2 * supportBlend);
++          const radiusDerivative = (-0.03 * 6 * supportBlend * (1 - supportBlend) * 180) / (20 * PI);
++          let supportAngleGradient = 0;
++          const fqx = Math.abs(cx - fmx) - 0.225,
++            fqy = Math.abs(cy - fmy) - 0.02;
++          const fex = Math.max(0, fqx),
++            fey = Math.max(0, fqy),
++            fl = Math.sqrt(fex * fex + fey * fey);
++          const fc = Math.min(Math.max(fqx, fqy), 0) + fl - fr;
++          if (fc < C) {
++            C = fc;
++            supportAngleGradient = -radiusDerivative;
++            if (fl > 1e-9) {
++              gx = ((cx < fmx ? -1 : 1) * fex) / fl;
++              gy = ((cy < fmy ? -1 : 1) * fey) / fl;
++            } else if (fqx > fqy) {
++              gx = cx < fmx ? -1 : 1;
++              gy = 0;
++            } else {
++              gx = 0;
++              gy = cy < fmy ? -1 : 1;
++            }
++          }
++          ga = centreDrop * (gx * torsoSin - gy * torsoCos) + supportAngleGradient;
++        } else {
++          C = h.tankX - this.axleOrgX - p.hips.x;
++          gx = -1;
++          gy = 0;
+         }
+-        ga = centreDrop * (gx * sin(torso) - gy * cos(torso)) + supportAngleGradient;
+-      } else {
+-        C = h.tankX - this.axleOrgX - p.hips.x;
+-        gx = -1;
+-        gy = 0;
++        if (!position) {
++          this.holdRows[row] = C;
++          this.holdRows[row + 1] = gx;
++          this.holdRows[row + 2] = gy;
++          this.holdRows[row + 3] = ga;
++        }
+       }
+       if (C >= (position ? -0.001 : 0.03)) continue;
+       if (position && C < -0.04) continue; // a large impact releases; do not project a thrown rider back onto the bike
+@@ -2177,7 +2207,7 @@
+         tgy = gx;
+       const txl = tgx * j[0]! + tgy * j[2]!,
+         tyl = tgx * j[1]! + tgy * j[3]!;
+-      const tga = k === 2 ? 0.08 * (tgx * sin(torso) - tgy * cos(torso)) : 0;
++      const tga = k === 2 ? 0.08 * (tgx * torsoSin - tgy * torsoCos) : 0;
+       const tx = c * txl - s * tyl,
+         ty = s * txl + c * tyl,
+         tr = tgx * j[4]! + tgy * j[5]! + tga,

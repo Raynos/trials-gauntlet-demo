@@ -113,10 +113,14 @@ async function replay(rec: InputRecording, file: string, hashes?: string[]): Pro
   let quiet = 0;
   const tmp = { x: 0, y: 0, psi: 0 };
   // the target's world velocity history (DEMAND_W + 1 samples) and the last over-demand tick
-  let ptx = Number.NaN;
-  let pty = Number.NaN;
-  const vhx: number[] = [];
-  const vhy: number[] = [];
+  // The spawn is stationary before the first input. Include its actual target
+  // in the demand history: starting with NaN discarded the initial command's
+  // acceleration, falsely labeling ticks 1..7 as already recovered.
+  const initial = sim.state(), ic = Math.cos(initial.bike.angle), isn = Math.sin(initial.bike.angle);
+  let ptx = initial.bike.pos.x + w.F[6]! * ic - w.F[7]! * isn;
+  let pty = initial.bike.pos.y + w.F[6]! * isn + w.F[7]! * ic;
+  const vhx: number[] = Array(DEMAND_W + 1).fill(0);
+  const vhy: number[] = Array(DEMAND_W + 1).fill(0);
   let lastOver = -1e9;
   let excursion = 0;
   let excursionAt = -1;

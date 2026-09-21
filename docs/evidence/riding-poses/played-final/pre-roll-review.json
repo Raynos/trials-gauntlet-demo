@@ -1,0 +1,33 @@
+{
+  "scope": "Parent inspection of temporally ordered decoded gameplay frames, with full input-driven MP4 retained; not a human continuous-video review. Captures precede final arm-roll and release-offset repairs.",
+  "captures": [
+    {
+      "capture": "race",
+      "evidencePath": "/tmp/trials-poses-final/race/evidence.json",
+      "evidenceSHA256": "cd8661db0f615f3db2bb5a7d66f91b73154b4476b2beec8c9fb2b410f5534814",
+      "clipPath": "/tmp/trials-poses-final/race/clip.mp4",
+      "clipSHA256": "443683d18c5886e6e906cfd2ed1977f7e96151b5e9f0db997b34739b4614235f",
+      "reviewedSequentialFrames": [
+        55,
+        58,
+        62
+      ],
+      "finding": "Rejected: pronounced sleeve pits during held forward lean; followed by visible return to seated pose."
+    },
+    {
+      "capture": "hop-street",
+      "evidencePath": "/tmp/trials-poses-final/hop-street/evidence.json",
+      "evidenceSHA256": "af6cf8dd3d60b404c22078872a97bc7d7bf4bff4670c0eb0607eb7bd2d4d4525",
+      "clipPath": "/tmp/trials-poses-final/hop-street/clip.mp4",
+      "clipSHA256": "c3c2e197968dcc9068d93f89e97514711c428fa99742cfe38ee924012f7f0672",
+      "reviewedSequentialFrames": [
+        18,
+        28,
+        38,
+        52,
+        62
+      ],
+      "finding": "Rear preload, standing forward transfer, rear-wheel lift, landing and seated recovery are present in input-driven sequence. Garment review remains open."
+    }
+  ]
+}
