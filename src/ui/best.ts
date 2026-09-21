@@ -1,3 +1,4 @@
+import { getStorage } from '../platform/storage';
 /**
  * Best time per track in localStorage (`trials.best.<trackId>`), plus the
  * quality override (`trials.quality`). Every access is try/catch'd: private
@@ -52,7 +53,7 @@ export function boardOrder(a: BoardEntry, b: BoardEntry): number {
 
 function store(): Storage | null {
   try {
-    return typeof localStorage === 'undefined' ? null : localStorage;
+    return getStorage();
   } catch {
     return null;
   }

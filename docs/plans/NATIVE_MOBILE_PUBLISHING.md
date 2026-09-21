@@ -1,8 +1,10 @@
 # Publish the TypeScript / Three.js game on iOS and Android
 
-Status: **proposed; implementation not started**. Ask 72; branch `docs/native-mobile-publishing`.
+Status: **in build; autonomous implementation authorized**. Ask 72; branch `docs/native-mobile-publishing`.
 Repository baseline: `7784f731`, package version `0.3.2`. Research checked **2026-09-21**.
-This request produces a plan, not native projects or a store submission. Parent owns integration and acceptance.
+Ask 72 delivered the plan; ask 73 authorized autonomous implementation. Scope confirmed iOS/Android only. Parent owns integration and acceptance.
+
+**User decisions:** personal publisher accounts; free with no ads or in-app purchases; eligible remote updates included in the first release. Account access, final identifiers and actual-device/store review remain release prerequisites.
 
 ## Recommendation and the update answer
 
@@ -10,8 +12,8 @@ Use **Capacitor** to package the existing game in an iOS WKWebView and Android W
 physics, rendering and UI in TypeScript / Three.js. Small native projects supply installation, signing,
 app lifecycle and any device plugins; no game rewrite or Ionic UI framework is needed.
 
-Ship a complete, locally bundled game first. Consider a controlled over-the-air (OTA) web-bundle channel
-after the native release works. Keep the website/PWA as another target of the same source tree.
+Ship a complete, locally bundled game plus a controlled over-the-air (OTA) web-bundle channel in the
+first release. Qualify the bundled app before enabling channel promotion. Keep the website/PWA as another target of the same source tree.
 
 **Can we publish once and have every website update appear in the apps without store updates?**
 Technically, a wrapper loading a hosted website can receive new web code on subsequent loads. A bundled
@@ -40,7 +42,7 @@ the web channel more broadly within policy. Neither store's acceptance is guaran
 |---|---|
 | Website-only release | Website/PWA only; does not advance either mobile channel |
 | Art, text, tuning or level data supported by the existing game | Candidate remote content release after compatibility and policy checks; not a blanket exemption |
-| Small JS/CSS fix preserving reviewed behavior | Optional OTA candidate; iOS assessment required; ordinary store release always available |
+| Small JS/CSS fix preserving reviewed behavior | OTA candidate; iOS assessment required; ordinary store release always available |
 | New modes, major mechanics, different purpose or monetization | Store-reviewed release under our policy, even when implemented entirely in TypeScript |
 | Capacitor/plugin upgrade, native SDK, entitlement, permission, launcher icon or bundled native launch screen | New signed store binary |
 | Store target-SDK or security maintenance | New signed store binary; budget for ongoing upkeep |
@@ -52,13 +54,13 @@ A new track currently changes the JS bundle; calling it “content” does not c
 
 | Approach | Website updates reach installed apps? | Tradeoff / decision |
 |---|---|---|
-| Capacitor + bundled `dist/` | Only after a store update initially | **Launch choice:** offline first launch, reproducible reviewed build, shared implementation |
-| Capacitor + bundled fallback + OTA | After publishing a compatible mobile bundle and activating it | **Optional phase:** requires downloader/plugin, signing, compatibility, rollback and policy checks |
+| Capacitor + bundled `dist-native/` | Store releases replace the factory bundle | Offline fallback in the selected architecture |
+| Capacitor + bundled fallback + OTA | After publishing a compatible mobile bundle and activating it | **First-release choice:** separate signed channels, compatibility checks and local rollback |
 | WebView pointed at live production URL | Usually on a later load, subject to caches | Online dependency and coupled releases; not our production default |
 | Android Trusted Web Activity (TWA) | Uses the hosted site's update behavior | Alternative if website parity dominates; Android-only and a different runtime/integration path |
 | Existing installed PWA | Uses the website/service-worker update behavior | Already available outside stores; simplest route if avoiding store review is the primary objective |
 
-Capacitor documents `server.url` as a live-reload facility not intended for production. Use `webDir: 'dist'`
+Capacitor documents `server.url` as a live-reload facility not intended for production. Use `webDir: 'dist-native'`
 and packaged assets. A TWA runs the verified website fullscreen in the user's browser and verifies ownership
 using Digital Asset Links. [Capacitor configuration](https://capacitorjs.com/docs/config),
 [Chrome TWA overview](https://developer.chrome.com/docs/android/trusted-web-activity).
@@ -73,7 +75,7 @@ TypeScript + Three.js + game assets
    deployment      iOS shell        Android shell
                    WKWebView        Android WebView
                         \            /
-                 optional mobile update channels
+                 signed mobile update channels
                  immutable bundle + local fallback
 ```
 
@@ -100,6 +102,10 @@ Do not assume WebView `localStorage` is durable enough: select and test native p
 progress, and keep app version upgrades and OTA rollback from erasing it. Uninstall/data-clear is different
 from an update and may remove local saves.
 
+## Current implementation evidence
+
+Capacitor 8.5.2 shells build for iOS Simulator and Android; native mode excludes the PWA worker. Lifecycle interruption handling, transactional native save snapshots and signed next-launch updates are implemented. Installed iOS and Android builds have staged and activated a signed healthy bundle. The native channel is disabled by default until production URLs and a public verification key are supplied. See [native runbook](../native/README.md) and [evidence](../evidence/native-mobile/). Device, store and remaining failure qualification below stay open.
+
 ## Implementation phases and acceptance
 
 ### P0 — Freeze scope and build requirements
@@ -107,23 +113,23 @@ from an update and may remove local saves.
 - [ ] Record publisher identity, permanent bundle/application IDs, countries, device support and distribution
   account status. Proposed launch scope: one offline single-player game, current content, no new ads,
   accounts, purchases or online leaderboards. Product decisions are HR-14, not prerequisites to this plan.
-- [ ] Pin compatible Capacitor core/CLI/iOS/Android/plugin versions and native toolchains. The repo already
+- [x] Pin compatible Capacitor core/CLI/iOS/Android/plugin versions and native toolchains. The repo already
   requires Node 22+. Verify the chosen versions against [Capacitor environment setup](https://capacitorjs.com/docs/getting-started/environment-setup).
 - [ ] Record minimum supported OS/WebView versions from the actual device qualification. Do not confuse
   those with submission SDK requirements: today Apple requires Xcode 26+ / iOS 26 SDK for uploads,
   and ordinary new Play apps/updates target Android 16 / API 36+. Recheck immediately before submission.
   [Apple requirements](https://developer.apple.com/news/upcoming-requirements/),
   [Android target API requirements](https://developer.android.com/google/play/requirements/target-sdk).
-- [ ] Freeze a source revision and baseline recordings; report known performance/replay gaps separately
+- [x] Freeze a source revision and baseline recordings; report known performance/replay gaps separately
   from wrapper regressions. This plan does not silently close `PERF-BACKLOG.md` or `RIDING_POSES.md`.
 
 ### P1 — Produce installable local bundles
 
-- [ ] Add `capacitor.config.ts`, committed `ios/` and `android/` project sources, dependencies and build
+- [x] Add `capacitor.config.ts`, committed `ios/` and `android/` project sources, dependencies and build
   scripts. Keep native code limited to shell needs; gameplay remains shared. Exclude build outputs,
   signing keys, provisioning material, personal IDE state and service credentials from version control.
-- [ ] Add native-target Vite boot behavior before syncing assets. Proposed flow: `pnpm build:native`
-  (new script), `pnpm exec cap sync`, then Xcode archive / Gradle signed release AAB. A web build alone
+- [x] Add native-target Vite boot behavior before syncing assets. Implemented flow: `pnpm build:native`
+  (native target), `pnpm exec cap sync`, then Xcode archive / Gradle signed release AAB. A web build alone
   is not an IPA or AAB. [Capacitor build workflow](https://capacitorjs.com/docs/basics/workflow).
 - [ ] Generate native app icons/splash assets from approved art; configure landscape behavior and safe
   areas, including home indicator, notches and Android edge-to-edge system bars. Keep links out of the
@@ -174,37 +180,34 @@ from an update and may remove local saves.
   save-upgrade and offline gates on the artifacts obtained through the stores. Update `RELEASES.md` with
   platform build numbers, source SHA, web-bundle ID and evidence.
 
-### P4 — Optional OTA qualification, separate from initial launch
+### P4 — OTA qualification, required for first release (user decision)
 
-- [ ] Choose a maintained updater only after checking current support, pricing, self-hosting/export options,
-  asset limits, signature verification, native-version targeting and automatic rollback. Provider documentation
-  demonstrates technical delivery, not store permission. For example, [Appflow live updates](https://ionic.io/docs/appflow/quickstart/deploy)
-  documents a separate SDK/channel that supplies HTML/CSS/JS; Capacitor alone does not supply this channel.
+- [x] Choose a maintained updater only after checking current support, pricing, self-hosting/export options,
+  asset limits, signature verification, native-version targeting and automatic rollback. Selected `@capgo/capacitor-updater@8.51.20`, manual mode with our RSA-PSS signed manifest and a static HTTPS host. Vendor endpoints disabled; no subscription or account. See [runbook](../native/README.md) and [capability evidence](../evidence/native-mobile/updater.md). Documentation demonstrates technical delivery, not store permission.
 - [ ] If the updater/plugin was absent from the initial binary, ship it through a store update first. Decide
   iOS eligibility for the intended patch categories; retain store-only delivery when uncertain or rejected.
 - [ ] Implement the release and failure behavior below. Prove valid update, interrupted download, bad
   signature/hash, incompatible native shell, bad startup, low disk, offline launch, rollback and save recovery.
 - [ ] Exercise an A → B → A rollback drill on both platforms through their installed builds. Archive an OTA
-  capability report; if OTA is deferred, keep this phase explicitly deferred rather than marking it passed.
+  capability report; unmeasured failure cases remain open and are not inferred from a successful happy path.
 
-## How updates would operate
+## How updates operate
 
 Maintain three independent identities: **native version/build** (store shell), **web bundle ID** (immutable
 game build/source SHA), and **save/physics schema versions**. Track all three in support diagnostics.
 
 1. Build an immutable release from one revision. Website deployment and mobile promotion are separate
    jobs; publishing Vercel production must not implicitly advance `ios-stable` or `android-stable`.
-2. A signed manifest names the bundle, content hashes/sizes, platform, compatible native build range,
-   required plugin capabilities and schema constraints. Pin trust in the installed shell; HTTPS plus an
+2. A signed manifest names the bundle, archive hash, platform, compatible native build range,
+   runtime compatibility ID and save-schema constraint. Pin trust in the installed shell; HTTPS plus an
    unsigned hash from the same server is not sufficient authentication. Keep old compatible bundles.
 3. App starts from its installed known-good bundle immediately. Check updates opportunistically with a
    bounded timeout. Download into staging; interrupted downloads leave the current game playable.
 4. Verify signature, compatibility and the complete asset set before making anything active. Use immutable
    hashed paths for *all* remote assets, not just existing content-addressed GLBs. Prevent mixed releases.
-5. Activate atomically at the next cold launch, or an explicit safe menu restart. Never reload mid-run or
+5. Activate atomically at the next cold launch, (the current implementation). Never reload mid-run or
    during a save. Keep the previous working bundle and the bundled factory fallback.
-6. Confirm health after the real boot reaches a usable menu and the runtime assets load. On startup failure
-   or repeated crash, automatically revert; do not mistake a user backgrounding the app for a failed boot.
+6. Confirm health after the real boot reaches a usable menu and the runtime assets load. If boot never acknowledges readiness, automatically revert; do not mistake a user backgrounding the app for a failed boot.
 7. Promote beta → limited cohort → stable; stop/revert promotion on failures. An offline device cannot receive
    a remote rollback instruction, so local fallback must work. Reject updates requiring a newer shell and
    offer the store upgrade while preserving the old playable game.
@@ -229,17 +232,13 @@ activate on a later safe launch. A `B` that needs shell `1.1` waits for a store 
   opted in for 14 days before applying for production access. This is not automatic production approval.
   [Google testing requirements](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en-GB).
 - Additional costs: Mac/native build infrastructure, test devices, hosting/bandwidth and an optional OTA
-  service. No provider subscription or account purchase is part of this planning request.
+  service. No provider subscription or account purchase has been made.
 - Planning estimate, not a commitment: 1–2 working days for an installable proof, 3–7 for lifecycle/storage
   and device qualification, 2–5 for listings/release automation, plus enrollment/testing/review wait time.
-  Optional OTA adds roughly 3–7 engineering days after vendor choice; device or review findings can expand it.
+  OTA qualification and store review can expand these estimates; local implementation is already underway.
 
-HR-14 records the future human decisions: publisher/account type and permanent IDs, target markets/devices,
-monetization, web-save import priority, and whether to fund optional OTA after the bundled release. Technical
-preparation can proceed under the proposed defaults when implementation is requested; no account purchase
-or public submission is authorized by this plan alone.
+HR-14 records remaining human prerequisites: personal developer-account access/enrollment, permanent IDs, target markets and actual-device/human acceptance. Personal publication, free/no ads/no purchases and first-release eligible OTA are decided. Technical implementation proceeds autonomously; store signing and publication still require those prerequisites.
 
 **Plan done line:** both store-distributed apps install and play the shared TypeScript/Three.js game offline,
 preserve saves across updates, pass recorded native/device gates and have a repeatable release runbook.
-The optional OTA phase is either proved with recovery evidence or explicitly deferred in favor of store
-updates. Update this tracker and archive only when those outcomes are evidenced or exceptions accepted.
+The OTA phase must be proved with recovery evidence; iOS-ineligible changes still use store updates. Update this tracker and archive only when those outcomes are evidenced or exceptions accepted.

@@ -1,3 +1,4 @@
+import { getStorage } from '../platform/storage';
 /**
  * Level reviewer (docs/design/game.md §21): a first-class screen — REVIEW on the main menu → a level
  * picker → the review UI for one track. The track is loaded with nothing racing (phase `menu`), the bike
@@ -90,7 +91,7 @@ export function segmentAt(segments: readonly ReviewSegment[], x: number): number
 
 /** Notes per track / segment in localStorage (`trials.review.<track>` → { [i]: SegmentNote }). Storage failures are silent. */
 export class ReviewStore {
-  constructor(private readonly storage: Pick<Storage, 'getItem' | 'setItem'> | null = typeof localStorage === 'undefined' ? null : localStorage) {}
+  constructor(private readonly storage: Pick<Storage, 'getItem' | 'setItem'> | null = getStorage()) {}
 
   load(trackId: string): Record<number, SegmentNote> {
     try {

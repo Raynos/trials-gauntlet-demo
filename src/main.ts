@@ -43,6 +43,8 @@ import type { PrepareStep } from './boot/steps';
 import type { BikeClass, QualityTier, RiderOutfit, RiderOutfitRenderer } from './core/types';
 import { startTier } from './game/startTier';
 import { loadRiderOutfit } from './ui/outfit';
+// Direct compile-time guard lets the web build omit the native bridge and its chunks.
+declare const __NATIVE_APP__: boolean;
 
 type AnyModule = Record<string, unknown>;
 
@@ -151,6 +153,8 @@ interface Composed {
 
 /** Renderer-side startup work run through the boot plan (`PREPARE_STEPS`, src/render/index.ts `prepare`). */
 type Preparable = Partial<{ prepare(run: StepRunner<PrepareStep>): Promise<void> }>;
+
+let nativeReady: (() => Promise<void>) | undefined;
 
 function boot(): void {
   const params = new URLSearchParams(location.search);
@@ -386,6 +390,11 @@ function boot(): void {
         p.detail(getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track');
         await nextPaint();
         shell.start(); // loads the track (compile + physics + renderer world) and shows the menu
+        if (__NATIVE_APP__) {
+          const { installNativeLifecycle } = await import('./platform/lifecycle');
+          const disposeNative = await installNativeLifecycle(shell);
+          window.addEventListener('pagehide', () => { void disposeNative(); }, { once: true });
+        }
         console.info(`[trials] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
         await nextPaint();
       });
@@ -404,6 +413,7 @@ function boot(): void {
         if (f) await f.ready;
       });
       sFonts.done();
+      if (nativeReady) await nativeReady();
     } catch (e) {
       console.error('[trials] boot failed', e);
       plan.fail(`Startup failed: ${e instanceof Error ? e.message : String(e)}`);
@@ -411,4 +421,17 @@ function boot(): void {
   }
 }
 
-boot();
+if (typeof __NATIVE_APP__ !== 'undefined' && __NATIVE_APP__) {
+  void import('./platform/native-bootstrap').then(async ({ prepareNativeApp }) => {
+    const native = await prepareNativeApp();
+    if (!native) return;
+    nativeReady = native.ready;
+    boot();
+  }).catch((error: unknown) => {
+    console.error('[trials] native startup failed', error);
+    // Let the existing loading screen surface the failure; never discard a save to recover boot.
+    window.dispatchEvent(new ErrorEvent('error', { message: error instanceof Error ? error.message : 'Native startup failed' }));
+  });
+} else {
+  boot();
+}

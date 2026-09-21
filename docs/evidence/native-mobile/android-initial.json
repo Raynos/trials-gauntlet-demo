@@ -1,0 +1,79 @@
+{
+  "status": "initial shell proof; final integrated source requires a fresh build and qualification",
+  "at": "2026-09-21T08:47:42.119Z",
+  "environment": "Android API36 ARM64 Pixel7 headless emulator; software GPU; airplane mode",
+  "toolchain": {
+    "capacitor": "8.5.2",
+    "gradle": "8.14.3",
+    "androidGradlePlugin": "8.13.0",
+    "java": "24",
+    "compileSdk": 36,
+    "targetSdk": 36,
+    "minSdk": 24
+  },
+  "build": {
+    "applicationId": "com.trialsgauntlet.game",
+    "versionName": "1.0",
+    "versionCode": 1,
+    "webBuild": "4625229c",
+    "debugApkSha256": "8cccc5a473b9fd02450598ac488cce94af35e55c76104cc22f27ece0099c70d7",
+    "unsignedReleaseAabSha256": "5f59a85eaf87700be2aeabe1c6b77a9ea67cbb92af315132d9b60d7ab08e3bb5"
+  },
+  "offlineColdBoot": {
+    "airplaneMode": true,
+    "navigatorOnline": false,
+    "origin": "https://localhost",
+    "platform": "android",
+    "activityLaunchMs": 833,
+    "gameReadyMs": 1863.3
+  },
+  "replay": {
+    "recording": "harness/inputs/flat-test/bot-3.json",
+    "runs": [
+      {
+        "finishTime": 8.65,
+        "stateHash": "ecdf62a55f6185a6",
+        "faults": 0
+      },
+      {
+        "finishTime": 8.65,
+        "stateHash": "ecdf62a55f6185a6",
+        "faults": 0
+      }
+    ]
+  },
+  "crash": {
+    "recording": "harness/inputs/flat-test/crash.json",
+    "faults": 2
+  },
+  "restart": {
+    "synchronizedRenderMs": 65.89999999999418,
+    "phase": "riding",
+    "tick": 1
+  },
+  "lifecycle": {
+    "backgroundPaused": true,
+    "backgroundTick": 386,
+    "foregroundStillPaused": true,
+    "foregroundTick": 386,
+    "backgroundInput": {
+      "throttle": 0,
+      "brake": 0,
+      "lean": 0
+    },
+    "hardwareBackResumed": true,
+    "secondHardwareBackPaused": true
+  },
+  "playedClip": {
+    "localIgnoredPath": ".native-build/android-clear-crash-restart.mp4",
+    "sha256": "53f21cb08208eae1d4a4903073ec95af6f634257e0e7b38bfa00ac509ad0075f",
+    "durationSeconds": 20.955344,
+    "capture": "adb screenrecord while golden and crash inputs advance through the native WebView, followed by restart",
+    "judgment": "parent pending"
+  },
+  "limitations": [
+    "Emulator proof, not physical-device performance or store acceptance.",
+    "Initial APK predates Filesystem and completed OTA integration.",
+    "Next shell versionName is 1.0.0; this initial artifact used 1.0."
+  ]
+}

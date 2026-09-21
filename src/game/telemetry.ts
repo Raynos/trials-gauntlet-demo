@@ -1,3 +1,4 @@
+import { getStorage } from '../platform/storage';
 /**
  * Local, opt-in run log (MEGA_PLAN P3; default ON, Settings → Telemetry). Every finished run
  * appends one `RunTelemetry` to `localStorage['trials.runlog']`, bounded to `RUNLOG_MAX`
@@ -15,7 +16,7 @@ export const RUNLOG_MAX = 200;
 
 function store(): Storage | null {
   try {
-    return typeof localStorage === 'undefined' ? null : localStorage;
+    return getStorage();
   } catch {
     return null;
   }

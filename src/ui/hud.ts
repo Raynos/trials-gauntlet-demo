@@ -1,3 +1,4 @@
+import { getStorage } from '../platform/storage';
 /**
  * Trials-style DOM HUD: centred run timer + fault pill, checkpoint progress
  * strip, kinetic banners (3-2-1-GO, CRASH!, CHECKPOINT, TRACK FINISHED!),
@@ -734,7 +735,7 @@ function el<K extends 'div'>(tag: K, className: string): HTMLDivElement {
 /** Mirrors `reviewEnabled` in src/ui/inbox.ts without importing it (that module stays a lazy chunk). */
 function reviewEnabled(): boolean {
   try {
-    return /[?&]review=1(&|$)/.test(location.search) || !!localStorage.getItem('trials.reviewPassword');
+    return /[?&]review=1(&|$)/.test(location.search) || !!getStorage()?.getItem('trials.reviewPassword');
   } catch {
     return false;
   }

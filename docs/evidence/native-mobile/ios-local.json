@@ -1,0 +1,200 @@
+{
+  "at": "2026-09-21T09:09:56.428895+00:00",
+  "environment": "Headless iPhone 16 Pro simulator, iOS 26.5, Capacitor 8.5.2, shell 1.0.0(1)",
+  "scope": "Local unsigned simulator QA; not physical-device, visual, or store acceptance",
+  "functional": {
+    "boot": {
+      "hasSW": false,
+      "origin": "capacitor://localhost",
+      "ready": true,
+      "screen": "menu"
+    },
+    "crashed": {
+      "faults": 2,
+      "phase": "riding"
+    },
+    "first": {
+      "hash": "389a5dc6c07ab8c3",
+      "phase": "finished",
+      "time": 40.55833333333333
+    },
+    "probeAt": 1789981086355,
+    "replayEqual": true,
+    "restarted": {
+      "frame": 0,
+      "phase": "riding",
+      "restartMs": 0
+    },
+    "second": {
+      "hash": "389a5dc6c07ab8c3",
+      "phase": "finished",
+      "time": 40.55833333333333
+    }
+  },
+  "ota": {
+    "stage": {
+      "current": {
+        "checksum": "",
+        "downloaded": "1970-01-01T00:00:00.000Z",
+        "id": "builtin",
+        "status": "success",
+        "version": "1.0.0"
+      },
+      "marker": "builtin-a",
+      "screen": "menu",
+      "sequence": "1",
+      "pending": true,
+      "bundles": [
+        {
+          "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+          "downloaded": "2026-09-21T09:00:21.852Z",
+          "id": "PW8iF1KoC4",
+          "status": "pending",
+          "version": "1.0.1-qa"
+        }
+      ]
+    },
+    "activate": {
+      "current": {
+        "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+        "downloaded": "2026-09-21T09:00:21.852Z",
+        "id": "PW8iF1KoC4",
+        "status": "success",
+        "version": "1.0.1-qa"
+      },
+      "marker": "healthy-b",
+      "screen": "menu",
+      "sequence": "1",
+      "pending": false,
+      "bundles": [
+        {
+          "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+          "downloaded": "2026-09-21T09:00:21.852Z",
+          "id": "PW8iF1KoC4",
+          "status": "success",
+          "version": "1.0.1-qa"
+        }
+      ]
+    },
+    "brokenStage": {
+      "current": {
+        "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+        "downloaded": "2026-09-21T09:00:21.852Z",
+        "id": "PW8iF1KoC4",
+        "status": "success",
+        "version": "1.0.1-qa"
+      },
+      "marker": "healthy-b",
+      "screen": "menu",
+      "sequence": "2",
+      "pending": true,
+      "bundles": [
+        {
+          "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+          "downloaded": "2026-09-21T09:00:21.852Z",
+          "id": "PW8iF1KoC4",
+          "status": "success",
+          "version": "1.0.1-qa"
+        },
+        {
+          "checksum": "a67cba6bd640507af39fc89ad76fc1cc2dabeb1e5462249766bea8180068b3fa",
+          "downloaded": "2026-09-21T09:04:49.377Z",
+          "id": "TGDg4vCsQ9",
+          "status": "pending",
+          "version": "1.0.2-broken-qa"
+        }
+      ]
+    },
+    "automaticRollback": {
+      "current": {
+        "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+        "downloaded": "2026-09-21T09:00:21.852Z",
+        "id": "PW8iF1KoC4",
+        "status": "success",
+        "version": "1.0.1-qa"
+      },
+      "marker": "healthy-b",
+      "screen": "menu",
+      "sequence": "2",
+      "pending": false,
+      "bundles": [
+        {
+          "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+          "downloaded": "2026-09-21T09:00:21.852Z",
+          "id": "PW8iF1KoC4",
+          "status": "success",
+          "version": "1.0.1-qa"
+        }
+      ]
+    },
+    "corruptArchive": "Signed seq3 manifest served archive with appended corruption; prior healthy bundle remained, no pending marker, sequence remained2. Native rejection event not separately captured.",
+    "qualificationConfig": {
+      "appReadyTimeout": 120000,
+      "autoDeletePrevious": false
+    },
+    "saveMirrorRemoved": {
+      "before": "0",
+      "current": {
+        "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+        "downloaded": "2026-09-21T09:00:21.852Z",
+        "id": "PW8iF1KoC4",
+        "status": "success",
+        "version": "1.0.1-qa"
+      },
+      "probeAt": 1789981732613,
+      "removed": null,
+      "screen": "settings"
+    },
+    "saveRestoredFromNativeSnapshot": {
+      "current": {
+        "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+        "downloaded": "2026-09-21T09:00:21.852Z",
+        "id": "PW8iF1KoC4",
+        "status": "success",
+        "version": "1.0.1-qa"
+      },
+      "probeAt": 1789981768489,
+      "screen": "menu",
+      "sound": "0"
+    }
+  },
+  "limits": [
+    "Production channels/key not configured",
+    "Physical iPhone performance/touch/audio interruption not measured",
+    "Interrupted download/low disk installed-app tests open",
+    "New automatic previous-bundle cleanup config sourceverified, not yet exercised by upgrade drill"
+  ],
+  "finalStandardBuild": {
+    "configuration": "No production/QA update endpoint, explicit previous/failed cleanup enabled",
+    "build": "Xcode Debug simulator BUILD SUCCEEDED",
+    "functional": {
+      "boot": {
+        "hasSW": false,
+        "origin": "capacitor://localhost",
+        "ready": true,
+        "screen": "menu"
+      },
+      "crashed": {
+        "faults": 2,
+        "phase": "riding"
+      },
+      "first": {
+        "hash": "389a5dc6c07ab8c3",
+        "phase": "finished",
+        "time": 40.55833333333333
+      },
+      "probeAt": 1789981831725,
+      "replayEqual": true,
+      "restarted": {
+        "frame": 0,
+        "phase": "riding",
+        "restartMs": 0
+      },
+      "second": {
+        "hash": "389a5dc6c07ab8c3",
+        "phase": "finished",
+        "time": 40.55833333333333
+      }
+    }
+  }
+}

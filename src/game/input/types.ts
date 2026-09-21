@@ -7,6 +7,8 @@ export interface InputSource {
   read(out: InputFrame): void;
   /** Menu / meta buttons pressed since the last poll (edge-triggered). */
   pollMeta(): MetaButtons;
+  /** Discard held state and queued menu edges after an app interruption. */
+  reset?(): void;
   dispose(): void;
 }
 

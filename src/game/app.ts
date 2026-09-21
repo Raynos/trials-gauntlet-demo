@@ -1,3 +1,4 @@
+import { getStorage } from '../platform/storage';
 /**
  * Browser app shell: front end (main menu → track select / garage / settings /
  * credits) ⇄ runs (countdown → riding → pause / results), input mux → game,
@@ -10,6 +11,7 @@
  * results. The menu renders over the live 3D scene with `BACKDROP_TRACK`
  * loaded in the `menu` phase (the key art plate covers it once decoded).
  */
+import { NEUTRAL_INPUT } from '../core/types';
 import type { BikeClass, CameraOverride, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RiderOutfit, RunResult, TrackDef, TrialsHook } from '../core/types';
 import type { AudioScene, AudioSystem } from '../audio';
 import { getTrack, listTrackIds } from '../tracks';
@@ -229,6 +231,7 @@ export class App {
   private ghostOn: boolean;
   private lastNow = 0;
   private raf = 0;
+  private nativeInactive = false;
   private audioUnlocked = false;
   private lastTrackId: string | null = null;
   /** Seconds of riding since the last GO (touch zones settle at 3 s). */
@@ -249,7 +252,7 @@ export class App {
       .map((id) => getTrack(id))
       .filter((t): t is TrackDef => t !== undefined);
     try {
-      this.lastTrackId = localStorage.getItem(LAST_TRACK_KEY);
+      this.lastTrackId = getStorage()?.getItem(LAST_TRACK_KEY) ?? null;
     } catch {
       this.lastTrackId = null;
     }
@@ -367,7 +370,7 @@ export class App {
         this.bestTimes.clear();
         this.lastTrackId = null;
         try {
-          localStorage.removeItem(LAST_TRACK_KEY);
+          getStorage()?.removeItem(LAST_TRACK_KEY);
         } catch {
           /* storage unavailable */
         }
@@ -532,7 +535,7 @@ export class App {
     if (this.qualityChoice === 'auto') this.qualityWhy = `governor start ${start}${loadHeldTier() ? ' (held last session)' : ''}`;
 
     const unlock = (): void => {
-      if (this.audioUnlocked) return;
+      if (this.audioUnlocked || this.nativeInactive) return;
       this.audioUnlocked = true;
       void this.audio?.unlock();
     };
@@ -780,6 +783,10 @@ export class App {
     }
     this.lastNow = performance.now();
     const frame = (now: number): void => {
+      if (this.nativeInactive) {
+        this.raf = requestAnimationFrame(frame);
+        return;
+      }
       // Frame cap: a phase-locked cadence (src/game/cadence.ts) — a render is due every 1000/cap ms from
       // the first one, whatever RAF slot it lands on, so a 30 cap on a 60 or 120 Hz display holds 30 flat
       // instead of slipping to 24–28 after each frame that overran its slot (PERF.md §0 F4). Physics is
@@ -809,6 +816,52 @@ export class App {
 
   stop(): void {
     cancelAnimationFrame(this.raf);
+  }
+
+  /** OS interruptions stop simulation, discard held controls, and require an explicit Resume. */
+  setNativeActive(active: boolean): void {
+    if (this.nativeInactive === !active) return;
+    this.nativeInactive = !active;
+    this.audio?.setAppActive?.(active);
+    this.mux.reset();
+    this.game.setInput(NEUTRAL_INPUT);
+    this.prevRestart = this.prevThrottle = false;
+    this.lastNow = performance.now();
+    this.lastRenderAt = 0;
+    this.cadence.reset();
+    if (!active) {
+      if (this.inRun() && this.game.phase() !== 'finished' && !this.game.paused()) this.togglePause('native:background');
+      if (this.screen === 'replay') this.game.setPaused(true);
+      // Reviewer is a development surface; return to its picker instead of resuming a ride unattended.
+      if (this.screen === 'reviewer') this.leaveReview();
+      this.audio?.setMasterVolume(0);
+      this.audioUnlocked = false;
+    } else {
+      this.audio?.setMasterVolume(this.soundOn && !this.replayMuted ? this.volume : 0);
+      this.fit();
+    }
+  }
+
+  /** Android Back uses the visible app hierarchy; false permits minimizing only at the main menu. */
+  nativeBack(): boolean {
+    if (this.nativeInactive) return true;
+    this.mux.reset();
+    this.game.setInput(NEUTRAL_INPUT);
+    if (this.onboard.visible) this.onboard.dismiss();
+    else if (this.screen === 'replay') this.replay.exit();
+    else if (this.screen === 'reviewer') this.leaveReview();
+    else if (this.screen === 'run') {
+      if (this.pause.visible) this.resume('native:back');
+      else if (this.game.phase() === 'finished') {
+        if (this.hud.resultsInteractive()) this.quit('native:back');
+      } else this.togglePause('native:back');
+    } else if (this.screen === 'menu') return false;
+    else if (this.screen === 'garage') this.garage.back();
+    else {
+      const screen = this.screen === 'tracks' ? this.tracksScreen : this.screen === 'settings' ? this.settings : this.screen === 'review' ? this.reviewPick : this.credits;
+      screen.back();
+    }
+    return true;
   }
 
   /** Current front-end screen or `run`. */
@@ -905,7 +958,7 @@ export class App {
     this.setAudioScene('run');
     this.lastTrackId = id;
     try {
-      localStorage.setItem(LAST_TRACK_KEY, id);
+      getStorage()?.setItem(LAST_TRACK_KEY, id);
     } catch {
       /* storage unavailable */
     }

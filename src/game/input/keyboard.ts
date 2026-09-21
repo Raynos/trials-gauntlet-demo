@@ -71,6 +71,11 @@ export class KeyboardInput implements InputSource {
     return m;
   }
 
+  reset(): void {
+    this.down.clear();
+    clearMeta(this.meta);
+  }
+
   dispose(): void {
     this.target.removeEventListener('keydown', this.onDown);
     this.target.removeEventListener('keyup', this.onUp);

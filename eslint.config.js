@@ -7,7 +7,7 @@ import tseslint from 'typescript-eslint';
 const DETERMINISTIC_PATHS = ['src/physics/**/*.ts', 'src/tracks/**/*.ts', 'src/audio/model/**/*.ts', 'src/core/**/*.ts'];
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'harness/out/**', 'reference/**', '**/*.d.ts'] },
+  { ignores: ['dist/**', 'dist-native/**', 'ios/**', 'android/**', '.native-build/**', 'node_modules/**', 'harness/out/**', 'reference/**', '**/*.d.ts'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

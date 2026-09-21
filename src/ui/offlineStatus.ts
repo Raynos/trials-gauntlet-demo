@@ -7,6 +7,8 @@
  *    `navigator.storage.persist()` does not exist on iOS. There is nothing to engineer around it —
  *    the user's call was to accept it — so it gets stated rather than hidden.
  */
+import { isNativeApp } from '../platform/target';
+
 export interface OfflineHeld {
   build: string;
   entries: number;
@@ -14,8 +16,9 @@ export interface OfflineHeld {
   bytes: number;
 }
 
-/** Resolves null when no worker controls the page (dev, `?sw=0`, `?harness=1`, or a browser without one). */
+/** Native uses installed files; web resolves null when no worker controls the page. */
 export function offlineHeld(timeoutMs = 8000): Promise<OfflineHeld | null> {
+  if (isNativeApp()) return Promise.resolve(null);
   const sw = typeof navigator === 'undefined' ? null : navigator.serviceWorker;
   if (!sw?.controller || typeof MessageChannel === 'undefined') return Promise.resolve(null);
   return new Promise<OfflineHeld | null>((resolve) => {
@@ -35,8 +38,9 @@ export function offlineHeld(timeoutMs = 8000): Promise<OfflineHeld | null> {
   });
 }
 
-/** The settings line. Empty string when there is no worker — the screen simply shows nothing. */
+/** Installed-file status on native, cached-file status on web (hidden without a worker). */
 export function offlineLine(held: OfflineHeld | null): string {
+  if (isNativeApp()) return 'Offline ready · game files included with this app';
   if (!held || held.bytes <= 0) return '';
   return `Offline ready · ${(held.bytes / 1e6).toFixed(1)} MB in ${held.entries} files · iOS clears it after 7 days without opening the game`;
 }

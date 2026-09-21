@@ -1,3 +1,4 @@
+import { getStorage } from '../platform/storage';
 import type { RiderOutfit } from '../core/types';
 import { AVAILABLE_RIDER_PRESETS, DEFAULT_RIDER_OUTFIT, normalizeRiderOutfit, normalizeRiderFamily, type RiderModelFamily } from '../core/riderPresets';
 
@@ -21,7 +22,7 @@ function loadPreference<T>(override: string | null | undefined, normalize: (valu
   const requested = normalize(override);
   if (requested) return requested;
   try {
-    const stored = localStorage.getItem(RIDER_OUTFIT_KEY);
+    const stored = getStorage()?.getItem(RIDER_OUTFIT_KEY);
     return normalize(stored);
   } catch {
     return null;
@@ -32,7 +33,7 @@ export function saveRiderOutfit(outfit: RiderOutfit): void {
   const canonical = normalizeRiderOutfit(outfit);
   if (!canonical) return;
   try {
-    if (typeof localStorage !== 'undefined') localStorage.setItem(RIDER_OUTFIT_KEY, canonical);
+    getStorage()?.setItem(RIDER_OUTFIT_KEY, canonical);
   } catch {
     // The selection still applies to the current page when storage is unavailable.
   }

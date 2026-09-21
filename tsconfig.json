@@ -1,10 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "types": ["vite/client"],
+    "types": [
+      "vite/client"
+    ],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -20,5 +26,11 @@
     "noEmit": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "vite.config.ts", "vitest.config.ts", "eslint.config.js"]
+  "include": [
+    "src",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "eslint.config.js",
+    "capacitor.config.ts"
+  ]
 }

@@ -42,6 +42,7 @@ export class WebAudioSystem implements AudioSystem {
   private unlocking: Promise<void> | null = null;
   private master = 1;
   private disposed = false;
+  private appActive = true;
   private track: CompiledTrack | null = null;
   private seed = 0;
   private onVisibility: (() => void) | null = null;
@@ -91,8 +92,14 @@ export class WebAudioSystem implements AudioSystem {
     if (b?.kind === 'worklet') b.node.port.postMessage({ scene: this.driver.scene });
   }
 
+  setAppActive(active: boolean): void {
+    this.appActive = active;
+    if (!active && this.ctx?.state === 'running') void this.ctx.suspend().catch(() => undefined);
+    // Leave resuming to browser recovery or the next explicit gesture.
+  }
+
   unlock(): Promise<void> {
-    if (this.disposed) return Promise.resolve();
+    if (this.disposed || !this.appActive) return Promise.resolve();
     if (!this.ctx) {
       // Synchronous creation inside the gesture — this is the iOS requirement.
       try {
@@ -102,7 +109,7 @@ export class WebAudioSystem implements AudioSystem {
       }
       const ctx = this.ctx;
       const kick = (): void => {
-        if (this.disposed || this.ctx !== ctx) return;
+        if (this.disposed || !this.appActive || this.ctx !== ctx) return;
         if ((ctx.state as string) === 'interrupted' || ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
       };
       // Safari suspends/interrupts on phone calls, tab switches and the lock screen; resume

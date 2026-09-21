@@ -1,3 +1,5 @@
+import { getStorage } from '../platform/storage';
+import { isNativeApp } from '../platform/target';
 /**
  * The in-game review inbox (the "✎ NOTE" control on the run HUD, `?review=1` to enable).
  *
@@ -74,7 +76,7 @@ export interface StorageLike {
 
 const safeStorage = (): StorageLike | null => {
   try {
-    return typeof localStorage === 'undefined' ? null : localStorage;
+    return getStorage();
   } catch {
     return null;
   }
@@ -82,6 +84,8 @@ const safeStorage = (): StorageLike | null => {
 
 /** The control is offered when a password is stored or the URL carries `?review=1` (which opens the password prompt). */
 export function reviewEnabled(search = location.search, storage = safeStorage()): boolean {
+  // Development feedback assumes a same-origin Vercel API; native release has no inbox backend.
+  if (isNativeApp()) return false;
   if (/[?&]review=1(&|$)/.test(search)) return true;
   try {
     return !!storage?.getItem(PASSWORD_KEY);

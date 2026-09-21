@@ -388,6 +388,12 @@ export class TouchInput implements InputSource {
     return m;
   }
 
+  reset(): void {
+    this.releaseAll('app-interruption');
+    this.rawTouches = 0;
+    clearMeta(this.meta);
+  }
+
   dispose(): void {
     document.removeEventListener('gesturestart', this.onGesture as EventListener);
     document.removeEventListener('gesturechange', this.onGesture as EventListener);

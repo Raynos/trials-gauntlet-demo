@@ -23,6 +23,7 @@ const NAV_THRESHOLD = 0.6;
 export class GamepadInput implements InputSource {
   readonly device = 'gamepad' as const;
   private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false, alt: false };
+  private interrupted = false;
   private prevNavX = 0;
   private prevNavY = 0;
   private prevStart = false;
@@ -55,6 +56,14 @@ export class GamepadInput implements InputSource {
       out.throttle = out.brake = out.lean = 0;
       out.hop = false;
       out.restart = false;
+      return;
+    }
+    // A held controller button must not dismiss the pause shown while backgrounding.
+    if (this.interrupted) {
+      const held = p.buttons.some((b) => b.pressed || b.value > 0.02) || p.axes.some((a) => Math.abs(a) > DEADZONE);
+      out.throttle = out.brake = out.lean = 0;
+      out.hop = out.restart = false;
+      if (!held) this.interrupted = false;
       return;
     }
     const rt = button(p, BTN_RT);
@@ -96,6 +105,13 @@ export class GamepadInput implements InputSource {
     const m = { ...this.meta };
     clearMeta(this.meta);
     return m;
+  }
+
+  reset(): void {
+    this.interrupted = true;
+    this.prevNavX = this.prevNavY = 0;
+    this.prevStart = this.prevA = this.prevB = this.prevY = false;
+    clearMeta(this.meta);
   }
 
   dispose(): void {}

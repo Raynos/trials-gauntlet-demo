@@ -23,6 +23,8 @@ export interface AudioSystem {
   /** One-shots. */
   onEvent(event: GameEvent): void;
   setMasterVolume(v: number): void;
+  /** Native lifecycle: prevent the browser audio recovery path from reviving background audio. */
+  setAppActive?(active: boolean): void;
   dispose(): void;
   /** Harness: replay a recording to interleaved stereo PCM (48 kHz), no clock. */
   renderOffline?: ((recordingJson: string, seconds: number) => Promise<Float32Array>) | undefined;

@@ -196,7 +196,7 @@ export function writeBootPlanTable(root: string, modelAssets?: readonly ModelAss
 }
 
 /** Bundle + (in build) minify `src/boot/inline.ts` with the core file list and the build sha compiled in. */
-export async function buildInline(root: string, core: LoadItem[], totals: DeclaredBootTotals, minify: boolean, id: string): Promise<string> {
+export async function buildInline(root: string, core: LoadItem[], totals: DeclaredBootTotals, minify: boolean, id: string, native = false): Promise<string> {
   const res = await esbuild.build({
     entryPoints: [path.join(root, 'src', 'boot', 'inline.ts')],
     bundle: true,
@@ -207,14 +207,14 @@ export async function buildInline(root: string, core: LoadItem[], totals: Declar
     minify,
     charset: 'utf8',
     legalComments: 'none',
-    define: { __BOOT_CORE__: JSON.stringify(core.map((i) => [i.path, i.bytes])), __BOOT_TOTALS__: JSON.stringify(totals), __BOOT_BUILD__: JSON.stringify(id), __BOOT_SW__: JSON.stringify(minify) },
+    define: { __BOOT_CORE__: JSON.stringify(core.map((i) => [i.path, i.bytes])), __BOOT_TOTALS__: JSON.stringify(totals), __BOOT_BUILD__: JSON.stringify(id), __BOOT_SW__: JSON.stringify(minify && !native), __NATIVE_APP__: JSON.stringify(native) },
   });
   const code = res.outputFiles[0]?.text.trim() ?? '';
   if (minify && Buffer.byteLength(code) > INLINE_BUDGET_BYTES) throw new Error(`inline loader is ${Buffer.byteLength(code)} B, budget ${INLINE_BUDGET_BYTES} B`);
   return code;
 }
 
-function loadManifest(id: string): Plugin[] {
+function loadManifest(id: string, native = false): Plugin[] {
   let root = process.cwd();
   let coreItems: LoadItem[] = [];
   let totals: DeclaredBootTotals = emptyBootTotals();
@@ -258,7 +258,7 @@ function loadManifest(id: string): Plugin[] {
       order: 'post',
       async handler(html, ctx) {
         // The inline loader: TypeScript, bundled; minified with the core list compiled in for the build (≤ 8 KB budget asserted).
-        const code = await buildInline(root, ctx.bundle ? coreItems : [], totals, !!ctx.bundle, id);
+        const code = await buildInline(root, ctx.bundle ? coreItems : [], totals, !!ctx.bundle, id, native);
         if (!html.includes('<script id="boot"></script>')) throw new Error('index.html: <script id="boot"></script> missing');
         // Function replacer: a string replacement would interpret `$&` / `$'` inside the minified code
         // (the 2026-09-15 audit's P1 — `$&&t++` re-inserted the placeholder markup into the script).
@@ -394,13 +394,15 @@ function buildId(): string {
   return 'dev';
 }
 
-export default defineConfig({
-  define: { __BUILD_ID__: JSON.stringify(buildId()), __BUILD_TIME__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z'), __WORLDMAP_V__: JSON.stringify(contentStamp(publicStamp(process.cwd(), ['art/worldmap'])).slice(0, 8)) },
+export default defineConfig(({ mode }) => ({
+  define: { __NATIVE_APP__: JSON.stringify(mode === 'native'), __BUILD_ID__: JSON.stringify(buildId()), __BUILD_TIME__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z'), __WORLDMAP_V__: JSON.stringify(contentStamp(publicStamp(process.cwd(), ['art/worldmap'])).slice(0, 8)) },
   // Relative base so the built bundle also works when served from a subpath
   // (Vercel preview folders, file listings, the harness preview server).
   base: './',
-  plugins: [bundleBudget(), ...loadManifest(buildId()), pwa(buildId()), pruneFlatModels()],
+  // Native assets are installed with the app. Only the website uses a service worker.
+  plugins: [bundleBudget(), ...loadManifest(buildId(), mode === 'native'), ...(mode === 'native' ? [] : [pwa(buildId())]), pruneFlatModels()],
   build: {
+    outDir: mode === 'native' ? 'dist-native' : 'dist',
     target: 'es2022',
     sourcemap: true,
     chunkSizeWarningLimit: 700,
@@ -423,4 +425,4 @@ export default defineConfig({
     strictPort: false,
     headers: ISOLATION_HEADERS,
   },
-});
+}));

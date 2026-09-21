@@ -1,3 +1,4 @@
+import { flushStorage } from '../platform/storage';
 /**
  * Front end (docs/design/game.md §10): main menu ("Broadcast", boot lands on
  * it — there is no title step) → the world map (src/ui/worldMapScreen.ts, the level select) / garage / settings / credits.
@@ -14,6 +15,7 @@ import type { QualityChoice } from './menu';
 import type { UiSfx } from './sfx';
 import { conceal, reveal, isLiveTarget } from './live';
 import { artTier } from '../boot/tier';
+import { isNativeApp } from '../platform/target';
 
 export type FrontScreen = 'menu' | 'garage' | 'tracks' | 'settings' | 'credits' | 'review';
 
@@ -77,6 +79,12 @@ export const BUILD_STAMP_SHORT = BUILD_STAMP.replace(/ \d\d:\d\dZ?$/, '');
 
 /** Clear anything that could pin an old build (SW caches, session state), then reload. Settings and PBs stay. */
 export async function hardReload(): Promise<void> {
+  // Restart the installed bundle. The native app owns its files and save data.
+  if (isNativeApp()) {
+    await flushStorage();
+    location.reload();
+    return;
+  }
   try {
     sessionStorage.clear();
   } catch {
@@ -582,10 +590,10 @@ export class SettingsScreen extends Screen {
       list.appendChild(el);
     }
 
-    // Reload game: the only way to pick up a new build from a home-screen install (no browser chrome).
+    // Explicit safe reload from Settings; native boot may apply a verified staged bundle.
     {
       const el = h('div', 'setting');
-      el.innerHTML = `<div class="lab">Reload game<small>Fetches the latest build · settings and best times stay</small></div><button type="button" class="btn">⟳ Reload</button>`;
+      el.innerHTML = `<div class="lab">Reload game<small>${isNativeApp() ? 'Applies a downloaded update · settings and best times stay' : 'Fetches the latest build · settings and best times stay'}</small></div><button type="button" class="btn">⟳ Reload</button>`;
       const btn = el.querySelector<HTMLButtonElement>('button')!;
       const activate = (): void => {
         btn.textContent = 'Reloading…';

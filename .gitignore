@@ -34,3 +34,11 @@ harness/out/trailer/trailer-ui-*
 
 # Python bytecode from the trailer editor
 harness/trailer/__pycache__/
+
+# Native bundles/build products; signing material stays outside the repository.
+dist-native/
+.native-build/
+*.keystore
+*.jks
+*.p12
+*.mobileprovision

@@ -1,0 +1,169 @@
+{
+  "at": "2026-09-21T09:01:48.109Z",
+  "environment": "Headless Android API36 ARM64 emulator; Java21; Gradle8.14.3; Capacitor8.5.2; native1.0.0(1)",
+  "scope": "Integrated source candidate with local test HTTPS channel and ephemeral debug-only CA; not store/device qualification",
+  "offline": {
+    "at": "2026-09-21T09:00:50.451Z",
+    "environment": "headless Android emulator; airplane mode",
+    "launch": "Starting: Intent { cmp=com.trialsgauntlet.game/.MainActivity }\nStatus: ok\nLaunchState: COLD\nActivity: com.trialsgauntlet.game/.MainActivity\nTotalTime: 708\nWaitTime: 710\nComplete",
+    "boot": {
+      "online": false,
+      "origin": "https://localhost",
+      "platform": "android",
+      "readyAtMs": 727.8
+    },
+    "runs": [
+      {
+        "finishTime": 8.65,
+        "hash": "ecdf62a55f6185a6",
+        "faults": 0
+      },
+      {
+        "finishTime": 8.65,
+        "hash": "ecdf62a55f6185a6",
+        "faults": 0
+      }
+    ],
+    "crash": {
+      "phase": "riding",
+      "faults": 2
+    },
+    "restart": {
+      "wallMs": 65.09999999997672,
+      "phase": "riding",
+      "tick": 1
+    },
+    "background": {
+      "paused": true,
+      "tick": 175,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      }
+    },
+    "foreground": {
+      "paused": true,
+      "tick": 175
+    },
+    "pass": true
+  },
+  "signedOta": {
+    "healthy": {
+      "pass": true,
+      "currentWhileStaged": "1.0.0",
+      "markerWhileStaged": null,
+      "activated": {
+        "checksum": "1b04c04d8863be6453e17ad8d120d11e9c9e2c21c14301f512e37841ad8b0279",
+        "id": "qbkBVcwrMT",
+        "version": "1.0.1-qa",
+        "downloaded": "2026-09-21T09:02:10.771+0000",
+        "status": "success"
+      },
+      "relaunchVersion": "1.0.1-qa",
+      "saveMirrorRecovery": true,
+      "saveAfterRelaunch": "flat-test",
+      "pendingConsumed": true
+    },
+    "wrongChecksum": {
+      "pass": true,
+      "keptVersion": "1.0.1-qa",
+      "failures": [
+        {
+          "version": "1.0.2-qa"
+        },
+        {
+          "error": "finish_download_fail",
+          "version": "1.0.2-qa"
+        },
+        {
+          "version": "1.0.2-qa"
+        }
+      ],
+      "highestSequence": "1"
+    },
+    "failedReadyRollback": {
+      "pass": true,
+      "failedBundleVersion": "1.0.3-qa",
+      "observedFailedReadyAt": "2026-09-21T09:05:09.149Z",
+      "restoredVersion": "1.0.1-qa",
+      "restoredStatus": "success",
+      "waitIncludingReloadMs": 128231,
+      "saveRetained": "flat-test",
+      "pendingConsumed": true
+    }
+  },
+  "testTrust": "Only the locally installed QA APK trusts the temporary test CA. All three debug-only trust source files removed after build. Keys live outside repository.",
+  "limitations": [
+    "Emulator timings are not physical-device performance measurements.",
+    "Production update URL/signing identity and store publishing remain separate."
+  ],
+  "finalStandardBuild": {
+    "debugApkSha256": "d00a82831ce3d8397b539cf652df400891329c5acdff975b9272ec0c82f6db67",
+    "releaseAabSha256": "68f2c0cda440ecbf722516ffdcfc88bad172eeec5c64f59cb837cdd03d5b4015",
+    "debugCaAbsent": true,
+    "testChannelAbsent": true,
+    "previousAndFailedCleanupEnabled": true,
+    "qualification": {
+      "at": "2026-09-21T09:09:11.771Z",
+      "environment": "headless Android emulator; airplane mode",
+      "launch": "Starting: Intent { cmp=com.trialsgauntlet.game/.MainActivity }\nStatus: ok\nLaunchState: COLD\nActivity: com.trialsgauntlet.game/.MainActivity\nTotalTime: 833\nWaitTime: 835\nComplete",
+      "boot": {
+        "online": false,
+        "origin": "https://localhost",
+        "platform": "android",
+        "readyAtMs": 732.4
+      },
+      "runs": [
+        {
+          "finishTime": 8.65,
+          "hash": "ecdf62a55f6185a6",
+          "faults": 0
+        },
+        {
+          "finishTime": 8.65,
+          "hash": "ecdf62a55f6185a6",
+          "faults": 0
+        }
+      ],
+      "crash": {
+        "phase": "riding",
+        "faults": 2
+      },
+      "restart": {
+        "wallMs": 116.69999999995343,
+        "phase": "riding",
+        "tick": 1
+      },
+      "background": {
+        "paused": true,
+        "tick": 161,
+        "input": {
+          "throttle": 0,
+          "brake": 0,
+          "lean": 0
+        }
+      },
+      "foreground": {
+        "paused": true,
+        "tick": 161
+      },
+      "pass": true
+    },
+    "runtime": {
+      "current": {
+        "bundle": {
+          "checksum": "",
+          "id": "builtin",
+          "version": "1.0.0",
+          "downloaded": "1970-01-01T00:00:00.000Z",
+          "status": "success"
+        },
+        "native": "1.0.0"
+      },
+      "marker": null,
+      "lastTrack": "flat-test",
+      "online": false
+    }
+  }
+}

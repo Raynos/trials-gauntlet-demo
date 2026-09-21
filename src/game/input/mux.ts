@@ -76,6 +76,12 @@ export class InputMux {
     return { frame: quantizeInput(m), meta };
   }
 
+  reset(): void {
+    for (const s of this.sources) s.reset?.();
+    Object.assign(this.scratch, NEUTRAL_INPUT);
+    Object.assign(this.merged, NEUTRAL_INPUT);
+  }
+
   dispose(): void {
     for (const s of this.sources) s.dispose();
     this.sources.length = 0;
