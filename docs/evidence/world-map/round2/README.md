@@ -13,7 +13,7 @@ Played headless on Chromium / SwiftShader from `dist/`, seeded 6 / 15, by `harne
 ## Measured (`measure.json`)
 
 - 18 states across the three geometries: 0 scroll axes, 0 px page overflow, 0 tappables under 44 px, 0 overlaps; 5 region plates decoded in every state; the gate on screen wherever the road into Night City is.
-- Frames (SwiftShader, relative; this run overlapped the desktop stills): idle p50 8.3 / p90 25 ms, drag 8.4 / 33.5, inertia 8.4 / 115, pinch 16 / 375; an idle-machine run of the same build gave idle 8.3 / 9.3, drag 8.3 / 9.8, inertia 8.3 / 10, pinch 8.4 / 150 (`docs/plans/WORLD_MAP.md` status). One camera push 17 µs; 418 scene nodes.
+- Frames (SwiftShader, relative; this run overlapped the desktop stills): idle p50 8.3 / p90 25 ms, drag 8.4 / 33.5, inertia 8.4 / 115, pinch 16 / 375; an idle-machine run of the same build gave idle 8.3 / 9.3, drag 8.3 / 9.8, inertia 8.3 / 10, pinch 8.4 / 150 (`project/archive/WORLD_MAP.md` status). One camera push 17 µs; 418 scene nodes.
 - Plates: 12 lazy files, 3 011 KB, none over cap (Industrial 2x now 1408 wide, 284 KB).
 - e2e on this build: `--only=front` 365/365, `--only=run` 90/90, `--only=desktop` 188/188.
 

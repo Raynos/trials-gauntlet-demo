@@ -1,5 +1,5 @@
 /**
- * World map styles (docs/plans/WORLD_MAP.md, ask 54) — owned by src/ui/worldMapScreen.ts, injected once as its own
+ * World map styles (project/archive/WORLD_MAP.md, ask 54) — owned by src/ui/worldMapScreen.ts, injected once as its own
  * <style id="worldmap-css">. Tokens come from styles.ts (`--amber`, `--slab`, `--font`, medal colours, safe-area
  * insets). The scene is one transform root; markers, names and the card counter-scale with `--inv` (1 / zoom) so a
  * diamond is a true 44 px hit target at every zoom (the box is 46 px: a 44 px box reads 43.99 after the scale's round trip).

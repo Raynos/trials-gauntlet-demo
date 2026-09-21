@@ -1,14 +1,16 @@
 # Hero art integration — Astra's delivery into the game
 
+**Closed: 2026-09-21 · tag `v0.3.0`.** The user accepted the integrated rider, bike and garage as done in ask 71. The measured phone-high budget gap moved to `docs/plans/PERF-BACKLOG.md`; the actual iPhone garage frame-rate check was waived for plan closure and is not claimed as measured.
+
 Opened 2026-09-16 when `HERO_OPEN_WORK.md` was split; this is the plan that file was missing. Owner: Claude + Opus
 (the README's standing rule: game integration belongs to us, art to Astra's
-[HERO_GARAGE_PRODUCTION.md](HERO_GARAGE_PRODUCTION.md)). Blocked on the user's HR-07 review of the art; not on Astra.
-The tracker is [README.md](README.md).
+[HERO_GARAGE_PRODUCTION.md](HERO_GARAGE_PRODUCTION.md)). The HR-07 review was the original opening condition.
+The tracker is [README.md](../../docs/plans/README.md).
 
 ## What is delivered (R33 catalog, R34 variants — provisional)
 
 Authoritative selection: `prototypes/hero-garage/public/assets/catalog.json` (never a filename). Handoff:
-[ART_HANDOFF.md](../../prototypes/hero-garage/art/ART_HANDOFF.md).
+[ART_HANDOFF.md](../../docs/evidence/hero-art/delivery/ART_HANDOFF.md).
 
 - Rider: 60.16 MB packed (lossless Meshopt of 186.9 MB raw; 12 renderer comparisons byte-identical), 19 bones,
   26 sockets, six clips (`sit_cruise`, `forward_attack`, `hang_back`, `compression`, `extension`, `landing_absorption`), 39 packed images; KTX2/UASTC
@@ -17,7 +19,7 @@ Authoritative selection: `prototypes/hero-garage/public/assets/catalog.json` (ne
   charcoal/yellow) — the other three bike skins have no source yet.
 - Outfits: art exports for all five existing outfit IDs (mustard Street, charcoal Street, open-face Street, blue/white
   Race, charcoal/yellow Race).
-- Rig contract: [rig-contract/README.md](../../prototypes/hero-garage/art/rig-contract/README.md) — raw → Three.js
+- Rig contract: [RIG_CONTRACT.md](../../docs/evidence/hero-art/delivery/RIG_CONTRACT.md) — raw → Three.js
   name mapping, inverse binds, contact drift < 2.3 µm over 750 frames; the 11 mm sole/peg offset is documented, not a
   contact pass.
 - Runtime qualification so far: 30 s desktop WebKit mobile proxy, no errors, deterministic canvas replay, **18 ms p95
@@ -37,7 +39,7 @@ the 60-cap governor and the phone-high tier stand.
    (two bars, monotone, 100 at the end), missing-file recovery kept.
 2. **Rig binding.** Map the 19 bones / 26 sockets onto `riderRig.ts` and `riderBody.drawn`; grips and soles on the
    physics contact points, the 11 mm sole/peg offset resolved here or declared. The six clips are reference only —
-   the physical path drives the pose ([RIDING_POSES.md](RIDING_POSES.md)).
+   the physical path drives the pose ([RIDING_POSES.md](../../docs/plans/RIDING_POSES.md)).
 3. **LOD and tiers.** A decimated LOD chain under `lod.ts` so low / medium / phone-high each fit their draw / tri /
    Mpx budgets; textures per tier (KTX2 on phones, RGBA8 desktop-high).
 4. **Garage first, level second.** The orbit garage (`src/render/world/garageStage.ts`) at 30 fps on the phone proxy, then b1 at the
@@ -59,8 +61,8 @@ loader invariant, replay determinism and the ship gate are unchanged; `RELEASES.
 - [x] The catalog rider and bike work in the garage and in-level with all delivered outfits and liveries.
 - [x] Loader invariants, replay determinism, and the ship gate hold.
 - [x] `RELEASES.md` carries the v0.3.0 pin.
-- [ ] Phone-high in-level rows meet ≤ 123 draws and model ≤ 8.8 ms. Integration measured 142 / 9.2; ask 60 measured 139 / 9.7.
-- [ ] The integrated garage holds 30 fps on the user's iPhone (HR-10). The existing device report predates this art build.
+- [ ] Phone-high in-level rows meet ≤ 123 draws and model ≤ 8.8 ms. Integration measured 142 / 9.2; ask 60 measured 139 / 9.7. Accepted as a performance backlog item in ask 71.
+- [ ] The integrated garage holds 30 fps on the user's iPhone. Waived for plan closure in ask 71; the existing device report predates this art build.
 
 ## Status (ask 43, opened 2026-09-16 23:15)
 

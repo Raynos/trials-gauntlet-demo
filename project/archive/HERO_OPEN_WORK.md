@@ -1,6 +1,6 @@
 # Hero work still open after the branch merge
 
-**Closed: 2026-09-16 — split into three plans.** §1–2 → `docs/plans/RIDING_POSES.md`; §3 → `docs/plans/CHROMIUM_METAL_SHADER_INIT.md`; the game-integration gap §4 pointed at → `docs/plans/HERO_ART_INTEGRATION.md` (art itself stays in `docs/plans/HERO_GARAGE_PRODUCTION.md`); §5's evidence bullets are each successor's done-lines. Superseded facts below: R8 and r15 have landed (`f00724e`, `5b56431`); the seated candidate is live as `riderBody.drawn`.
+**Closed: 2026-09-16 — split into three plans.** §1–2 → `docs/plans/RIDING_POSES.md`; §3 → `project/archive/CHROMIUM_METAL_SHADER_INIT.md`; the game-integration gap §4 pointed at → `project/archive/HERO_ART_INTEGRATION.md` (art plan `project/archive/HERO_GARAGE_PRODUCTION.md`); §5's evidence bullets are each successor's done-lines. Superseded facts below: R8 and r15 have landed (`f00724e`, `5b56431`); the seated candidate is live as `riderBody.drawn`.
 
 Updated September 16, 2026. Scope: the rider/bike visual-quality work, riding feedback, and fresh garage prototype requested by the user. This is the actionable handoff; [docs/plans/README.md](README.md) remains the project-wide status index.
 

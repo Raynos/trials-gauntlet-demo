@@ -1,5 +1,5 @@
 /**
- * One played clip of the world map (the level select; docs/plans/WORLD_MAP.md), phone geometry, seeded 6 / 15:
+ * One played clip of the world map (the level select; project/archive/WORLD_MAP.md), phone geometry, seeded 6 / 15:
  *   menu → PLAY → (opens on the current track: M1, the seeded next track, at region zoom) → drag-pan from the Industrial
  *   docks across into the Canyon → pinch out to the whole continent → into each of the five zones (tap the name, pinch in
  *   to fill the view with its plate, pinch back out) → tap Night City (flies to its nearest marker) → tap

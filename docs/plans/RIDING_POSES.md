@@ -2,7 +2,7 @@
 
 Split out of `project/archive/HERO_OPEN_WORK.md` §1–2 on 2026-09-16. Owner: the physics owner (`src/physics/v2/rider.ts`,
 `tuning.ts`) with the hero render owner for the drawn chain (`src/render/hero/riderRig.ts`, `gltfRider*.ts`). Gameplay
-priority. Sibling plans: [HERO_ART_INTEGRATION.md](HERO_ART_INTEGRATION.md) (the new assets),
+priority. Sibling plans: [HERO_ART_INTEGRATION.md](../../project/archive/HERO_ART_INTEGRATION.md) (the new assets),
 `project/archive/CHROMIUM_METAL_SHADER_INIT.md` (startup bug, closed as non-repro). The tracker is [README.md](README.md).
 
 ## Where it stands (R9, `f00724e`)

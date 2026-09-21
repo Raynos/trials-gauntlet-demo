@@ -1,6 +1,6 @@
 # World map — round 1 (plates + camera + markers), ask 54
 
-The painted continent as the level select (`docs/plans/WORLD_MAP.md`), played headless on Chromium / SwiftShader from `dist/` (`npx vite build`), seeded 6 / 15 (B1 gold, B2 silver, B3 bronze, E1 silver, E2 bronze, E3 silver on Pro). Everything here was played by `harness/e2e/worldmap-{stills,clip,frames}.mts`, never posed.
+The painted continent as the level select (`project/archive/WORLD_MAP.md`), played headless on Chromium / SwiftShader from `dist/` (`npx vite build`), seeded 6 / 15 (B1 gold, B2 silver, B3 bronze, E1 silver, E2 bronze, E3 silver on Pro). Everything here was played by `harness/e2e/worldmap-{stills,clip,frames}.mts`, never posed.
 
 ## The clip
 

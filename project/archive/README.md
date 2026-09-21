@@ -18,10 +18,12 @@ Contents
 - `MEGA_PLAN.md` — the v0.1.0 → v0.2.0 mega build, closed 2026-09-15 at tag `v0.2.0` (`b52dfd0`); the numbers are in `RELEASES.md`.
 - `CLOSEOUT.md` — the 3-hour close-out contract of 2026-09-15; ran to its outcome.
 - `BLENDER_HERO.md` — Astra's branch plan; the branch is on `main`; its remainder went to `HERO_OPEN_WORK.md`, now also here.
-- `HERO_OPEN_WORK.md` — the post-merge hero handoff, closed 2026-09-16 by splitting into `docs/plans/RIDING_POSES.md`, `CHROMIUM_METAL_SHADER_INIT.md` and `HERO_ART_INTEGRATION.md`.
+- `HERO_OPEN_WORK.md` — the post-merge hero handoff, closed 2026-09-16 by splitting into `docs/plans/RIDING_POSES.md`, `CHROMIUM_METAL_SHADER_INIT.md` and `HERO_ART_INTEGRATION.md`; the latter two are now archived.
 - `loading-progress-invariant.md`, `touch-navigation-invariant.md` — the two P0 task docs, both landed and holding.
 - `RIDER_ON_GLASS.md` — the second mega plan, closed 2026-09-16 at `f00724e` (G 100 %; H on the user's decision with the whole Astra branch merged).
 - `blender-branch-merge.md` — the merge rules and the three test merges; the branch is on `main` in full.
 - `CHROMIUM_METAL_SHADER_INIT.md` — the GL 1281 startup bug, closed 2026-09-16 as non-repro (18/18 clean Metal gates incl. the original failing build; evidence `docs/evidence/chromium-metal/`).
 - `HERO_GARAGE_PRODUCTION.md` — Astra's Blender art plan, closed 2026-09-17 with ask 43: delivery integrated, prototype retired; the recipe lives in `assets/blender/hero-art/`, the handoff in `docs/evidence/hero-art/delivery/`.
 - `PWA_OFFLINE.md` — offline PWA plan, closed 2026-09-21 at tag `pwa-offline-complete`: origin-down headless gate proved an offline B1 finish, and the user confirmed the PWA works offline on the actual phone.
+- `WORLD_MAP.md` — painted continent level select, closed 2026-09-21 on the user's acceptance (ask 71), pinned to the last framing fix `411697e`; actual iPhone gesture performance remains unmeasured by the user's closure choice.
+- `HERO_ART_INTEGRATION.md` — catalog rider, bike and garage, closed 2026-09-21 on the user's acceptance (ask 71), pinned to `v0.3.0`; the measured phone-high gap moved to `docs/plans/PERF-BACKLOG.md`, and actual iPhone garage fps remains unmeasured.

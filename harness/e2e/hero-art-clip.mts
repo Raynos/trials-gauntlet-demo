@@ -1,5 +1,5 @@
 /**
- * Played hero-art clip (ask 43, docs/plans/HERO_ART_INTEGRATION.md step 5): one WebKit page at phone geometry,
+ * Played hero-art clip (ask 43, project/archive/HERO_ART_INTEGRATION.md step 5): one WebKit page at phone geometry,
  * recorded start to finish —
  *   boot → menu → GARAGE (tapped) → every outfit tapped, and on each outfit the Pro then the Rookie chip (15 hero swaps;
  *   a per-rAF probe watches every frame of every swap for the ask 29/40 grey flash: the stage dropping, a procedural

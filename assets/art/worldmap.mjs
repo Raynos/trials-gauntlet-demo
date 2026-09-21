@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Cut the world-map terrain plates (docs/plans/WORLD_MAP.md § 3, ask 54): the world plate and the five region
+// Cut the world-map terrain plates (project/archive/WORLD_MAP.md § 3, ask 54): the world plate and the five region
 // plates, from assets/design/worldmap/build/{world/world-plate,regions/<id>}.png (codex image_gen outputs — briefs
 // beside them, runner build/gen-regions.mjs) into public/art/worldmap/*.webp at two tiers (2x = the 1536 source,
 // 1x = 1024 wide), plus worldmap.json (the per-asset record build.mjs folds into public/art/manifest.json).

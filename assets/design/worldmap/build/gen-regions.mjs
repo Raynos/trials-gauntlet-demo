@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// World map region plates (docs/plans/WORLD_MAP.md § 3): one codex image_gen run per region, with the world plate
+// World map region plates (project/archive/WORLD_MAP.md § 3): one codex image_gen run per region, with the world plate
 // (build/world/world-plate.png) and that region's crop guide (build/guides/<id>.png — derived, not kept: cut here by
 // `magick -crop` from the plate at the crop in src/ui/worldMap.ts REGIONS, scaled to 1536 × 1024) as the two reference
 // images, so the result is the same place at ~3× the detail. Writes build/regions/<id>.brief.md, runs the five in

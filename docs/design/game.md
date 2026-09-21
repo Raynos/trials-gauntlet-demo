@@ -341,7 +341,7 @@ removed stays.
     the height; once `.menu-screen.live`, the hit at PLAY's centre is PLAY at opacity 1.
 - **Track select — the world map** (`WorldMapScreen`, `src/ui/worldMapScreen.ts` over the pure data of
   `src/ui/worldMap.ts`; ask 54, the A "Rebirth" mockup `assets/design/worldmap/A-painted-{world,region}.png`;
-  plan `docs/plans/WORLD_MAP.md`): one tilted painted continent in campaign order — the Industrial docks and
+  plan `project/archive/WORLD_MAP.md`): one tilted painted continent in campaign order — the Industrial docks and
   refinery bottom-left (the Lab hangar and P1 on the pier), the Canyon mesas above across the river, the Snow
   peak with its chairlift, Night City on its bay across the bridge, the Foundry burning on the far shore under
   haze. The terrain is two zoom tiers of chrome-free painted plates (`public/art/worldmap/`, cut by

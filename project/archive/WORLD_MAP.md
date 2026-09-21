@@ -1,5 +1,7 @@
 # World map — the painted continent as the level select (ask 54)
 
+**Closed: 2026-09-21 · `411697e` (last world-map framing fix).** The user accepted the shipped map as done in ask 71. The actual iPhone gesture check below was waived for plan closure; no device measurement is claimed.
+
 **Goal (the user's words):** "Yep, the rebirth world map mockup looks fantastic. I want that, like literally that. I want you to do that for level selector. Like that would be amazing. You have to build a new level selector from scratch. This is not going to be easy, but you can do it. Just work really hard on that." On the current screen: "it's just dioramas linked on one page … complete shit. It needs to be from scratch, built absolutely from scratch all the way up."
 
 **The bar:** `assets/design/worldmap/A-painted-world.png` (the whole continent) and `A-painted-region.png` (Industrial + Canyon at region zoom) — *literally that*. A side-by-side of the mockup and the built screen at the same view is the round-3 judge. Written intent: `assets/design/worldmap/briefs/{shared,A,world,region}.md`; `assets/design/worldmap/SPEC.md` when the design agent lands it.
@@ -32,7 +34,7 @@ One tilted painted continent in campaign order: Industrial docks + refinery bott
 - [x] Bytes: world plate ≤ 350 KB per tier, region plates ≤ 300 KB each, nothing on the boot set, loader 8 192 B, bundle ≤ 600 KB gz. (R2: world 331 / 212 KB; regions 2x 243–296 KB — Industrial 284 KB at 1408 wide; 1x 166–266 KB; 3 011 KB in 12 lazy files)
 - [x] Evidence per round in `docs/evidence/world-map/round<N>/` (rounds 1–3): the played clip (menu → PLAY → drag-pan two regions → pinch out → zoom into Night City → tap H1 → fly to B1 → RIDE → 3 s → quit at 932 × 430), stills at 844 × 390 and 1280 × 720, `measure.json`, and the mockup-vs-built side-by-side.
 - [x] e2e: `--only=front`, `--only=run`, `--only=desktop` green with every diorama expectation re-pointed, not deleted. (R3: 476 / 90 / 188)
-- [ ] Actual iPhone Safari: PLAY → pan across two regions → pinch in and out → select a marker → return to menu, without lost gestures or sustained stutter. Record the user's reading in `docs/device/` (HR-13); the WebKit proxy above does not establish this.
+- [ ] Actual iPhone Safari: PLAY → pan across two regions → pinch in and out → select a marker → return to menu, without lost gestures or sustained stutter. Waived by the user's closure decision (ask 71); the WebKit proxy above does not establish this.
 
 ## Status
 

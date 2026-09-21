@@ -327,7 +327,7 @@ for (const bike of ['rookie', 'pro']) {
 }
 
 {
-  // World map plates (the level select's painted continent, docs/plans/WORLD_MAP.md): assets/art/worldmap.mjs cuts the
+  // World map plates (the level select's painted continent, project/archive/WORLD_MAP.md): assets/art/worldmap.mjs cuts the
   // world plate and the five region plates at 2x / 1x into public/art/worldmap/ and writes worldmap.json; recorded here
   // so the manifest carries their bytes and tier (lazy — never on the boot set).
   const meta = join(pub, 'worldmap/worldmap.json');

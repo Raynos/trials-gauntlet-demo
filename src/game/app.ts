@@ -163,7 +163,7 @@ export class App {
   private readonly sfx: UiSfx;
   private readonly art: ArtManifest;
   private readonly menu: MainMenuScreen;
-  /** The level select: the painted world map (docs/plans/WORLD_MAP.md). */
+  /** The level select: the painted world map (project/archive/WORLD_MAP.md). */
   private readonly tracksScreen: WorldMapScreen;
   private readonly settings: SettingsScreen;
   private readonly credits: CreditsScreen;

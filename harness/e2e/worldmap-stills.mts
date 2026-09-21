@@ -1,5 +1,5 @@
 /**
- * Headless stills + measurements of the world map (the level select; docs/plans/WORLD_MAP.md) on Chromium or WebKit at
+ * Headless stills + measurements of the world map (the level select; project/archive/WORLD_MAP.md) on Chromium or WebKit at
  * phone / desktop geometries: the opening camera (centred on the current track at region zoom), a drag-pan across two
  * regions, a pinch out to the whole continent, a tap into Night City, the locked H1 (its rule on the plate, the card,
  * the gate and the RIDE pill), the focused card on B1; per state the camera (zoom, bounds, focused track, markers on

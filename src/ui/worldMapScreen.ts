@@ -1,5 +1,5 @@
 /**
- * World map — the painted continent as the level select (docs/plans/WORLD_MAP.md, ask 54; the A "Rebirth" mockup,
+ * World map — the painted continent as the level select (project/archive/WORLD_MAP.md, ask 54; the A "Rebirth" mockup,
  * assets/design/worldmap/A-painted-{world,region}.png). One `translate / scale` scene root under a `touch-action:
  * none` viewport: the world plate, five region plates cross-fading in above the tier zoom, the road (SVG), fog of
  * war over locked land, region names, the markers (a diamond on the terrain with a leader-line name plate, the

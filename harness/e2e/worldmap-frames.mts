@@ -1,5 +1,5 @@
 /**
- * Frame timing inside the world map (the level select, docs/plans/WORLD_MAP.md; Chromium / SwiftShader, so relative
+ * Frame timing inside the world map (the level select, project/archive/WORLD_MAP.md; Chromium / SwiftShader, so relative
  * not absolute): rAF intervals while the map idles (the cloud drift and the beacon are the only animations), during a
  * one-finger drag, through its inertia and during a pinch, plus the scene's node count, the main-thread cost of a
  * camera push (the transform + the counter-scales + the tier blend) and the plate bytes, sampled from the page.

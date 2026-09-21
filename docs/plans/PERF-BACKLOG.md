@@ -4,6 +4,8 @@ Opened 2026-09-15 when `project/archive/PERF.md` closed as a ledger (cuts #0, #1
 
 Where the ledger left the phone-high frame on b1: **≈ 123 calls / 92 k tris / 1.59 raw (1.14 effective) Mpx / 5 passes / model 8.8 ms** (h3 150 / 113 k / 9.4 ms). The two terms that remain are fill (1.14 × 4.4 ≈ 5.0 ms — the canvas at DPR 1.5, already the floor for that tier) and draws (123 × 0.02 ≈ 2.5 ms). Every row below moves draws, traversal or the spikes; none moves the fill term without lowering DPR.
 
+**Hero art integration carry-forward (ask 71, 2026-09-21):** the integrated hero's latest recorded b1 phone-high row is 139 calls / 240 k tris / model 9.7 ms (ask 60), above the former integration target of ≤ 123 calls / ≤ 8.8 ms. The user accepted the art integration plan as done and kept this measured gap with the live performance work. The integrated garage's actual iPhone fps was not measured; user acceptance does not establish a 30 fps device result.
+
 Method rules carried over (they are why the ledger is trustworthy): counts (calls / tris / Mpx / programs / re-acquisitions) and **interleaved in-page A/Bs** are the comparators — cross-run CPU ms on this shared host move ±25 % with load; a cut is pixel-neutral when the A/B still at t400/800/1200 differs by ≤ ~0.1 % of pixels with ≤ a handful beyond 8/255 (the baked-vs-instanced edge-crack class); every cut lands with `pnpm exec tsx harness/bench/det.ts` 15/15 on phone-high / medium / low, `pnpm harness:hero-webkit` drift ≤ 5 mm, and the WebKit tier ratio (`harness/bench/webkit.ts`) unchanged.
 
 | rank | cut | what is left / why it was not landed | factor (term) | effort | the measurement that proves it |

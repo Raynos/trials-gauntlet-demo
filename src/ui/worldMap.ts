@@ -1,5 +1,5 @@
 /**
- * World map — the painted continent as the level select (docs/plans/WORLD_MAP.md, ask 54). Pure data and
+ * World map — the painted continent as the level select (project/archive/WORLD_MAP.md, ask 54). Pure data and
  * layout for `WorldMapScreen` (worldMapScreen.ts), unit-tested in worldMap.test.ts: the map's coordinate
  * space (the world plate's pixel grid), one anchor per track on the terrain, the five regions in campaign
  * order with their plate crops and fog, the route through every campaign track, the tier gate on the road

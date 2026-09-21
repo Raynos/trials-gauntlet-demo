@@ -490,7 +490,7 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   const tl0 = await touchLayer(page);
   expect(!tl0.on, flow, 'R4-off-in-menus', `touch layer on in the menu`);
   await menuItem(page, flow, 'Play');
-  // Tap the focused marker (B1, the opening focus on a fresh profile): the focused marker's diamond launches (world map, docs/plans/WORLD_MAP.md).
+  // Tap the focused marker (B1, the opening focus on a fresh profile): the focused marker's diamond launches (world map, project/archive/WORLD_MAP.md).
   const ok = await tapSel(page, flow, '.tracks-screen.live .wm-marker.on .wm-hit');
   if (!ok) return page.close();
   // SwiftShader stalls the main thread for seconds on the run's first frames: wait for the handoff, don't time it.
