@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "startedAt": "2026-09-21T11:36:33.791Z",
+  "pass": true,
+  "device": {
+    "udid": "F3058DD5-DCB6-4D86-93CC-6E56A785B788",
+    "name": "trials-iphone",
+    "model": "iPhone 16 Pro",
+    "runtime": "iOS Simulator 26.5"
+  },
+  "limitations": [
+    "Recorded inputs and existing game hooks prove deterministic clear, terminal crash and logical restart; not native-touch or stranger gameplay.",
+    "Cold boot uses bundled local assets with disabled update channels; iOS Simulator host networking remains enabled.",
+    "Retained clip is unjudged motion evidence. No visual, audio, device thermal or physical-hardware conclusion.",
+    "This gate does not repeat the separate WebGL context-loss suite."
+  ],
+  "artifact": {
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ship/2026-09-21T11-36-33.790Z/App.app",
+    "version": "1.0.0",
+    "build": "1",
+    "id": "com.trialsgauntlet.game",
+    "indexSha256": "db30c78b582be5235112d9c5a85f87f0153fe680b5957b00abdae1dd18685dd5",
+    "bundleTreeSha256": "7f3dd802c08cbd67961d45a68d49e0ada566819ec3b6f89fe1ede8e1318f7f4d",
+    "treeHashMethod": "SHA-256 of SHA256(file), two spaces, relative path, newline for all sorted regular bundle files.",
+    "contract": {
+      "schema": 1,
+      "target": "native",
+      "runtime": "native-v1",
+      "saveSchema": 1,
+      "sourceRevision": "a64f48f6",
+      "production": false,
+      "channels": null,
+      "publicKeyFingerprint": null
+    },
+    "checkout": "a64f48f6d28a67feb3cb57787e941e3f1edb0fab",
+    "capacitorConfigSha256": "75dd0da9fed37ca58c261cfb8583d9362bed076771d3b5b2f87b731889e64c40",
+    "nativeBuildSha256": "08854543a47fc5266f19ce82303eca88d5ddc7fac3eb1a7b316d08a7c9735e98"
+  },
+  "video": {
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ship/2026-09-21T11-36-33.790Z/cold-launch.mp4",
+    "scope": "Installed native cold launch recording, capped at 20 seconds and stopped when the probe finishes; retained without motion judgement.",
+    "sha256": "f7156fb0d09159d18edb274c83a8ca69df65001df61d301271da418b9abc4b68"
+  },
+  "recording": {
+    "path": "harness/inputs/b1-first-ride/bot-3.json",
+    "sha256": "9085276b4b1510eed01a0332ca95fc35467f68871b7bf0b270add3405ee470a1"
+  },
+  "probe": {
+    "boot": {
+      "hasSW": false,
+      "native": {
+        "build": "1",
+        "id": "com.trialsgauntlet.game",
+        "name": "Trials Gauntlet",
+        "version": "1.0.0"
+      },
+      "online": true,
+      "origin": "capacitor://localhost",
+      "ready": true,
+      "screen": "menu",
+      "search": ""
+    },
+    "errors": [],
+    "externalResources": [],
+    "final": {
+      "paused": false,
+      "phase": "menu",
+      "screen": "menu",
+      "tick": 0
+    },
+    "pass": true,
+    "probeAt": 1789990619821,
+    "shipGate": {
+      "crashed": {
+        "attemptedTicks": 92,
+        "faults": 1,
+        "phase": "crashed",
+        "tick": 92
+      },
+      "first": {
+        "faults": 0,
+        "hash": "389a5dc6c07ab8c3",
+        "phase": "finished",
+        "time": 40.55833333333333
+      },
+      "pass": true,
+      "restart": {
+        "elapsedMs": 0,
+        "phase": "riding",
+        "tick": 1
+      },
+      "second": {
+        "faults": 0,
+        "hash": "389a5dc6c07ab8c3",
+        "phase": "finished",
+        "time": 40.55833333333333
+      }
+    },
+    "token": "ef073383-4b52-4cd9-9dbf-3df1b1093aaf",
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ship/2026-09-21T11-36-33.790Z/probe.json",
+    "sha256": "14532bf3dd41bbf09f1596c9570fa48ea9610e7c0732eb7511c006538e1da426",
+    "probeScriptSha256": "f2a5332cfeb8026681afe7f0073ea0c17f6d4761f46443dffe64dc7c38d9b77d",
+    "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ship/2026-09-21T11-36-33.790Z/probe.log",
+    "exitCode": 0
+  },
+  "simulatorShutdown": true,
+  "finishedAt": "2026-09-21T11:39:18.012Z",
+  "nativeTouches": {
+    "pass": true,
+    "device": {
+      "udid": "4AF4B80E-8F16-4883-B556-054C7AE08C10",
+      "name": "iPhone 17e",
+      "runtime": "iOS Simulator 26.5"
+    },
+    "observerEnabled": false,
+    "runner": "scripts/native-ios-ui.sh",
+    "testSource": "ios/App/AppUITests/NativeTouchTests.swift",
+    "testSourceSha256": "ee25c36998585037efc980c908e3075fb1757d862540a99f1e50348c4e845ed7",
+    "testName": "NativeTouchTests.testMenuRidePauseRestartThroughNativeTouches",
+    "tests": 1,
+    "failures": 0,
+    "durationSeconds": 50.078,
+    "artifact": {
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ship/2026-09-21T11-36-33.790Z/XCTest-App.app",
+      "indexSha256": "db30c78b582be5235112d9c5a85f87f0153fe680b5957b00abdae1dd18685dd5",
+      "capacitorConfigSha256": "75dd0da9fed37ca58c261cfb8583d9362bed076771d3b5b2f87b731889e64c40",
+      "nativeBuildSha256": "08854543a47fc5266f19ce82303eca88d5ddc7fac3eb1a7b316d08a7c9735e98",
+      "matchesGateConfigAndEntry": true,
+      "appExecutableSha256": "012e3382de8c9f0ed13c449c108a5439f4d06a9bc7f2eaa342ab252478b8c39a",
+      "debugLibrarySha256": "2fb5230d75e230a0b0d987f6c83049a2d256f510648b7ae336dbd517f9166ee1"
+    },
+    "result": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ui/result-20260921T113723Z.xcresult",
+    "testLog": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ui/test-20260921T113723Z.log",
+    "testLogSha256": "beb120c9d50cee34de6be4e846d87ec5bca886c9c3e3e067da318b6344bfd1f3",
+    "video": {
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-ui/touch-20260921T113723Z.mp4",
+      "sha256": "4caffc0532d425c832fcaf0e919cf2d3580725a15ab2b80eb75d25f6de07ad09",
+      "scope": "Native XCUITest touch/lifecycle recording retained without motion judgement."
+    },
+    "assertions": [
+      "Native Play tap opens map and Ride enters a run.",
+      "Native pause tap exposes Resume; Restart returns to a run that can be paused again.",
+      "Home backgrounds the native app; activating it stays paused for two seconds until manual Resume.",
+      "Native Quit returns to main menu."
+    ],
+    "limitations": [
+      "iPhone 17e coordinate qualification only; not generic tablet input coverage.",
+      "Existing saves meant first-run tutorial did not appear in this run.",
+      "Does not claim a native-touch track clear, visual/audio quality, physical-device or stranger validation."
+    ],
+    "simulatorShutdown": true
+  },
+  "cleanup": {
+    "primaryShutdown": true,
+    "secondaryShutdown": true,
+    "userIPhone17ProState": "Booted"
+  }
+}

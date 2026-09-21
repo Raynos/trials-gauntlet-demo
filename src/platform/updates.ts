@@ -45,6 +45,10 @@ export interface UpdateCleanupResult { deleted: string[]; failed: string[]; skip
 
 /** Bound native filesystem work per launch; a later launch retries any remaining or failed cleanup. */
 const CLEANUP_LIMIT = 8;
+// Failed activations remain quarantined for this native/runtime version. Never evict failure
+// history to make room: a full ledger disables new activations until a new native release.
+const ACTIVATION_LIMIT = 32;
+interface ActivationAttempt { id: string; version: string }
 
 /** Public configuration only. Missing or malformed settings safely leave OTA disabled. */
 export function readUpdateConfig(manifestUrl: string | undefined, publicJwk: string | undefined): UpdateConfig | null {
@@ -115,6 +119,7 @@ export function createNativeUpdater(options: UpdateOptions) {
   const namespace = `trials.nativeUpdates.${host.platform}.${host.nativeVersion}.${host.runtime}`;
   const pendingKey = `${namespace}.pending`;
   const sequenceKey = `${namespace}.sequence`;
+  const activationKey = `${namespace}.activations`;
   const fetcher = options.fetcher ?? fetch;
   const now = options.now ?? Date.now;
   const verify = (e: SignedUpdate) => verifyUpdate(e, config!, host, options.subtle ?? crypto.subtle, now());
@@ -122,6 +127,24 @@ export function createNativeUpdater(options: UpdateOptions) {
   let bootChecked = false;
   let ready = false;
   let cleanupAttempts = 0;
+
+  const readActivations = (): ActivationAttempt[] => {
+    const raw = storage.getItem(activationKey);
+    if (raw === null) return [];
+    if (raw.length > 16_384) throw new Error('Invalid activation ledger');
+    const entries: unknown = JSON.parse(raw);
+    if (!Array.isArray(entries) || entries.length > ACTIVATION_LIMIT || entries.some((entry: unknown) => {
+      if (!entry || typeof entry !== 'object') return true;
+      const { id, version } = entry as Partial<ActivationAttempt>;
+      return typeof id !== 'string' || !id || id.length > 200 || id === 'builtin' ||
+        typeof version !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._+-]{0,99}$/.test(version) || version === 'builtin';
+    }) || new Set(entries.map((entry: ActivationAttempt) => entry.version)).size !== entries.length) throw new Error('Invalid activation ledger');
+    return entries as ActivationAttempt[];
+  };
+  const writeActivations = (entries: ActivationAttempt[]) => {
+    if (entries.length) storage.setItem(activationKey, JSON.stringify(entries));
+    else storage.removeItem(activationKey);
+  };
 
   /** Caller owns `checking`: cleanup must never race our download or pending-marker writes. */
   const cleanup = async (): Promise<UpdateCleanupResult> => {
@@ -151,8 +174,8 @@ export function createNativeUpdater(options: UpdateOptions) {
       for (const candidate of bundles) {
         if (cleanupAttempts >= CLEANUP_LIMIT) break;
         // Keep every success: the plugin's private previous-fallback pointer has no public getter.
-        // Error/deleting/deleted metadata belongs to native rollback cleanup; deleting it here would
-        // erase rejection history. Unknown and downloading statuses are deliberately left alone.
+        // Error/deleting/deleted files and metadata remain owned by native cleanup. Our separate
+        // activation ledger preserves quarantine; unknown/downloading statuses are left alone.
         if (candidate.status !== 'pending' || !candidate.id || candidate.id === 'builtin' || candidate.id === pendingId) continue;
         const { bundle: current } = await adapter.current();
         if (candidate.id === current.id) continue;
@@ -197,6 +220,12 @@ export function createNativeUpdater(options: UpdateOptions) {
         const { bundles } = await adapter.list();
         const bundle = bundles.find((b) => b.id === pending.id);
         if (!bundle || bundle.status === 'error' || bundle.version !== manifest.bundleId || bundle.checksum !== manifest.sha256) return 'rejected';
+        const attempts = readActivations();
+        if (attempts.length >= ACTIVATION_LIMIT || attempts.some((entry) => entry.version === manifest.bundleId)) return 'rejected';
+        // Record before reload, independent of native error/deleted metadata. A transfer never
+        // reaches here. Only this exact bundle's acknowledged healthy boot can clear its entry.
+        writeActivations([...attempts, { id: bundle.id, version: manifest.bundleId }]);
+        await storage.flush?.();
         await adapter.set({ id: bundle.id }); // reloads, only at this cold-start boundary
         return 'activated';
       } catch {
@@ -207,6 +236,19 @@ export function createNativeUpdater(options: UpdateOptions) {
       // Required even without a configured channel: the native plugin owns its rollback watchdog.
       await adapter.notifyAppReady();
       ready = true;
+      // Persistence trouble must not undo native acknowledgement or block the playable game.
+      // A stale durable entry is conservative: it only prevents reusing this bundle version.
+      try {
+        const attempts = readActivations();
+        if (attempts.length) {
+          const { bundle: current } = await adapter.current();
+          const remaining = attempts.filter((entry) => entry.id !== current.id || entry.version !== current.version);
+          if (remaining.length !== attempts.length) {
+            writeActivations(remaining);
+            await storage.flush?.();
+          }
+        }
+      } catch { /* Keep gameplay available; failed/malformed state is closed to new updates. */ }
     },
     /** Optional explicit sweep. Normal checkForUpdate also sweeps before/after its download. */
     async cleanupAbandoned(): Promise<UpdateCleanupResult> {
@@ -234,8 +276,10 @@ export function createNativeUpdater(options: UpdateOptions) {
         if (!Number.isSafeInteger(highest) || manifest.sequence <= highest) return 'none';
         const { bundle: current } = await adapter.current();
         if (current.version === manifest.bundleId) return 'none';
-        const { bundles } = await adapter.list();
-        if (bundles.some((b) => b.version === manifest.bundleId && b.status === 'error')) return 'rejected';
+        const attempts = readActivations();
+        if (attempts.length >= ACTIVATION_LIMIT || attempts.some((entry) => entry.version === manifest.bundleId)) return 'rejected';
+        // Native error covers both interrupted downloads and failed starts. Only our durable
+        // preactivation ledger distinguishes them reliably, including after native auto-deletion.
         const bundle = await adapter.download({ url: manifest.url, version: manifest.bundleId, checksum: manifest.sha256 });
         if (bundle.status === 'error' || bundle.version !== manifest.bundleId || bundle.checksum !== manifest.sha256) return 'rejected';
         storage.setItem(pendingKey, JSON.stringify({ envelope, id: bundle.id } satisfies PendingUpdate));

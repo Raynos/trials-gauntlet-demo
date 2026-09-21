@@ -121,5 +121,19 @@
       "note": "Actual OS-touch evidence uses this reduced display configuration, not the nominal 1080x2400 profile. Full-resolution layout qualification remains separate."
     }
   },
-  "coverageNote": "Installed and available does not mean tested. Only named dated probe reports establish passing coverage. No older iOS/Android runtime installed."
+  "additionalAndroid": [
+    {
+      "avd": "trials_gauntlet_api24",
+      "api": 24,
+      "os": "Android 7.0",
+      "abi": "arm64-v8a",
+      "image": "google_apis",
+      "imageRevision": 29,
+      "installedAtRound": 7,
+      "stockWebView": "53.0.2785.124",
+      "evidence": "android-api24-round7.json",
+      "qualification": "Boot/install and readable unsupported-runtime page pass; gameplay fails with stock provider. Updated-provider gameplay remains unqualified."
+    }
+  ],
+  "coverageNote": "Initial inventory supplemented with the round7 API24 installation evidence. Installed and available does not mean tested. Only named dated probe reports establish passing coverage. No older iOS runtime installed; API24 stock WebView does not qualify the declared Android minimum."
 }

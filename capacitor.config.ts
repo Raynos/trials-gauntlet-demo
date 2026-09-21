@@ -15,6 +15,8 @@ const config: CapacitorConfig = {
     errorPath: 'native-unavailable.html',
   },
   plugins: {
+    // The game stays dark in both OS appearances; retain Capacitor's safe-area handling.
+    SystemBars: { style: 'DARK', initialViewportFitValueHint: 'cover' },
     CapacitorUpdater: {
       autoUpdate: 'off',
       updateUrl: '',

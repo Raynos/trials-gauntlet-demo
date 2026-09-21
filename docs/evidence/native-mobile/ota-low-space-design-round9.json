@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "at": "2026-09-21",
+  "status": "Low-space design only; ASK85 transient retry regression fixed and unit-verified, installed OTA ENOSPC not executed.",
+  "pluginVersion": "8.51.20",
+  "scope": "Bounded installed-app download-staging and extraction ENOSPC qualification on task-owned simulators/emulators; never fill host or global device storage.",
+  "sourcePaths": {
+    "android": [
+      {
+        "source": "node_modules/@capgo/capacitor-updater/android/src/main/java/ee/forgr/capacitor_updater/CapacitorUpdaterPlugin.java:842",
+        "finding": "documentsDir is Context.getFilesDir(): /data/user/0/com.trialsgauntlet.game/files (canonical task image path /data/data/com.trialsgauntlet.game/files)."
+      },
+      {
+        "source": "node_modules/@capgo/capacitor-updater/android/src/main/java/ee/forgr/capacitor_updater/DownloadService.java:684",
+        "finding": "ZIP request uses files/temp_<nativeRandomId>.tmp plus files/update_<nativeRandomId>.dat, then renames the ZIP to a separate random filename under files. cache/capgo_downloads belongs to delta/manifest caching, not this signed ZIP path."
+      },
+      {
+        "source": "node_modules/@capgo/capacitor-updater/android/src/main/java/ee/forgr/capacitor_updater/DownloadService.java:689",
+        "finding": "Checks at least 100 MiB free on target parent before GET, then compares cached availableSpace with contentLength*2. Do not mount all files on the small filesystem: it includes native saves and would fail preflight instead of write."
+      },
+      {
+        "source": "node_modules/@capgo/capacitor-updater/android/src/main/java/ee/forgr/capacitor_updater/DownloadService.java:714",
+        "finding": "Resumable temp cleanup runs before getResponseCode; writer opens temp path after response headers at line769. A held HTTP response is a deterministic opportunity to replace only the newly created empty temp file with an owned symlink."
+      },
+      {
+        "source": "node_modules/@capgo/capacitor-updater/android/src/main/java/ee/forgr/capacitor_updater/CapgoUpdater.java:320",
+        "finding": "Extraction writes files/capgo_unzip_<random>/<entry>; IOException becomes generic Failed to unzip at line375. finishDownload line886 then flattens to files/versions/<id>, and failure cleanup line921 removes extraction tree and ZIP."
+      }
+    ],
+    "ios": [
+      {
+        "source": "node_modules/@capgo/capacitor-updater/ios/Sources/CapacitorUpdaterPlugin/CapgoUpdater.swift:275",
+        "finding": "Alamofire downloads to FileManager.temporaryDirectory/<UUID>. Actual app sandbox tmp URL must be measured; never assume a host global temporary directory is safe to mount."
+      },
+      {
+        "source": "node_modules/@capgo/capacitor-updater/ios/Sources/CapacitorUpdaterPlugin/CapgoUpdater.swift:1201",
+        "finding": "Resumable ZIP is Documents/package_<id>.tmp, metadata Documents/update_<id>.dat, then final ZIP Documents/<id> (line2080). Download staging storeDownloadedFile line356 removes existing temp path before move on non-resumed responses, so an individual temp-file symlink would be removed and is not a valid fault injection."
+      },
+      {
+        "source": "node_modules/@capgo/capacitor-updater/ios/Sources/CapacitorUpdaterPlugin/CapgoUpdater.swift:489",
+        "finding": "Preflight checks 100 MiB free on Documents before network request. A bounded Documents mount must be added only after held request arrival if testing later ENOSPC; earlier mounting tests preflight insufficient_disk_space only."
+      },
+      {
+        "source": "node_modules/@capgo/capacitor-updater/ios/Sources/CapacitorUpdaterPlugin/CapgoUpdater.swift:853",
+        "finding": "Extraction creates Library/capgo_unzip_<random10>; final bundle Library/NoCloud/ionic_built_snapshots/<id>. Native save slots are Library/trials-save-{a,b}.json and must stay untouched on original filesystem."
+      },
+      {
+        "source": "node_modules/@capgo/capacitor-updater/ios/Sources/CapacitorUpdaterPlugin/CapgoUpdater.swift:794",
+        "finding": "extractZipEntry uses legacy FileHandle.write(data) at line822, and resumed ZIP copy similarly uses FileHandle.write at line375. Actual ENOSPC may raise an Objective-C file-handle exception rather than a Swift Error. Process survival is a test assertion, not an assumption."
+      }
+    ]
+  },
+  "existingHarnesses": [
+    {
+      "path": "scripts/native-ios-enospc.mjs",
+      "reuse": "8 MiB HFS+ image in ignored artifact directory; mountpoint inside exact task app sandbox; distinct device identity and <=16 MiB capacity guard before each 4 KiB fill write; 16 MiB hard write ceiling; kernel ENOSPC corroboration; ownership-checked cleanup."
+    },
+    {
+      "path": "scripts/native-android-enospc.mjs",
+      "reuse": "256 KiB tmpfs in nonshared task app mount namespace, non-root app UID/GID and existing SELinux label, namespace keeper for cleanup, exact type/capacity/device guards, max65 4 KiB blocks. Existing committed saves are never relocated."
+    },
+    {
+      "path": "scripts/native-ota-test.mjs:66",
+      "reuse": "Local trusted HTTPS delay mode holds ZIP response up to60 seconds. Add a bounded explicit release gate/ready handshake for deterministic tests; stop on timeout. Existing timer alone must not race mount preparation."
+    },
+    {
+      "path": "scripts/native-ios-ota-suite.mjs",
+      "reuse": "Installed Debug bridge; normal readiness, real update controller, signed fixtures, save/update metadata snapshots, stage and next-launch activation checks. Currently writes probe results in Documents, so iOS Documents-overlay test must use a task-owned Library status/command file or retain outcome in memory until unmount."
+    },
+    {
+      "path": "scripts/native-android-ota-suite.mjs",
+      "reuse": "Installed WebView CDP and real controller checks with selected save snapshots and identical-publication retry."
+    }
+  ],
+  "proposedCases": [
+    {
+      "case": "Android actual ZIP write ENOSPC",
+      "feasibility": "Concrete bounded next implementation; not executed.",
+      "steps": [
+        "Start healthy installed QA build; finish readiness and seed durable gameplay/settings saves. Require current builtin or a healthy downloaded bundle and no pending update. Snapshot both saves, current/fallback metadata, pending/high-water and active bundle tree hashes.",
+        "Provision empty 256 KiB private tmpfs using existing mount namespace guards; verify real app can write there and truncate owned target to zero. Serve a fresh correctly signed ZIP with sequence above high-water; hold its response before headers/body.",
+        "After server observes ZIP GET, find exactly one new files/temp_<id>.tmp matching newly registered downloading bundle. Require length zero, absence from baseline, and no other active download. Cleanup has already occurred before HTTP getResponseCode. Replace only this owned empty temp path with relative link to bounded target. Verify resolved path from app namespace; no existing saved game file is changed.",
+        "Fill only bounded tmpfs to ENOSPC, confirm real app write error and distinct capacity. Release HTTP gate; capture actual DownloadService write failure, controller result, unchanged current bundle/pending/high-water and gameplay/save availability.",
+        "After native request settles, remove only the exact owned link if it remains; plugin may remove it during failure cleanup. Unmount via keeper. Retry identical manifest sequence/hash/version through controller, verify staging, next-launch activation, save preservation and normal cold boot."
+      ]
+    },
+    {
+      "case": "iOS actual downloaded-ZIP staging ENOSPC",
+      "feasibility": "Concrete candidate without plugin modification; cross-volume move and alternate reporting preflight required.",
+      "steps": [
+        "Resolve exact task app data container and Documents; keep Library and all current/fallback bundles untouched. Capture Documents inventory; mount overlays original directory without deleting or moving its existing files. Avoid any concurrent document import/export.",
+        "Prepare 8 MiB HFS+ image; first prove a small real native cross-volume FileManager move succeeds (Filesystem.rename implementation must be checked) while there is space. If it fails EXDEV/EACCES instead, stop: no ENOSPC claim.",
+        "Start signed update request on normal filesystem; hold ZIP response after GET proves the plugin disk-space preflight passed. Mount bounded filesystem at this task app Documents path only; verify mount identity/capacity. Use Library-owned status files or in-memory outcome, since normal Debug report Documents/native-probe.json is temporarily covered.",
+        "Fill bounded filesystem using guarded hard-cap loop. Release response. Normal URLSession transient ZIP stays on its ordinary app temporary path; storeDownloadedFile must move/copy it into the full bounded Documents path. Capture native disk-full error and independent kernel ENOSPC. This qualifies download staging, not network streaming disk writes.",
+        "Observe gameplay/process survival and unchanged Library saves/current metadata. Wait for request completion, unmount, verify original Documents inventory/save bytes, and retry identical publication normally through real controller."
+      ],
+      "caveats": [
+        "Do not mount all Library: it would cover saves and active/fallback bundles. Do not replace package_<id>.tmp with a symlink because plugin removes it before move.",
+        "Small volume mounted before request tests preflight rejection, not actual write ENOSPC. It may be a separate optional case.",
+        "Mounting a task-owned Documents overlay is broader than the prior save symlink test; exact app ownership, reporting route, no concurrent I/O, and restoration must be proven before execution."
+      ]
+    },
+    {
+      "case": "Both platforms extraction ENOSPC",
+      "feasibility": "Needs Debug debugger coordination proof; filesystem polling alone is unsafe and not sufficient.",
+      "steps": [
+        "Download a valid signed archive completely on ordinary app storage. Use a normal Debug breakpoint immediately before extraction creates/writes its first entry: Android CapgoUpdater.unzip overload receives random dest; iOS saveDownloaded/first extractZipEntry exposes destUnZip/destPath.",
+        "While stopped before first file write, read exact random extraction directory from debugger. Require app-root prefix capgo_unzip_, newly created/empty state, and no current/pending/fallback reference. Mount only that owned extraction directory onto bounded filesystem (256 KiB Android private namespace or8 MiB iOS HFS+); preserve original empty directory. Never redirect an archive entry outside its canonical root or disable ZIP traversal checks.",
+        "Before resuming, configure debugger to stop again on thrown error before native recursive cleanup if needed. Use large first regular entry and leave one filesystem block free so file creation succeeds and payload write reaches ENOSPC. Archive padding, if needed, is finite (for example16 MiB zeros), added only to a copied QA bundle before normal signing; no unbounded ZIP bomb.",
+        "Resume and capture actual native extraction outcome, filesystem free bytes/kernel diagnostic, app survival, current bundle and durable saves. On iOS explicitly detect FileHandle exception/crash. Android generic unzip error requires path/kernel evidence because cause is discarded.",
+        "Coordinate unmount before native recursive cleanup crosses mounted root when necessary; never let test cleanup delete unrelated bundle directories. Retry exact publication after recovery, verify staging/activation and saves. If debugger unavailable under existing normal Debug permissions, report unqualified rather than racing folder creation or weakening security."
+      ],
+      "openQuestions": [
+        "LLDB Swift local symbol availability and JDWP method breakpoint tooling have not been verified.",
+        "iOS legacy FileHandle ENOSPC exception behavior needs actual installed evidence; could require plugin fix if process crashes.",
+        "Mounted extraction root removal behavior must be observed and cleanup ordered accordingly."
+      ]
+    }
+  ],
+  "qaBuildWithoutSharedSourceMutation": {
+    "possible": true,
+    "method": "Read existing ignored QA config and spawn Vite with explicit VITE_MOBILE_MANIFEST_IOS, VITE_MOBILE_MANIFEST_ANDROID, VITE_MOBILE_PUBLIC_KEY environment plus --mode native --outDir .native-build/ota-dist-round9. Keep NATIVE_RELEASE unset/0. No .env write, config source edit, cap sync, native shared project mutation or changes to dist-native. Parent controls native packaging/builds and can copy this public output into separately frozen QA native artifacts.",
+    "currentConfig": ".native-build/ota-test-config.json",
+    "iosManifest": "https://localhost:8443/ios/manifest.json",
+    "androidManifest": "https://10.0.2.2:8443/android/manifest.json",
+    "privateSigningKeyExistsOutsideCheckout": true,
+    "tlsCertificateValidity": "2026-09-21 08:56:36 UTC through2026-09-23 08:56:36 UTC; checked openssl certificate dates only, trust state not checked.",
+    "packaging": "scripts/native-ota-fixtures.mjs copies source and never modifies it. scripts/mobile-release.mjs checks channel/public-key fingerprint/runtime/save-schema match in native-build.json, signs immutable ZIP hash manifest. Choose fresh sequence above installed high-water and fresh output directory. Existing public key can be reused without creating new keys; neither trust nor certificate installation was attempted.",
+    "buildSideEffects": "Vite runs native-notices --check and writes only chosen output; parent must verify fixture native-build.json and installed artifact key/channel match. QA and production-disabled channels are distinct artifacts; ordinary final store candidate should not accidentally contain local QA channels."
+  },
+  "codeRiskObserved": {
+    "source": "src/platform/updates.ts:238",
+    "finding": "At read time checkForUpdate rejects any same-version native error record. ENOSPC before durable staging must be retryable with same publication. Remove or narrow this guard using durable high-water before claiming retry qualification; parent notified. Do not fabricate a new sequence to hide retry failure.",
+    "status": "Fixed in ASK85 by separate durable activation ledger; native error status is no longer used as blanket download quarantine."
+  },
+  "requiredEvidence": [
+    "Kernel ENOSPC on verified bounded filesystem and actual updater path/native failure; insufficient_disk_space preflight, EXDEV, EACCES and generic unzip failure alone are not substitutes.",
+    "Signed/hash-valid fixture and unchanged compiled runtime/native bounds; actual current/pending/high-water before/after.",
+    "Committed non-update gameplay entries unchanged; explicit user preference save during failed download succeeds because save slots remain on original filesystem.",
+    "Game playable while fault active or documented actual crash; replayed track/instant restart and cold launch after recovery, with valid recorded clip for motion judgment.",
+    "Same-publication retry after removing fault; successful staging and eligible next-launch activation; no reload during riding.",
+    "No leaked mounts/links/namespace keepers, original directories restored, SELinux unchanged, owned task emulator/simulator stopped."
+  ],
+  "actionsPerformed": "Read local native source/harnesses and existing public QA metadata; wrote this design report and ASK85 updater source/tests only. No credentials/QA config/trust, mounts, downloads, native builds or simulator mutation.",
+  "remaining": "Actual low-space OTA qualification remains open on both platforms until above installed experiments and cleanup evidence pass.",
+  "ask85": {
+    "regressionEstablished": {
+      "before": "Two focused tests failed: same signed publication retry returned rejected after native error, for both empty and nonempty checksum records. Other30 existing updater tests passed.",
+      "nativeSourceEvidence": [
+        {
+          "path": "node_modules/@capgo/capacitor-updater/ios/Sources/CapacitorUpdaterPlugin/CapgoUpdater.swift:2076",
+          "finding": "Transfer failure stores status error with empty checksum."
+        },
+        {
+          "path": "node_modules/@capgo/capacitor-updater/ios/Sources/CapacitorUpdaterPlugin/CapgoUpdater.swift:2102",
+          "finding": "Extraction failure stores status error after checksum has already been calculated. Nonempty checksum cannot reliably identify startup failures."
+        },
+        {
+          "path": "node_modules/@capgo/capacitor-updater/android/src/main/java/ee/forgr/capacitor_updater/CapgoUpdater.java:1430",
+          "finding": "Native download already supports retry of failed/deleted/deleting matching versions through its own targeted cleanup. JS controller does not broadly delete error records."
+        },
+        {
+          "path": "node_modules/@capgo/capacitor-updater/ios/Sources/CapacitorUpdaterPlugin/CapacitorUpdaterPlugin.swift:3416",
+          "finding": "Watchdog stores lastFailedBundle then marks current error; autoDeleteFailed may change it to deleting/deleted and remove files."
+        },
+        {
+          "path": "node_modules/@capgo/capacitor-updater/android/src/main/java/ee/forgr/capacitor_updater/CapacitorUpdaterPlugin.java:5173",
+          "finding": "Android watchdog similarly persists lastFailedBundle, marks error, rolls back, and schedules native cleanup."
+        },
+        {
+          "path": "node_modules/@capgo/capacitor-updater/android/src/main/java/ee/forgr/capacitor_updater/CapacitorUpdaterPlugin.java:4394",
+          "finding": "getFailedUpdate consumes native record before JS durable save; iOS equivalent at4774. Not used to avoid destructive-read crash window."
+        }
+      ]
+    },
+    "implementation": {
+      "paths": [
+        "src/platform/updates.ts",
+        "src/platform/updates.test.ts"
+      ],
+      "key": "trials.nativeUpdates.<platform>.<nativeVersion>.<runtime>.activations",
+      "saveAllowlist": "Existing src/platform/native-storage.ts:14 accepts trials.nativeUpdates prefix; test verifies new key is allowed.",
+      "behavior": "Immediately before native set/reload, record native bundle ID and release version then await durable flush. Transfer/extraction failures before activation create no journal entry, so identical signed publication can retry. A failed start leaves its journal entry through native rollback/auto-deletion and blocks even a higher sequence or changed hash reusing that version. Existing durable sequence high-water remains unchanged.",
+      "healthyRemoval": "After successful native notifyAppReady, remove only journal entry whose native ID and version equal current healthy bundle, then flush. Removal/read/flush errors do not reject successful native acknowledgement or block gameplay.",
+      "bounds": "Maximum32 unique versions per native/runtime namespace and16KiB serialized ledger. Malformed or oversized history blocks new updates; full history rejects new downloads/activations. Failure entries are never evicted to create capacity. A new native-version namespace begins fresh.",
+      "unchanged": "Native cleanup retains ownership of error/deleting/deleted files; no broad deletion, getFailedUpdate call, credentials, QA configuration, or app reload scheduling change.",
+      "legacyDevelopmentLimitation": "No store app has shipped. Historical development watchdog failures predating journal creation remain protected by sequence high-water for that publication, but lack durable version quarantine against higher-sequence reuse after native metadata deletion. No speculative migration or destructive native failed-record read was added."
+    },
+    "validation": {
+      "commands": [
+        "npx vitest run src/platform/updates.test.ts src/platform/native-storage.test.ts",
+        "npx tsc --noEmit",
+        "npx eslint src/platform/updates.ts src/platform/updates.test.ts",
+        "git diff --check"
+      ],
+      "result": "51 tests pass (43 updater,8 storage); typecheck, focused lint and diff check pass.",
+      "coverage": [
+        "iOS nonempty-checksum extraction error and Android empty-checksum transfer error retry same signed publication",
+        "Higher-sequence same-version reuse rejected after rollback even with changed ZIP hash and no native metadata",
+        "Durable journal write before set, flush failure prevents set",
+        "Only exact healthy acknowledged native ID/version removes entry durably",
+        "Readiness failure preserves entry; cleanup persistence failure does not block acknowledged gameplay",
+        "Malformed, duplicate, oversized and full32 histories fail closed without eviction",
+        "Existing durable staging, sequence, pending consumption, save preservation and bounded orphan cleanup tests"
+      ]
+    },
+    "installedEvidence": "Not performed by this agent; mocked native errors are regression coverage, not real ENOSPC qualification. Parent owns integrated native builds and installed checks."
+  }
+}

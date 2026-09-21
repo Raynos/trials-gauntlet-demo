@@ -298,6 +298,18 @@ its sequence and marker. Those records share the durable save adapter so WebView
 cannot repeatedly retry a known failed update. Preserve two save generations and do not migrate to
 an incompatible schema while claiming rollback support.
 
+Before activation, also persist the bundle ID/version in an activation ledger. Only that exact bundle's
+healthy readiness acknowledgement removes its entry. A failed start remains blocked even if native
+cleanup deletes its files or the server republishes the version at a higher sequence. The ledger keeps
+at most 32 entries per native-version/runtime namespace; malformed or full state stops new updates
+without blocking the installed game. Do not evict failed entries to make room.
+
+Download/extraction errors alone do not enter that ledger, so a failed transfer can retry the same signed
+publication after storage or connectivity recovers. Native `error` metadata cannot distinguish transfer
+failure from watchdog rollback. The new journal covers future activation attempts; older development
+builds have only their sequence protection for historical failures. No production app has shipped yet.
+Unit tests cover this distinction; final installed OTA and low-space qualification remain required.
+
 The native plugin's readiness watchdog can revert a bundle that never reaches a usable boot. It does
 not detect every gameplay defect after acknowledgement. To roll back a later regression, publish the
 previous good game as a new signed release with a higher sequence. Keep each native-version channel

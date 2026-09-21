@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T11:46:12.937Z",
+  "baseRevision": "a64f48f6d28a67feb3cb57787e941e3f1edb0fab",
+  "finding": "The installed Android shell uses dark native margins with readable system icons. A durable activation journal distinguishes failed starts from recoverable download errors. Simulator coverage remains an explicit mobile-goal acceptance gate.",
+  "sourceHashes": {
+    "capacitor.config.ts": "38ae462c2c1708d0d9ab614c785114287d9f87cb7f827a2953092990c2aeec02",
+    "android/app/src/main/res/values/styles.xml": "4eaea335bf06bf3776e9f0c1e26d60fada4fcafdea4c8d48e8a9727d8993eb64",
+    "src/platform/updates.ts": "bd171c731da93c7e4a88b15f872336dde948c346fcdd74c9a6c53b5ca1051a0b",
+    "src/platform/updates.test.ts": "b0c43c7b360658e147fa02c0ce8eabaaaa2a0e7fe35abecbc4bedf4f9f4f7a39",
+    "scripts/native-ios-ship.mjs": "11f24f0d22f22f8ed034f1c3ba6cd422a3fb8b845e6090e43be92e2d47bc8708",
+    "scripts/native-android-presentation.mjs": "bebc3a0e541562ca3555a5721835cc4c772a7f09e3f6b6bad50ea720a1971aff"
+  },
+  "reports": {
+    "ios": {
+      "path": "docs/evidence/native-mobile/ios-ship-round9.json",
+      "sha256": "f17a638c6ed465766bf815059d59b5b02579eeb62a4053ad0eb18759625a4e07"
+    },
+    "android": {
+      "path": "docs/evidence/native-mobile/android-presentation-round9.json",
+      "sha256": "a07d0fab83485bd59e39cdc870670711f9b218d453e2dd4e1b4edf5c2da31e10"
+    },
+    "ota": {
+      "path": "docs/evidence/native-mobile/ota-low-space-design-round9.json",
+      "sha256": "a82c01e94868dd62d1fb67c54412c9b79ace0905a2543b8498d28742310ad78b"
+    }
+  },
+  "validation": {
+    "typecheck": {
+      "command": "pnpm typecheck",
+      "exitCode": 0,
+      "scope": "Application and harness"
+    },
+    "tests": {
+      "command": "pnpm test",
+      "exitCode": 0,
+      "files": 94,
+      "passed": 1169,
+      "skipped": 2,
+      "log": ".native-build/tests-round9.log",
+      "sha256": "90d34a22d30aa357851f14db9dc855a9e302f28d9e8bfaaf56ad3c01e5108242",
+      "skipReason": "Existing decimated LOD fork-surface cases; other geometry and replay tests execute."
+    },
+    "lint": {
+      "command": "pnpm lint",
+      "exitCode": 0,
+      "log": ".native-build/lint-round9.log"
+    },
+    "webBuild": {
+      "command": "pnpm build",
+      "exitCode": 0,
+      "log": ".native-build/web-build-round9.log"
+    },
+    "nativeBuild": {
+      "command": "pnpm build:native && pnpm exec cap sync",
+      "exitCode": 0,
+      "log": ".native-build/native-build-round9.log"
+    },
+    "iosBuild": {
+      "configuration": "Debug iOS Simulator, unsigned",
+      "exitCode": 0,
+      "log": ".native-build/ios-build-round9.log"
+    },
+    "androidBuild": {
+      "command": "./gradlew --no-daemon assembleDebug bundleRelease",
+      "exitCode": 0,
+      "log": ".native-build/android-build-round9.log"
+    }
+  },
+  "parentReview": {
+    "staticPresentation": "Before day-mode frame was white; after gesture and three-button frames have dark margins and discernible native icons. Game controls remain readable. This is static layout assessment only.",
+    "motion": "Retained native recordings have not been judged in motion; no visual-motion or physical-device performance pass is claimed.",
+    "updater": "Reviewed durable write-before-set, exact healthy-bundle acknowledgement, failed-version retention, bounded malformed/full ledger behavior and same-publication download retry tests. Installed OTA watchdog and low-space reruns remain open for this changed controller."
+  },
+  "remaining": [
+    "Installed OTA low-space and changed-controller watchdog regression",
+    "Cold Android scene draw latency and physical-device restart p95 qualification",
+    "WebView >=140 safe-area path and older OS/provider qualification",
+    "Remaining secondary-device touch/rotation matrix",
+    "Whole-device storage pressure and physical-device thermal/performance/stranger checks",
+    "Production channels, signed store upgrades and HR-14 account/publication prerequisites"
+  ]
+}

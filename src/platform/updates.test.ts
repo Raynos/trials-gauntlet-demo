@@ -1,5 +1,6 @@
 import { webcrypto } from 'node:crypto';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { isSaveKey } from './native-storage';
 import { createNativeUpdater, readUpdateConfig, updateStatusLine, verifyUpdate, type SignedUpdate, type UpdateAdapter, type UpdateBundle, type UpdateConfig, type UpdateHost, type UpdateManifest } from './updates';
 
 const subtle = webcrypto.subtle as SubtleCrypto;
@@ -91,6 +92,27 @@ describe('native bundle staging', () => {
     expect(await createNativeUpdater(options).activateStagedAtBoot()).toBe('none');
     expect(storage.getItem('trials.best.b1')).toBe('saved');
   });
+  it.each(['ios', 'android'] as const)('retries identical publications after empty/nonempty-checksum transient errors on %s', async (platform) => {
+    const failedChecksum = platform === 'ios' ? checksum : '';
+    const a = adapter(), storage = memory(), envelope = await signed({ ...manifest, platform });
+    const errors: UpdateBundle[] = [];
+    a.list.mockImplementation(async () => ({ bundles: errors }));
+    a.download.mockImplementationOnce(async () => {
+      errors.push({ id: 'failed-transfer', version: manifest.bundleId, checksum: failedChecksum, status: 'error' });
+      throw new Error('ENOSPC');
+    });
+    const options = { adapter: a, storage, host: { ...host, platform }, config, subtle, fetcher: vi.fn(async () => new Response(JSON.stringify(envelope))) as unknown as typeof fetch };
+    const first = createNativeUpdater(options);
+    await first.notifyReady();
+    expect(await first.checkForUpdate()).toBe('unavailable');
+    expect(storage.data.size).toBe(0);
+    const retry = createNativeUpdater(options);
+    await retry.notifyReady();
+    expect(await retry.checkForUpdate()).toBe('staged');
+    expect(a.download).toHaveBeenCalledTimes(2);
+    expect(a.set).not.toHaveBeenCalled();
+    expect(a.delete).not.toHaveBeenCalled();
+  });
   it('rejects mismatched native download hash without staging', async () => {
     const a = adapter(), storage = memory();
     a.download.mockResolvedValueOnce({ id: 'wrong', version: manifest.bundleId, checksum: 'b'.repeat(64), status: 'pending' });
@@ -111,7 +133,7 @@ describe('native bundle staging', () => {
     order.length = 0;
     a.set.mockImplementationOnce(async () => { order.push('set'); });
     expect(await createNativeUpdater(options).activateStagedAtBoot()).toBe('activated');
-    expect(order).toEqual(['flush', 'set']);
+    expect(order).toEqual(['flush', 'flush', 'set']);
   });
   it('does not switch bundles when pending-marker consumption cannot be persisted', async () => {
     const a = adapter(), storage = memory();
@@ -144,6 +166,114 @@ describe('native bundle staging', () => {
     expect(await disabled.checkForUpdate()).toBe('disabled');
     expect(a.notifyAppReady).toHaveBeenCalledTimes(2);
     expect(a.download).not.toHaveBeenCalled();
+  });
+});
+
+describe('durable activation quarantine', () => {
+  const prefix = 'trials.nativeUpdates.ios.0.3.2.native-v1';
+  const ledgerKey = `${prefix}.activations`;
+  async function fixture() {
+    const a = adapter(), storage = memory();
+    const envelope = await signed();
+    const durable = { ...storage, flush: vi.fn(async () => undefined) };
+    const options = { adapter: a, storage: durable, host, config, subtle, fetcher: vi.fn(async () => new Response(JSON.stringify(envelope))) as unknown as typeof fetch };
+    const updater = createNativeUpdater(options);
+    await updater.notifyReady();
+    expect(await updater.checkForUpdate()).toBe('staged');
+    return { a, storage, durable, options };
+  }
+  it('persists quarantine before reload and retains it across rollback and higher-sequence version reuse', async () => {
+    const { a, storage, durable, options } = await fixture();
+    storage.setItem('trials.best.b1', 'unchanged');
+    expect(isSaveKey(ledgerKey)).toBe(true);
+    a.set.mockImplementationOnce(async () => {
+      expect(durable.flush).toHaveBeenCalled();
+      expect(JSON.parse(storage.getItem(ledgerKey)!)).toEqual([{ id: 'download-123', version: manifest.bundleId }]);
+    });
+    expect(await createNativeUpdater(options).activateStagedAtBoot()).toBe('activated');
+    // Native watchdog restores builtin, then auto-deletes the failed bundle's metadata.
+    a.list.mockResolvedValue({ bundles: [] });
+    const recovery = createNativeUpdater(options);
+    await recovery.notifyReady();
+    expect(await recovery.checkForUpdate()).toBe('none'); // Same sequence remains blocked.
+    const newer = await signed({ ...manifest, sequence: 2, sha256: 'b'.repeat(64), url: `https://updates.example/releases/${'b'.repeat(64)}.zip` });
+    const reusedVersion = createNativeUpdater({ ...options, fetcher: vi.fn(async () => new Response(JSON.stringify(newer))) as unknown as typeof fetch });
+    await reusedVersion.notifyReady();
+    expect(await reusedVersion.checkForUpdate()).toBe('rejected');
+    expect(storage.getItem(ledgerKey)).not.toBeNull();
+    expect(storage.getItem('trials.best.b1')).toBe('unchanged');
+    expect(a.download).toHaveBeenCalledOnce();
+  });
+  it('clears only the exact healthy acknowledged bundle and flushes removal', async () => {
+    const { a, storage, durable, options } = await fixture();
+    await createNativeUpdater(options).activateStagedAtBoot();
+    const failed = { id: 'older-failure', version: 'old-game' };
+    storage.setItem(ledgerKey, JSON.stringify([failed, { id: 'download-123', version: manifest.bundleId }]));
+    a.current.mockResolvedValue({ bundle: { id: 'download-123', version: manifest.bundleId, checksum, status: 'success' } });
+    const order: string[] = [];
+    a.notifyAppReady.mockImplementationOnce(async () => { order.push('ready'); });
+    durable.flush.mockImplementation(async () => { order.push('flush'); });
+    await createNativeUpdater(options).notifyReady();
+    expect(JSON.parse(storage.getItem(ledgerKey)!)).toEqual([failed]);
+    expect(order).toEqual(['ready', 'flush']);
+  });
+  it('does not clear quarantine on a same-version different native bundle or rejected native readiness', async () => {
+    const { a, storage, options } = await fixture();
+    await createNativeUpdater(options).activateStagedAtBoot();
+    a.current.mockResolvedValue({ bundle: { id: 'other-copy', version: manifest.bundleId, checksum, status: 'success' } });
+    await createNativeUpdater(options).notifyReady();
+    expect(storage.getItem(ledgerKey)).not.toBeNull();
+    a.current.mockResolvedValue({ bundle: { id: 'download-123', version: manifest.bundleId, checksum, status: 'pending' } });
+    a.notifyAppReady.mockRejectedValueOnce(new Error('native acknowledgement failed'));
+    await expect(createNativeUpdater(options).notifyReady()).rejects.toThrow();
+    expect(storage.getItem(ledgerKey)).not.toBeNull();
+  });
+  it('never switches when the activation record flush fails after successful pending consumption', async () => {
+    const { a, storage, durable, options } = await fixture();
+    durable.flush.mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('ENOSPC'));
+    expect(await createNativeUpdater(options).activateStagedAtBoot()).toBe('rejected');
+    expect(a.set).not.toHaveBeenCalled();
+    expect(storage.getItem(`${prefix}.pending`)).toBeNull();
+    expect(storage.getItem(ledgerKey)).not.toBeNull();
+  });
+  it('keeps a successfully acknowledged game usable when quarantine removal cannot persist', async () => {
+    const { a, storage, durable, options } = await fixture();
+    await createNativeUpdater(options).activateStagedAtBoot();
+    const persistedBeforeReady = storage.getItem(ledgerKey);
+    a.current.mockResolvedValue({ bundle: { id: 'download-123', version: manifest.bundleId, checksum, status: 'success' } });
+    durable.flush.mockRejectedValueOnce(new Error('ENOSPC'));
+    const healthy = createNativeUpdater(options);
+    await expect(healthy.notifyReady()).resolves.toBeUndefined();
+    expect(a.notifyAppReady).toHaveBeenCalledTimes(2);
+    expect(await healthy.checkForUpdate()).toBe('none');
+    expect(persistedBeforeReady).not.toBeNull(); // A cold launch may conservatively restore this stale entry.
+  });
+  it.each(['{broken', '{}', '[null]', JSON.stringify([{ id: 'a', version: 'same' }, { id: 'b', version: 'same' }]), JSON.stringify(Array.from({ length: 33 }, (_, i) => ({ id: `id-${i}`, version: `v${i}` })))])('fails closed on malformed/oversized activation history %s', async (raw) => {
+    const { a, storage, options } = await fixture();
+    storage.setItem(ledgerKey, raw);
+    expect(await createNativeUpdater(options).activateStagedAtBoot()).toBe('rejected');
+    const recovery = createNativeUpdater(options);
+    await expect(recovery.notifyReady()).resolves.toBeUndefined();
+    const newer = await signed({ ...manifest, sequence: 2 });
+    const check = createNativeUpdater({ ...options, fetcher: vi.fn(async () => new Response(JSON.stringify(newer))) as unknown as typeof fetch });
+    await check.notifyReady();
+    expect(await check.checkForUpdate()).toBe('unavailable');
+    expect(storage.getItem(ledgerKey)).toBe(raw);
+    expect(a.set).not.toHaveBeenCalled();
+    expect(a.download).toHaveBeenCalledOnce();
+  });
+  it('preserves all 32 failures and refuses activation when the bounded ledger is full', async () => {
+    const { a, storage, options } = await fixture();
+    const raw = JSON.stringify(Array.from({ length: 32 }, (_, i) => ({ id: `id-${i}`, version: `v${i}` })));
+    storage.setItem(ledgerKey, raw);
+    expect(await createNativeUpdater(options).activateStagedAtBoot()).toBe('rejected');
+    const newer = await signed({ ...manifest, sequence: 2 });
+    const next = createNativeUpdater({ ...options, fetcher: vi.fn(async () => new Response(JSON.stringify(newer))) as unknown as typeof fetch });
+    await next.notifyReady();
+    expect(await next.checkForUpdate()).toBe('rejected');
+    expect(storage.getItem(ledgerKey)).toBe(raw);
+    expect(a.set).not.toHaveBeenCalled();
+    expect(a.download).toHaveBeenCalledOnce();
   });
 });
 

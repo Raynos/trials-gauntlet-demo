@@ -128,6 +128,7 @@ Use headless runners and task-owned simulator instances; do not interrupt an alr
 | iPad mini (A17 Pro) | iOS 26.5 | Tablet layout, landscape/rotation, touch and gameplay smoke | [Gameplay smoke](../evidence/native-mobile/ios-matrix-smoke.json) and [control geometry](../evidence/native-mobile/ios-touch-matrix.json) passed; rotation/actual-touch qualification open |
 | iPad Pro 13-inch (M5) | iOS 26.5 | Large tablet layout and gameplay smoke | [Gameplay smoke](../evidence/native-mobile/ios-matrix-smoke.json) and [control geometry](../evidence/native-mobile/ios-touch-matrix.json) passed; actual-touch/lifecycle qualification open |
 | Pixel 7 (`trials_gauntlet_api36`) | Android 16 / API 36, Google APIs ARM64 image revision 7; emulator 37.1.11.0; 1080×2400, 420 dpi, 2 GB configured RAM | Full native E2E + OTA/save failure suite + Android Back | Initial offline gameplay, lifecycle, save restoration, signed activation, hash rejection and watchdog rollback [passed locally](../evidence/native-mobile/android-integrated.json); full matrix below remains open |
+| Pixel 7 (`trials_gauntlet_api24`) | Android 7 / API 24, Google APIs ARM64 image revision 29; stock WebView 53 | Older-runtime capability qualification and readable unsupported-runtime recovery | Installed app reaches the bundled failure screen; gameplay fails capability requirements with the stock provider. Updated-provider gameplay remains unqualified. |
 
 Additional installed iOS profiles: iPhone 17 Pro, iPhone 17, iPhone Air, iPad Pro 11-inch (M5), iPad Air
 11/13-inch (M4), and iPad (A16). They can support focused regressions; availability is not a pass.
@@ -275,6 +276,29 @@ matches exactly, and a worker update retains all 14 models with zero model bytes
 warm-start check passes with zero bytes transferred. [Round8 evidence](../evidence/native-mobile/round8.json)
 retains the results and artifact/log hashes; these browser timings do not establish phone performance.
 
+Round9 adds a durable activation ledger: recoverable download errors can retry the identical signed
+publication, while failed starts remain blocked independently of native cleanup. The 43 updater tests
+cover this distinction, persistence failure, healthy acknowledgement and bounded malformed/full history.
+The [low-space design](../evidence/native-mobile/ota-low-space-design-round9.json) specifies bounded
+native ZIP-write/extraction tests; those experiments and the changed-controller watchdog rerun remain
+open. Repository types, lint, 1,169 tests (two existing skips) and the web/native builds pass.
+
+The rebuilt [iOS ship gate](../evidence/native-mobile/ios-ship-round9.json) proves two exact zero-fault
+clears, an actual terminal crash and a one-tick restart. The same configuration passes iPhone17e native
+touch navigation, pause/restart and background/manual-resume. Both task simulators are shut down after
+testing; recordings are retained without motion judgement. These checks do not close physical-device
+performance or the rest of the simulator matrix.
+
+The [Android presentation/ship report](../evidence/native-mobile/android-presentation-round9.json)
+qualifies dark native bars and readable controls in day/night appearance with gesture/three-button
+navigation; actual OS Back works in all four cases. WebView133 retains native inset padding; this does
+not test the provider>=140 CSS-inset path. Exact zero-fault clears and a terminal crash/tick1 restart
+pass. The initial probe included the new scene's first draw and took863.1ms; a split followup measured
+919.5ms draw versus0.3ms logical reset. With the loaded/crashed scene actually drawn before timing,
+restart takes0.9ms plus49.1ms redraw. All original misses remain in evidence. The single warmed50ms
+sample is below the local100ms probe threshold, but does not prove physical-device restart p95≤33ms
+or sustained frame rate. Native recordings remain unjudged in motion.
+
 ### P0 — Freeze scope and build requirements
 
 - [ ] Record publisher identity, permanent bundle/application IDs, countries, device support and distribution
@@ -374,6 +398,12 @@ game build/source SHA), and **save/physics schema versions**. Track all three in
    hashed paths for *all* remote assets, not just existing content-addressed GLBs. Prevent mixed releases.
 5. Activate atomically at the next cold launch, (the current implementation). Never reload mid-run or
    during a save. Keep the previous working bundle and the bundled factory fallback.
+   Persist an activation-attempt record before switching. Remove it only when that exact native bundle
+   acknowledges a healthy boot; keep failed versions blocked even after native cleanup or higher-sequence
+   republication. A bounded 32-entry ledger fails closed for further updates when full or malformed.
+   Transfer errors remain retryable without changing the signed publication. This distinction has unit
+   coverage; installed low-space OTA and final watchdog regression checks remain open. Historical
+   development builds predate the ledger; no production native app has shipped yet.
 6. Confirm health after the real boot reaches a usable menu and the runtime assets load. If boot never acknowledges readiness, automatically revert; do not mistake a user backgrounding the app for a failed boot.
 7. Promote beta → limited cohort → stable; stop/revert promotion on failures. An offline device cannot receive
    a remote rollback instruction, so local fallback must work. Reject updates requiring a newer shell and

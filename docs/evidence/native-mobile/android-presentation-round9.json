@@ -1,0 +1,349 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T11:45:22.266Z",
+  "status": "Presentation and warmed terminal gate passed; cold first-draw latency misses retained",
+  "apkSha256": "086549b56ebd08d53b654d93545ab7859876ae65082be6baa072364f9d7acb88",
+  "artifact": ".native-build/presentation-round9/final.apk",
+  "nativeVersion": "1.0.0",
+  "versionCode": 1,
+  "device": {
+    "avd": "trials_gauntlet_api36",
+    "serial": "emulator-5554",
+    "profile": "Pixel 7",
+    "api": 36,
+    "cores": 2,
+    "headless": true,
+    "gpu": "SwiftShader",
+    "webView": "com.google.android.webview133.0.6943.137",
+    "physicalPixels": [
+      1080,
+      2400
+    ],
+    "overridePixels": [
+      720,
+      1280
+    ],
+    "landscapePixels": [
+      1280,
+      720
+    ],
+    "density": 280
+  },
+  "runner": "scripts/native-android-presentation.mjs",
+  "reproductionCommands": [
+    "node scripts/native-android-presentation.mjs --apk .native-build/presentation-round9/final.apk --output .native-build/presentation-round9/report.json",
+    "node scripts/native-android-presentation.mjs --apk .native-build/presentation-round9/final.apk --output .native-build/presentation-round9/terminal.json --presentation false --night-modes no"
+  ],
+  "before": {
+    "apkSha256": "d7ad7b0049807212cfd38ab97396b5a35371fc0f07c4e54d34ab57de8f744921",
+    "backgroundRgb": [
+      250,
+      250,
+      250
+    ],
+    "screenshot": ".native-build/presentation-round9/before-day-menu.png",
+    "rawReport": ".native-build/presentation-round9/before.json"
+  },
+  "presentation": {
+    "pass": true,
+    "profiles": [
+      {
+        "night": "no",
+        "mode": "gestural",
+        "pass": true,
+        "viewport": {
+          "width": 690,
+          "height": 360,
+          "dpr": 1.75
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "nativeBounds": {
+          "left": 73,
+          "top": 49,
+          "right": 1280,
+          "bottom": 678
+        },
+        "backgroundRgb": [
+          16,
+          18,
+          24
+        ],
+        "back": {
+          "method": "adb touchscreen edge Back gesture",
+          "from": [
+            1,
+            360
+          ],
+          "to": [
+            320,
+            360
+          ],
+          "durationMs": 350,
+          "returnedToMenu": true
+        },
+        "screenshot": ".native-build/presentation-round9/final-v2-no-gestural-menu.png",
+        "afterBackScreenshot": ".native-build/presentation-round9/final-v2-no-gestural-after-back.png"
+      },
+      {
+        "night": "no",
+        "mode": "threebutton",
+        "pass": true,
+        "viewport": {
+          "width": 642,
+          "height": 384,
+          "dpr": 1.75
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "nativeBounds": {
+          "left": 73,
+          "top": 49,
+          "right": 1196,
+          "bottom": 720
+        },
+        "backgroundRgb": [
+          16,
+          18,
+          24
+        ],
+        "back": {
+          "method": "adb touchscreen tap on actual system Back button",
+          "x": 1238,
+          "y": 537,
+          "returnedToMenu": true
+        },
+        "screenshot": ".native-build/presentation-round9/final-v2-no-threebutton-menu.png",
+        "afterBackScreenshot": ".native-build/presentation-round9/final-v2-no-threebutton-after-back.png"
+      },
+      {
+        "night": "yes",
+        "mode": "gestural",
+        "pass": true,
+        "viewport": {
+          "width": 690,
+          "height": 360,
+          "dpr": 1.75
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "nativeBounds": {
+          "left": 73,
+          "top": 49,
+          "right": 1280,
+          "bottom": 678
+        },
+        "backgroundRgb": [
+          16,
+          18,
+          24
+        ],
+        "back": {
+          "method": "adb touchscreen edge Back gesture",
+          "from": [
+            1,
+            360
+          ],
+          "to": [
+            320,
+            360
+          ],
+          "durationMs": 350,
+          "returnedToMenu": true
+        },
+        "screenshot": ".native-build/presentation-round9/final-night-gate-yes-gestural-menu.png",
+        "afterBackScreenshot": ".native-build/presentation-round9/final-night-gate-yes-gestural-after-back.png"
+      },
+      {
+        "night": "yes",
+        "mode": "threebutton",
+        "pass": true,
+        "viewport": {
+          "width": 642,
+          "height": 384,
+          "dpr": 1.75
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "nativeBounds": {
+          "left": 73,
+          "top": 49,
+          "right": 1196,
+          "bottom": 720
+        },
+        "backgroundRgb": [
+          16,
+          18,
+          24
+        ],
+        "back": {
+          "method": "adb touchscreen tap on actual system Back button",
+          "x": 1238,
+          "y": 537,
+          "returnedToMenu": true
+        },
+        "screenshot": ".native-build/presentation-round9/final-night-gate-yes-threebutton-menu.png",
+        "afterBackScreenshot": ".native-build/presentation-round9/final-night-gate-yes-threebutton-after-back.png"
+      }
+    ],
+    "iconContrast": {
+      "pass": true,
+      "raw": ".native-build/presentation-round9/icon-contrast.json",
+      "method": "Post-run retained PNG analysis; full native region pixel histogram, most frequent neutral glyph shade >=60, relative luminance ratio against region median background. Requires >=3:1 and >5 glyph pixels. Does not claim formal accessibility certification.",
+      "statusWhiteRatio": 18.720850677,
+      "gestureHandleRatio": 15.857130536,
+      "threeButtonGrayRatio": 3.260429087,
+      "threeButtonGlyphRgb": [
+        102,
+        102,
+        102
+      ]
+    },
+    "geometryScope": "All menu button center hit tests and >=44 CSS target dimensions pass; all visible text ink fits. Credits target box extends ~1.714 CSS px below gestural viewport, while its text and center fit. No claim every target box is wholly contained.",
+    "nativeInsets": "Native WebView bounds inset system bars/cutout; CSS safe-area env values remain zero."
+  },
+  "shipGate": {
+    "pass": true,
+    "raw": ".native-build/presentation-round9/terminal-warmed.json",
+    "boot": {
+      "ready": true,
+      "readyAtMs": 913.1,
+      "online": false,
+      "platform": "android",
+      "current": {
+        "checksum": "",
+        "id": "builtin",
+        "version": "1.0.0",
+        "downloaded": "1970-01-01T00:00:00.000Z",
+        "status": "success"
+      }
+    },
+    "clears": [
+      {
+        "phase": "finished",
+        "time": 8.65,
+        "hash": "ecdf62a55f6185a6",
+        "faults": 0
+      },
+      {
+        "phase": "finished",
+        "time": 8.65,
+        "hash": "ecdf62a55f6185a6",
+        "faults": 0
+      }
+    ],
+    "crashRestart": {
+      "initialRenderMs": 99.80000000004657,
+      "crashedRenderMs": 40.09999999997672,
+      "crash": {
+        "phase": "crashed",
+        "tick": 92,
+        "faults": 1,
+        "stepped": 92
+      },
+      "restart": {
+        "phase": "riding",
+        "tick": 1,
+        "logicalMs": 0.9000000000232831,
+        "renderMs": 49.09999999997672,
+        "wallMs": 50
+      }
+    },
+    "method": "Recorded flat-test bot-3 input twice; actual throttle1/lean-1 reaches terminal crashed with fault1. Loaded scene and crashed scene are drawn before timing logical restart+one tick+post-restart draw.",
+    "scope": "50ms warmed synchronous draw observation in software-GPU emulator. Does not qualify physical phone latency or visual instant restart."
+  },
+  "retainedLatencyFailures": [
+    {
+      "raw": ".native-build/presentation-round9/final-night-gate.json",
+      "pass": false,
+      "metric": "restart+one tick+first draw after loading track",
+      "wallMs": 863.0999999999767
+    },
+    {
+      "raw": ".native-build/presentation-round9/terminal-timing.json",
+      "pass": false,
+      "metric": "unwarmed split timing",
+      "phase": "riding",
+      "tick": 1,
+      "logicalMs": 0.2999999999301508,
+      "renderMs": 919.5,
+      "wallMs": 919.7999999999302
+    }
+  ],
+  "harnessCorrections": [
+    {
+      "raw": ".native-build/presentation-round9/before-modes.json",
+      "finding": "Back lookup only inspected app window and assumed systemui package; API36 actual Back belongs to NexusLauncher. Final runner uses all-window UIAutomation and observed clickable Back element."
+    },
+    {
+      "raw": ".native-build/presentation-round9/final-report.json",
+      "finding": "Back lookup assumed adjacent XML attributes; corrected to allow intervening attributes. Arbitrary >=180 brightness threshold rejected visible idle gray native icons."
+    },
+    {
+      "raw": ".native-build/presentation-round9/final-v2.json",
+      "finding": "Both day Back actions passed. Arbitrary brightness failure retained and superseded only by separate saved-PNG contrast measurement. First night UIAutomation command failed; bounded retry support added, missing night cases then passed without retries."
+    }
+  ],
+  "launchClips": [
+    ".native-build/presentation-round9/final-v2-launch.mp4",
+    ".native-build/presentation-round9/final-night-gate-launch.mp4"
+  ],
+  "limitations": [
+    "Static screenshot and geometry measurements do not judge animation, title quality, launch-motion quality, audio output, or physical-device behavior.",
+    "WebView133 only: initialViewportFitValueHint behavior introduced for newer WebView>=140 is not qualified here.",
+    "Earlier OTA, binary-upgrade, graphics-loss, and storage-fault suites were not rerun on this APK.",
+    "No overall first-draw latency pass: 863.1ms and919.8ms cold-render measurements remain failures of that metric."
+  ],
+  "cleanup": {
+    "originalSettings": {
+      "night": "Night mode: no",
+      "nightSetting": "1",
+      "navigation": "2",
+      "overlays": [
+        "[ ] com.android.internal.systemui.navbar.threebutton",
+        "[ ] com.android.internal.systemui.navbar.twobutton",
+        "[ ] com.android.internal.systemui.navbar.transparent",
+        "[x] com.android.internal.systemui.navbar.gestural"
+      ],
+      "airplane": "1",
+      "wifi": "0"
+    },
+    "restoredSettings": {
+      "night": "Night mode: no",
+      "nightSetting": "1",
+      "navigation": "2",
+      "overlays": [
+        "[ ] com.android.internal.systemui.navbar.threebutton",
+        "[ ] com.android.internal.systemui.navbar.twobutton",
+        "[ ] com.android.internal.systemui.navbar.transparent",
+        "[x] com.android.internal.systemui.navbar.gestural"
+      ],
+      "airplane": "1",
+      "wifi": "0"
+    },
+    "settingsMatch": true,
+    "emulatorPid": 16465,
+    "emulatorStopped": true,
+    "adbDevicesEmpty": true,
+    "normalArtifactInstalled": true,
+    "appDataCleared": false,
+    "temporaryUiXmlRemoved": true,
+    "sdkAndIgnoredArtifactsPreserved": true
+  }
+}
