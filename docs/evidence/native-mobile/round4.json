@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:22:14.765Z",
+  "baseRevision": "d41ff571",
+  "scope": "Installed local OTA failure qualification and reusable runners; no game/update-controller production logic changed.",
+  "qaArtifactHashes": {
+    ".native-build/ios/Build/Products/Debug-iphonesimulator/App.app/public/index.html": "a3dc5cdf9eda4a2bf54994d580dce0d344fccd31443957d7d3b304327030db52",
+    ".native-build/ios/Build/Products/Debug-iphonesimulator/App.app/App": "15be6a773ae163c9c12205d7484fb3758625df58d13087dc139a3b8640c8594a",
+    ".native-build/app-ota-round4.apk": "98fd57b49e078432982932a1896edc95210387bbead78e4748f632dee1594199",
+    "scripts/native-ios-ota-suite.mjs": "4185d30643b431044a9f7373f0c5eab89fe7a8ff193fc26c54a33e1eac774dfc"
+  },
+  "validation": {
+    "ios": "17/17 stages; watchdog128909ms; subsequent cold launch8573ms",
+    "android": "18/18 checks; watchdog128551ms; subsequent launch preserves failed-sequence high-water without ZIP GET",
+    "fixtures": "18 designed platform/case fixtures verified before installed runs; fresh sequences2001–2009",
+    "nodeTests": "3/3 packager, fixture-generation and real HTTPS fault-server tests passed",
+    "lint": "Changed runner/probe ESLint passed",
+    "nativeBuilds": "iOS Debug simulator and Android Debug APK compiled with QA settings, then rebuilt successfully with normal disabled channels",
+    "restoredIosGameplay": {
+      "boot": {
+        "hasSW": false,
+        "origin": "capacitor://localhost",
+        "ready": true,
+        "resources": [],
+        "screen": "menu"
+      },
+      "crashed": {
+        "faults": 2,
+        "phase": "riding"
+      },
+      "first": {
+        "hash": "389a5dc6c07ab8c3",
+        "phase": "finished",
+        "time": 40.55833333333333
+      },
+      "probeAt": 1789986041915,
+      "replayEqual": true,
+      "restarted": {
+        "frame": 0,
+        "phase": "riding",
+        "restartMs": 0
+      },
+      "second": {
+        "hash": "389a5dc6c07ab8c3",
+        "phase": "finished",
+        "time": 40.55833333333333
+      }
+    },
+    "restoredAndroid": {
+      "at": "2026-09-21T10:22:50.192Z",
+      "apkSha256": "9d2ca3c434758572a045efe9e1db53aad5431e26c78b5e80e0035038190160eb",
+      "updaterConfig": {
+        "autoUpdate": "off",
+        "updateUrl": "",
+        "statsUrl": "",
+        "channelUrl": "",
+        "resetWhenUpdate": true,
+        "appReadyTimeout": 120000,
+        "autoDeletePrevious": true,
+        "autoDeleteFailed": true
+      },
+      "appDataClear": "Success",
+      "boot": {
+        "platform": "android",
+        "origin": "https://localhost",
+        "online": false,
+        "ready": true,
+        "screen": "menu",
+        "marker": null,
+        "current": {
+          "checksum": "",
+          "id": "builtin",
+          "version": "1.0.0",
+          "downloaded": "1970-01-01T00:00:00.000Z",
+          "status": "success"
+        },
+        "updateKeys": [],
+        "qaRequests": []
+      },
+      "pass": true
+    }
+  },
+  "normalBuildContract": {
+    "schema": 1,
+    "target": "native",
+    "runtime": "native-v1",
+    "saveSchema": 1,
+    "sourceRevision": "d41ff571",
+    "production": false,
+    "channels": null,
+    "publicKeyFingerprint": null
+  },
+  "normalArtifactHashes": {
+    ".native-build/ios/Build/Products/Debug-iphonesimulator/App.app/public/index.html": "04ce57154d93cd4bed916c7b8a3939f9c9d2dc77f287df7813551c415e50d66e",
+    "android/app/build/outputs/apk/debug/app-debug.apk": "9d2ca3c434758572a045efe9e1db53aad5431e26c78b5e80e0035038190160eb"
+  },
+  "limitations": [
+    "Local Simulator/emulator Debug builds and ephemeral TLS fixture trust, not production/store distribution.",
+    "Gameplay hooks/DOM callbacks establish update/save fixtures; actual native-touch evidence remains the separate round3 suites.",
+    "Save proofs here cover selected preferences and updater state, not all progress/PB/ghost corruption or binary-upgrade scenarios.",
+    "Low-storage/denied-access, olderOS, remaining matrix, actual-device performance/human-play and store gates remain open."
+  ],
+  "cleanup": {
+    "iosTaskSimulatorStopped": true,
+    "iosTemporaryCertificateTrustReset": true,
+    "userSimulatorUntouched": true,
+    "android": {
+      "emulatorPid": 35383,
+      "emulatorStopped": true,
+      "temporaryAndroidDebugTrustSourcesRemoved": true,
+      "qaApkPreserved": ".native-build/app-ota-round4.apk",
+      "sdkAndToolchainsPreserved": true,
+      "httpsServerStoppedByParent": true
+    },
+    "localHttpsServerStopped": true
+  }
+}

@@ -1,0 +1,2221 @@
+{
+  "schema": 1,
+  "startedAt": "2026-09-21T10:12:04.070Z",
+  "fingerprint": "e3659208edde067328fd3176402202613c2796723e20578150c34bdc7a0d55fd",
+  "device": "F3058DD5-DCB6-4D86-93CC-6E56A785B788",
+  "channel": "https://localhost:8443/ios/manifest.json",
+  "fixtureSha256": "f39e1036ec7f3d5adda48d5498d28e79c91b17fc74b016a871533770bf7aa7b7",
+  "sourceRevision": "d41ff571",
+  "steps": [
+    {
+      "name": "baseline",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:12:04.072Z",
+      "probeFile": ".native-build/ios-ota-round4/baseline-ed603576-9813-435a-b065-9ede7f95ee14.js",
+      "log": ".native-build/ios-ota-round4/baseline-ed603576-9813-435a-b065-9ede7f95ee14.log",
+      "elapsedMs": 10683,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:12:10.921Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            }
+          ],
+          "current": {
+            "checksum": "",
+            "downloaded": "1970-01-01T00:00:00.000Z",
+            "id": "builtin",
+            "status": "success",
+            "version": "1.0.0"
+          },
+          "durable": {
+            "generation": 25,
+            "name": "trials-save-a.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2,
+            "valid": true
+          },
+          "marker": null,
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2,
+          "slots": [
+            {
+              "generation": 25,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2,
+              "valid": true
+            },
+            {
+              "generation": 24,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": null
+              },
+              "sequence": 2,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985534725,
+        "token": "ed603576-9813-435a-b065-9ede7f95ee14"
+      },
+      "finishedAt": "2026-09-21T10:12:14.756Z"
+    },
+    {
+      "name": "stageA",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:12:14.756Z",
+      "probeFile": ".native-build/ios-ota-round4/stageA-729cad72-a6be-4c67-9e94-774fd90b4010.js",
+      "log": ".native-build/ios-ota-round4/stageA-729cad72-a6be-4c67-9e94-774fd90b4010.log",
+      "elapsedMs": 8623,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:12:21.739Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T10:12:21.768Z",
+          "method": "GET",
+          "path": "/ios/6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b.zip"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+              "downloaded": "2026-09-21T10:12:21.979Z",
+              "id": "RDIFwiHBTY",
+              "status": "pending",
+              "version": "1.0.2001-fixture-valida"
+            }
+          ],
+          "current": {
+            "checksum": "",
+            "downloaded": "1970-01-01T00:00:00.000Z",
+            "id": "builtin",
+            "status": "success",
+            "version": "1.0.0"
+          },
+          "durable": {
+            "generation": 26,
+            "name": "trials-save-b.json",
+            "pending": {
+              "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+              "id": "RDIFwiHBTY",
+              "sequence": 2001,
+              "version": "1.0.2001-fixture-valida"
+            },
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2001,
+            "valid": true
+          },
+          "marker": null,
+          "paused": false,
+          "pending": {
+            "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+            "id": "RDIFwiHBTY",
+            "sequence": 2001,
+            "version": "1.0.2001-fixture-valida"
+          },
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2001,
+          "slots": [
+            {
+              "generation": 25,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2,
+              "valid": true
+            },
+            {
+              "generation": 26,
+              "name": "trials-save-b.json",
+              "pending": {
+                "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+                "id": "RDIFwiHBTY",
+                "sequence": 2001,
+                "version": "1.0.2001-fixture-valida"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985542738,
+        "samples": [
+          {
+            "at": 6129,
+            "marker": null,
+            "screen": "menu",
+            "tick": 0
+          }
+        ],
+        "token": "729cad72-a6be-4c67-9e94-774fd90b4010"
+      },
+      "finishedAt": "2026-09-21T10:12:23.379Z"
+    },
+    {
+      "name": "activateA",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:12:23.380Z",
+      "probeFile": ".native-build/ios-ota-round4/activateA-944213ae-0212-4ef2-b8c2-e08bb8e92f56.js",
+      "log": ".native-build/ios-ota-round4/activateA-944213ae-0212-4ef2-b8c2-e08bb8e92f56.log",
+      "elapsedMs": 8624,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:12:30.337Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+              "downloaded": "2026-09-21T10:12:21.979Z",
+              "id": "RDIFwiHBTY",
+              "status": "success",
+              "version": "1.0.2001-fixture-valida"
+            }
+          ],
+          "current": {
+            "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+            "downloaded": "2026-09-21T10:12:21.979Z",
+            "id": "RDIFwiHBTY",
+            "status": "success",
+            "version": "1.0.2001-fixture-valida"
+          },
+          "durable": {
+            "generation": 27,
+            "name": "trials-save-a.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2001,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2001,
+          "slots": [
+            {
+              "generation": 27,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            },
+            {
+              "generation": 26,
+              "name": "trials-save-b.json",
+              "pending": {
+                "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+                "id": "RDIFwiHBTY",
+                "sequence": 2001,
+                "version": "1.0.2001-fixture-valida"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985551844,
+        "token": "944213ae-0212-4ef2-b8c2-e08bb8e92f56"
+      },
+      "finishedAt": "2026-09-21T10:12:32.004Z"
+    },
+    {
+      "name": "interruptB",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:12:32.005Z",
+      "probeFile": ".native-build/ios-ota-round4/interruptB-da91c875-d263-4939-a55c-d215c9a4559b.js",
+      "log": ".native-build/ios-ota-round4/interruptB-da91c875-d263-4939-a55c-d215c9a4559b.log",
+      "elapsedMs": 39730,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:12:38.873Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T10:12:38.898Z",
+          "method": "GET",
+          "path": "/ios/5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba.zip"
+        },
+        {
+          "fault": "interrupt",
+          "path": "/ios/5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba.zip",
+          "afterBytes": 32768
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+              "downloaded": "2026-09-21T10:12:21.979Z",
+              "id": "RDIFwiHBTY",
+              "status": "success",
+              "version": "1.0.2001-fixture-valida"
+            }
+          ],
+          "current": {
+            "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+            "downloaded": "2026-09-21T10:12:21.979Z",
+            "id": "RDIFwiHBTY",
+            "status": "success",
+            "version": "1.0.2001-fixture-valida"
+          },
+          "durable": {
+            "generation": 28,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2001,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "run",
+          "sequence": 2001,
+          "slots": [
+            {
+              "generation": 27,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            },
+            {
+              "generation": 28,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            }
+          ],
+          "tick": 3670
+        },
+        "before": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+              "downloaded": "2026-09-21T10:12:21.979Z",
+              "id": "RDIFwiHBTY",
+              "status": "success",
+              "version": "1.0.2001-fixture-valida"
+            }
+          ],
+          "current": {
+            "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+            "downloaded": "2026-09-21T10:12:21.979Z",
+            "id": "RDIFwiHBTY",
+            "status": "success",
+            "version": "1.0.2001-fixture-valida"
+          },
+          "durable": {
+            "generation": 28,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2001,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "run",
+          "sequence": 2001,
+          "slots": [
+            {
+              "generation": 27,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            },
+            {
+              "generation": 28,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            }
+          ],
+          "tick": 45
+        },
+        "probeAt": 1789985591022,
+        "token": "da91c875-d263-4939-a55c-d215c9a4559b"
+      },
+      "finishedAt": "2026-09-21T10:13:11.735Z"
+    },
+    {
+      "name": "retryBWhileRiding",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:13:11.735Z",
+      "probeFile": ".native-build/ios-ota-round4/retryBWhileRiding-716f7aeb-d42e-46d9-8777-0ee45e40ed1d.js",
+      "log": ".native-build/ios-ota-round4/retryBWhileRiding-716f7aeb-d42e-46d9-8777-0ee45e40ed1d.log",
+      "elapsedMs": 23632,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:13:18.527Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T10:13:18.558Z",
+          "method": "GET",
+          "path": "/ios/5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba.zip"
+        },
+        {
+          "fault": "delay",
+          "path": "/ios/5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba.zip",
+          "delayMs": 15000
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba",
+              "downloaded": "2026-09-21T10:13:33.757Z",
+              "id": "EsHZVtB0H5",
+              "status": "pending",
+              "version": "1.0.2002-fixture-validb"
+            },
+            {
+              "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+              "downloaded": "2026-09-21T10:12:21.979Z",
+              "id": "RDIFwiHBTY",
+              "status": "success",
+              "version": "1.0.2001-fixture-valida"
+            }
+          ],
+          "current": {
+            "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+            "downloaded": "2026-09-21T10:12:21.979Z",
+            "id": "RDIFwiHBTY",
+            "status": "success",
+            "version": "1.0.2001-fixture-valida"
+          },
+          "durable": {
+            "generation": 29,
+            "name": "trials-save-a.json",
+            "pending": {
+              "checksum": "5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba",
+              "id": "EsHZVtB0H5",
+              "sequence": 2002,
+              "version": "1.0.2002-fixture-validb"
+            },
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2002,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": {
+            "checksum": "5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba",
+            "id": "EsHZVtB0H5",
+            "sequence": 2002,
+            "version": "1.0.2002-fixture-validb"
+          },
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "run",
+          "sequence": 2002,
+          "slots": [
+            {
+              "generation": 29,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba",
+                "id": "EsHZVtB0H5",
+                "sequence": 2002,
+                "version": "1.0.2002-fixture-validb"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2002,
+              "valid": true
+            },
+            {
+              "generation": 28,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            }
+          ],
+          "tick": 1774
+        },
+        "before": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+              "downloaded": "2026-09-21T10:12:21.979Z",
+              "id": "RDIFwiHBTY",
+              "status": "success",
+              "version": "1.0.2001-fixture-valida"
+            }
+          ],
+          "current": {
+            "checksum": "6c94f37468be53d1949c68b4b9746827ced3f1e424c2859fe01322d8c0758e5b",
+            "downloaded": "2026-09-21T10:12:21.979Z",
+            "id": "RDIFwiHBTY",
+            "status": "success",
+            "version": "1.0.2001-fixture-valida"
+          },
+          "durable": {
+            "generation": 28,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2001,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "run",
+          "sequence": 2001,
+          "slots": [
+            {
+              "generation": 27,
+              "name": "trials-save-a.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            },
+            {
+              "generation": 28,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2001,
+              "valid": true
+            }
+          ],
+          "tick": 58
+        },
+        "probeAt": 1789985614944,
+        "samples": [
+          {
+            "at": 7806,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 58
+          },
+          {
+            "at": 8307,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 120
+          },
+          {
+            "at": 8808,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 180
+          },
+          {
+            "at": 9311,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 242
+          },
+          {
+            "at": 9811,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 302
+          },
+          {
+            "at": 10311,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 362
+          },
+          {
+            "at": 10813,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 422
+          },
+          {
+            "at": 11313,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 482
+          },
+          {
+            "at": 11813,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 542
+          },
+          {
+            "at": 12314,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 602
+          },
+          {
+            "at": 12815,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 662
+          },
+          {
+            "at": 13318,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 722
+          },
+          {
+            "at": 13823,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 782
+          },
+          {
+            "at": 14327,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 844
+          },
+          {
+            "at": 14830,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 904
+          },
+          {
+            "at": 15335,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 964
+          },
+          {
+            "at": 15840,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1024
+          },
+          {
+            "at": 16344.000000000002,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1086
+          },
+          {
+            "at": 16846,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1146
+          },
+          {
+            "at": 17351,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1206
+          },
+          {
+            "at": 17855,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1266
+          },
+          {
+            "at": 18361,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1328
+          },
+          {
+            "at": 18862.000000000004,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1388
+          },
+          {
+            "at": 19367,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1448
+          },
+          {
+            "at": 19870,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1508
+          },
+          {
+            "at": 20374,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1568
+          },
+          {
+            "at": 20878,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1630
+          },
+          {
+            "at": 21383,
+            "marker": "validA",
+            "screen": "run",
+            "tick": 1690
+          }
+        ],
+        "token": "716f7aeb-d42e-46d9-8777-0ee45e40ed1d"
+      },
+      "finishedAt": "2026-09-21T10:13:35.368Z"
+    },
+    {
+      "name": "activateB",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:13:35.368Z",
+      "probeFile": ".native-build/ios-ota-round4/activateB-de284c02-5118-4e8e-9ace-0ca13826b08a.js",
+      "log": ".native-build/ios-ota-round4/activateB-de284c02-5118-4e8e-9ace-0ca13826b08a.log",
+      "elapsedMs": 8589,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:13:41.971Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba",
+              "downloaded": "2026-09-21T10:13:33.757Z",
+              "id": "EsHZVtB0H5",
+              "status": "success",
+              "version": "1.0.2002-fixture-validb"
+            }
+          ],
+          "current": {
+            "checksum": "5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba",
+            "downloaded": "2026-09-21T10:13:33.757Z",
+            "id": "EsHZVtB0H5",
+            "status": "success",
+            "version": "1.0.2002-fixture-validb"
+          },
+          "durable": {
+            "generation": 30,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2002,
+            "valid": true
+          },
+          "marker": "validB",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2002,
+          "slots": [
+            {
+              "generation": 29,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba",
+                "id": "EsHZVtB0H5",
+                "sequence": 2002,
+                "version": "1.0.2002-fixture-validb"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2002,
+              "valid": true
+            },
+            {
+              "generation": 30,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2002,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985623861,
+        "token": "de284c02-5118-4e8e-9ace-0ca13826b08a"
+      },
+      "finishedAt": "2026-09-21T10:13:43.957Z"
+    },
+    {
+      "name": "stageIntentionalRollback",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:13:43.958Z",
+      "probeFile": ".native-build/ios-ota-round4/stageIntentionalRollback-d7bc1191-10ad-4ab1-b6da-9a9587dfffca.js",
+      "log": ".native-build/ios-ota-round4/stageIntentionalRollback-d7bc1191-10ad-4ab1-b6da-9a9587dfffca.log",
+      "elapsedMs": 8569,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:13:50.391Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T10:13:50.413Z",
+          "method": "GET",
+          "path": "/ios/ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8.zip"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba",
+              "downloaded": "2026-09-21T10:13:33.757Z",
+              "id": "EsHZVtB0H5",
+              "status": "success",
+              "version": "1.0.2002-fixture-validb"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "pending",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "5ba33cb72999953fa3270fc0eb554a4222ab28b61cbd5192f12add72980dd3ba",
+            "downloaded": "2026-09-21T10:13:33.757Z",
+            "id": "EsHZVtB0H5",
+            "status": "success",
+            "version": "1.0.2002-fixture-validb"
+          },
+          "durable": {
+            "generation": 31,
+            "name": "trials-save-a.json",
+            "pending": {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "id": "9oxwFQKN6F",
+              "sequence": 2003,
+              "version": "1.0.2003-fixture-intentionalrollback"
+            },
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2003,
+            "valid": true
+          },
+          "marker": "validB",
+          "paused": false,
+          "pending": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "id": "9oxwFQKN6F",
+            "sequence": 2003,
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2003,
+          "slots": [
+            {
+              "generation": 31,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+                "id": "9oxwFQKN6F",
+                "sequence": 2003,
+                "version": "1.0.2003-fixture-intentionalrollback"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            },
+            {
+              "generation": 30,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2002,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985631796,
+        "samples": [
+          {
+            "at": 6062,
+            "marker": "validB",
+            "screen": "menu",
+            "tick": 0
+          }
+        ],
+        "token": "d7bc1191-10ad-4ab1-b6da-9a9587dfffca"
+      },
+      "finishedAt": "2026-09-21T10:13:52.527Z"
+    },
+    {
+      "name": "activateIntentionalRollback",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:13:52.527Z",
+      "probeFile": ".native-build/ios-ota-round4/activateIntentionalRollback-801af8bc-7165-4ff2-9c53-7633dada3df8.js",
+      "log": ".native-build/ios-ota-round4/activateIntentionalRollback-801af8bc-7165-4ff2-9c53-7633dada3df8.log",
+      "elapsedMs": 8584,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:13:59.086Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 32,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2003,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2003,
+          "slots": [
+            {
+              "generation": 31,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+                "id": "9oxwFQKN6F",
+                "sequence": 2003,
+                "version": "1.0.2003-fixture-intentionalrollback"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            },
+            {
+              "generation": 32,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985640991,
+        "token": "801af8bc-7165-4ff2-9c53-7633dada3df8"
+      },
+      "finishedAt": "2026-09-21T10:14:01.111Z"
+    },
+    {
+      "name": "expired",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:14:01.112Z",
+      "probeFile": ".native-build/ios-ota-round4/expired-c3ec9a0a-5bd5-45ee-9adc-4665d697910c.js",
+      "log": ".native-build/ios-ota-round4/expired-c3ec9a0a-5bd5-45ee-9adc-4665d697910c.log",
+      "elapsedMs": 37625,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:14:07.590Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 32,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2003,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2003,
+          "slots": [
+            {
+              "generation": 31,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+                "id": "9oxwFQKN6F",
+                "sequence": 2003,
+                "version": "1.0.2003-fixture-intentionalrollback"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            },
+            {
+              "generation": 32,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985678281,
+        "token": "c3ec9a0a-5bd5-45ee-9adc-4665d697910c"
+      },
+      "finishedAt": "2026-09-21T10:14:38.738Z"
+    },
+    {
+      "name": "incompatible",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:14:38.738Z",
+      "probeFile": ".native-build/ios-ota-round4/incompatible-bc3e006d-3305-4072-bab2-8b381b75f97d.js",
+      "log": ".native-build/ios-ota-round4/incompatible-bc3e006d-3305-4072-bab2-8b381b75f97d.log",
+      "elapsedMs": 37623,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:14:45.191Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 32,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2003,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2003,
+          "slots": [
+            {
+              "generation": 31,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+                "id": "9oxwFQKN6F",
+                "sequence": 2003,
+                "version": "1.0.2003-fixture-intentionalrollback"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            },
+            {
+              "generation": 32,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985715862,
+        "token": "bc3e006d-3305-4072-bab2-8b381b75f97d"
+      },
+      "finishedAt": "2026-09-21T10:15:16.361Z"
+    },
+    {
+      "name": "wrongSignature",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:15:16.361Z",
+      "probeFile": ".native-build/ios-ota-round4/wrongSignature-43aa6e3d-a53a-41b6-b001-14cc0c1c19fb.js",
+      "log": ".native-build/ios-ota-round4/wrongSignature-43aa6e3d-a53a-41b6-b001-14cc0c1c19fb.log",
+      "elapsedMs": 37753,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:15:23.375Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 32,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2003,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2003,
+          "slots": [
+            {
+              "generation": 31,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+                "id": "9oxwFQKN6F",
+                "sequence": 2003,
+                "version": "1.0.2003-fixture-intentionalrollback"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            },
+            {
+              "generation": 32,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985753681,
+        "token": "43aa6e3d-a53a-41b6-b001-14cc0c1c19fb"
+      },
+      "finishedAt": "2026-09-21T10:15:54.116Z"
+    },
+    {
+      "name": "corruptZip",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:15:54.116Z",
+      "probeFile": ".native-build/ios-ota-round4/corruptZip-bd24dd2d-d2db-4bb8-bdad-763b10b8524b.js",
+      "log": ".native-build/ios-ota-round4/corruptZip-bd24dd2d-d2db-4bb8-bdad-763b10b8524b.log",
+      "elapsedMs": 37855,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:16:01.412Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T10:16:01.442Z",
+          "method": "GET",
+          "path": "/ios/ae799a87c9ba85bbc6f7715eb529ca6159a65e470c2bc89d1ab28ee11f2dbdaa.zip"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 32,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2003,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2003,
+          "slots": [
+            {
+              "generation": 31,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+                "id": "9oxwFQKN6F",
+                "sequence": 2003,
+                "version": "1.0.2003-fixture-intentionalrollback"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            },
+            {
+              "generation": 32,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985791702,
+        "token": "bd24dd2d-d2db-4bb8-bdad-763b10b8524b"
+      },
+      "finishedAt": "2026-09-21T10:16:31.973Z"
+    },
+    {
+      "name": "seedOrphan",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:16:31.973Z",
+      "probeFile": ".native-build/ios-ota-round4/seedOrphan-a2a88406-39c3-41d5-8d48-2af7a99b1dc7.js",
+      "log": ".native-build/ios-ota-round4/seedOrphan-a2a88406-39c3-41d5-8d48-2af7a99b1dc7.log",
+      "elapsedMs": 9892,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:16:40.428Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T10:16:41.380Z",
+          "method": "GET",
+          "path": "/ios/3ab15dc4cf5bb845bfb84020febd6fe9a15223d74a4371c074292137f7f43e80.zip"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "3ab15dc4cf5bb845bfb84020febd6fe9a15223d74a4371c074292137f7f43e80",
+              "downloaded": "2026-09-21T10:16:41.700Z",
+              "id": "bKOKxAmqxF",
+              "status": "pending",
+              "version": "1.0.2009-fixture-orphan"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 32,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2003,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2003,
+          "slots": [
+            {
+              "generation": 31,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+                "id": "9oxwFQKN6F",
+                "sequence": 2003,
+                "version": "1.0.2003-fixture-intentionalrollback"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            },
+            {
+              "generation": 32,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "before": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 32,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2003,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2003,
+          "slots": [
+            {
+              "generation": 31,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+                "id": "9oxwFQKN6F",
+                "sequence": 2003,
+                "version": "1.0.2003-fixture-intentionalrollback"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            },
+            {
+              "generation": 32,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "downloaded": {
+          "checksum": "3ab15dc4cf5bb845bfb84020febd6fe9a15223d74a4371c074292137f7f43e80",
+          "downloaded": "2026-09-21T10:16:41.700Z",
+          "id": "bKOKxAmqxF",
+          "status": "pending",
+          "version": "1.0.2009-fixture-orphan"
+        },
+        "probeAt": 1789985801706,
+        "token": "a2a88406-39c3-41d5-8d48-2af7a99b1dc7"
+      },
+      "finishedAt": "2026-09-21T10:16:41.866Z"
+    },
+    {
+      "name": "cleanupOrphan",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:16:41.867Z",
+      "probeFile": ".native-build/ios-ota-round4/cleanupOrphan-aa2750de-ada8-48df-a27e-2a0b85eff216.js",
+      "log": ".native-build/ios-ota-round4/cleanupOrphan-aa2750de-ada8-48df-a27e-2a0b85eff216.log",
+      "elapsedMs": 11860,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:16:50.357Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 32,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2003,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2003,
+          "slots": [
+            {
+              "generation": 31,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+                "id": "9oxwFQKN6F",
+                "sequence": 2003,
+                "version": "1.0.2003-fixture-intentionalrollback"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            },
+            {
+              "generation": 32,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985813628,
+        "token": "aa2750de-ada8-48df-a27e-2a0b85eff216"
+      },
+      "finishedAt": "2026-09-21T10:16:53.727Z"
+    },
+    {
+      "name": "stageBrokenStartup",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:16:53.728Z",
+      "probeFile": ".native-build/ios-ota-round4/stageBrokenStartup-2c1e845c-c445-49ce-9073-aa63000da323.js",
+      "log": ".native-build/ios-ota-round4/stageBrokenStartup-2c1e845c-c445-49ce-9073-aa63000da323.log",
+      "elapsedMs": 9785,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:17:01.525Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        },
+        {
+          "at": "2026-09-21T10:17:01.550Z",
+          "method": "GET",
+          "path": "/ios/4fb17c80bb2c9de6ac86e58ea5c80ffa729f9cb3cd7aba768b562ea1c256438c.zip"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            },
+            {
+              "checksum": "4fb17c80bb2c9de6ac86e58ea5c80ffa729f9cb3cd7aba768b562ea1c256438c",
+              "downloaded": "2026-09-21T10:17:01.774Z",
+              "id": "XQruAZ3SB9",
+              "status": "pending",
+              "version": "1.0.2008-fixture-brokenstartup"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 33,
+            "name": "trials-save-a.json",
+            "pending": {
+              "checksum": "4fb17c80bb2c9de6ac86e58ea5c80ffa729f9cb3cd7aba768b562ea1c256438c",
+              "id": "XQruAZ3SB9",
+              "sequence": 2008,
+              "version": "1.0.2008-fixture-brokenstartup"
+            },
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2008,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": {
+            "checksum": "4fb17c80bb2c9de6ac86e58ea5c80ffa729f9cb3cd7aba768b562ea1c256438c",
+            "id": "XQruAZ3SB9",
+            "sequence": 2008,
+            "version": "1.0.2008-fixture-brokenstartup"
+          },
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2008,
+          "slots": [
+            {
+              "generation": 33,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "4fb17c80bb2c9de6ac86e58ea5c80ffa729f9cb3cd7aba768b562ea1c256438c",
+                "id": "XQruAZ3SB9",
+                "sequence": 2008,
+                "version": "1.0.2008-fixture-brokenstartup"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2008,
+              "valid": true
+            },
+            {
+              "generation": 32,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2003,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985822518,
+        "samples": [
+          {
+            "at": 6642,
+            "marker": "validA",
+            "screen": "menu",
+            "tick": 0
+          }
+        ],
+        "token": "2c1e845c-c445-49ce-9073-aa63000da323"
+      },
+      "finishedAt": "2026-09-21T10:17:03.514Z"
+    },
+    {
+      "name": "watchdogRecovery",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:17:03.514Z",
+      "probeFile": ".native-build/ios-ota-round4/watchdogRecovery-86ab8083-260f-4e7d-820c-60200b37d507.js",
+      "log": ".native-build/ios-ota-round4/watchdogRecovery-86ab8083-260f-4e7d-820c-60200b37d507.log",
+      "elapsedMs": 128909,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:19:10.356Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 34,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2008,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2008,
+          "slots": [
+            {
+              "generation": 33,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "4fb17c80bb2c9de6ac86e58ea5c80ffa729f9cb3cd7aba768b562ea1c256438c",
+                "id": "XQruAZ3SB9",
+                "sequence": 2008,
+                "version": "1.0.2008-fixture-brokenstartup"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2008,
+              "valid": true
+            },
+            {
+              "generation": 34,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2008,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985951861,
+        "token": "86ab8083-260f-4e7d-820c-60200b37d507"
+      },
+      "finishedAt": "2026-09-21T10:19:12.423Z"
+    },
+    {
+      "name": "recoveryColdLaunch",
+      "status": "passed",
+      "startedAt": "2026-09-21T10:19:12.424Z",
+      "probeFile": ".native-build/ios-ota-round4/recoveryColdLaunch-7edcad9b-a963-41cc-a878-bcb11069e03e.js",
+      "log": ".native-build/ios-ota-round4/recoveryColdLaunch-7edcad9b-a963-41cc-a878-bcb11069e03e.log",
+      "elapsedMs": 8573,
+      "process": {
+        "code": 0,
+        "timedOut": false
+      },
+      "serverEvents": [
+        {
+          "at": "2026-09-21T10:19:18.925Z",
+          "method": "GET",
+          "path": "/ios/manifest.json"
+        }
+      ],
+      "report": {
+        "after": {
+          "bundles": [
+            {
+              "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+              "downloaded": "2026-09-21T09:00:21.852Z",
+              "id": "PW8iF1KoC4",
+              "status": "success",
+              "version": "1.0.1-qa"
+            },
+            {
+              "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+              "downloaded": "2026-09-21T10:13:50.600Z",
+              "id": "9oxwFQKN6F",
+              "status": "success",
+              "version": "1.0.2003-fixture-intentionalrollback"
+            }
+          ],
+          "current": {
+            "checksum": "ab1f4860245a11ebfdc77cd9734fd990d73fb71b6f6448a2b06c8c60f19ea8e8",
+            "downloaded": "2026-09-21T10:13:50.600Z",
+            "id": "9oxwFQKN6F",
+            "status": "success",
+            "version": "1.0.2003-fixture-intentionalrollback"
+          },
+          "durable": {
+            "generation": 34,
+            "name": "trials-save-b.json",
+            "pending": null,
+            "preferences": {
+              "trials.sound": "0",
+              "trials.volume": "0.3"
+            },
+            "sequence": 2008,
+            "valid": true
+          },
+          "marker": "validA",
+          "paused": false,
+          "pending": null,
+          "preferences": {
+            "trials.sound": "0",
+            "trials.volume": "0.3"
+          },
+          "screen": "menu",
+          "sequence": 2008,
+          "slots": [
+            {
+              "generation": 33,
+              "name": "trials-save-a.json",
+              "pending": {
+                "checksum": "4fb17c80bb2c9de6ac86e58ea5c80ffa729f9cb3cd7aba768b562ea1c256438c",
+                "id": "XQruAZ3SB9",
+                "sequence": 2008,
+                "version": "1.0.2008-fixture-brokenstartup"
+              },
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2008,
+              "valid": true
+            },
+            {
+              "generation": 34,
+              "name": "trials-save-b.json",
+              "pending": null,
+              "preferences": {
+                "trials.sound": "0",
+                "trials.volume": "0.3"
+              },
+              "sequence": 2008,
+              "valid": true
+            }
+          ],
+          "tick": 0
+        },
+        "probeAt": 1789985960809,
+        "token": "7edcad9b-a963-41cc-a878-bcb11069e03e"
+      },
+      "finishedAt": "2026-09-21T10:19:20.997Z"
+    }
+  ],
+  "pass": true,
+  "scope": "Installed Debug controller and native updater probes. No browser, game build, app install, save reset, production channel, or OS-touch automation.",
+  "limits": [
+    "Task-owned iOS Simulator only; no physical device or store approval claim.",
+    "Gameplay hooks and Settings DOM handlers establish test conditions; native touch qualification is a separate suite.",
+    "Negative rejection observation is bounded to 30 seconds after normal readiness and paired with actual local server requests.",
+    "Successful native bundle retention is controlled by the plugin; orphan case checks only abandoned pending cleanup."
+  ],
+  "finishedAt": "2026-09-21T10:19:20.998Z",
+  "artifactHashes": {
+    ".native-build/ios/Build/Products/Debug-iphonesimulator/App.app/public/index.html": "a3dc5cdf9eda4a2bf54994d580dce0d344fccd31443957d7d3b304327030db52",
+    ".native-build/ios/Build/Products/Debug-iphonesimulator/App.app/App": "15be6a773ae163c9c12205d7484fb3758625df58d13087dc139a3b8640c8594a",
+    ".native-build/app-ota-round4.apk": "98fd57b49e078432982932a1896edc95210387bbead78e4748f632dee1594199",
+    "scripts/native-ios-ota-suite.mjs": "4185d30643b431044a9f7373f0c5eab89fe7a8ff193fc26c54a33e1eac774dfc"
+  }
+}

@@ -4,6 +4,8 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 const device = process.env.TRIALS_SIMULATOR ?? 'F3058DD5-DCB6-4D86-93CC-6E56A785B788';
+const timeoutMs = Number(process.env.TRIALS_PROBE_TIMEOUT_MS ?? 150000);
+if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1000 || timeoutMs > 300000) throw new Error('TRIALS_PROBE_TIMEOUT_MS must be between 1000 and 300000.');
 const appId = 'com.trialsgauntlet.game';
 const app = path.resolve('.native-build/ios/Build/Products/Debug-iphonesimulator/App.app');
 const sim = (...args) => execFileSync('xcrun', ['simctl', ...args], { encoding: 'utf8' }).trim();
@@ -40,7 +42,7 @@ const before = existsSync(report) ? readFileSync(report, 'utf8') : null;
 execFileSync('xcrun', ['simctl', 'launch', device, appId], {
   env: {...process.env, SIMCTL_CHILD_TRIALS_PROBE_JS: script}, stdio: 'inherit',
 });
-const end = Date.now() + 150000;
+const end = Date.now() + timeoutMs;
 while (Date.now() < end) {
   if (existsSync(report)) {
     const text = readFileSync(report, 'utf8');

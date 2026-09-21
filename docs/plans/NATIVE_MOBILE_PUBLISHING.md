@@ -122,10 +122,10 @@ Use headless runners and task-owned simulator instances; do not interrupt an alr
 | Target | Installed runtime/profile | Required coverage | Current evidence |
 |---|---|---|---|
 | iPhone 16 Pro (`trials-iphone`) | iOS 26.5 (23F77), Xcode 26.6 | Full native E2E + OTA/save failure suite | Initial real installed-app gameplay, signed activation, watchdog rollback and save restoration [passed locally](../evidence/native-mobile/ios-local.json); full matrix below remains open |
-| iPhone 17e | iOS 26.5 | Smaller phone layout, touch controls, safe areas, cold boot/clear/crash/restart, lifecycle and save smoke | [Menu/replay/crash/restart smoke passed](../evidence/native-mobile/ios-matrix-smoke.json); touch/layout/lifecycle qualification open |
-| iPhone 17 Pro Max | iOS 26.5 | Larger phone layout and the same smoke flow | [Menu/replay/crash/restart smoke passed](../evidence/native-mobile/ios-matrix-smoke.json); touch/layout/lifecycle qualification open |
-| iPad mini (A17 Pro) | iOS 26.5 | Tablet layout, landscape/rotation, touch and gameplay smoke | [Menu/replay/crash/restart smoke passed](../evidence/native-mobile/ios-matrix-smoke.json); tablet/rotation/touch qualification open |
-| iPad Pro 13-inch (M5) | iOS 26.5 | Large tablet layout and gameplay smoke | [Menu/replay/crash/restart smoke passed](../evidence/native-mobile/ios-matrix-smoke.json); touch/layout/lifecycle qualification open |
+| iPhone 17e | iOS 26.5 | Smaller phone layout, touch controls, safe areas, cold boot/clear/crash/restart, lifecycle and save smoke | [Gameplay smoke](../evidence/native-mobile/ios-matrix-smoke.json), [control geometry](../evidence/native-mobile/ios-touch-matrix.json), and [XCTest native-touch/lifecycle smoke](../evidence/native-mobile/ios-ui.json) passed; save/rotation and played-clip assessment remain open |
+| iPhone 17 Pro Max | iOS 26.5 | Larger phone layout and the same smoke flow | [Gameplay smoke](../evidence/native-mobile/ios-matrix-smoke.json) and [control geometry](../evidence/native-mobile/ios-touch-matrix.json) passed; actual touch/lifecycle qualification open |
+| iPad mini (A17 Pro) | iOS 26.5 | Tablet layout, landscape/rotation, touch and gameplay smoke | [Gameplay smoke](../evidence/native-mobile/ios-matrix-smoke.json) and [control geometry](../evidence/native-mobile/ios-touch-matrix.json) passed; rotation/actual-touch qualification open |
+| iPad Pro 13-inch (M5) | iOS 26.5 | Large tablet layout and gameplay smoke | [Gameplay smoke](../evidence/native-mobile/ios-matrix-smoke.json) and [control geometry](../evidence/native-mobile/ios-touch-matrix.json) passed; actual-touch/lifecycle qualification open |
 | Pixel 7 (`trials_gauntlet_api36`) | Android 16 / API 36, Google APIs ARM64 image revision 7; emulator 37.1.11.0; 1080×2400, 420 dpi, 2 GB configured RAM | Full native E2E + OTA/save failure suite + Android Back | Initial offline gameplay, lifecycle, save restoration, signed activation, hash rejection and watchdog rollback [passed locally](../evidence/native-mobile/android-integrated.json); full matrix below remains open |
 
 Additional installed iOS profiles: iPhone 17 Pro, iPhone 17, iPhone Air, iPad Pro 11-inch (M5), iPad Air
@@ -162,6 +162,21 @@ restoration. Its actual display was overridden to 720×1280 / 280 dpi (landscape
 also passes: actual Play/Ride/onboarding, pause/restart, Home/foreground remaining paused, explicit Resume
 and Quit. Its default verification uses no JS observation or game-hook actions. These partial suites
 do not close the complete matrix above.
+
+Round 4 adds repeatable installed-app OTA runners for both primary devices. The
+[iOS suite](../evidence/native-mobile/ios-ota-round4.json) passes all 17 stages: signed A→B,
+interrupted transfer and later retry, staging during a progressing ride, intentional higher-sequence
+rollback, expired/incompatible/wrong-signature rejection before ZIP download, corrupt ZIP rejection,
+abandoned pending cleanup, and startup-watchdog fallback with a healthy subsequent cold launch.
+The watchdog returned the previous healthy game after 128.909 seconds; saved sound/volume preferences
+survived in the WebView and checksummed native snapshots. This is local Debug-app evidence with temporary
+TLS trust and signed fixtures, not production-channel, physical-device or store qualification.
+The [Android suite](../evidence/native-mobile/android-ota-round4.json) passes 18 checks across the same
+failure cases, including unchanged active content on foreground with a staged update, watchdog recovery
+after 128.551 seconds, a later launch without redownloading the failed startup, and saved bike/outfit
+preferences retained in native storage.
+Low-storage/denied-access failures, native binary upgrades, broader save corruption/migration cases,
+older OS coverage and final store-artifact reruns remain open.
 
 ### P0 — Freeze scope and build requirements
 

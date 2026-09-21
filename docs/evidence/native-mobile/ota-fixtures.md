@@ -69,3 +69,27 @@ Installed iOS/Android results belong in their probe reports. These fixture check
 Generated the real game fixtures from `.native-build/ota-dist-round3`, source revision `069b1683`, for native version `1.0.0` and sequences `1001`–`1009`. All 18 platform/case entries passed their designed signature/hash/expiry/bounds checks. Healthy ZIPs are approximately 36.1 MB. Only `wrongSignature` fails signature verification, only `corruptZip` fails archive SHA-256, only `expired` is expired and only `incompatible` fails native bounds.
 
 Independent archive checks at `2026-09-21T09:48:36.284Z` validated all 16 uncorrupted ZIP containers, extracted every marker, confirmed broken-startup HTML has no game loader, and compared A's HTML byte-for-byte with the intentional rollback's HTML on both platforms. The input build index remained unchanged: SHA-256 `2dc8682d737a42b093897cd43d5baa365d5fd77b9b944ff74a78798011e45588`. Ignored machine-readable evidence: `.native-build/ota-fixtures-round3/checks.json` and `artifact-checks.json`. The three packager/fixture/server tests and targeted ESLint passed.
+
+## Installed suite runners
+
+`scripts/native-ios-ota-suite.mjs` runs 17 stages against an already-installed QA app, verifies fresh
+probe tokens, checks both WebView state and checksummed native save slots, and retains per-stage JSON
+and local server requests. It supports `--resume` only with the same fixture fingerprint and device.
+Its watchdog stage allows 210 seconds and requires at least 110 seconds before the healthy fallback
+returns; a subsequent cold launch must stay healthy without retrying the consumed broken sequence.
+
+`scripts/native-android-ota-suite.mjs --mode full` reinstalls a supplied QA APK and clears only that
+task app's data on a selected emulator. It exercises the same release/failure scenarios through the
+normal controller and records native bundle metadata, server requests and native-save preferences.
+Its `--mode retry-proof` stops after interruption and successful retry for a focused regression.
+The Android native downloader can retain an interrupted request as `downloading` in its raw registry
+while omitting it from the ordinary bundle list. A test must not assume every interrupted request
+immediately becomes an `error`; observe the server fault, unchanged active release and successful retry.
+
+Round 4 uses source `d41ff571`, native version `1.0.0`, fresh sequences `2001`–`2009`, and the final
+120-second readiness timeout. [The iOS report](ios-ota-round4.json) records all 17 stages passing,
+including 128.909 seconds to watchdog recovery and 8.573 seconds for the following cold launch.
+The [Android report](android-ota-round4.json) records 18 passing checks and watchdog recovery after
+128.551 seconds; a later cold launch retains the failed sequence without another ZIP request.
+No production release was promoted. Low-storage, binary-upgrade, older-OS and actual-device gates
+remain separate; these runs do not establish visual quality or physical-device performance.

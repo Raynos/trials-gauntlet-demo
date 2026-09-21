@@ -100,6 +100,25 @@ only on a disposable task emulator. Both runners change test saves; neither targ
 The [OTA fixture runbook](../evidence/native-mobile/ota-fixtures.md) supplies signed A/B/rollback and
 negative releases plus per-platform interrupted/delayed transfers for repeatable installed-app tests.
 
+Installed OTA suites exercise the normal update controller against those local fixtures:
+
+```sh
+node scripts/native-ios-ota-suite.mjs --fixtures .native-build/ota-fixtures-round4
+node scripts/native-android-ota-suite.mjs --mode full --serial emulator-5554 \
+  --apk .native-build/app-ota-round4.apk --fixtures .native-build/ota-fixtures-round4
+```
+
+First build and install the QA wrapper with the fixture channels/public key and temporary local TLS
+trust; these runners do not configure production channels. Keep the local HTTPS server running and
+use fresh fixture sequences above the installed high-water value. iOS uses the already-installed app
+and writes resumable stage reports under `.native-build/ios-ota-round4/`; `--resume` retains passed
+stages only with the same device and fixture fingerprint. Android reinstalls the specified QA APK
+and clears that task app's saves on the selected emulator. Both change test saves and channel fixtures.
+See each script's options for custom output and server-log paths. `TRIALS_PROBE_TIMEOUT_MS` extends
+the iOS debug probe deadline when observing the 120-second startup watchdog; its default is 150 seconds.
+The debug bridge observes readiness for up to 200 seconds and remains absent from Release builds.
+These suites cover update delivery and recovery, separately from native-input and physical-device gates.
+
 ## Signed updates hosted on Vercel
 
 The native updater is `@capgo/capacitor-updater` in manual, self-hosted mode. Vendor auto-update,

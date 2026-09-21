@@ -46,7 +46,8 @@ private final class ProbeBridgeViewController: CAPBridgeViewController {
             self.attempts += 1
             self.webView?.evaluateJavaScript("Boolean(window.__trials?.app && !document.querySelector('#loader'))") { ready, _ in
                     if ready as? Bool == true { self.runProbe() }
-                    else if self.attempts < 240 { self.pollReady() }
+                    // Keep observing through the updater's 120 s watchdog plus fallback boot.
+                    else if self.attempts < 400 { self.pollReady() }
                     else { self.save(["error": "Native boot probe timed out"]) }
             }
         }

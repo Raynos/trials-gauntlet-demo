@@ -1,0 +1,563 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:14:58.976Z",
+  "finishedAt": "2026-09-21T10:21:06.454Z",
+  "pass": true,
+  "apkSha256": "98fd57b49e078432982932a1896edc95210387bbead78e4748f632dee1594199",
+  "fixtureSourceRevision": "d41ff571",
+  "sequenceBase": 2000,
+  "environment": "task-owned headless Android emulator; local trusted HTTPS; real installed update controller",
+  "device": {
+    "avd": "trials_gauntlet_api36",
+    "profile": "Pixel 7",
+    "api": 36,
+    "serial": "emulator-5554",
+    "display": "720x1280 override, density280, landscape",
+    "headless": true
+  },
+  "runner": "scripts/native-android-ota-suite.mjs",
+  "rawReport": ".native-build/android-ota-round4-full.json",
+  "cases": [
+    {
+      "name": "Preference fixture is saved by real game callbacks",
+      "pass": true
+    },
+    {
+      "name": "A stages without replacing builtin in the active launch",
+      "pass": true
+    },
+    {
+      "name": "A activates and acknowledges ready on next launch",
+      "pass": true
+    },
+    {
+      "name": "Interrupted B retains healthy A and does not stage",
+      "pass": true
+    },
+    {
+      "name": "A later healthy launch retries interrupted B successfully",
+      "pass": true
+    },
+    {
+      "name": "B activates only on the next launch and keeps native preferences",
+      "pass": true
+    },
+    {
+      "name": "Delayed download leaves a live B ride and does not activate on foreground",
+      "pass": true
+    },
+    {
+      "name": "Higher signed sequence intentionally rolls content B back to healthy A",
+      "pass": true
+    },
+    {
+      "name": "expired rejected before any archive GET",
+      "pass": true
+    },
+    {
+      "name": "incompatible rejected before any archive GET",
+      "pass": true
+    },
+    {
+      "name": "wrongSignature rejected before any archive GET",
+      "pass": true
+    },
+    {
+      "name": "Corrupted archive rejected without activating or advancing sequence",
+      "pass": true
+    },
+    {
+      "name": "Orphan fixture exists as pending without an app pending pointer",
+      "pass": true
+    },
+    {
+      "name": "Healthy boot removes orphan and keeps active bundle plus preferences",
+      "pass": true
+    },
+    {
+      "name": "Broken startup fixture stages while healthy A remains active",
+      "pass": true
+    },
+    {
+      "name": "Failed-ready watchdog restores the previous healthy bundle and saves",
+      "pass": true
+    },
+    {
+      "name": "Later cold launch does not re-download or reactivate failed startup",
+      "pass": true
+    },
+    {
+      "name": "Native filesystem snapshot retains the original preference fixture",
+      "pass": true
+    }
+  ],
+  "postRunAssertions": {
+    "timing": "Assertions added to runner after completion and evaluated against unchanged captured fields; full suite was not repeated.",
+    "watchdogMinimumMs": 110000,
+    "observedRecoveryMs": 128551,
+    "laterLaunchHighestSequence": "2008",
+    "pass": true
+  },
+  "activation": {
+    "stagedA": {
+      "current": {
+        "checksum": "",
+        "id": "builtin",
+        "version": "1.0.0",
+        "downloaded": "1970-01-01T00:00:00.000Z",
+        "status": "success"
+      },
+      "marker": null,
+      "ready": true,
+      "screen": "run",
+      "phase": "riding",
+      "tick": 186,
+      "pending": {
+        "id": "vKV1wsoitU",
+        "bundleId": "1.0.2001-fixture-valida",
+        "sequence": 2001
+      },
+      "sequence": "2001"
+    },
+    "activeA": {
+      "current": {
+        "checksum": "7425bbbfa653350eb4158891ddbd2707b4b6f6e41fd9bb69daba434817276159",
+        "id": "vKV1wsoitU",
+        "version": "1.0.2001-fixture-valida",
+        "downloaded": "2026-09-21T10:15:17.995+0000",
+        "status": "success"
+      },
+      "marker": "validA",
+      "ready": true,
+      "screen": "menu",
+      "phase": "menu",
+      "tick": 0,
+      "pending": null,
+      "sequence": "2001"
+    },
+    "activeB": {
+      "current": {
+        "checksum": "004d4a58855e712ad1d51a955dce7153ad3704c7c0db9acaa86e939b9bc4554b",
+        "id": "Wz3FT1Ab96",
+        "version": "1.0.2002-fixture-validb",
+        "downloaded": "2026-09-21T10:16:01.231+0000",
+        "status": "success"
+      },
+      "marker": "validB",
+      "ready": true,
+      "screen": "menu",
+      "phase": "menu",
+      "tick": 0,
+      "pending": null,
+      "sequence": "2002"
+    },
+    "intentionalRollback": {
+      "current": {
+        "checksum": "6902cf632ce72365a40b47a8729962e53899ef8d8531f36e8de23488616a42ef",
+        "id": "ge4dge8iE8",
+        "version": "1.0.2003-fixture-intentionalrollback",
+        "downloaded": "2026-09-21T10:16:45.930+0000",
+        "status": "success"
+      },
+      "marker": "validA",
+      "ready": true,
+      "screen": "menu",
+      "phase": "menu",
+      "tick": 0,
+      "pending": null,
+      "sequence": "2003"
+    }
+  },
+  "interruptedTransfer": {
+    "afterBytes": 32768,
+    "snapshot": {
+      "current": {
+        "checksum": "7425bbbfa653350eb4158891ddbd2707b4b6f6e41fd9bb69daba434817276159",
+        "id": "vKV1wsoitU",
+        "version": "1.0.2001-fixture-valida",
+        "downloaded": "2026-09-21T10:15:17.995+0000",
+        "status": "success"
+      },
+      "marker": "validA",
+      "ready": true,
+      "screen": "menu",
+      "phase": "menu",
+      "tick": 0,
+      "pending": null,
+      "sequence": "2001"
+    },
+    "ordinaryBundles": [
+      {
+        "checksum": "7425bbbfa653350eb4158891ddbd2707b4b6f6e41fd9bb69daba434817276159",
+        "id": "vKV1wsoitU",
+        "version": "1.0.2001-fixture-valida",
+        "downloaded": "2026-09-21T10:15:17.995+0000",
+        "status": "success"
+      }
+    ],
+    "rawBundles": [
+      {
+        "checksum": "",
+        "id": "uQa9hB5Hkn",
+        "version": "1.0.2002-fixture-validb",
+        "downloaded": "2026-09-21T10:15:42.833+0000",
+        "status": "downloading"
+      },
+      {
+        "checksum": "7425bbbfa653350eb4158891ddbd2707b4b6f6e41fd9bb69daba434817276159",
+        "id": "vKV1wsoitU",
+        "version": "1.0.2001-fixture-valida",
+        "downloaded": "2026-09-21T10:15:17.995+0000",
+        "status": "success"
+      }
+    ],
+    "traffic": {
+      "manifestGet": 1,
+      "archiveGet": 1,
+      "faults": [
+        {
+          "fault": "interrupt",
+          "path": "/android/004d4a58855e712ad1d51a955dce7153ad3704c7c0db9acaa86e939b9bc4554b.zip",
+          "afterBytes": 32768
+        }
+      ]
+    },
+    "retried": {
+      "current": {
+        "checksum": "7425bbbfa653350eb4158891ddbd2707b4b6f6e41fd9bb69daba434817276159",
+        "id": "vKV1wsoitU",
+        "version": "1.0.2001-fixture-valida",
+        "downloaded": "2026-09-21T10:15:17.995+0000",
+        "status": "success"
+      },
+      "marker": "validA",
+      "ready": true,
+      "screen": "menu",
+      "phase": "menu",
+      "tick": 0,
+      "pending": {
+        "id": "Wz3FT1Ab96",
+        "bundleId": "1.0.2002-fixture-validb",
+        "sequence": 2002
+      },
+      "sequence": "2002"
+    },
+    "retryTraffic": {
+      "manifestGet": 1,
+      "archiveGet": 1,
+      "faults": []
+    },
+    "interpretation": "Interrupted B remained registry-only downloading with an empty checksum and was absent from ordinary list(). A later cold launch fetched B again and durably staged it. No retry blacklist failure was observed; controller unchanged."
+  },
+  "delayedTransfer": {
+    "delayMs": 15000,
+    "before": {
+      "current": {
+        "checksum": "004d4a58855e712ad1d51a955dce7153ad3704c7c0db9acaa86e939b9bc4554b",
+        "id": "Wz3FT1Ab96",
+        "version": "1.0.2002-fixture-validb",
+        "downloaded": "2026-09-21T10:16:01.231+0000",
+        "status": "success"
+      },
+      "marker": "validB",
+      "ready": true,
+      "screen": "run",
+      "phase": "riding",
+      "tick": 101,
+      "pending": null,
+      "sequence": "2002"
+    },
+    "later": {
+      "current": {
+        "checksum": "004d4a58855e712ad1d51a955dce7153ad3704c7c0db9acaa86e939b9bc4554b",
+        "id": "Wz3FT1Ab96",
+        "version": "1.0.2002-fixture-validb",
+        "downloaded": "2026-09-21T10:16:01.231+0000",
+        "status": "success"
+      },
+      "marker": "validB",
+      "ready": true,
+      "screen": "run",
+      "phase": "riding",
+      "tick": 251,
+      "pending": null,
+      "sequence": "2002"
+    },
+    "staged": {
+      "current": {
+        "checksum": "004d4a58855e712ad1d51a955dce7153ad3704c7c0db9acaa86e939b9bc4554b",
+        "id": "Wz3FT1Ab96",
+        "version": "1.0.2002-fixture-validb",
+        "downloaded": "2026-09-21T10:16:01.231+0000",
+        "status": "success"
+      },
+      "marker": "validB",
+      "ready": true,
+      "screen": "run",
+      "phase": "riding",
+      "tick": 2485,
+      "pending": {
+        "id": "ge4dge8iE8",
+        "bundleId": "1.0.2003-fixture-intentionalrollback",
+        "sequence": 2003
+      },
+      "sequence": "2003"
+    },
+    "afterHomeForeground": {
+      "current": {
+        "checksum": "004d4a58855e712ad1d51a955dce7153ad3704c7c0db9acaa86e939b9bc4554b",
+        "id": "Wz3FT1Ab96",
+        "version": "1.0.2002-fixture-validb",
+        "downloaded": "2026-09-21T10:16:01.231+0000",
+        "status": "success"
+      },
+      "marker": "validB",
+      "ready": true,
+      "screen": "run",
+      "phase": "riding",
+      "tick": 2588,
+      "pending": {
+        "id": "ge4dge8iE8",
+        "bundleId": "1.0.2003-fixture-intentionalrollback",
+        "sequence": 2003
+      },
+      "sequence": "2003"
+    },
+    "traffic": {
+      "manifestGet": 1,
+      "archiveGet": 2,
+      "faults": [
+        {
+          "fault": "delay",
+          "path": "/android/004d4a58855e712ad1d51a955dce7153ad3704c7c0db9acaa86e939b9bc4554b.zip",
+          "delayMs": 15000
+        },
+        {
+          "fault": "delay",
+          "path": "/android/6902cf632ce72365a40b47a8729962e53899ef8d8531f36e8de23488616a42ef.zip",
+          "delayMs": 15000
+        }
+      ]
+    }
+  },
+  "manifestRejections": [
+    {
+      "case": "expired",
+      "observationAfterManifestMs": 6000,
+      "traffic": {
+        "manifestGet": 1,
+        "archiveGet": 0,
+        "faults": []
+      },
+      "currentVersion": "1.0.2003-fixture-intentionalrollback",
+      "highestSequence": "2003",
+      "pending": null
+    },
+    {
+      "case": "incompatible",
+      "observationAfterManifestMs": 6000,
+      "traffic": {
+        "manifestGet": 1,
+        "archiveGet": 0,
+        "faults": []
+      },
+      "currentVersion": "1.0.2003-fixture-intentionalrollback",
+      "highestSequence": "2003",
+      "pending": null
+    },
+    {
+      "case": "wrongSignature",
+      "observationAfterManifestMs": 6000,
+      "traffic": {
+        "manifestGet": 1,
+        "archiveGet": 0,
+        "faults": []
+      },
+      "currentVersion": "1.0.2003-fixture-intentionalrollback",
+      "highestSequence": "2003",
+      "pending": null
+    }
+  ],
+  "corruptArchive": {
+    "snapshot": {
+      "current": {
+        "checksum": "6902cf632ce72365a40b47a8729962e53899ef8d8531f36e8de23488616a42ef",
+        "id": "ge4dge8iE8",
+        "version": "1.0.2003-fixture-intentionalrollback",
+        "downloaded": "2026-09-21T10:16:45.930+0000",
+        "status": "success"
+      },
+      "marker": "validA",
+      "ready": true,
+      "screen": "menu",
+      "phase": "menu",
+      "tick": 0,
+      "pending": null,
+      "sequence": "2003"
+    },
+    "failureMetadata": [
+      {
+        "checksum": "",
+        "id": "yuVWdxoS7W",
+        "version": "1.0.2007-fixture-corruptzip",
+        "downloaded": "2026-09-21T10:18:04.006+0000",
+        "status": "error"
+      }
+    ],
+    "events": [
+      {
+        "event": "downloadFailed",
+        "data": {
+          "version": "1.0.2007-fixture-corruptzip"
+        },
+        "at": 1789985884005
+      },
+      {
+        "event": "downloadFailed",
+        "data": {
+          "error": "finish_download_fail",
+          "version": "1.0.2007-fixture-corruptzip"
+        },
+        "at": 1789985884007
+      },
+      {
+        "event": "downloadFailed",
+        "data": {
+          "version": "1.0.2007-fixture-corruptzip"
+        },
+        "at": 1789985884010
+      }
+    ],
+    "traffic": {
+      "manifestGet": 1,
+      "archiveGet": 1,
+      "faults": []
+    }
+  },
+  "orphanCleanup": {
+    "orphan": {
+      "checksum": "5947607ffd3c747ee0769a9c889c8953539d0aaf4cc626528b00df7467783f72",
+      "id": "tVHwnzxLQJ",
+      "version": "1.0.2009-fixture-orphan",
+      "downloaded": "2026-09-21T10:18:17.616+0000",
+      "status": "pending"
+    },
+    "appPendingBeforeCleanup": null,
+    "afterCleanupBundleIds": [
+      "ge4dge8iE8"
+    ],
+    "activeBundleId": "ge4dge8iE8"
+  },
+  "watchdog": {
+    "failedReadyAt": "2026-09-21T10:18:45.079Z",
+    "configuredTimeoutMs": 120000,
+    "observedRecoveryMs": 128551,
+    "brokenMarkerActuallyObserved": true,
+    "gameReadyAtBrokenMarker": false,
+    "restored": {
+      "current": {
+        "checksum": "6902cf632ce72365a40b47a8729962e53899ef8d8531f36e8de23488616a42ef",
+        "id": "ge4dge8iE8",
+        "version": "1.0.2003-fixture-intentionalrollback",
+        "downloaded": "2026-09-21T10:16:45.930+0000",
+        "status": "success"
+      },
+      "marker": "validA",
+      "ready": true,
+      "screen": "menu",
+      "phase": "menu",
+      "tick": 0,
+      "pending": null,
+      "sequence": "2008"
+    },
+    "laterLaunch": {
+      "current": {
+        "checksum": "6902cf632ce72365a40b47a8729962e53899ef8d8531f36e8de23488616a42ef",
+        "id": "ge4dge8iE8",
+        "version": "1.0.2003-fixture-intentionalrollback",
+        "downloaded": "2026-09-21T10:16:45.930+0000",
+        "status": "success"
+      },
+      "marker": "validA",
+      "ready": true,
+      "screen": "menu",
+      "phase": "menu",
+      "tick": 0,
+      "pending": null,
+      "sequence": "2008"
+    },
+    "laterTraffic": {
+      "manifestGet": 1,
+      "archiveGet": 0,
+      "faults": []
+    },
+    "laterObservationAfterGameReadyMs": 3000
+  },
+  "nativePreferences": {
+    "fixture": {
+      "trials.bikeClass": "pro",
+      "trials.riderOutfit": "race-bluewhite",
+      "trials.onboarded": "1",
+      "trials.lastTrack": "flat-test"
+    },
+    "initialGeneration": 5,
+    "final": {
+      "generation": 12,
+      "prefs": {
+        "trials.bikeClass": "pro",
+        "trials.riderOutfit": "race-bluewhite",
+        "trials.onboarded": "1",
+        "trials.lastTrack": "flat-test"
+      }
+    },
+    "preserved": true
+  },
+  "limitations": [
+    "Local HTTPS fixture server and a task-owned emulator; production hosting, signing account and physical-device behavior were not tested.",
+    "Game UI callbacks create preferences and launch rides; native updater set/next/notifyReady are never called by the harness.",
+    "The orphan fixture alone uses native download directly; all advertised releases use the production signed-manifest controller.",
+    "No-request assertions cover the recorded launch observation window. Visual quality and audible output are not inferred.",
+    "The interrupted registry-only downloading entry and corrupt-archive error registry metadata remained; orphan cleanup assertion concerns the abandoned pending bundle directory, not removal of all native registry history."
+  ],
+  "normalRestore": {
+    "at": "2026-09-21T10:22:50.192Z",
+    "apkSha256": "9d2ca3c434758572a045efe9e1db53aad5431e26c78b5e80e0035038190160eb",
+    "updaterConfig": {
+      "autoUpdate": "off",
+      "updateUrl": "",
+      "statsUrl": "",
+      "channelUrl": "",
+      "resetWhenUpdate": true,
+      "appReadyTimeout": 120000,
+      "autoDeletePrevious": true,
+      "autoDeleteFailed": true
+    },
+    "appDataClear": "Success",
+    "boot": {
+      "platform": "android",
+      "origin": "https://localhost",
+      "online": false,
+      "ready": true,
+      "screen": "menu",
+      "marker": null,
+      "current": {
+        "checksum": "",
+        "id": "builtin",
+        "version": "1.0.0",
+        "downloaded": "1970-01-01T00:00:00.000Z",
+        "status": "success"
+      },
+      "updateKeys": [],
+      "qaRequests": []
+    },
+    "pass": true
+  },
+  "cleanup": {
+    "emulatorPid": 35383,
+    "emulatorStopped": true,
+    "temporaryAndroidDebugTrustSourcesRemoved": true,
+    "qaApkPreserved": ".native-build/app-ota-round4.apk",
+    "sdkAndToolchainsPreserved": true,
+    "httpsServerStoppedByParent": true
+  }
+}
