@@ -79,6 +79,27 @@ node scripts/native-android-capabilities.mjs --serial emulator-5554 \
 That runner installs the local debug APK, enables airplane mode on the emulator, and fails on captured
 resource/render errors. These programmatic checks do not establish real-touch or visual acceptance.
 
+Native input runners are separate from the game-hook probes:
+
+```sh
+bash scripts/native-ios-ui.sh
+node scripts/native-android-touch.mjs --serial emulator-5554 \
+  --apk android/app/build/outputs/apk/debug/app-debug.apk \
+  --output .native-build/android-touch.json --fresh
+```
+
+The iOS runner builds XCUITest against already-synced assets, boots a shutdown iPhone 17e by default,
+and shuts down only the simulator it started. `TRIALS_UI_SIMULATOR` selects another shutdown profile.
+It tests native taps and Home/foreground through XCTest; results and a recorded clip stay under
+`.native-build/ios-ui/`. A failed native-touch run remains a failed gate even if game-hook smoke passes.
+The Android runner maps CSS targets to the actual native WebView rectangle, injects `adb input` touches,
+and checks navigation, controls, Back, lifecycle and committed preferences after force-kill. `--fresh`
+clears only the task app's data on the selected emulator to exercise first-launch onboarding. Use it
+only on a disposable task emulator. Both runners change test saves; neither targets physical phones.
+
+The [OTA fixture runbook](../evidence/native-mobile/ota-fixtures.md) supplies signed A/B/rollback and
+negative releases plus per-platform interrupted/delayed transfers for repeatable installed-app tests.
+
 ## Signed updates hosted on Vercel
 
 The native updater is `@capgo/capacitor-updater` in manual, self-hosted mode. Vendor auto-update,
@@ -168,7 +189,10 @@ requires a successful save flush before deleting. Deletion failures are retried 
 This is conservative housekeeping, not a hard quota for every native status. Keep remote known-good
 artifacts even after on-device cleanup.
 Local rollback qualification used the earlier `autoDeletePrevious: false` configuration; the new
-deletion behavior is source-verified and still needs an installed-app retention check.
+orphan sweep has an [installed iOS pass](../evidence/native-mobile/ios-retention.json): a deliberately
+seeded pending bundle disappears on the next healthy launch, with current/bundled and existing successful
+content preserved. Successful-fallback replacement, failed-file retention, interrupted downloads and
+Android cleanup with the final configuration still need installed-app qualification.
 
 Native SDK/plugin/permission changes and iOS-ineligible functionality changes use normal store releases.
 Revalidate Apple/Google policy before each promotion; a signed bundle is authentic, not automatically

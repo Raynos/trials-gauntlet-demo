@@ -30,7 +30,7 @@ if (mode === 'setup') {
   console.log(JSON.stringify({ configPath, certPath, webRoot, port: config.port, iosManifest: config.iosManifest, androidManifest: config.androidManifest }, null, 2));
 } else if (mode === 'serve') {
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  https.createServer({ cert: fs.readFileSync(config.certPath), key: fs.readFileSync(config.tlsKeyPath) }, (req, res) => {
+  const server = https.createServer({ cert: fs.readFileSync(config.certPath), key: fs.readFileSync(config.tlsKeyPath) }, (req, res) => {
     const origin = req.headers.origin;
     if (origin === 'https://localhost' || origin === 'capacitor://localhost') res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Cache-Control', 'no-store');
@@ -38,13 +38,35 @@ if (mode === 'setup') {
     if (req.method === 'OPTIONS') { res.writeHead(204, { 'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS' }); res.end(); return; }
     const requested = decodeURIComponent(new URL(req.url, 'https://localhost').pathname);
     const file = path.resolve(config.webRoot, '.' + requested);
-    if (!file.startsWith(config.webRoot + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) { res.writeHead(404); res.end('No test release'); return; }
+    if (requested.split('/').some(part => part.startsWith('.')) || !file.startsWith(config.webRoot + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) { res.writeHead(404); res.end('No test release'); return; }
     if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405); res.end(); return; }
     res.setHeader('Content-Type', file.endsWith('.json') ? 'application/json' : 'application/zip');
     res.setHeader('Content-Length', fs.statSync(file).size);
     console.log(JSON.stringify({ at: new Date().toISOString(), method: req.method, path: requested }));
-    if (req.method === 'HEAD') res.end(); else fs.createReadStream(file).pipe(res);
-  }).listen(config.port, '127.0.0.1', () => console.log(`Local OTA fixture listening on port ${config.port}`));
+    if (req.method === 'HEAD') { res.end(); return; }
+    let fault;
+    for (const platform of ['ios', 'android']) {
+      try {
+        const candidate = JSON.parse(fs.readFileSync(path.join(config.webRoot, `.fixture-network-${platform}.json`), 'utf8'));
+        if (requested.startsWith(candidate.pathPrefix)) { fault = candidate; break; }
+      } catch { /* Normal transfer without a fault control file. */ }
+    }
+    const applies = file.endsWith('.zip') && fault && requested.startsWith(fault.pathPrefix);
+    if (applies && fault.mode === 'interrupt') {
+      const count = Math.max(1, Math.min(Number(fault.afterBytes) || 32768, fs.statSync(file).size - 1));
+      console.log(JSON.stringify({ fault: 'interrupt', path: requested, afterBytes: count }));
+      const stream = fs.createReadStream(file, { end: count - 1 });
+      stream.pipe(res, { end: false });
+      stream.on('end', () => res.destroy());
+      res.on('close', () => stream.destroy());
+    } else if (applies && fault.mode === 'delay') {
+      const delayMs = Math.max(1, Math.min(Number(fault.delayMs) || 15000, 60000));
+      console.log(JSON.stringify({ fault: 'delay', path: requested, delayMs }));
+      const timer = setTimeout(() => { if (!res.destroyed) fs.createReadStream(file).pipe(res); }, delayMs);
+      res.on('close', () => clearTimeout(timer));
+    } else fs.createReadStream(file).pipe(res);
+  });
+  server.listen(config.port, '127.0.0.1', () => console.log(`Local OTA fixture listening on port ${server.address().port}`));
 } else {
   console.error('Usage: node scripts/native-ota-test.mjs setup|serve [ignored-config-path]');
   process.exitCode = 2;

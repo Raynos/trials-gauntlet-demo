@@ -149,6 +149,20 @@ on the latest OS proves older-OS compatibility.
 - [ ] Re-run applicable suites on final signed store candidates and keep actual-phone thermal/performance,
   interruption and stranger-touch gates below. Simulator timings never establish phone fps or battery life.
 
+Round 3 adds real native-input runners (`scripts/native-ios-ui.sh`,
+`scripts/native-android-touch.mjs`) and [signed OTA failure fixtures](../evidence/native-mobile/ota-fixtures.md).
+The [iOS geometry matrix](../evidence/native-mobile/ios-touch-matrix.json) covers iPhone 16 Pro,
+iPhone 17e, iPhone 17 Pro Max, iPad mini and iPad Pro 13-inch; an outer-label safe-area defect was corrected. These are
+measured control bounds/delegated hit tests, not visual or actual-touch approval. An installed iOS
+[orphan-cleanup test](../evidence/native-mobile/ios-retention.json) passes; the remaining retention and
+transfer failures stay open. The [Android native-touch suite](../evidence/native-mobile/android-touch.json) passes 15 checks, including
+six instantaneous restart taps, held controls, Back, background/foreground and force-kill preference
+restoration. Its actual display was overridden to 720×1280 / 280 dpi (landscape 1280×720); nominal Pixel 7
+1080×2400 layout and physical-device results are not inferred. The iPhone 17e [XCTest native-touch/lifecycle smoke](../evidence/native-mobile/ios-ui.json)
+also passes: actual Play/Ride/onboarding, pause/restart, Home/foreground remaining paused, explicit Resume
+and Quit. Its default verification uses no JS observation or game-hook actions. These partial suites
+do not close the complete matrix above.
+
 ### P0 — Freeze scope and build requirements
 
 - [ ] Record publisher identity, permanent bundle/application IDs, countries, device support and distribution

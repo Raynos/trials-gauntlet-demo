@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T09:59:23.673Z",
+  "pass": true,
+  "environment": "headless Android emulator; airplane mode",
+  "apkSha256": "b40e5a1986b2450e69b3988257dd2060f934bfe22111c5a3aa2a49336f117fd8",
+  "coldLaunch": true,
+  "boot": {
+    "online": false,
+    "origin": "https://localhost",
+    "platform": "android",
+    "readyAtMs": 3117.9
+  },
+  "deterministicRuns": [
+    {
+      "finishTime": 8.65,
+      "hash": "ecdf62a55f6185a6",
+      "faults": 0
+    },
+    {
+      "finishTime": 8.65,
+      "hash": "ecdf62a55f6185a6",
+      "faults": 0
+    }
+  ],
+  "replayEqual": true,
+  "terminalCrash": {
+    "phase": "crashed",
+    "faults": 1,
+    "tick": 85,
+    "stepped": 85
+  },
+  "oneTickRestart": {
+    "phase": "riding",
+    "tick": 1,
+    "wallMs": 115.60000000000582
+  },
+  "background": {
+    "paused": true,
+    "tick": 60,
+    "input": {
+      "throttle": 0,
+      "brake": 0,
+      "lean": 0
+    }
+  },
+  "foreground": {
+    "paused": true,
+    "tick": 60
+  },
+  "rawEvidence": [
+    ".native-build/android-gameplay-round3.json",
+    ".native-build/android-terminal-crash-round3.json"
+  ],
+  "scope": "Installed normal app, offline cold launch. Deterministic replay and terminal crash/restart are game-hook physics fixtures, not OS control or visual-quality claims; see android-touch.json for actual OS control proof.",
+  "crashFixture": "flat-test seed 3277865877, throttle 1 / lean -1, stepped until crashed (bounded to 1200 ticks); observed crash at tick 85, then restart and one tick.",
+  "notes": [
+    "The existing crash recording registers two faults and ends riding after recovery, so an additional bounded fixture stopped at the actual crashed phase before checking one-tick restart.",
+    "Restart wall time includes synchronous renderer completion on emulator and is not physical-device latency evidence."
+  ]
+}

@@ -5,7 +5,8 @@
  * button top-right, pause top-left, both ≥ 44 pt.
  *
  * Robustness (iOS Safari, the P0): the frame is *recomputed every read()*
- * from a Map of active pointers — never toggled by up/down — and a pointer is
+ * from a Map of active pointers, with one unread completed restart tap retained
+ * when its entire press falls between reads. A pointer is
  * dropped on ANY of: pointerup, pointercancel, lostpointercapture, pointerleave
  * with no buttons, raw touchend/touchcancel reporting zero fingers, blur,
  * pagehide, visibilitychange→hidden, and a 400 ms watchdog that fires when a
@@ -29,8 +30,9 @@
  * are hit-tested only while the layer is `.live` (enabled, on the touch device, no overlay up,
  * and the buttons observed drawn for 150 ms) AND the button is drawn at >= .5 opacity right now.
  * Otherwise a corner tap is just the zone under it. Pause fires on pointerUP inside the rect (a
- * tap, not a touch-down), and a finger that leaves a button's rect is dead until it lifts — it
- * never becomes gas.
+ * tap, not a touch-down). Restart stays held for long-press behavior, while a completed tap that
+ * no read observed is delivered once. A finger that leaves a button's rect is dead until it lifts
+ * — it never becomes gas.
  */
 import type { InputFrame } from '../../core/types';
 import { LIVE_OPACITY, conceal, effectiveOpacity, isLive, reveal } from '../../ui/live';
@@ -42,6 +44,8 @@ type Zone = 'back' | 'fwd' | 'brake' | 'throttle' | 'restart' | 'pause' | 'none'
 interface ActivePointer {
   zone: Zone;
   type: string;
+  /** A held restart already reached read(); its release must not queue another. */
+  restartRead: boolean;
   /** performance.now() at pointerdown (watchdog / debug). */
   since: number;
 }
@@ -80,6 +84,8 @@ export class TouchInput implements InputSource {
   readonly device = 'touch' as const;
   readonly root: HTMLDivElement;
   private readonly pointers = new Map<number, ActivePointer>();
+  /** A complete restart tap between reads, consumed by exactly one read. */
+  private restartTap = false;
   private readonly meta: MetaButtons = { pause: false, confirm: false, back: false, navX: 0, navY: 0, active: false };
   private enabled = false;
   private visible = false;
@@ -177,6 +183,7 @@ export class TouchInput implements InputSource {
   setVisible(on: boolean): void {
     this.visible = on;
     this.root.classList.toggle('visible', on);
+    if (!on) this.releaseAll('hidden-controls');
     this.armButtons();
   }
 
@@ -240,7 +247,7 @@ export class TouchInput implements InputSource {
   // -- pointer path -----------------------------------------------------------
 
   private readonly onDown = (e: PointerEvent): void => {
-    if (!this.enabled) return;
+    if (!this.enabled || this.underOverlay) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     e.preventDefault();
     try {
@@ -249,7 +256,7 @@ export class TouchInput implements InputSource {
       /* Safari may reject capture for an already-ended pointer */
     }
     const zone = this.zoneAt(e.clientX, e.clientY, undefined);
-    this.pointers.set(e.pointerId, { zone, type: e.pointerType, since: this.now() });
+    this.pointers.set(e.pointerId, { zone, type: e.pointerType, since: this.now(), restartRead: false });
     this.meta.active = true;
     this.paint();
   };
@@ -273,6 +280,11 @@ export class TouchInput implements InputSource {
   private readonly onUp = (e: PointerEvent): void => {
     // Pause is a TAP: it fires on the up of a pointer that went down on ❚❚ and is still on it (a cancel or a slide-off is nothing).
     if (e.type === 'pointerup' && this.pointers.get(e.pointerId)?.zone === 'pause') this.meta.pause = true;
+    const pointer = this.pointers.get(e.pointerId);
+    if (e.type === 'pointerup' && pointer?.zone === 'restart' && !pointer.restartRead) {
+      const { x, y } = toLogical(e.clientX, e.clientY, this.pt);
+      if (this.buttonAt(this.els.restart, x, y)) this.restartTap = true;
+    }
     this.release(e.pointerId, e.type);
   };
 
@@ -299,7 +311,11 @@ export class TouchInput implements InputSource {
       // No fingers on the glass: nothing can be held, whatever the pointer stream said. Should this end arrive
       // before the pointerup (belt and braces), a finger still on ❚❚ is a completed tap.
       if (e.type === 'touchend' && this.has('pause')) this.meta.pause = true;
+      // Safari may report raw touchend before pointerup. Preserve a completed tap
+      // across either ordering, but never turn cancellation into a restart.
+      const restartTap = e.type === 'touchend' && (this.restartTap || [...this.pointers.values()].some(p => p.zone === 'restart' && !p.restartRead));
       this.releaseAll(e.type);
+      this.restartTap = restartTap;
     }
   };
 
@@ -329,6 +345,7 @@ export class TouchInput implements InputSource {
   }
 
   private releaseAll(why: string): void {
+    this.restartTap = false;
     if (this.pointers.size === 0) return;
     this.pointers.clear();
     this.releases++;
@@ -367,7 +384,13 @@ export class TouchInput implements InputSource {
     out.brake = this.has('brake') ? 1 : 0;
     out.lean = (this.has('fwd') ? 1 : 0) - (this.has('back') ? 1 : 0);
     out.hop = false;
-    out.restart = this.has('restart');
+    out.restart = this.restartTap;
+    this.restartTap = false;
+    for (const pointer of this.pointers.values()) {
+      if (pointer.zone !== 'restart') continue;
+      out.restart = true;
+      pointer.restartRead = true;
+    }
     this.lastFrame = out;
     if (this.debugEl) this.paintDebug();
   }

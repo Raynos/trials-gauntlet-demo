@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T09:57:34.263Z",
+  "baseRevision": "069b1683f2700bdaeaa37fe2b1bb134c1ddd6332",
+  "sourceCandidate": "base revision + this round\u2019s tracked changes; hashes identify tested code and app artifacts",
+  "hashes": {
+    "src/game/input/touch.ts": "d0d1a654f4a8fc44c1c5a82ad8bf956b1216105734d6f1c819f97a2e027e116c",
+    "src/ui/styles.ts": "fbafae5ea05cec71d5c5625504f36095918a0c52e5842eff3556ce04699fff20",
+    "android/app/build/outputs/apk/debug/app-debug.apk": "b40e5a1986b2450e69b3988257dd2060f934bfe22111c5a3aa2a49336f117fd8",
+    ".native-build/ios/Build/Products/Debug-iphonesimulator/App.app/public/index.html": "ea2b53e7c222a81a607d038ea9aff7066671b412ac21b1a42377a06ae0d4f498"
+  },
+  "validation": {
+    "nativeBuilds": "iOS Debug simulator and Android Debug APK built successfully",
+    "unitSuite": "91 files passed / 1 file failed: 1148 tests passed, 2 skipped, single shared-host timing failure in physics r5 at 5.166 us > 5 us; isolated unchanged r5 rerun 8/8 passed at 4.458 us",
+    "typecheck": "passed both app and harness tsconfig",
+    "determinism": "9/9, 4867 ticks, final hash389a5dc6c07ab8c3; explicit b1-first-ride/bot-3.json with fresh web build",
+    "releaseFixtures": "6 Node tests passed: config, packager, fixtures, real interrupted/delayed HTTPS server",
+    "lint": "targeted changed JS/TS checks passed; prior whole-repository lint baseline remains outside this round",
+    "thirdRoundShipGate": "Both installed native apps cold boot, replay clear twice with exact hashes, register crash faults, and restart at tick0 (iOS) / tick1 (Android). Native touch tests are separate from these hook-driven gameplay checks."
+  },
+  "iosGameplay": {
+    "boot": {
+      "hasSW": false,
+      "origin": "capacitor://localhost",
+      "ready": true,
+      "resources": [],
+      "screen": "menu"
+    },
+    "crashed": {
+      "faults": 2,
+      "phase": "riding"
+    },
+    "first": {
+      "hash": "389a5dc6c07ab8c3",
+      "phase": "finished",
+      "time": 40.55833333333333
+    },
+    "probeAt": 1789984457677,
+    "replayEqual": true,
+    "restarted": {
+      "frame": 0,
+      "phase": "riding",
+      "restartMs": 0
+    },
+    "second": {
+      "hash": "389a5dc6c07ab8c3",
+      "phase": "finished",
+      "time": 40.55833333333333
+    }
+  },
+  "geometry": "five iOS profiles pass measured safe-area and delegated-hit checks; see ios-touch-matrix.json",
+  "retention": "real iOS native orphan pending bundle removed on next boot; see ios-retention.json",
+  "touch": {
+    "android": "15/15 installed OS interaction checks passed; six instantaneous restart taps, hold/release, Back/lifecycle, force-kill saved preferences. Effective display720x1280/280dpi; see android-touch.json",
+    "ios": "iPhone17e normal XCTest run passed1test/0failures in48.313s: actual taps navigation, pause/restart, Home/foreground paused, explicit Resume and Quit; first-launch tutorial covered by preceding pass. See ios-ui.json."
+  },
+  "limitations": [
+    "Physical phone performance/thermal/audio/human-play gates remain open.",
+    "Clips recorded by native UI runners are retained locally; no visual-quality judgment inferred from machine reports.",
+    "Store signing, production OTA channels/key custody and store review remain open."
+  ],
+  "androidGameplay": {
+    "schema": 1,
+    "at": "2026-09-21T09:59:23.673Z",
+    "pass": true,
+    "environment": "headless Android emulator; airplane mode",
+    "apkSha256": "b40e5a1986b2450e69b3988257dd2060f934bfe22111c5a3aa2a49336f117fd8",
+    "coldLaunch": true,
+    "boot": {
+      "online": false,
+      "origin": "https://localhost",
+      "platform": "android",
+      "readyAtMs": 3117.9
+    },
+    "deterministicRuns": [
+      {
+        "finishTime": 8.65,
+        "hash": "ecdf62a55f6185a6",
+        "faults": 0
+      },
+      {
+        "finishTime": 8.65,
+        "hash": "ecdf62a55f6185a6",
+        "faults": 0
+      }
+    ],
+    "replayEqual": true,
+    "terminalCrash": {
+      "phase": "crashed",
+      "faults": 1,
+      "tick": 85,
+      "stepped": 85
+    },
+    "oneTickRestart": {
+      "phase": "riding",
+      "tick": 1,
+      "wallMs": 115.60000000000582
+    },
+    "background": {
+      "paused": true,
+      "tick": 60,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      }
+    },
+    "foreground": {
+      "paused": true,
+      "tick": 60
+    },
+    "rawEvidence": [
+      ".native-build/android-gameplay-round3.json",
+      ".native-build/android-terminal-crash-round3.json"
+    ],
+    "scope": "Installed normal app, offline cold launch. Deterministic replay and terminal crash/restart are game-hook physics fixtures, not OS control or visual-quality claims; see android-touch.json for actual OS control proof.",
+    "crashFixture": "flat-test seed 3277865877, throttle 1 / lean -1, stepped until crashed (bounded to 1200 ticks); observed crash at tick 85, then restart and one tick.",
+    "notes": [
+      "The existing crash recording registers two faults and ends riding after recovery, so an additional bounded fixture stopped at the actual crashed phase before checking one-tick restart.",
+      "Restart wall time includes synchronous renderer completion on emulator and is not physical-device latency evidence."
+    ]
+  }
+}

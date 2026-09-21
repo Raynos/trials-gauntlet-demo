@@ -16,7 +16,7 @@ NODE
 TRIALS_PROBE_FILE=.native-build/capabilities-ios.js TRIALS_PROBE_NO_INSTALL=1 node scripts/native-ios-probe.mjs
 ```
 
-Set `TRIALS_SIMULATOR` for each matrix device. The runner saves `.native-build/evidence/ios-probe.json`; copy that result per device before the next run overwrites it. The runner's custom-probe exit status does **not** check `pass`; inspect `pass` and every failure. Split sections or track subsets if the entire matrix exceeds its 150-second wait.
+Set `TRIALS_SIMULATOR` for each matrix device. The runner saves `.native-build/evidence/ios-probe.json`; copy that result per device before the next run overwrites it. The runner exits nonzero when a custom probe returns `pass: false` or an error; inspect every reported failure. Split sections or track subsets if the entire matrix exceeds its 150-second wait.
 
 For an already launched headless Android emulator, reuse the debug WebView CDP client. Launch a background promise to avoid the client's 60-second per-evaluation deadline, then poll its result:
 

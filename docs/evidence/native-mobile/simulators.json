@@ -110,7 +110,16 @@
     ],
     "densityDpi": 420,
     "configuredRam": "2G",
-    "headless": true
+    "headless": true,
+    "round3EffectiveDisplay": {
+      "wmSizeOverride": [
+        720,
+        1280
+      ],
+      "densityDpiOverride": 280,
+      "source": "android-touch.json",
+      "note": "Actual OS-touch evidence uses this reduced display configuration, not the nominal 1080x2400 profile. Full-resolution layout qualification remains separate."
+    }
   },
   "coverageNote": "Installed and available does not mean tested. Only named dated probe reports establish passing coverage. No older iOS/Android runtime installed."
 }

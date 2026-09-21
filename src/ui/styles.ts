@@ -636,6 +636,9 @@ export const HUD_CSS = /* css */ `
 /* Key caps: 75 % of the quarter wide, inset 6 px from the strip's top edge and 6 px above the home indicator, radius 8,
    bevelled (top highlight, darker bottom); glyph 22 px, label .72rem tracking .2em. */
 .tz-key { position: absolute; left: 12.5%; right: 12.5%; bottom: calc(var(--sab) + .385rem); height: var(--key-h); display: flex; align-items: center; justify-content: center; gap: .3rem; border-radius: 8px; color: rgb(var(--k)); background: rgba(255,255,255,.1); box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -2px 0 rgba(0,0,0,.45), 0 0 0 1px rgba(0,0,0,.35); font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; text-shadow: 0 1px 0 rgba(0,0,0,.6); transform-origin: 50% 100%; transition: background-color 80ms var(--ease), color 80ms var(--ease), transform 80ms var(--ease), box-shadow 80ms var(--ease), text-shadow 80ms; }
+/* Keep outer labels inside a notched phone's safe area; gesture quarters remain full width. */
+.tz-back .tz-key { left: max(12.5%, calc(var(--sal) + .385rem)); }
+.tz-throttle .tz-key { right: max(12.5%, calc(var(--sar) + .385rem)); }
 .tz-key b, .tz-key i { display: inline-flex; align-items: center; gap: .05rem; }
 .tz-key svg { display: block; width: 22px; height: 22px; }
 .tz-key span { padding: 0 .1em; }

@@ -1,0 +1,1418 @@
+{
+  "scope": "Installed normal-app control geometry and delegated hit routing; game hooks prepare ride, not OS touch",
+  "sourceCandidate": "069b1683 + safe-area CSS",
+  "results": [
+    {
+      "name": "trials-iphone",
+      "probe": {
+        "bikes": [],
+        "boot": {
+          "info": {
+            "bike": "rookie",
+            "entryHold": false,
+            "harness": false,
+            "lastRender": {
+              "audioMs": 0,
+              "hudMs": 0,
+              "prepMs": 0,
+              "submitMs": 0,
+              "syncMs": 0
+            },
+            "loadTrackMs": 229,
+            "modules": {
+              "audio": "WebAudioSystem",
+              "bike": "gltf",
+              "physics": "createBikePhysics",
+              "render": "ThreeRenderer",
+              "rider": "gltf"
+            },
+            "physicsHz": 120,
+            "quality": "low",
+            "qualityWhy": "governor \u2193 low (p95 45.0 ms, drops 5 %)",
+            "readyAtMs": 312,
+            "render": {
+              "biome": "industrial",
+              "bloomers": 22,
+              "calls": 102,
+              "canvasH": 402,
+              "canvasW": 874,
+              "deviceClass": "phone",
+              "devicePixelRatio": 1.5,
+              "dpr": 1,
+              "entering": true,
+              "entryMs": 0,
+              "heroDoc": "bike-lod rider-lod",
+              "heroShadow": "hero-only",
+              "heroTris": 13629,
+              "passes": 1,
+              "phase": "countdown",
+              "profile": "low",
+              "riderMaterialVariant": null,
+              "riderOutfit": "street-mustard",
+              "rtMB": 4.7,
+              "rtMpx": 0.61,
+              "rtPasses": "shadow 512\u00d7512 | scene\u2192canvas 874\u00d7402",
+              "shadowMap": 512,
+              "skippedFrames": 0,
+              "stalePrograms": 41,
+              "textureGenMs": 438.9999999999991,
+              "tier": "low",
+              "trackCalls": 11,
+              "trackTris": 177888,
+              "tris": 78732,
+              "zoom": "countdown"
+            },
+            "seed": 138717428,
+            "trackId": "b1-first-ride",
+            "version": "0.2.2-core"
+          },
+          "nativePlatform": "ios",
+          "origin": "capacitor://localhost",
+          "serviceWorkerControlled": false,
+          "url": "capacitor://localhost"
+        },
+        "consoleErrors": [],
+        "exceptions": [],
+        "failures": [],
+        "finishedAt": "2026-09-21T09:48:24.962Z",
+        "limitations": [
+          "Track coverage is initial scene load/render smoke, not traversal or a complete texture/asset inventory.",
+          "Successful requests, GL draw calls and selection state do not prove correct visual appearance. Judge played clips separately.",
+          "Audio capability is API availability; audible output and worklet processing were not exercised.",
+          "Touch geometry and programmatic clicks do not prove physical touch, multitouch or system gesture behavior.",
+          "Cached resources and failures swallowed without console/fetch/error signals may not appear in this report."
+        ],
+        "networkFailures": [],
+        "outfits": [],
+        "pass": true,
+        "preparation": "game hooks and onboarding HTMLElement.click; geometry only, not OS touch",
+        "probeAt": 1789984104962,
+        "requests": [],
+        "restoration": {
+          "bike": "rookie",
+          "changedMirrorKeys": [],
+          "effectiveRestored": true,
+          "exactNativeSaveRestoration": "not asserted: UI saves native state; browser mirror is diagnostic only",
+          "riderOutfit": "street-mustard",
+          "screen": "menu",
+          "track": "b1-first-ride"
+        },
+        "schema": 1,
+        "sections": [
+          "touch"
+        ],
+        "startedAt": "2026-09-21T09:48:21.305Z",
+        "touch": {
+          "app": {
+            "bottom": 402,
+            "height": 402,
+            "right": 874,
+            "width": 874,
+            "x": 0,
+            "y": 0
+          },
+          "canvas": {
+            "bounds": {
+              "bottom": 402,
+              "height": 402,
+              "right": 874,
+              "width": 874,
+              "x": 0,
+              "y": 0
+            },
+            "height": 402,
+            "width": 874
+          },
+          "coarsePointer": true,
+          "controls": [
+            {
+              "bounds": {
+                "bottom": 402,
+                "height": 402,
+                "right": 218.5,
+                "width": 218.5,
+                "x": 0,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-back",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 376.265625,
+                "height": 38.203125,
+                "right": 191.1875,
+                "width": 123.453125,
+                "x": 67.734375,
+                "y": 338.0625
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 402,
+                "height": 402,
+                "right": 437,
+                "width": 218.5,
+                "x": 218.5,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-fwd",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 376.265625,
+                "height": 38.203125,
+                "right": 409.6875,
+                "width": 163.875,
+                "x": 245.8125,
+                "y": 338.0625
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 402,
+                "height": 402,
+                "right": 655.5,
+                "width": 218.5,
+                "x": 437,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-brake",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 376.265625,
+                "height": 38.203125,
+                "right": 628.1875,
+                "width": 163.875,
+                "x": 464.3125,
+                "y": 338.0625
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 402,
+                "height": 402,
+                "right": 874,
+                "width": 218.5,
+                "x": 655.5,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-throttle",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 376.265625,
+                "height": 38.203125,
+                "right": 806.265625,
+                "width": 123.453125,
+                "x": 682.8125,
+                "y": 338.0625
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 54.4375,
+                "height": 44,
+                "right": 129.9375,
+                "width": 56,
+                "x": 73.9375,
+                "y": 10.4375
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-pause",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            },
+            {
+              "bounds": {
+                "bottom": 54.4375,
+                "height": 44,
+                "right": 800.0625,
+                "width": 81.9375,
+                "x": 718.125,
+                "y": 10.4375
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-restart",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            }
+          ],
+          "dpr": 3,
+          "innerHeight": 402,
+          "innerWidth": 874,
+          "layerClass": "touch-layer visible on live",
+          "maxTouchPoints": 5,
+          "onboardingVisible": false,
+          "orientation": "landscape-primary",
+          "pointerEvent": true,
+          "safeArea": {
+            "bottom": 20,
+            "left": 62,
+            "right": 62,
+            "top": 0
+          },
+          "visualViewport": {
+            "height": 402,
+            "offsetLeft": 0,
+            "offsetTop": 0,
+            "scale": 1,
+            "width": 874
+          }
+        },
+        "tracks": [],
+        "warnings": []
+      }
+    },
+    {
+      "name": "iPhone 17 Pro Max",
+      "deviceId": "5496C91C-D289-44D4-B357-E723FB8F7994",
+      "exitCode": 0,
+      "probe": {
+        "bikes": [],
+        "boot": {
+          "info": {
+            "bike": "rookie",
+            "entryHold": false,
+            "harness": false,
+            "lastRender": {
+              "audioMs": 0,
+              "hudMs": 0,
+              "prepMs": 0,
+              "submitMs": 0,
+              "syncMs": 0
+            },
+            "loadTrackMs": 370,
+            "modules": {
+              "audio": "WebAudioSystem",
+              "bike": "gltf",
+              "physics": "createBikePhysics",
+              "render": "ThreeRenderer",
+              "rider": "gltf"
+            },
+            "physicsHz": 120,
+            "quality": "low",
+            "qualityWhy": "governor \u2193 low (p95 34.0 ms, drops 13 %)",
+            "readyAtMs": 459,
+            "render": {
+              "biome": "industrial",
+              "bloomers": 0,
+              "calls": 102,
+              "canvasH": 440,
+              "canvasW": 956,
+              "deviceClass": "phone",
+              "devicePixelRatio": 1.5,
+              "dpr": 1,
+              "entering": true,
+              "entryMs": 0,
+              "heroDoc": "bike-lod rider-lod",
+              "heroShadow": "hero-only",
+              "heroTris": 13629,
+              "passes": 1,
+              "phase": "countdown",
+              "profile": "low",
+              "riderMaterialVariant": null,
+              "riderOutfit": "street-mustard",
+              "rtMB": 5.2,
+              "rtMpx": 0.68,
+              "rtPasses": "shadow 512\u00d7512 | scene\u2192canvas 956\u00d7440",
+              "shadowMap": 512,
+              "skippedFrames": 44,
+              "stalePrograms": 7,
+              "textureGenMs": 645.0000000000005,
+              "tier": "low",
+              "trackCalls": 11,
+              "trackTris": 177888,
+              "tris": 100724,
+              "zoom": "countdown"
+            },
+            "seed": 138717428,
+            "trackId": "b1-first-ride",
+            "version": "0.2.2-core"
+          },
+          "nativePlatform": "ios",
+          "origin": "capacitor://localhost",
+          "serviceWorkerControlled": false,
+          "url": "capacitor://localhost"
+        },
+        "consoleErrors": [],
+        "exceptions": [],
+        "failures": [],
+        "finishedAt": "2026-09-21T09:51:09.976Z",
+        "limitations": [
+          "Track coverage is initial scene load/render smoke, not traversal or a complete texture/asset inventory.",
+          "Successful requests, GL draw calls and selection state do not prove correct visual appearance. Judge played clips separately.",
+          "Audio capability is API availability; audible output and worklet processing were not exercised.",
+          "Touch geometry and programmatic clicks do not prove physical touch, multitouch or system gesture behavior.",
+          "Cached resources and failures swallowed without console/fetch/error signals may not appear in this report."
+        ],
+        "networkFailures": [],
+        "outfits": [],
+        "pass": true,
+        "preparation": "game hooks and onboarding HTMLElement.click; geometry only, not OS touch",
+        "probeAt": 1789984269976,
+        "requests": [],
+        "restoration": {
+          "bike": "rookie",
+          "changedMirrorKeys": [],
+          "effectiveRestored": true,
+          "exactNativeSaveRestoration": "not asserted: UI saves native state; browser mirror is diagnostic only",
+          "riderOutfit": "street-mustard",
+          "screen": "menu",
+          "track": "b1-first-ride"
+        },
+        "schema": 1,
+        "sections": [
+          "touch"
+        ],
+        "startedAt": "2026-09-21T09:51:05.811Z",
+        "touch": {
+          "app": {
+            "bottom": 440,
+            "height": 440,
+            "right": 956,
+            "width": 956,
+            "x": 0,
+            "y": 0
+          },
+          "canvas": {
+            "bounds": {
+              "bottom": 440,
+              "height": 440,
+              "right": 956,
+              "width": 956,
+              "x": 0,
+              "y": 0
+            },
+            "height": 440,
+            "width": 956
+          },
+          "coarsePointer": true,
+          "controls": [
+            {
+              "bounds": {
+                "bottom": 440,
+                "height": 440,
+                "right": 239,
+                "width": 239,
+                "x": 0,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-back",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 413.859375,
+                "height": 40.828125,
+                "right": 209.125,
+                "width": 140.984375,
+                "x": 68.140625,
+                "y": 373.03125
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 440,
+                "height": 440,
+                "right": 478,
+                "width": 239,
+                "x": 239,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-fwd",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 413.859375,
+                "height": 40.828125,
+                "right": 448.125,
+                "width": 179.25,
+                "x": 268.875,
+                "y": 373.03125
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 440,
+                "height": 440,
+                "right": 717,
+                "width": 239,
+                "x": 478,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-brake",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 413.859375,
+                "height": 40.828125,
+                "right": 687.125,
+                "width": 179.25,
+                "x": 507.875,
+                "y": 373.03125
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 440,
+                "height": 440,
+                "right": 956,
+                "width": 239,
+                "x": 717,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-throttle",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 413.859375,
+                "height": 40.828125,
+                "right": 887.859375,
+                "width": 140.984375,
+                "x": 746.875,
+                "y": 373.03125
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 55.15625,
+                "height": 44,
+                "right": 130.75,
+                "width": 56,
+                "x": 74.75,
+                "y": 11.15625
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-pause",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            },
+            {
+              "bounds": {
+                "bottom": 55.15625,
+                "height": 44,
+                "right": 881.25,
+                "width": 87.4375,
+                "x": 793.8125,
+                "y": 11.15625
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-restart",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            }
+          ],
+          "dpr": 3,
+          "innerHeight": 440,
+          "innerWidth": 956,
+          "layerClass": "touch-layer visible on live",
+          "maxTouchPoints": 5,
+          "onboardingVisible": false,
+          "orientation": "landscape-primary",
+          "pointerEvent": true,
+          "safeArea": {
+            "bottom": 20,
+            "left": 62,
+            "right": 62,
+            "top": 0
+          },
+          "visualViewport": {
+            "height": 440,
+            "offsetLeft": 0,
+            "offsetTop": 0,
+            "scale": 1,
+            "width": 956
+          }
+        },
+        "tracks": [],
+        "warnings": []
+      },
+      "error": null
+    },
+    {
+      "name": "iPad mini (A17 Pro)",
+      "deviceId": "4F26A738-1E6E-44F9-98BB-5E2F52227489",
+      "exitCode": 0,
+      "probe": {
+        "bikes": [],
+        "boot": {
+          "info": {
+            "bike": "rookie",
+            "entryHold": false,
+            "harness": false,
+            "lastRender": {
+              "audioMs": 0,
+              "hudMs": 0,
+              "prepMs": 0,
+              "submitMs": 0,
+              "syncMs": 0
+            },
+            "loadTrackMs": 281,
+            "modules": {
+              "audio": "WebAudioSystem",
+              "bike": "gltf",
+              "physics": "createBikePhysics",
+              "render": "ThreeRenderer",
+              "rider": "gltf"
+            },
+            "physicsHz": 120,
+            "quality": "low",
+            "qualityWhy": "governor \u2193 low (p95 30.0 ms, drops 7 %)",
+            "readyAtMs": 454,
+            "render": {
+              "biome": "industrial",
+              "bloomers": 0,
+              "calls": 100,
+              "canvasH": 744,
+              "canvasW": 1133,
+              "deviceClass": "desktop",
+              "devicePixelRatio": 2,
+              "dpr": 1,
+              "entering": true,
+              "entryMs": 0,
+              "heroDoc": "bike-lod rider-lod",
+              "heroShadow": "hero-only",
+              "heroTris": 13629,
+              "passes": 1,
+              "phase": "countdown",
+              "profile": "low",
+              "riderMaterialVariant": null,
+              "riderOutfit": "street-mustard",
+              "rtMB": 8.4,
+              "rtMpx": 1.11,
+              "rtPasses": "shadow 512\u00d7512 | scene\u2192canvas 1133\u00d7744",
+              "shadowMap": 512,
+              "skippedFrames": 46,
+              "stalePrograms": 41,
+              "textureGenMs": 642.0000000000009,
+              "tier": "low",
+              "trackCalls": 11,
+              "trackTris": 177888,
+              "tris": 77598,
+              "zoom": "countdown"
+            },
+            "seed": 138717428,
+            "trackId": "b1-first-ride",
+            "version": "0.2.2-core"
+          },
+          "nativePlatform": "ios",
+          "origin": "capacitor://localhost",
+          "serviceWorkerControlled": false,
+          "url": "capacitor://localhost"
+        },
+        "consoleErrors": [],
+        "exceptions": [],
+        "failures": [],
+        "finishedAt": "2026-09-21T09:51:47.395Z",
+        "limitations": [
+          "Track coverage is initial scene load/render smoke, not traversal or a complete texture/asset inventory.",
+          "Successful requests, GL draw calls and selection state do not prove correct visual appearance. Judge played clips separately.",
+          "Audio capability is API availability; audible output and worklet processing were not exercised.",
+          "Touch geometry and programmatic clicks do not prove physical touch, multitouch or system gesture behavior.",
+          "Cached resources and failures swallowed without console/fetch/error signals may not appear in this report."
+        ],
+        "networkFailures": [],
+        "outfits": [],
+        "pass": true,
+        "preparation": "game hooks and onboarding HTMLElement.click; geometry only, not OS touch",
+        "probeAt": 1789984307395,
+        "requests": [],
+        "restoration": {
+          "bike": "rookie",
+          "changedMirrorKeys": [],
+          "effectiveRestored": true,
+          "exactNativeSaveRestoration": "not asserted: UI saves native state; browser mirror is diagnostic only",
+          "riderOutfit": "street-mustard",
+          "screen": "menu",
+          "track": "b1-first-ride"
+        },
+        "schema": 1,
+        "sections": [
+          "touch"
+        ],
+        "startedAt": "2026-09-21T09:51:43.177Z",
+        "touch": {
+          "app": {
+            "bottom": 744,
+            "height": 744,
+            "right": 1133,
+            "width": 1133,
+            "x": 0,
+            "y": 0
+          },
+          "canvas": {
+            "bounds": {
+              "bottom": 744,
+              "height": 744,
+              "right": 1133,
+              "width": 1133,
+              "x": 0,
+              "y": 0
+            },
+            "height": 744,
+            "width": 1133
+          },
+          "coarsePointer": true,
+          "controls": [
+            {
+              "bounds": {
+                "bottom": 744,
+                "height": 744,
+                "right": 283.25,
+                "width": 283.25,
+                "x": 0,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-back",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 712.078125,
+                "height": 46.078125,
+                "right": 247.84375,
+                "width": 212.4375,
+                "x": 35.40625,
+                "y": 666
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 744,
+                "height": 744,
+                "right": 566.5,
+                "width": 283.25,
+                "x": 283.25,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-fwd",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 712.078125,
+                "height": 46.078125,
+                "right": 531.09375,
+                "width": 212.4375,
+                "x": 318.65625,
+                "y": 666
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 744,
+                "height": 744,
+                "right": 849.75,
+                "width": 283.25,
+                "x": 566.5,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-brake",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 712.078125,
+                "height": 46.078125,
+                "right": 814.34375,
+                "width": 212.4375,
+                "x": 601.90625,
+                "y": 666
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 744,
+                "height": 744,
+                "right": 1133,
+                "width": 283.25,
+                "x": 849.75,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-throttle",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 712.078125,
+                "height": 46.078125,
+                "right": 1097.59375,
+                "width": 212.4375,
+                "x": 885.15625,
+                "y": 666
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 88.59375,
+                "height": 44,
+                "right": 70.390625,
+                "width": 56,
+                "x": 14.390625,
+                "y": 44.59375
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-pause",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            },
+            {
+              "bounds": {
+                "bottom": 88.59375,
+                "height": 44,
+                "right": 1118.609375,
+                "width": 98.625,
+                "x": 1019.984375,
+                "y": 44.59375
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-restart",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            }
+          ],
+          "dpr": 2,
+          "innerHeight": 744,
+          "innerWidth": 1133,
+          "layerClass": "touch-layer visible on live",
+          "maxTouchPoints": 5,
+          "onboardingVisible": false,
+          "orientation": "landscape-primary",
+          "pointerEvent": true,
+          "safeArea": {
+            "bottom": 25,
+            "left": 0,
+            "right": 0,
+            "top": 32
+          },
+          "visualViewport": {
+            "height": 744,
+            "offsetLeft": 0,
+            "offsetTop": 0,
+            "scale": 1,
+            "width": 1133
+          }
+        },
+        "tracks": [],
+        "warnings": []
+      },
+      "error": null
+    },
+    {
+      "name": "iPad Pro 13-inch (M5)",
+      "deviceId": "102F6390-F7D7-4139-87DE-C13A8566C556",
+      "exitCode": 0,
+      "probe": {
+        "bikes": [],
+        "boot": {
+          "info": {
+            "bike": "rookie",
+            "entryHold": false,
+            "harness": false,
+            "lastRender": {
+              "audioMs": 0,
+              "hudMs": 0,
+              "prepMs": 0,
+              "submitMs": 0,
+              "syncMs": 0
+            },
+            "loadTrackMs": 285,
+            "modules": {
+              "audio": "WebAudioSystem",
+              "bike": "gltf",
+              "physics": "createBikePhysics",
+              "render": "ThreeRenderer",
+              "rider": "gltf"
+            },
+            "physicsHz": 120,
+            "quality": "low",
+            "qualityWhy": "governor \u2193 low (p95 34.0 ms, drops 9 %)",
+            "readyAtMs": 432,
+            "render": {
+              "biome": "industrial",
+              "bloomers": 0,
+              "calls": 98,
+              "canvasH": 1032,
+              "canvasW": 1376,
+              "deviceClass": "desktop",
+              "devicePixelRatio": 2,
+              "dpr": 1,
+              "entering": true,
+              "entryMs": 0,
+              "heroDoc": "bike-lod rider-lod",
+              "heroShadow": "hero-only",
+              "heroTris": 13629,
+              "passes": 1,
+              "phase": "countdown",
+              "profile": "low",
+              "riderMaterialVariant": null,
+              "riderOutfit": "street-mustard",
+              "rtMB": 12.8,
+              "rtMpx": 1.68,
+              "rtPasses": "shadow 512\u00d7512 | scene\u2192canvas 1376\u00d71032",
+              "shadowMap": 512,
+              "skippedFrames": 36,
+              "stalePrograms": 41,
+              "textureGenMs": 681.0000000000032,
+              "tier": "low",
+              "trackCalls": 11,
+              "trackTris": 177888,
+              "tris": 75098,
+              "zoom": "countdown"
+            },
+            "seed": 138717428,
+            "trackId": "b1-first-ride",
+            "version": "0.2.2-core"
+          },
+          "nativePlatform": "ios",
+          "origin": "capacitor://localhost",
+          "serviceWorkerControlled": false,
+          "url": "capacitor://localhost"
+        },
+        "consoleErrors": [],
+        "exceptions": [],
+        "failures": [],
+        "finishedAt": "2026-09-21T09:52:22.584Z",
+        "limitations": [
+          "Track coverage is initial scene load/render smoke, not traversal or a complete texture/asset inventory.",
+          "Successful requests, GL draw calls and selection state do not prove correct visual appearance. Judge played clips separately.",
+          "Audio capability is API availability; audible output and worklet processing were not exercised.",
+          "Touch geometry and programmatic clicks do not prove physical touch, multitouch or system gesture behavior.",
+          "Cached resources and failures swallowed without console/fetch/error signals may not appear in this report."
+        ],
+        "networkFailures": [],
+        "outfits": [],
+        "pass": true,
+        "preparation": "game hooks and onboarding HTMLElement.click; geometry only, not OS touch",
+        "probeAt": 1789984342584,
+        "requests": [],
+        "restoration": {
+          "bike": "rookie",
+          "changedMirrorKeys": [],
+          "effectiveRestored": true,
+          "exactNativeSaveRestoration": "not asserted: UI saves native state; browser mirror is diagnostic only",
+          "riderOutfit": "street-mustard",
+          "screen": "menu",
+          "track": "b1-first-ride"
+        },
+        "schema": 1,
+        "sections": [
+          "touch"
+        ],
+        "startedAt": "2026-09-21T09:52:17.794Z",
+        "touch": {
+          "app": {
+            "bottom": 1032,
+            "height": 1032,
+            "right": 1376,
+            "width": 1376,
+            "x": 0,
+            "y": 0
+          },
+          "canvas": {
+            "bounds": {
+              "bottom": 1032,
+              "height": 1032,
+              "right": 1376,
+              "width": 1376,
+              "x": 0,
+              "y": 0
+            },
+            "height": 1032,
+            "width": 1376
+          },
+          "coarsePointer": true,
+          "controls": [
+            {
+              "bounds": {
+                "bottom": 1032,
+                "height": 1032,
+                "right": 344,
+                "width": 344,
+                "x": 0,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-back",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 1000.078125,
+                "height": 46.078125,
+                "right": 301,
+                "width": 258,
+                "x": 43,
+                "y": 954
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 1032,
+                "height": 1032,
+                "right": 688,
+                "width": 344,
+                "x": 344,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-fwd",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 1000.078125,
+                "height": 46.078125,
+                "right": 645,
+                "width": 258,
+                "x": 387,
+                "y": 954
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 1032,
+                "height": 1032,
+                "right": 1032,
+                "width": 344,
+                "x": 688,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-brake",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 1000.078125,
+                "height": 46.078125,
+                "right": 989,
+                "width": 258,
+                "x": 731,
+                "y": 954
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 1032,
+                "height": 1032,
+                "right": 1376,
+                "width": 344,
+                "x": 1032,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-throttle",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 1000.078125,
+                "height": 46.078125,
+                "right": 1333,
+                "width": 258,
+                "x": 1075,
+                "y": 954
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 88.59375,
+                "height": 44,
+                "right": 70.390625,
+                "width": 56,
+                "x": 14.390625,
+                "y": 44.59375
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-pause",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            },
+            {
+              "bounds": {
+                "bottom": 88.59375,
+                "height": 44,
+                "right": 1361.609375,
+                "width": 98.625,
+                "x": 1262.984375,
+                "y": 44.59375
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-restart",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            }
+          ],
+          "dpr": 2,
+          "innerHeight": 1032,
+          "innerWidth": 1376,
+          "layerClass": "touch-layer visible on live",
+          "maxTouchPoints": 5,
+          "onboardingVisible": false,
+          "orientation": "landscape-primary",
+          "pointerEvent": true,
+          "safeArea": {
+            "bottom": 25,
+            "left": 0,
+            "right": 0,
+            "top": 32
+          },
+          "visualViewport": {
+            "height": 1032,
+            "offsetLeft": 0,
+            "offsetTop": 0,
+            "scale": 1,
+            "width": 1376
+          }
+        },
+        "tracks": [],
+        "warnings": []
+      },
+      "error": null
+    },
+    {
+      "name": "iPhone 17e",
+      "deviceId": "4AF4B80E-8F16-4883-B556-054C7AE08C10",
+      "exitCode": 0,
+      "probe": {
+        "bikes": [],
+        "boot": {
+          "info": {
+            "bike": "rookie",
+            "entryHold": false,
+            "harness": false,
+            "lastRender": {
+              "audioMs": 0,
+              "hudMs": 0,
+              "prepMs": 0,
+              "submitMs": 0,
+              "syncMs": 0
+            },
+            "loadTrackMs": 179,
+            "modules": {
+              "audio": "WebAudioSystem",
+              "bike": "gltf",
+              "physics": "createBikePhysics",
+              "render": "ThreeRenderer",
+              "rider": "gltf"
+            },
+            "physicsHz": 120,
+            "quality": "low",
+            "qualityWhy": "governor \u2193 low (p95 103.0 ms, drops 7 %)",
+            "readyAtMs": 329,
+            "render": {
+              "biome": "industrial",
+              "bloomers": 22,
+              "calls": 103,
+              "canvasH": 390,
+              "canvasW": 844,
+              "deviceClass": "phone",
+              "devicePixelRatio": 1.5,
+              "dpr": 1,
+              "entering": true,
+              "entryMs": 0,
+              "heroDoc": "bike-lod rider-lod",
+              "heroShadow": "hero-only",
+              "heroTris": 13629,
+              "passes": 1,
+              "phase": "countdown",
+              "profile": "low",
+              "riderMaterialVariant": null,
+              "riderOutfit": "street-mustard",
+              "rtMB": 4.5,
+              "rtMpx": 0.59,
+              "rtPasses": "shadow 512\u00d7512 | scene\u2192canvas 844\u00d7390",
+              "shadowMap": 512,
+              "skippedFrames": 0,
+              "stalePrograms": 41,
+              "textureGenMs": 407.9999999999998,
+              "tier": "low",
+              "trackCalls": 11,
+              "trackTris": 177888,
+              "tris": 78732,
+              "zoom": "countdown"
+            },
+            "seed": 138717428,
+            "trackId": "b1-first-ride",
+            "version": "0.2.2-core"
+          },
+          "nativePlatform": "ios",
+          "origin": "capacitor://localhost",
+          "serviceWorkerControlled": false,
+          "url": "capacitor://localhost"
+        },
+        "consoleErrors": [],
+        "exceptions": [],
+        "failures": [],
+        "finishedAt": "2026-09-21T10:01:48.706Z",
+        "limitations": [
+          "Track coverage is initial scene load/render smoke, not traversal or a complete texture/asset inventory.",
+          "Successful requests, GL draw calls and selection state do not prove correct visual appearance. Judge played clips separately.",
+          "Audio capability is API availability; audible output and worklet processing were not exercised.",
+          "Touch geometry and programmatic clicks do not prove physical touch, multitouch or system gesture behavior.",
+          "Cached resources and failures swallowed without console/fetch/error signals may not appear in this report."
+        ],
+        "networkFailures": [],
+        "outfits": [],
+        "pass": true,
+        "preparation": "game hooks and onboarding HTMLElement.click; geometry only, not OS touch",
+        "probeAt": 1789984908706,
+        "requests": [],
+        "restoration": {
+          "bike": "rookie",
+          "changedMirrorKeys": [],
+          "effectiveRestored": true,
+          "exactNativeSaveRestoration": "not asserted: UI saves native state; browser mirror is diagnostic only",
+          "riderOutfit": "street-mustard",
+          "screen": "menu",
+          "track": "b1-first-ride"
+        },
+        "schema": 1,
+        "sections": [
+          "touch"
+        ],
+        "startedAt": "2026-09-21T10:01:45.377Z",
+        "touch": {
+          "app": {
+            "bottom": 390,
+            "height": 390,
+            "right": 844,
+            "width": 844,
+            "x": 0,
+            "y": 0
+          },
+          "canvas": {
+            "bounds": {
+              "bottom": 390,
+              "height": 390,
+              "right": 844,
+              "width": 844,
+              "x": 0,
+              "y": 0
+            },
+            "height": 390,
+            "width": 844
+          },
+          "coarsePointer": true,
+          "controls": [
+            {
+              "bounds": {
+                "bottom": 390,
+                "height": 390,
+                "right": 211,
+                "width": 211,
+                "x": 0,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-back",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 364.40625,
+                "height": 37.234375,
+                "right": 184.625,
+                "width": 132.03125,
+                "x": 52.59375,
+                "y": 327.171875
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 390,
+                "height": 390,
+                "right": 422,
+                "width": 211,
+                "x": 211,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-fwd",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 364.40625,
+                "height": 37.234375,
+                "right": 395.625,
+                "width": 158.25,
+                "x": 237.375,
+                "y": 327.171875
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 390,
+                "height": 390,
+                "right": 633,
+                "width": 211,
+                "x": 422,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-brake",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 364.40625,
+                "height": 37.234375,
+                "right": 606.625,
+                "width": 158.25,
+                "x": 448.375,
+                "y": 327.171875
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 390,
+                "height": 390,
+                "right": 844,
+                "width": 211,
+                "x": 633,
+                "y": 0
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 1,
+              "pointerEvents": "none",
+              "selector": ".tz-throttle",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": {
+                "bottom": 364.40625,
+                "height": 37.234375,
+                "right": 791.40625,
+                "width": 132.03125,
+                "x": 659.375,
+                "y": 327.171875
+              }
+            },
+            {
+              "bounds": {
+                "bottom": 54.171875,
+                "height": 44,
+                "right": 114.625,
+                "width": 56,
+                "x": 58.625,
+                "y": 10.171875
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-pause",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            },
+            {
+              "bounds": {
+                "bottom": 54.171875,
+                "height": 44,
+                "right": 785.375,
+                "width": 79.90625,
+                "x": 705.46875,
+                "y": 10.171875
+              },
+              "hitAtCenter": true,
+              "hitElement": "touch-layer visible on live",
+              "opacity": 0.9,
+              "pointerEvents": "none",
+              "selector": ".tz-restart",
+              "visualInsideSafeArea": true,
+              "visualKeyBounds": null
+            }
+          ],
+          "dpr": 3,
+          "innerHeight": 390,
+          "innerWidth": 844,
+          "layerClass": "touch-layer visible on live",
+          "maxTouchPoints": 5,
+          "onboardingVisible": false,
+          "orientation": "landscape-primary",
+          "pointerEvent": true,
+          "safeArea": {
+            "bottom": 20,
+            "left": 47,
+            "right": 47,
+            "top": 0
+          },
+          "visualViewport": {
+            "height": 390,
+            "offsetLeft": 0,
+            "offsetTop": 0,
+            "scale": 1,
+            "width": 844
+          }
+        },
+        "tracks": [],
+        "warnings": []
+      }
+    }
+  ],
+  "pass": true
+}

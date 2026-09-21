@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "qualification": "Native XCTest navigation and lifecycle assertions; parent judges played clips.",
+  "device": {
+    "name": "iPhone 17e",
+    "udid": "4AF4B80E-8F16-4883-B556-054C7AE08C10",
+    "platform": "iOS Simulator",
+    "architecture": "arm64",
+    "runtime": "26.5",
+    "runtimeBuild": "23F77",
+    "viewportPoints": {
+      "width": 844,
+      "height": 390
+    },
+    "orientation": "landscape"
+  },
+  "app": {
+    "bundleId": "com.trialsgauntlet.game",
+    "configuration": "Debug",
+    "indexPath": ".native-build/ios-ui/DerivedData/Build/Products/Debug-iphonesimulator/App.app/public/index.html",
+    "indexSha256": "ea2b53e7c222a81a607d038ea9aff7066671b412ac21b1a42377a06ae0d4f498"
+  },
+  "command": "bash scripts/native-ios-ui.sh",
+  "runs": [
+    {
+      "stamp": "20260921T095821Z",
+      "pass": true,
+      "passedTests": 1,
+      "failedTests": 0,
+      "passiveObserverEnabled": true,
+      "onboardingTapped": true,
+      "resultPath": ".native-build/ios-ui/result-20260921T095821Z.xcresult",
+      "resultTreeSha256": "5734dcdbf8b486fcfa068396f8d8db15a4b2cfc0d6c8cb063c199d7257b7adbe",
+      "resultTreeHashMethod": "SHA-256 of UTF-8 lines SHA256(file) + two spaces + sorted relative POSIX path + newline, for every regular file recursively.",
+      "clipPath": ".native-build/ios-ui/touch-20260921T095821Z.mp4",
+      "clipSha256": "4937b81573131ff5ae7451bbb345dae8a1fc0d08c3f5ed07eb2e164e9cec9600",
+      "logPath": ".native-build/ios-ui/test-20260921T095821Z.log",
+      "logSha256": "52c0241e740ed67af213fcdeaf57f2a7cac77a34a542ed221baf841d9f7da0f8",
+      "startTimeUnix": 1789984709.15,
+      "finishTimeUnix": 1789984759.677
+    },
+    {
+      "stamp": "20260921T100003Z",
+      "pass": true,
+      "passedTests": 1,
+      "failedTests": 0,
+      "passiveObserverEnabled": false,
+      "onboardingTapped": false,
+      "resultPath": ".native-build/ios-ui/result-20260921T100003Z.xcresult",
+      "resultTreeSha256": "0dd281392ceea61b82d37512002255df009e5d35a2de16dad3ce14aaa3cd8b69",
+      "resultTreeHashMethod": "SHA-256 of UTF-8 lines SHA256(file) + two spaces + sorted relative POSIX path + newline, for every regular file recursively.",
+      "clipPath": ".native-build/ios-ui/touch-20260921T100003Z.mp4",
+      "clipSha256": "4e8cbc7bdc3dc037d288373c3f852940161cc3e70e7ff2e46dffa68396158595",
+      "logPath": ".native-build/ios-ui/test-20260921T100003Z.log",
+      "logSha256": "25718751e755c5d447bc108c8d26b79ab0ff0e883a4fb218117b29893ea96260",
+      "startTimeUnix": 1789984810.247,
+      "finishTimeUnix": 1789984865.541
+    }
+  ],
+  "assertions": [
+    "Normal app startup with loader disappearance before Play; no harness URL.",
+    "Real native touch Play reveals world-map Ride.",
+    "Real native Ride and first-launch Got it enter a run (first passing run); saved-state run preserves onboarding dismissal (normal passing run).",
+    "Real pause tap reveals Resume; native Restart hides pause menu; next pause opens it again.",
+    "Native Resume hides pause menu.",
+    "Home places the app in runningBackground; activate reveals Resume and keeps it present for 2 seconds.",
+    "Manual native Resume hides pause menu; next pause and native Quit return to menu Play."
+  ],
+  "limits": [
+    "Only default iPhone 17e landscape native touch coordinates are qualified; no tablet touch claim.",
+    "No track-clear, crash recovery, replay determinism, precise physics/tick freeze, performance, audio, or visual-quality verdict comes from this smoke test.",
+    "No physical device or store-signed binary exercised.",
+    "First pass had optional passive JS observation enabled; final normal pass had it disabled and used no JS probe/game action.",
+    "Onboarding is persistent; normal rerun does not erase saves or reinstall from a clean container.",
+    "Artifacts are retained in ignored local .native-build; paths are not committed media."
+  ],
+  "failedAttempts": [
+    {
+      "resultPath": ".native-build/ios-ui/result-20260921T094502Z.xcresult",
+      "finding": "Exact Play label mismatched rendered PLAY \u25b8; locator now matches case-insensitive label prefix."
+    },
+    {
+      "resultPath": ".native-build/ios-ui/result-20260921T094840Z.xcresult",
+      "finding": "Pre-readiness tap did not leave menu; these runs did not complete navigation."
+    },
+    {
+      "resultPath": ".native-build/ios-ui/result-20260921T095103Z.xcresult",
+      "finding": "Pre-readiness tap did not leave menu; these runs did not complete navigation."
+    },
+    {
+      "resultPath": ".native-build/ios-ui/result-20260921T095455Z.xcresult",
+      "finding": "Pre-readiness tap did not leave menu; these runs did not complete navigation."
+    },
+    {
+      "resultPath": ".native-build/ios-ui/result-20260921T095626Z.xcresult",
+      "finding": "Pre-readiness tap did not leave menu; these runs did not complete navigation."
+    }
+  ],
+  "readinessDiagnosis": {
+    "finding": "WKWebView accessibility exposes menu Play and reports it hittable while opaque boot loader still covers it. Wait for DOWNLOAD loader text to disappear before tapping Play.",
+    "passiveReport": ".native-build/ios-ui/observed-20260921T095626Z.json",
+    "reportResult": "Menu live, no events observed after loader completion; original tap preceded observer installation. Two full-route passes followed the loader readiness correction.",
+    "staleReports": "Early copied observed-095455/095821 reports predate their runs and are not evidence. Runner now rejects reports with probeAt older than run start."
+  }
+}

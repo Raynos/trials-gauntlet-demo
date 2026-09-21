@@ -1,0 +1,521 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T09:56:50.934Z",
+  "finishedAt": "2026-09-21T09:57:48.995Z",
+  "pass": true,
+  "environment": "task-owned headless Pixel 7 API 36 emulator; offline; OS adb input",
+  "device": {
+    "sdk": "36",
+    "abi": "arm64-v8a",
+    "size": "Physical size: 1080x2400\nOverride size: 720x1280",
+    "density": "Physical density: 420\nOverride density: 280"
+  },
+  "apkSha256": "b40e5a1986b2450e69b3988257dd2060f934bfe22111c5a3aa2a49336f117fd8",
+  "command": "node scripts/native-android-touch.mjs --fresh --output .native-build/android-touch-round3-final.json --recording .native-build/android-touch-round3-final.mp4",
+  "rawEvidence": ".native-build/android-touch-round3-final.json",
+  "playedClip": {
+    "path": ".native-build/android-touch-round3-final.mp4",
+    "sha256": "213ca2d2504381f5d83b92986838a1a94cf5737672a999ed5ca2cba82ff92b33",
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720
+        },
+        {},
+        {}
+      ],
+      "format": {
+        "duration": "46.070256"
+      }
+    },
+    "judgment": "Recorded actual OS interactions; visual judgment belongs to parent/human, not this JSON"
+  },
+  "scope": {
+    "navigation": "100ms stationary OS touches via adb input touchscreen swipe",
+    "restart": "6 instantaneous adb input touchscreen tap presses plus 1.2s OS held press",
+    "controls": "OS swipes, single pointer; physics inputs read through debug hook",
+    "fixture": {
+      "track": "flat-test",
+      "injection": "window.__trials.loadTrack only; no setInput/step/skipCountdown/UI clicks"
+    },
+    "physicalDevice": false,
+    "audibleOutput": false
+  },
+  "before": {
+    "apkSha256": "a771d0bee78ec05b10253f12fe4ccd21bbf976ad51088dfe3ff7788a71f7fbd5",
+    "rawEvidence": ".native-build/android-touch-round3-delegated.json",
+    "playedClip": ".native-build/android-touch-round3-delegated.mp4",
+    "finding": "A visible/live correctly mapped instantaneous restart tap was missed; faults remained 0 and physics tick did not reset. A 100 ms OS press worked. TouchInput source was corrected to preserve one unread completed restart tap."
+  },
+  "checks": [
+    {
+      "name": "OS Play → track Ride → onboarding",
+      "pass": true
+    },
+    {
+      "name": "Touch targets ≥44 CSS px and affordances within safe viewport",
+      "pass": true
+    },
+    {
+      "name": "OS swipe applies/releases throttle",
+      "pass": true
+    },
+    {
+      "name": "OS swipe applies/releases lean back",
+      "pass": true
+    },
+    {
+      "name": "OS swipe applies/releases lean forward",
+      "pass": true
+    },
+    {
+      "name": "OS swipe applies/releases brake",
+      "pass": true
+    },
+    {
+      "name": "OS restart tap resets run",
+      "pass": true
+    },
+    {
+      "name": "Five instantaneous OS restart taps each apply once",
+      "pass": true
+    },
+    {
+      "name": "Held restart resets full run; release adds no extra restart",
+      "pass": true
+    },
+    {
+      "name": "Pause tap and Android Back run hierarchy",
+      "pass": true
+    },
+    {
+      "name": "Home cancels held input; foreground remains paused",
+      "pass": true
+    },
+    {
+      "name": "Android Back exits garage to menu",
+      "pass": true
+    },
+    {
+      "name": "Android Back exits settings to menu",
+      "pass": true
+    },
+    {
+      "name": "Android Back at menu minimizes app",
+      "pass": true
+    },
+    {
+      "name": "Force-kill preserves committed native preferences/onboarding",
+      "pass": true
+    }
+  ],
+  "nativeWebViewBounds": {
+    "left": 73,
+    "top": 49,
+    "right": 1280,
+    "bottom": 678
+  },
+  "geometry": {
+    "width": 690,
+    "height": 360,
+    "dpr": 1.75,
+    "safeArea": {
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 0
+    },
+    "controls": [
+      {
+        "selector": ".tz-back",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 172.57144165039062,
+          "height": 360.0000305175781,
+          "right": 172.57144165039062,
+          "bottom": 360.0000305175781
+        },
+        "visual": {
+          "x": 21.571430206298828,
+          "y": 321.7232360839844,
+          "width": 129.42857360839844,
+          "height": 33.27678680419922,
+          "right": 151.00000381469727,
+          "bottom": 355.0000228881836
+        }
+      },
+      {
+        "selector": ".tz-fwd",
+        "bounds": {
+          "x": 172.57144165039062,
+          "y": 0,
+          "width": 172.57144165039062,
+          "height": 360.0000305175781,
+          "right": 345.14288330078125,
+          "bottom": 360.0000305175781
+        },
+        "visual": {
+          "x": 194.1428680419922,
+          "y": 321.7232360839844,
+          "width": 129.42857360839844,
+          "height": 33.27678680419922,
+          "right": 323.5714416503906,
+          "bottom": 355.0000228881836
+        }
+      },
+      {
+        "selector": ".tz-brake",
+        "bounds": {
+          "x": 345.14288330078125,
+          "y": 0,
+          "width": 172.57144165039062,
+          "height": 360.0000305175781,
+          "right": 517.7143249511719,
+          "bottom": 360.0000305175781
+        },
+        "visual": {
+          "x": 366.71429443359375,
+          "y": 321.7232360839844,
+          "width": 129.42857360839844,
+          "height": 33.27678680419922,
+          "right": 496.1428680419922,
+          "bottom": 355.0000228881836
+        }
+      },
+      {
+        "selector": ".tz-throttle",
+        "bounds": {
+          "x": 517.7142944335938,
+          "y": 0,
+          "width": 172.57144165039062,
+          "height": 360.0000305175781,
+          "right": 690.2857360839844,
+          "bottom": 360.0000305175781
+        },
+        "visual": {
+          "x": 539.2857666015625,
+          "y": 321.7232360839844,
+          "width": 129.42857360839844,
+          "height": 33.27678680419922,
+          "right": 668.7143402099609,
+          "bottom": 355.0000228881836
+        }
+      },
+      {
+        "selector": ".tz-pause",
+        "bounds": {
+          "x": 10.392857551574707,
+          "y": 9.098215103149414,
+          "width": 56.000003814697266,
+          "height": 44.000003814697266,
+          "right": 66.39286136627197,
+          "bottom": 53.09821891784668
+        },
+        "visual": {
+          "x": 10.392857551574707,
+          "y": 9.098215103149414,
+          "width": 56.000003814697266,
+          "height": 44.000003814697266,
+          "right": 66.39286136627197,
+          "bottom": 53.09821891784668
+        }
+      },
+      {
+        "selector": ".tz-restart",
+        "bounds": {
+          "x": 606.3303833007812,
+          "y": 9.098215103149414,
+          "width": 73.5625,
+          "height": 44.000003814697266,
+          "right": 679.8928833007812,
+          "bottom": 53.09821891784668
+        },
+        "visual": {
+          "x": 606.3303833007812,
+          "y": 9.098215103149414,
+          "width": 73.5625,
+          "height": 44.000003814697266,
+          "right": 679.8928833007812,
+          "bottom": 53.09821891784668
+        }
+      }
+    ]
+  },
+  "controls": [
+    {
+      "name": "OS swipe applies/releases throttle",
+      "pass": true,
+      "during": {
+        "throttle": 1,
+        "brake": 0,
+        "lean": 0
+      },
+      "after": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      }
+    },
+    {
+      "name": "OS swipe applies/releases lean back",
+      "pass": true,
+      "during": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": -1
+      },
+      "after": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      }
+    },
+    {
+      "name": "OS swipe applies/releases lean forward",
+      "pass": true,
+      "during": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 1
+      },
+      "after": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      }
+    },
+    {
+      "name": "OS swipe applies/releases brake",
+      "pass": true,
+      "during": {
+        "throttle": 0,
+        "brake": 1,
+        "lean": 0
+      },
+      "after": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      }
+    }
+  ],
+  "instantaneousRestarts": [
+    {
+      "attempt": 1,
+      "pass": true,
+      "faultsBefore": 1,
+      "faultsAfter": 2
+    },
+    {
+      "attempt": 2,
+      "pass": true,
+      "faultsBefore": 2,
+      "faultsAfter": 3
+    },
+    {
+      "attempt": 3,
+      "pass": true,
+      "faultsBefore": 3,
+      "faultsAfter": 4
+    },
+    {
+      "attempt": 4,
+      "pass": true,
+      "faultsBefore": 4,
+      "faultsAfter": 5
+    },
+    {
+      "attempt": 5,
+      "pass": true,
+      "faultsBefore": 5,
+      "faultsAfter": 6
+    }
+  ],
+  "heldRestart": {
+    "afterHeldRestart": {
+      "screen": "run",
+      "paused": false,
+      "hidden": false,
+      "phase": "countdown",
+      "tick": 85,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      },
+      "heldControls": [],
+      "pos": {
+        "x": 0.5919398823029313,
+        "y": 0.49198794860026845
+      },
+      "faults": 0,
+      "track": "flat-test",
+      "bike": "rookie",
+      "outfit": "street-mustard"
+    },
+    "afterHeldCountdown": {
+      "screen": "run",
+      "paused": false,
+      "hidden": false,
+      "phase": "riding",
+      "tick": 25,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      },
+      "heldControls": [],
+      "pos": {
+        "x": 0.5918855007272398,
+        "y": 0.4922876152532116
+      },
+      "faults": 0,
+      "track": "flat-test",
+      "bike": "rookie",
+      "outfit": "street-mustard"
+    }
+  },
+  "lifecycle": {
+    "beforeHome": {
+      "paused": false,
+      "hidden": false,
+      "tick": 154,
+      "input": {
+        "throttle": 1,
+        "brake": 0,
+        "lean": 0
+      },
+      "heldControls": [
+        "tz tz-zone tz-throttle held"
+      ]
+    },
+    "background": {
+      "paused": true,
+      "hidden": true,
+      "tick": 222,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      },
+      "heldControls": []
+    },
+    "backgroundLater": {
+      "paused": true,
+      "hidden": true,
+      "tick": 222,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      },
+      "heldControls": []
+    },
+    "foreground": {
+      "paused": true,
+      "hidden": false,
+      "tick": 222,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      },
+      "heldControls": []
+    },
+    "afterResume": {
+      "paused": false,
+      "hidden": false,
+      "tick": 235,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      },
+      "heldControls": []
+    },
+    "inputScope": "Paused PhysicsState.input is the last simulated input, not a pending-control read; release is checked by cleared held controls and neutral input after actual Resume tap"
+  },
+  "saveBeforeKill": {
+    "generation": 5,
+    "entries": {
+      "trials.bikeClass": "pro",
+      "trials.riderOutfit": "race-bluewhite",
+      "trials.onboarded": "1",
+      "trials.lastTrack": "b1-first-ride"
+    }
+  },
+  "saveAfterKill": {
+    "menuPhysicsBike": "rookie",
+    "outfit": "race-bluewhite",
+    "entries": {
+      "trials.bikeClass": "pro",
+      "trials.riderOutfit": "race-bluewhite",
+      "trials.onboarded": "1",
+      "trials.lastTrack": "b1-first-ride"
+    },
+    "ride": {
+      "screen": "run",
+      "paused": false,
+      "hidden": false,
+      "phase": "countdown",
+      "tick": 40,
+      "input": {
+        "throttle": 0,
+        "brake": 0,
+        "lean": 0
+      },
+      "heldControls": [],
+      "pos": {
+        "x": 0.590695296625022,
+        "y": 0.5033522963521192
+      },
+      "faults": 0,
+      "track": "b1-first-ride",
+      "bike": "pro",
+      "outfit": "race-bluewhite"
+    },
+    "onboardingShown": false
+  },
+  "audio": {
+    "protocolEnabled": true,
+    "contextStates": [
+      {
+        "at": 1789984622603,
+        "state": "suspended",
+        "type": "realtime",
+        "sampleRate": 48000
+      },
+      {
+        "at": 1789984622604,
+        "state": "running",
+        "type": "realtime",
+        "sampleRate": 48000
+      },
+      {
+        "at": 1789984647781,
+        "state": "suspended",
+        "type": "realtime",
+        "sampleRate": 48000
+      },
+      {
+        "at": 1789984650556,
+        "state": "running",
+        "type": "realtime",
+        "sampleRate": 48000
+      }
+    ],
+    "scope": "Real app AudioContext protocol events only; emulator uses -no-audio; no audible-output assertion"
+  },
+  "failures": [],
+  "limitations": [
+    "Single headless emulator profile and single-pointer OS gestures; no physical multitouch/notch/system-gesture judgment.",
+    "No visual-quality or audible-output pass is inferred from hook values or protocol events.",
+    "Only flat-test loading uses a state-changing game hook; every navigation/control action uses adb OS input.",
+    "Native choices are intentionally changed on task-owned fixture data for force-kill durability checks."
+  ]
+}

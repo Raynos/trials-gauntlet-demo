@@ -154,7 +154,10 @@ window.__trialsNativeCapabilitiesProbe = async function (options = {}) {
         const key = el?.querySelector('.tz-key');
         const keyRect = rect(key);
         const insideSafe = b => b && b.x >= safe.left - 1 && b.y >= safe.top - 1 && b.right <= window.innerWidth - safe.right + 1 && b.bottom <= window.innerHeight - safe.bottom + 1;
-        geometry.controls.push({ selector, bounds: r, visualKeyBounds: keyRect, opacity: el ? opacity(el) : 0, pointerEvents: el ? getComputedStyle(el).pointerEvents : null, hitAtCenter: Boolean(el && (hit === el || el.contains(hit))), hitElement: hit?.className ?? null, visualInsideSafeArea: insideSafe(keyRect ?? r) });
+        // TouchInput routes coordinates on this common layer; its decorative
+        // children intentionally have pointer-events:none (including pause/restart).
+        const layer = el?.closest('.touch-layer');
+        geometry.controls.push({ selector, bounds: r, visualKeyBounds: keyRect, opacity: el ? opacity(el) : 0, pointerEvents: el ? getComputedStyle(el).pointerEvents : null, hitAtCenter: Boolean(el && (hit === el || el.contains(hit) || (hit === layer && getComputedStyle(layer).pointerEvents === 'auto'))), hitElement: hit?.className ?? null, visualInsideSafeArea: insideSafe(keyRect ?? r) });
       }
       report.touch = geometry;
       if (geometry.controls.some(c => !c.bounds || c.bounds.width <= 0 || c.bounds.height <= 0)) failure(stage, 'Missing or zero-size touch controls');

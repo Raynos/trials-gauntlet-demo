@@ -5,8 +5,9 @@
  * claims the gesture. Every one of those must release the zone within one
  * read(), and a watchdog must catch the case where no end event arrives at all.
  */
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { NEUTRAL_INPUT, type InputFrame } from '../../core/types';
+import { resetLive, tickLive } from '../../ui/live';
 import { _setOrientationForTest, toLogical, toPhysical } from '../../ui/orientation';
 import { TouchInput } from './touch';
 
@@ -30,6 +31,7 @@ class FakeTouchEvent extends Event {
 
 let clock = 0;
 const now = (): number => clock;
+const inputs: TouchInput[] = [];
 
 function setup(): { t: TouchInput; frame: () => InputFrame; root: HTMLElement } {
   document.body.innerHTML = '<div id="ui"></div>';
@@ -37,6 +39,7 @@ function setup(): { t: TouchInput; frame: () => InputFrame; root: HTMLElement } 
   Object.defineProperty(window, 'innerWidth', { value: 1000, configurable: true });
   Object.defineProperty(window, 'innerHeight', { value: 500, configurable: true });
   const t = new TouchInput(ui, { now });
+  inputs.push(t);
   // jsdom has no layout: give the layer a size and put the buttons off to the corners.
   Object.defineProperty(t.root, 'clientWidth', { value: 1000, configurable: true });
   Object.defineProperty(t.root, 'clientHeight', { value: 500, configurable: true });
@@ -66,6 +69,108 @@ const move = (root: HTMLElement, id: number, x: number, y: number): void => {
 
 beforeEach(() => {
   clock = 0;
+});
+
+afterEach(() => {
+  for (const input of inputs.splice(0)) input.dispose();
+  resetLive();
+});
+
+function restartSetup(): ReturnType<typeof setup> {
+  const fixture = setup();
+  const { t, root } = fixture;
+  const restart = root.querySelector<HTMLElement>('.tz-restart')!;
+  restart.getBoundingClientRect = () => ({ left: 900, right: 980, top: 10, bottom: 70, width: 80, height: 60, x: 900, y: 10, toJSON: () => ({}) });
+  // Drive the real button reveal gate; jsdom does not supply default opacity.
+  for (const el of [root.parentElement!, root, ...root.querySelectorAll<HTMLElement>('.tz-btn')]) el.style.opacity = '1';
+  t.setVisible(true);
+  tickLive(0);
+  tickLive(150);
+  expect(root.classList.contains('live')).toBe(true);
+  return fixture;
+}
+
+const restartUp = (root: HTMLElement, type = 'pointerup'): void => {
+  root.dispatchEvent(new FakePointerEvent(type, { pointerId: 1, clientX: 940, clientY: 40 }));
+};
+
+describe('restart taps between game frames', () => {
+  it('delivers one completed fast tap even when no read occurred while held', () => {
+    const { root, frame } = restartSetup();
+    down(root, 1, 940, 40);
+    restartUp(root);
+    restartUp(root, 'lostpointercapture'); // Normal implicit capture release after UP.
+    expect(frame().restart).toBe(true);
+    expect(frame().restart).toBe(false);
+    expect(frame().throttle).toBe(0);
+  });
+
+  it('keeps restart held for the app’s long-hold threshold without firing again on release', () => {
+    const { root, frame } = restartSetup();
+    down(root, 1, 940, 40);
+    root.dispatchEvent(new FakeTouchEvent('touchstart', 1));
+    for (clock = 0; clock <= 1500; clock += 100) expect(frame().restart).toBe(true);
+    restartUp(root);
+    root.dispatchEvent(new FakeTouchEvent('touchend', 0));
+    expect(frame().restart).toBe(false);
+    expect(frame().restart).toBe(false);
+  });
+
+  it.each(['raw-first', 'pointer-first', 'read-before-raw'] as const)('does not lose or double a fast tap with %s release ordering', (order) => {
+    const { root, frame } = restartSetup();
+    down(root, 1, 940, 40);
+    const rawEnd = (): void => { root.dispatchEvent(new FakeTouchEvent('touchend', 0)); };
+    if (order === 'raw-first') rawEnd();
+    restartUp(root);
+    if (order === 'read-before-raw') expect(frame().restart).toBe(true);
+    if (order !== 'raw-first') rawEnd();
+    if (order !== 'read-before-raw') expect(frame().restart).toBe(true);
+    restartUp(root); // A duplicate end has no live pointer to complete.
+    expect(frame().restart).toBe(false);
+  });
+
+  it.each(['pointercancel', 'lostpointercapture', 'touchcancel', 'slide-off', 'up-outside'] as const)('does not queue a restart after %s', (cancel) => {
+    const { root, frame } = restartSetup();
+    down(root, 1, 940, 40);
+    if (cancel === 'touchcancel') root.dispatchEvent(new FakeTouchEvent('touchcancel', 0));
+    else if (cancel === 'slide-off') {
+      move(root, 1, 940, 200);
+      move(root, 1, 940, 40); // Returning to the button cannot revive a cancelled press.
+    } else if (cancel === 'up-outside') root.dispatchEvent(new FakePointerEvent('pointerup', { pointerId: 1, clientX: 940, clientY: 200 }));
+    else restartUp(root, cancel);
+    restartUp(root);
+    root.dispatchEvent(new FakeTouchEvent('touchend', 0));
+    expect(frame().restart).toBe(false);
+    expect(frame().throttle).toBe(0);
+  });
+
+  it.each(['reset', 'blur', 'pagehide', 'disabled', 'overlay', 'hidden-controls'] as const)('clears an already completed unread tap on %s even with no active pointers', (interruption) => {
+    const { t, root, frame } = restartSetup();
+    down(root, 1, 940, 40);
+    restartUp(root);
+    expect(t.activePointers).toBe(0);
+    if (interruption === 'reset') t.reset();
+    else if (interruption === 'disabled') t.setEnabled(false);
+    else if (interruption === 'overlay') t.setOverlay(true);
+    else if (interruption === 'hidden-controls') t.setVisible(false);
+    else window.dispatchEvent(new Event(interruption));
+    root.dispatchEvent(new FakeTouchEvent('touchend', 0));
+    expect(frame().restart).toBe(false);
+    expect(frame().restart).toBe(false);
+  });
+
+  it('ignores new pointers under an overlay and clears a held restart on reset', () => {
+    const { t, root, frame } = restartSetup();
+    down(root, 1, 940, 40);
+    t.reset();
+    restartUp(root);
+    expect(frame().restart).toBe(false);
+    t.setOverlay(true);
+    down(root, 1, 940, 40);
+    restartUp(root);
+    expect(frame().restart).toBe(false);
+    expect(frame().throttle).toBe(0);
+  });
 });
 
 describe('TouchInput lifecycle (iOS Safari semantics)', () => {

@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "sourceCandidate": "069b1683 + safe-area CSS and test target changes",
+  "scenario": "Abandoned native download cleared on next normal launch; channel disabled",
+  "seed": {
+    "after": {
+      "current": {
+        "bundle": {
+          "checksum": "",
+          "downloaded": "1970-01-01T00:00:00.000Z",
+          "id": "builtin",
+          "status": "success",
+          "version": "1.0.0"
+        },
+        "native": "1.0.0"
+      },
+      "list": {
+        "bundles": [
+          {
+            "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+            "downloaded": "2026-09-21T09:00:21.852Z",
+            "id": "PW8iF1KoC4",
+            "status": "success",
+            "version": "1.0.1-qa"
+          },
+          {
+            "checksum": "b78a55dc7d9efd8c9034bca4718a44b9ed006cd860e9302c93a656357cd35023",
+            "downloaded": "2026-09-21T09:48:54.439Z",
+            "id": "AXaqxWpsXO",
+            "status": "pending",
+            "version": "1.0.1009-fixture-orphan"
+          }
+        ]
+      }
+    },
+    "before": {
+      "current": {
+        "bundle": {
+          "checksum": "",
+          "downloaded": "1970-01-01T00:00:00.000Z",
+          "id": "builtin",
+          "status": "success",
+          "version": "1.0.0"
+        },
+        "native": "1.0.0"
+      },
+      "list": {
+        "bundles": [
+          {
+            "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+            "downloaded": "2026-09-21T09:00:21.852Z",
+            "id": "PW8iF1KoC4",
+            "status": "success",
+            "version": "1.0.1-qa"
+          }
+        ]
+      }
+    },
+    "downloaded": {
+      "checksum": "b78a55dc7d9efd8c9034bca4718a44b9ed006cd860e9302c93a656357cd35023",
+      "downloaded": "2026-09-21T09:48:54.439Z",
+      "id": "AXaqxWpsXO",
+      "status": "pending",
+      "version": "1.0.1009-fixture-orphan"
+    },
+    "pass": true,
+    "pending": {
+      "trials.nativeUpdates.ios.1.0.0.native-v1.sequence": "2"
+    },
+    "probeAt": 1789984134440,
+    "scope": "Native plugin API deliberately seeds an abandoned downloaded bundle without the application pending marker"
+  },
+  "coldLaunch": {
+    "current": {
+      "bundle": {
+        "checksum": "",
+        "downloaded": "1970-01-01T00:00:00.000Z",
+        "id": "builtin",
+        "status": "success",
+        "version": "1.0.0"
+      },
+      "native": "1.0.0"
+    },
+    "list": {
+      "bundles": [
+        {
+          "checksum": "06d9882b9bd23a1a2b4a06620241ac95bdc5608d9ffd0ebdfc0c68a333d15382",
+          "downloaded": "2026-09-21T09:00:21.852Z",
+          "id": "PW8iF1KoC4",
+          "status": "success",
+          "version": "1.0.1-qa"
+        }
+      ]
+    },
+    "pass": true,
+    "probeAt": 1789984154412,
+    "scope": "Normal cold launch runs cleanup; no test-side delete or storage mutation",
+    "screen": "menu"
+  },
+  "pass": true,
+  "limits": [
+    "Seeds native plugin through its API; does not simulate disk exhaustion or interruption",
+    "Current builtin preserved; previous successful remote fallback retention not established by this case"
+  ]
+}
