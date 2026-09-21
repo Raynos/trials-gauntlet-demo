@@ -1,0 +1,16 @@
+{
+  "reference": "https://www.youtube.com/watch?v=5EtbE9r9L5k",
+  "referenceTitle": "UniversityOfTrials \u2014 Inferno IV First Checkpoint Tutorial",
+  "sourceSeconds": {
+    "neutral": 61.25,
+    "forward": 54.5,
+    "back": 59.75
+  },
+  "ours": "/tmp/trials-poses-round3/rookie-street-mustard-high/clip.mp4",
+  "ourFrameIndices": {
+    "neutral": 0,
+    "forward": 55,
+    "back": 110
+  },
+  "note": "Actual gameplay frames, cropped and uniformly scaled only. Different camera, costume, terrain and bike pitch. Fusion input values not asserted; silhouette examples, not a controlled matched-input test."
+}

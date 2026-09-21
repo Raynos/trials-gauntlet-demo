@@ -105,3 +105,5 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 74 | "Game super pixelated; get the HDR and AA settings from games wildshard prototype to fix that too" | **in flight** | Implemented Wildshard-style half-float HDR + final SMAA on all tiers, 1.5 phone DPR; WebKit/Metal captures clean, same recorded physics states, phone proxy p95 3.24→4.40 ms. Actual iPhone cost and deployment remain open. Evidence: docs/evidence/render-aa/round1/. |
 
 | 75 | "Wrap this up at a good pause point; 29% usage left" | **done** | Saved qualification-round3/PAUSE.md with the complete checkpoint and exact remaining R8 finding; all workers retired. Goal paused rather than marked complete. |
+
+| 76 | "Show before/after poses; show Trials Fusion and our game side by side" | **done** | Generated two three-row comparisons from recorded play; Fusion/source timestamps and camera/input limitations documented in docs/evidence/riding-poses/pose-comparison/. Main build goal remains paused. |
