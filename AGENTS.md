@@ -11,7 +11,7 @@
 - Never announce completion while budget remains.
 - This game should be playable on mobile iOS safari & desktop.
 - Favor subagents over workflows where possible, as subagents are resumable.
-- Plans and their status live in `docs/plans/README.md` (kept current by the parent at every commit); live plans: `docs/plans/PERF-BACKLOG.md`, `docs/plans/RIDING_POSES.md`, and the proposed `docs/plans/USE_A_REAL_PHYSICS_LIBRARY.md`; closed plans, including `WORLD_MAP.md` and `HERO_ART_INTEGRATION.md`, are in `project/archive/`. The hero art recipe is `assets/blender/hero-art/` (delivery + ignored masters), its handoff record `docs/evidence/hero-art/delivery/`.
+- Plans and their status live in `docs/plans/README.md` (kept current by the parent at every commit); live plans: `docs/plans/PERF-BACKLOG.md`, `docs/plans/RIDING_POSES.md`, and the proposed `docs/plans/USE_A_REAL_PHYSICS_LIBRARY.md` and `docs/plans/NATIVE_MOBILE_PUBLISHING.md`; closed plans, including `WORLD_MAP.md` and `HERO_ART_INTEGRATION.md`, are in `project/archive/`. The hero art recipe is `assets/blender/hero-art/` (delivery + ignored masters), its handoff record `docs/evidence/hero-art/delivery/`.
 - Completed plans and permanently stale docs are archived under `project/archive/` (rules in its README); status docs never move.
 - `docs/mission.md` holds the bars no plan can close; plans carry measurable proxies and may cite a mission line as their bar.
 - Every user ask → a row in `docs/tasks/ASKS.md` before you start; flip it when it lands; rows never leave.

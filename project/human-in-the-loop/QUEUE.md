@@ -4,6 +4,8 @@ Things that need **you**, not an agent. Everything else is `docs/tasks/ASKS.md`.
 decided** — the decision lands in the thing it changed (the plan, the SPEC, the ASKS row). Each line leads with what it is
 waiting on. IDs never reused. Ported from the FF15 demo's `HUMAN_REVIEW.md`.
 
+- **HR-14 — Native app publication choices (ask 72; before implementation/submission).** Waiting on: you — publisher/account type and permanent app IDs, target markets/devices, monetization, whether existing web saves need importing, and whether optional OTA is worth funding after the bundled release. Proposed defaults and phases: [`NATIVE_MOBILE_PUBLISHING.md`](../../docs/plans/NATIVE_MOBILE_PUBLISHING.md). The planning request is complete without these decisions; no account purchase or public submission yet.
+
 - **HR-05 — First review-inbox note.** Waiting on: you — when the ✎ NOTE button ships, enter the password once and send one note;
   I pull it and the loop is proven.
 
