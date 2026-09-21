@@ -47,7 +47,19 @@
         "CapacitorUpdater.webViewSession"
       ],
       "existingPersonalBestsAndPreferencesPreserved": true,
-      "notes": "iOS rotated upright and resized; Android original dimensions; no fabricated frames or audio. Frame/contact-sheet sampling used to select excerpt; parent must judge played clips."
+      "notes": "iOS rotated upright and resized; Android original dimensions; no fabricated frames or audio. Frame/contact-sheet sampling used to select excerpt; parent must judge played clips.",
+      "presentationCrop": {
+        "path": ".native-build/trailers/ios-10s-cropped.mp4",
+        "sha256": "bb8df62901200f2c42c0dde1d0c02dc668ccbe1d26c733f032179619ab53c4ea",
+        "source": ".native-build/trailers/ios-10s.mp4",
+        "cropPixels": {
+          "left": 88,
+          "top": 0,
+          "width": 1192,
+          "height": 588
+        },
+        "reason": "Remove the iPhone 16 Pro simulator Dynamic Island from the viewing copy; original device capture retained."
+      }
     },
     {
       "platform": "android",
