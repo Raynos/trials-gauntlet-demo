@@ -5,9 +5,9 @@
   "bike": "rookie",
   "tier": "easy",
   "technique": "rear-wheel-first gap landing",
-  "updatedAt": "2026-09-16T04:10:28.649Z",
+  "updatedAt": "2026-09-17T12:12:15.096Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "24a246e0",
+  "srcFingerprint": "4b9bc981",
   "attemptsBand": [
     3,
     5
@@ -18,165 +18,30 @@
       "skill": "average",
       "seeds": [
         2125781358,
-        2125781359,
-        2125781360,
-        2125781361,
-        2125781362,
-        2125781363,
-        2125781364,
-        2125781365,
-        2125781366
+        2125781359
       ],
       "attempts": [
         3,
-        1,
-        1,
-        5,
-        3,
-        2,
-        5,
-        4,
-        2
+        1
       ],
-      "medianAttempts": 3,
-      "clears": 9,
+      "medianAttempts": 2,
+      "clears": 2,
       "finishTimes": [
         87.35,
-        64.56666666666666,
-        64.025,
-        88.2,
-        87.30833333333334,
-        79.01666666666667,
-        91.98333333333333,
-        85.46666666666667,
-        77.83333333333333
+        64.56666666666666
       ],
-      "medianFinishTime": 85.46666666666667,
-      "bestX": 621.1037678330077,
+      "medianFinishTime": 75.95833333333333,
+      "bestX": 620.4083257960837,
       "deaths": [
-        {
-          "obstacle": "ramp @ 57.0 m",
-          "x": 57,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "nose-low": 1,
-            "air-short": 1
-          }
-        },
         {
           "obstacle": "ramp @ 66.0 m",
           "x": 66,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "air-gas-nose-up": 1,
-            "air-short": 1
-          }
-        },
-        {
-          "obstacle": "box @ 72.0 m",
-          "x": 72,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "air-short": 1,
-            "touchdown": 1
-          }
-        },
-        {
-          "obstacle": "ramp @ 322.2 m",
-          "x": 322.2,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "air-short": 1,
-            "nose-low": 1
-          }
-        },
-        {
-          "obstacle": "ramp @ 366.2 m",
-          "x": 366.2,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "air-short": 2
-          }
-        },
-        {
-          "obstacle": "box @ 183.2 m",
-          "x": 183.2,
           "count": 1,
           "reasons": {
             "crash": 1
-          },
-          "rules": {
-            "air-short": 1
-          }
-        },
-        {
-          "obstacle": "ramp @ 264.2 m",
-          "x": 264.2,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-low": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 275 m",
-          "x": 275,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 285 m",
-          "x": 285,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-high": 1
-          }
-        },
-        {
-          "obstacle": "ramp @ 310.2 m",
-          "x": 310.2,
-          "count": 1,
-          "reasons": {
-            "hazard": 1
           },
           "rules": {
             "air-gas-nose-up": 1
-          }
-        },
-        {
-          "obstacle": "box @ 525.4 m",
-          "x": 525.4,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
           }
         },
         {
@@ -192,15 +57,8 @@
         }
       ],
       "runs": [
-        "20260915-231027-d80857",
-        "20260915-231027-6761d4",
-        "20260915-231027-87ebfc",
-        "20260915-231027-7cd492",
-        "20260915-231027-738192",
-        "20260915-231027-b6eb39",
-        "20260915-231027-a6c36e",
-        "20260915-231027-d5498e",
-        "20260915-231027-109c2d"
+        "20260917-071212-8e7da9",
+        "20260917-071212-80dc64"
       ]
     }
   ]

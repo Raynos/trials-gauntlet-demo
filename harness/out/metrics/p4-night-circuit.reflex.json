@@ -5,9 +5,9 @@
   "bike": "rookie",
   "tier": "beginner",
   "technique": "the night-city kit at beginner pace",
-  "updatedAt": "2026-09-16T04:10:28.655Z",
+  "updatedAt": "2026-09-17T12:12:15.103Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "24a246e0",
+  "srcFingerprint": "4b9bc981",
   "attemptsBand": [
     1,
     2
@@ -18,66 +18,21 @@
       "skill": "average",
       "seeds": [
         1052590580,
-        1052590581,
-        1052590582,
-        1052590583,
-        1052590584,
-        1052590585,
-        1052590586,
-        1052590587,
-        1052590588
+        1052590581
       ],
       "attempts": [
         2,
-        4,
-        4,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2
+        4
       ],
-      "medianAttempts": 2,
-      "clears": 9,
+      "medianAttempts": 3,
+      "clears": 2,
       "finishTimes": [
         66.63333333333334,
-        98.55,
-        82.15,
-        50.50833333333333,
-        69.30833333333334,
-        51.44166666666667,
-        62.375,
-        51.4,
-        65.18333333333334
+        98.55
       ],
-      "medianFinishTime": 65.18333333333334,
-      "bestX": 503.5610259927601,
+      "medianFinishTime": 82.59166666666667,
+      "bestX": 503.4908760539842,
       "deaths": [
-        {
-          "obstacle": "ground @ 225 m",
-          "x": 225,
-          "count": 3,
-          "reasons": {
-            "crash": 3
-          },
-          "rules": {
-            "nose-low": 1,
-            "air-gas-nose-up": 1,
-            "air-short": 1
-          }
-        },
-        {
-          "obstacle": "ledge @ 39.0 m",
-          "x": 39,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-low": 1
-          }
-        },
         {
           "obstacle": "ground @ 150 m",
           "x": 150,
@@ -87,17 +42,6 @@
           },
           "rules": {
             "nose-high": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 180 m",
-          "x": 180,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
           }
         },
         {
@@ -123,19 +67,8 @@
           }
         },
         {
-          "obstacle": "ledge @ 321.0 m",
-          "x": 321,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-low": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 390 m",
-          "x": 390,
+          "obstacle": "ground @ 225 m",
+          "x": 225,
           "count": 1,
           "reasons": {
             "crash": 1
@@ -146,15 +79,8 @@
         }
       ],
       "runs": [
-        "20260915-231028-155187",
-        "20260915-231028-6ce4dd",
-        "20260915-231028-4f12ab",
-        "20260915-231028-4311b8",
-        "20260915-231028-88edaf",
-        "20260915-231028-8a969c",
-        "20260915-231028-4f93d9",
-        "20260915-231028-318771",
-        "20260915-231028-8457f0"
+        "20260917-071214-9cdc89",
+        "20260917-071214-27b243"
       ]
     }
   ]

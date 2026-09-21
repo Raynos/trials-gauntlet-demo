@@ -5,9 +5,9 @@
   "bike": "rookie",
   "tier": "beginner",
   "technique": "the canyon kit at beginner pace",
-  "updatedAt": "2026-09-16T04:10:28.654Z",
+  "updatedAt": "2026-09-17T12:12:15.102Z",
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "24a246e0",
+  "srcFingerprint": "4b9bc981",
   "attemptsBand": [
     1,
     2
@@ -18,88 +18,30 @@
       "skill": "average",
       "seeds": [
         1374220946,
-        1374220947,
-        1374220948,
-        1374220949,
-        1374220950,
-        1374220951,
-        1374220952,
-        1374220953,
-        1374220954
+        1374220947
       ],
       "attempts": [
         3,
-        3,
-        2,
-        2,
-        2,
-        3,
-        5,
-        2,
-        7
+        3
       ],
       "medianAttempts": 3,
-      "clears": 9,
+      "clears": 2,
       "finishTimes": [
         58.775,
-        65.58333333333333,
-        53.93333333333333,
-        54.28333333333333,
-        58.15,
-        62.425,
-        82.3,
-        55.166666666666664,
-        86.925
+        65.58333333333333
       ],
-      "medianFinishTime": 58.775,
+      "medianFinishTime": 62.17916666666666,
       "bestX": 499.27449285938553,
       "deaths": [
         {
-          "obstacle": "ground @ 205 m",
-          "x": 205,
-          "count": 6,
-          "reasons": {
-            "crash": 6
-          },
-          "rules": {
-            "air-gas-nose-up": 1,
-            "air-short": 3,
-            "nose-low": 2
-          }
-        },
-        {
-          "obstacle": "ledge @ 234.0 m",
-          "x": 234,
-          "count": 3,
-          "reasons": {
-            "crash": 3
-          },
-          "rules": {
-            "nose-low": 2,
-            "air-short": 1
-          }
-        },
-        {
           "obstacle": "ground @ 100 m",
           "x": 100,
-          "count": 2,
+          "count": 1,
           "reasons": {
-            "crash": 2
+            "crash": 1
           },
           "rules": {
-            "nose-low": 2
-          }
-        },
-        {
-          "obstacle": "ground @ 225 m",
-          "x": 225,
-          "count": 2,
-          "reasons": {
-            "crash": 2
-          },
-          "rules": {
-            "touchdown": 1,
-            "air-short": 1
+            "nose-low": 1
           }
         },
         {
@@ -114,17 +56,6 @@
           }
         },
         {
-          "obstacle": "ground @ 130 m",
-          "x": 130,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
-          }
-        },
-        {
           "obstacle": "ground @ 135 m",
           "x": 135,
           "count": 1,
@@ -136,60 +67,20 @@
           }
         },
         {
-          "obstacle": "ground @ 140 m",
-          "x": 140,
+          "obstacle": "ground @ 205 m",
+          "x": 205,
           "count": 1,
           "reasons": {
             "crash": 1
           },
           "rules": {
-            "nose-low": 1
-          }
-        },
-        {
-          "obstacle": "drum @ 197.0 m",
-          "x": 197,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "nose-low": 1
-          }
-        },
-        {
-          "obstacle": "ground @ 200 m",
-          "x": 200,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
-          }
-        },
-        {
-          "obstacle": "ramp @ 240.0 m",
-          "x": 240,
-          "count": 1,
-          "reasons": {
-            "crash": 1
-          },
-          "rules": {
-            "air-short": 1
+            "air-gas-nose-up": 1
           }
         }
       ],
       "runs": [
-        "20260915-231028-087452",
-        "20260915-231028-64ff8a",
-        "20260915-231028-2d3a73",
-        "20260915-231028-50ccc3",
-        "20260915-231028-4e5fe6",
-        "20260915-231028-07ddf9",
-        "20260915-231028-42c1c1",
-        "20260915-231028-a4de56",
-        "20260915-231028-e81071"
+        "20260917-071214-b0f030",
+        "20260917-071214-076e5f"
       ]
     }
   ]

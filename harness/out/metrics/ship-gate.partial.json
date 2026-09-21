@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "kind": "gate-partial",
+  "runId": "20260917-191553-3a94c7",
+  "startedAt": "2026-09-18T00:15:53.640Z",
+  "wallMs": 65146,
+  "git": "c1c9ef6",
+  "srcFingerprint": "4b9bc981",
+  "node": "v24.18.1",
+  "chromium": "151.0.7922.34",
+  "only": [
+    "offline"
+  ],
+  "checks": [
+    {
+      "id": "offline.coldStartPlayable",
+      "value": "100/100 done=true in 13848 ms",
+      "limit": true,
+      "pass": true,
+      "note": "9/9 offline e2e checks pass"
+    }
+  ],
+  "failed": 0
+}
