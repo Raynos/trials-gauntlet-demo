@@ -54,6 +54,14 @@ phone-high rows hold in-level (≤ 123 draws, model ≤ 8.8 ms) and the garage h
 loader invariant, replay determinism and the ship gate are unchanged; `RELEASES.md` carries the pin. Astra's
 "final user visual approval" (HR-07) is a precondition, not a row here.
 
+### Acceptance audit — 2026-09-21
+
+- [x] The catalog rider and bike work in the garage and in-level with all delivered outfits and liveries.
+- [x] Loader invariants, replay determinism, and the ship gate hold.
+- [x] `RELEASES.md` carries the v0.3.0 pin.
+- [ ] Phone-high in-level rows meet ≤ 123 draws and model ≤ 8.8 ms. Integration measured 142 / 9.2; ask 60 measured 139 / 9.7.
+- [ ] The integrated garage holds 30 fps on the user's iPhone (HR-10). The existing device report predates this art build.
+
 ## Status (ask 43, opened 2026-09-16 23:15)
 
 The user's `/goal`: integrate all of it and retire the prototype once trunk holds every asset, model and recipe. Findings

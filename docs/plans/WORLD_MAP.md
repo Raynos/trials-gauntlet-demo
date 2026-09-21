@@ -32,6 +32,7 @@ One tilted painted continent in campaign order: Industrial docks + refinery bott
 - [x] Bytes: world plate ≤ 350 KB per tier, region plates ≤ 300 KB each, nothing on the boot set, loader 8 192 B, bundle ≤ 600 KB gz. (R2: world 331 / 212 KB; regions 2x 243–296 KB — Industrial 284 KB at 1408 wide; 1x 166–266 KB; 3 011 KB in 12 lazy files)
 - [x] Evidence per round in `docs/evidence/world-map/round<N>/` (rounds 1–3): the played clip (menu → PLAY → drag-pan two regions → pinch out → zoom into Night City → tap H1 → fly to B1 → RIDE → 3 s → quit at 932 × 430), stills at 844 × 390 and 1280 × 720, `measure.json`, and the mockup-vs-built side-by-side.
 - [x] e2e: `--only=front`, `--only=run`, `--only=desktop` green with every diorama expectation re-pointed, not deleted. (R3: 476 / 90 / 188)
+- [ ] Actual iPhone Safari: PLAY → pan across two regions → pinch in and out → select a marker → return to menu, without lost gestures or sustained stutter. Record the user's reading in `docs/device/` (HR-13); the WebKit proxy above does not establish this.
 
 ## Status
 
