@@ -211,3 +211,5 @@ Open-face helmet remastered with compact crown, recessed vents, thin level peak,
 ### Opus integration handoff
 
 Art wrap-up: [exact selections, commits, contracts and remaining gates](../../prototypes/hero-garage/art/variants/OPUS_HANDOFF.md). Art already lives on shared main; no branch merge needed. Unaccepted R35 Race tracked edits archived locally and restored to committed recipes. Other workers’ game/UI/physics changes preserved. Sustained art remains stopped at2%.
+
+**Ask 77 / visual review:** user finds the current forward lean worse and prefers the backward pose. Matched-input before/current transition videos are recorded in [motion comparison](../evidence/riding-poses/motion-comparison/README.md). Forward visual acceptance remains open; implementation stays paused.

@@ -1,0 +1,205 @@
+{
+  "input": "harness/inputs/hero-r15/seated-forward-back.json",
+  "note": "Before = preserved pre-work baseline, not independently verified as yesterday. Main implementation remains paused. No runtime changes.",
+  "captures": {
+    "before": {
+      "build": "/tmp/trials-poses-aa-baseline/dist",
+      "recordingSha256": "a22550453addbd5dbbb274a0ef16841f40d0873eaef2b9e6cf0d243a91e90198",
+      "from": 120,
+      "to": 720,
+      "firstFrameInputTick": 124,
+      "frames": 150,
+      "fps": 30,
+      "quality": "high",
+      "outfit": "street-mustard",
+      "width": 1280,
+      "height": 720,
+      "errors": [],
+      "evidenceSha256": "fdbf2b27dc2fa89bd15aca84b41b3ed12507b77cadeeeedd7852cf5f43aaaf95"
+    },
+    "current": {
+      "build": "/tmp/trials-poses-round3/dist",
+      "recordingSha256": "a22550453addbd5dbbb274a0ef16841f40d0873eaef2b9e6cf0d243a91e90198",
+      "from": 120,
+      "to": 720,
+      "firstFrameInputTick": 124,
+      "frames": 150,
+      "fps": 30,
+      "quality": "high",
+      "outfit": "street-mustard",
+      "width": 1280,
+      "height": 720,
+      "errors": [],
+      "evidenceSha256": "e582a5478e1c004e08ae78f0918596a6fbb95fcf39341febe4159abd81721b1a"
+    }
+  },
+  "videos": {
+    "backward-slow.mp4": {
+      "sha256": "258060637574228a411f891a05e2eca1dff18e9cf89c73a4bc0fead39a78e12f",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1040,
+            "height": 660,
+            "nb_frames": "180"
+          }
+        ],
+        "format": {
+          "duration": "6.000000"
+        }
+      }
+    },
+    "forward-slow.mp4": {
+      "sha256": "7ef37bf506d4f2528ceb0c8a9410cfd76664004f25a3ab9028b528b7067b97ff",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1040,
+            "height": 660,
+            "nb_frames": "180"
+          }
+        ],
+        "format": {
+          "duration": "6.000000"
+        }
+      }
+    },
+    "forward-before-after.mp4": {
+      "sha256": "c1803edf5419440694e42296d6fb658591828a4450aad3b1727d70599df468b4",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1040,
+            "height": 660,
+            "nb_frames": "270"
+          }
+        ],
+        "format": {
+          "duration": "9.000000"
+        }
+      }
+    },
+    "evolution-climb.mp4": {
+      "sha256": "e334fba01966756d8ac9689e9978017b81f8f0b99c62570612fc4707f693d39c",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1280,
+            "height": 720,
+            "nb_frames": "420"
+          }
+        ],
+        "format": {
+          "duration": "7.007000"
+        }
+      }
+    },
+    "backward-realtime.mp4": {
+      "sha256": "e0ecc9de17ebd38c255a8205c4baf25c86c88b2f53e06dff7c23c024cc4dd7f3",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1040,
+            "height": 660,
+            "nb_frames": "90"
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      }
+    },
+    "evolution-weight-shifts.mp4": {
+      "sha256": "83a066fb290c251b7294134f511980982e5c6d2b4f01f8d2afb335a664ca44d8",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1280,
+            "height": 720,
+            "nb_frames": "390"
+          }
+        ],
+        "format": {
+          "duration": "6.506500"
+        }
+      }
+    },
+    "forward-realtime.mp4": {
+      "sha256": "4c7471a55be2ebe42d0da58caae8430e6f2607a21891c597f2b70551d6baf62d",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1040,
+            "height": 660,
+            "nb_frames": "90"
+          }
+        ],
+        "format": {
+          "duration": "3.000000"
+        }
+      }
+    },
+    "backward-before-after.mp4": {
+      "sha256": "d1f48aae02f73c1476eabfcd5015af6c611bb643aab5f6f29c71ff9527130778",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1040,
+            "height": 660,
+            "nb_frames": "270"
+          }
+        ],
+        "format": {
+          "duration": "9.000000"
+        }
+      }
+    },
+    "full-sequence-before-after.mp4": {
+      "sha256": "faf6a48547819ccf79ab7832e28b73623146ca634715678e99082c1445622ef3",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "width": 1040,
+            "height": 520,
+            "nb_frames": "150"
+          }
+        ],
+        "format": {
+          "duration": "5.000000"
+        }
+      }
+    }
+  },
+  "references": [
+    {
+      "file": "evolution-weight-shifts.mp4",
+      "source": "https://www.youtube.com/watch?v=J7CjAdnb_O0",
+      "start": 30.5,
+      "end": 37.0
+    },
+    {
+      "file": "evolution-climb.mp4",
+      "source": "https://www.youtube.com/watch?v=ytUW5r3RYw0",
+      "start": 58,
+      "end": 65
+    }
+  ]
+}

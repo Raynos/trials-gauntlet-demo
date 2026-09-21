@@ -107,3 +107,5 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 75 | "Wrap this up at a good pause point; 29% usage left" | **done** | Saved qualification-round3/PAUSE.md with the complete checkpoint and exact remaining R8 finding; all workers retired. Goal paused rather than marked complete. |
 
 | 76 | "Show before/after poses; show Trials Fusion and our game side by side" | **done** | Generated two three-row comparisons from recorded play; Fusion/source timestamps and camera/input limitations documented in docs/evidence/riding-poses/pose-comparison/. Main build goal remains paused. |
+
+| 77 | "Trials Evolution versus our game before/after; forward lean looks worse; show short neutral-to-forward/back transition videos" | **done — videos delivered for review** | Matched-input before/current forward and back transition MP4s, real time plus half speed; Evolution reference clips and provenance in docs/evidence/riding-poses/motion-comparison/. User rejects current forward silhouette; backward preferred. No runtime changes; main build remains paused. |
