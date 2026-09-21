@@ -1,0 +1,247 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:29:04.832Z",
+  "finishedAt": "2026-09-21T10:29:46.461Z",
+  "pass": true,
+  "artifacts": {
+    "baseline": {
+      "path": ".native-build/upgrade-round5/baseline.apk",
+      "sha256": "9d2ca3c434758572a045efe9e1db53aad5431e26c78b5e80e0035038190160eb",
+      "package": "package: name='com.trialsgauntlet.game' versionCode='1' versionName='1.0.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'"
+    },
+    "upgraded": {
+      "path": ".native-build/upgrade-round5/upgraded.apk",
+      "sha256": "6701585fa3359558b5749b7dec734fa08f6254adb01c7bcca6ec3bd503d36249",
+      "package": "package: name='com.trialsgauntlet.game' versionCode='2' versionName='1.0.1' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'"
+    }
+  },
+  "display": {
+    "size": "Physical size: 1080x2400\nOverride size: 720x1280",
+    "density": "Physical density: 420\nOverride density: 280"
+  },
+  "baselineBoot": {
+    "platform": "android",
+    "online": false,
+    "origin": "https://localhost",
+    "current": {
+      "checksum": "",
+      "id": "builtin",
+      "version": "1.0.0",
+      "downloaded": "1970-01-01T00:00:00.000Z",
+      "status": "success"
+    },
+    "marker": null,
+    "viewport": {
+      "width": 690,
+      "height": 360,
+      "dpr": 1.75
+    },
+    "screen": "menu"
+  },
+  "upgradedBoot": {
+    "platform": "android",
+    "online": false,
+    "origin": "https://localhost",
+    "current": {
+      "checksum": "",
+      "id": "builtin",
+      "version": "1.0.1",
+      "downloaded": "1970-01-01T00:00:00.000Z",
+      "status": "success"
+    },
+    "marker": null,
+    "viewport": {
+      "width": 690,
+      "height": 360,
+      "dpr": 1.75
+    },
+    "screen": "menu"
+  },
+  "installedVersion": [
+    "versionCode=2 minSdk=24 targetSdk=36",
+    "versionName=1.0.1"
+  ],
+  "pb": {
+    "time": 37.96666666666667,
+    "faults": 0,
+    "medal": "platinum",
+    "recordingBytes": 7567,
+    "recordingSha256": "2a9b7d4a77f6f82d44d7676f0723ccf838a500326db9429fac8d6a7b0753e3bb"
+  },
+  "baselineClear": {
+    "finished": true,
+    "time": 37.96666666666667,
+    "faults": 0,
+    "hash": "f0549ee508d870ed"
+  },
+  "upgradedClear": {
+    "finished": true,
+    "time": 37.96666666666667,
+    "faults": 0,
+    "hash": "f0549ee508d870ed"
+  },
+  "replay": {
+    "opened": true,
+    "info": {
+      "tick": 4556,
+      "length": 4556,
+      "playing": true,
+      "speed": 1,
+      "camera": "game"
+    },
+    "time": 37.96666666666667,
+    "phase": "finished"
+  },
+  "restart": {
+    "phase": "riding",
+    "tick": 1
+  },
+  "sourceRevision": "d41ff571",
+  "device": {
+    "avd": "trials_gauntlet_api36",
+    "api": 36,
+    "profile": "Pixel 7",
+    "headless": true
+  },
+  "runner": "scripts/native-android-upgrade.mjs",
+  "rawReport": ".native-build/upgrade-round5/report.json",
+  "cases": [
+    {
+      "name": "APK versions identify a real binary upgrade",
+      "pass": true
+    },
+    {
+      "name": "Real recorded ride earns durable PB medal and ghost",
+      "pass": true
+    },
+    {
+      "name": "Garage and settings fixture is durable",
+      "pass": true
+    },
+    {
+      "name": "install -r preserves native snapshot before first upgraded boot",
+      "pass": true
+    },
+    {
+      "name": "Offline upgraded boot restores every selected save entry",
+      "pass": true
+    },
+    {
+      "name": "Normal handlers read restored garage and settings",
+      "pass": true
+    },
+    {
+      "name": "Restored PB recording creates a live ghost on selected bike",
+      "pass": true
+    },
+    {
+      "name": "Stored PB replay reaches identical finish time after upgrade",
+      "pass": true
+    },
+    {
+      "name": "Recorded inputs remain deterministic across binary upgrade",
+      "pass": true
+    },
+    {
+      "name": "Upgraded app restarts to riding on the next simulation tick",
+      "pass": true
+    }
+  ],
+  "build": {
+    "trackedVersionUnchanged": true,
+    "sharedDistUnchanged": true,
+    "initScript": ".native-build/upgrade-round5/version.init.gradle",
+    "override": "gradle.beforeProject { p -> p.plugins.withId('com.android.application') { p.androidComponents.finalizeDsl { d -> d.defaultConfig.versionCode = 2; d.defaultConfig.versionName = '1.0.1' } } }",
+    "method": "assembleDebug with --init-script; same local debug signing key; verified packaged metadata before installation"
+  },
+  "nativeSave": {
+    "beforeGeneration": 7,
+    "afterInstall": {
+      "generation": 7,
+      "selectedEntriesSha256": "9b64c883ee8e6246d2d3148e2f81e9fb239b740740287222a73b9464a1a7ed76"
+    },
+    "selectedKeys": [
+      "trials.best.b1-first-ride@pro",
+      "trials.best.b1-first-ride@pro#board",
+      "trials.bikeClass",
+      "trials.fps",
+      "trials.ghost",
+      "trials.lastrun.b1-first-ride",
+      "trials.lastTrack",
+      "trials.onboarded",
+      "trials.quality",
+      "trials.riderOutfit",
+      "trials.sound",
+      "trials.volume"
+    ],
+    "selectedEntryCount": 12,
+    "allSelectedEntriesIdenticalAfterInstall": true,
+    "allSelectedEntriesReadAfterOfflineBoot": true,
+    "installCommand": "adb install -r upgraded.apk; no pm clear or uninstall between baseline and upgrade"
+  },
+  "restoredPreferences": {
+    "trials.bikeClass": "pro",
+    "trials.fps": "30",
+    "trials.ghost": "1",
+    "trials.lastTrack": "b1-first-ride",
+    "trials.onboarded": "1",
+    "trials.quality": "low",
+    "trials.riderOutfit": "race-bluewhite",
+    "trials.sound": "0",
+    "trials.volume": "0.4"
+  },
+  "restoredUI": {
+    "bike": "pro",
+    "outfit": "race-bluewhite",
+    "settings": {
+      "Quality": "low",
+      "Frame rate": null,
+      "Sound": "off",
+      "Volume": "40%",
+      "Ghost": "on",
+      "Bike model": "gltf",
+      "Run log": "on",
+      "Export run log": null,
+      "Reset progress": null,
+      "Reload game": null
+    }
+  },
+  "liveGhostAfterUpgrade": {
+    "exists": true,
+    "bike": "pro",
+    "outfit": "race-bluewhite"
+  },
+  "normalRestore": {
+    "install": "Performing Streamed Install\nSuccess",
+    "boot": {
+      "online": false,
+      "platform": "android",
+      "screen": "menu",
+      "current": {
+        "checksum": "",
+        "id": "builtin",
+        "version": "1.0.0",
+        "downloaded": "1970-01-01T00:00:00.000Z",
+        "status": "success"
+      },
+      "pbTime": 37.96666666666667
+    },
+    "version": [
+      "versionCode=1 minSdk=24 targetSdk=36",
+      "versionName=1.0.0"
+    ],
+    "pass": true
+  },
+  "limitations": [
+    "Task-owned API36 emulator with locally signed debug APKs; no store-delivered update or physical-device qualification.",
+    "Native binary version changed from1.0.0(1) to1.0.1(2); web assets and save schema stayed identical. This establishes same-schema upgrade persistence, not a future schema migration.",
+    "Recorded real solver input earned b1-first-ride progress/PB/ghost. UI callbacks selected preferences. No localStorage or native save fabrication.",
+    "Frame-rate selected value30 was checked in native and restored storage; UI segment query returned null, so no visible-selected-state claim for that row.",
+    "Earlier fixture setup clicked garage during its entrance and failed its prerequisite; preserved raw fixture-too-early.json. Final runner waits for live screen and committed selections."
+  ],
+  "cleanup": {
+    "emulatorPid": 52338,
+    "emulatorStopped": true,
+    "sdkAndProofArtifactsPreserved": true
+  }
+}

@@ -119,6 +119,36 @@ the iOS debug probe deadline when observing the 120-second startup watchdog; its
 The debug bridge observes readiness for up to 200 seconds and remains absent from Release builds.
 These suites cover update delivery and recovery, separately from native-input and physical-device gates.
 
+Native binary-upgrade tests keep actual game-earned PB/ghost recordings and normal UI preferences
+across install-over-existing-app replacement:
+
+```sh
+node scripts/native-ios-upgrade.mjs
+node scripts/native-android-upgrade.mjs --serial emulator-5554 \
+  --baseline .native-build/upgrade-round5/baseline.apk \
+  --upgraded .native-build/upgrade-round5/upgraded.apk
+```
+
+The iOS runner freezes the normal baseline and builds version 1.0.1 (2) into separate derived data;
+`--skip-build` reuses those frozen artifacts. It owns only the shutdown primary task simulator and
+restores the baseline without uninstalling. The Android runner requires two prebuilt APKs signed with
+the same key and differing native versions; it clears task-app data before seeding the baseline, then
+uses `adb install -r` without data clear for the upgrade. Its report includes both package versions.
+Neither test proves store-delivered upgrades. iOS Simulator can relocate its data container during
+replacement; saved bytes and game reads, rather than the container pathname, define persistence.
+
+Runtime native write failures now show a persistent warning with **Retry save**. The in-memory game
+continues; the last committed native snapshot remains available. The warning clears only after a
+successful native commit, including an automatic retry on a later mutation/lifecycle flush. Closing
+the app while the warning remains can lose changes that have not reached native storage.
+
+`node scripts/native-ios-storage-suite.mjs` and `node scripts/native-android-storage-suite.mjs`
+qualify the warning, unchanged committed slots, retry and cold-launch restoration. They intentionally
+place a directory at the task app's temporary save-file path to produce a real `EISDIR` write failure,
+then remove it and activate Retry save. This tests the write-error path without filling the host disk;
+it is not proof of OS low-storage or denied-access handling. Both change test preferences, capture a
+static warning screenshot, and clean their temporary obstruction/control files.
+
 ## Signed updates hosted on Vercel
 
 The native updater is `@capgo/capacitor-updater` in manual, self-hosted mode. Vendor auto-update,

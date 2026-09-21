@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:33:14.447Z",
+  "finishedAt": "2026-09-21T10:33:39.705Z",
+  "pass": true,
+  "apkSha256": "117ad2a29692ea15bb318825f35c6f303b96984ae25644639e90292f1934401b",
+  "fault": "Empty directory at files/trials-save-pending.json blocks an actual native write (EISDIR).",
+  "limitations": [
+    "Task-owned API36 headless emulator Debug build; Settings and retry DOM handlers, not OS touches.",
+    "EISDIR is not full-disk or permission-denial qualification. Selected committed save entries are preserved."
+  ],
+  "failure": {
+    "volume": "0.5",
+    "ready": true,
+    "warningVisible": true,
+    "text": "Progress isn’t saved. Retry before closing the app.",
+    "retry": "Retry save"
+  },
+  "failureGeometry": {
+    "viewport": {
+      "width": 690,
+      "height": 360,
+      "dpr": 1.75
+    },
+    "notice": {
+      "x": 65.14286041259766,
+      "y": 12.000000953674316,
+      "width": 560,
+      "height": 65.14286041259766
+    },
+    "button": {
+      "x": 516.7678833007812,
+      "y": 22.571430206298828,
+      "width": 93.80357360839844,
+      "height": 44.000003814697266
+    },
+    "buttonCenterHit": true,
+    "computedVisibility": "visible"
+  },
+  "warningScreenshot": ".native-build/android-storage-round5-warning.png",
+  "coldLaunch": {
+    "volume": "0.5",
+    "ready": true,
+    "warningVisible": false,
+    "online": false,
+    "platform": "android",
+    "current": {
+      "checksum": "",
+      "id": "builtin",
+      "version": "1.0.0",
+      "downloaded": "1970-01-01T00:00:00.000Z",
+      "status": "success"
+    }
+  },
+  "runner": "scripts/native-android-storage-suite.mjs",
+  "rawReport": ".native-build/android-storage-round5.json",
+  "sourceCandidate": "859cce51 plus native storage status / retry notice changes",
+  "device": {
+    "avd": "trials_gauntlet_api36",
+    "api": 36,
+    "profile": "Pixel 7",
+    "physicalPixels": [
+      1080,
+      2400
+    ],
+    "overridePixels": [
+      720,
+      1280
+    ],
+    "density": 280,
+    "webviewBoundsPixels": [
+      73,
+      49,
+      1280,
+      678
+    ]
+  },
+  "cases": [
+    {
+      "name": "Selected Settings volume is committed before obstruction",
+      "pass": true
+    },
+    {
+      "name": "Actual native write failure displays actionable retry notice",
+      "pass": true
+    },
+    {
+      "name": "Write failure preserves both committed snapshots byte for byte",
+      "pass": true
+    },
+    {
+      "name": "Retry commits new volume and preserves other selected state",
+      "pass": true
+    },
+    {
+      "name": "Retried save survives offline cold launch without warning",
+      "pass": true
+    }
+  ],
+  "snapshots": {
+    "before": [
+      {
+        "slot": "a",
+        "generation": 9,
+        "checksum": "a94c40f3",
+        "volume": "0.4",
+        "entryCount": 14
+      },
+      {
+        "slot": "b",
+        "generation": 8,
+        "checksum": "335b0a7a",
+        "volume": "0.4",
+        "entryCount": 14
+      }
+    ],
+    "duringFailure": [
+      {
+        "slot": "a",
+        "generation": 9,
+        "checksum": "a94c40f3",
+        "volume": "0.4",
+        "entryCount": 14
+      },
+      {
+        "slot": "b",
+        "generation": 8,
+        "checksum": "335b0a7a",
+        "volume": "0.4",
+        "entryCount": 14
+      }
+    ],
+    "afterRetry": [
+      {
+        "slot": "b",
+        "generation": 10,
+        "checksum": "5119632e",
+        "volume": "0.5",
+        "entryCount": 14
+      },
+      {
+        "slot": "a",
+        "generation": 9,
+        "checksum": "a94c40f3",
+        "volume": "0.4",
+        "entryCount": 14
+      }
+    ]
+  },
+  "otherEntriesPreserved": true,
+  "layoutChecks": {
+    "retryAtLeast44CSS": true,
+    "noticeWithinViewport": true,
+    "buttonCenterHit": true,
+    "osButtonCenterPixels": [
+      1059.4,
+      127
+    ],
+    "actionUsed": "DOM button click; pixel point is measured mapping, not an OS tap assertion"
+  },
+  "cleanup": {
+    "obstructionRemoved": true,
+    "currentApk": "normal version1.0.0/code1, bundled channel disabled",
+    "artifact": ".native-build/android-storage-round5.apk",
+    "emulatorPid": 52338,
+    "emulatorStopped": true,
+    "sdkAndProofArtifactsPreserved": true
+  },
+  "staticUiReview": "Parent inspected the captured native screenshot: warning and Retry save label are readable and unclipped inside the WebView. Geometry and center-hit checks support the static review; no OS-touch or motion claim."
+}

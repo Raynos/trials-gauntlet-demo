@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:36:22.007Z",
+  "baseRevision": "859cce51",
+  "finding": "Native snapshot write failures preserve committed progress but formerly gave players no visible warning. Native-only status and retry UI now remain until a durable commit succeeds.",
+  "hashes": {
+    "src/platform/native-storage.ts": "31eae75392c89bc5a2b078fae682de9293d44d608b8f40379b83fc0d8675911a",
+    "src/platform/native-bootstrap.ts": "610ccdebe6432a7d275b821b9e626b1e197dad3c305410660ae5bffed79e0321",
+    "src/ui/nativeSaveNotice.ts": "c76375ad6958d4282d385275a97005506cceb031a3b34d90a08537b9f2a0fec5",
+    ".native-build/ios/Build/Products/Debug-iphonesimulator/App.app/public/index.html": "f62f4bf568498eca53ea799ed5ffadb275b582144a496c4f4f9dde45f4292b23",
+    "android/app/build/outputs/apk/debug/app-debug.apk": "117ad2a29692ea15bb318825f35c6f303b96984ae25644639e90292f1934401b"
+  },
+  "validation": {
+    "unit": "40/40 targeted save/updater/notice tests pass, including repeated failure, preserved committed data, retry of newest pending changes and observer failure isolation.",
+    "types": "App and harness TypeScript checks pass.",
+    "lint": "Changed production and runner files pass targeted ESLint.",
+    "builds": "Native Vite + iOS Debug simulator + Android Debug APK build successfully; normal web production build passes and generated web JS contains no native save notice.",
+    "iosUpgrade": "Actual running 1.0.0(1)→1.0.1(2) preserves selected native save bytes and game reads, ghost, exact replay and restart; then baseline restored without uninstall.",
+    "androidUpgrade": "10/10 installed checks, including offline upgraded boot and PB/ghost preservation.",
+    "iosStorage": "Actual EISDIR preserves both slots, notice visible, retry advances committed generation, cold launch retains setting without warning.",
+    "androidStorage": "5/5 equivalent installed checks; offline cold launch retains recovered save.",
+    "staticUI": "Parent inspected both warning screenshots; text and button readable/unclipped. Measured buttons at least44CSSpx tall and contained in viewport."
+  },
+  "reports": [
+    "ios-upgrade-round5",
+    "android-upgrade-round5",
+    "ios-storage-round5",
+    "android-storage-round5"
+  ],
+  "cleanup": {
+    "taskIphone17eShutdown": true,
+    "taskPrimaryIphoneShutdown": true,
+    "taskAndroidEmulatorStopped": true,
+    "temporarySaveObstructionsRemoved": true
+  },
+  "limitations": [
+    "Upgrade tests use frozen pre-notice-repair Debug artifacts identified individually; final signed store candidates require reruns.",
+    "EISDIR is a real native filesystem write error but not actual disk exhaustion or permission denial.",
+    "iOS upgrade used bundled resources with network still enabled; Android upgrade/storage cold launch tested offline.",
+    "No physical-device performance, audible-output, human-play or store-approval claim."
+  ]
+}

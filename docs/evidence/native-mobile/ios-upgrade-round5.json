@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "startedAt": "2026-09-21T10:32:47.924Z",
+  "checkout": "859cce51a508498990d7a7b3b8b5665ef3c730c5",
+  "device": {
+    "udid": "F3058DD5-DCB6-4D86-93CC-6E56A785B788",
+    "name": "trials-iphone",
+    "model": "iPhone 16 Pro",
+    "runtime": "iOS Simulator 26.5"
+  },
+  "steps": [
+    {
+      "name": "seed",
+      "passed": true,
+      "probeAt": 1789986796667,
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/qualification-2026-09-21T10-32-47.923Z/seed.json",
+      "sha256": "8b944425cc068222006f11758e5950570eddff620e6b6f37758541b465329cbf",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/qualification-2026-09-21T10-32-47.923Z/seed.log"
+    },
+    {
+      "name": "upgraded",
+      "passed": true,
+      "probeAt": 1789986811722,
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/qualification-2026-09-21T10-32-47.923Z/upgraded.json",
+      "sha256": "9d2a4a9eaa02523f6fb5c51e3b40b72283f917cc5c0a831cde7e97ee7dd3f153",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/qualification-2026-09-21T10-32-47.923Z/upgraded.log"
+    },
+    {
+      "name": "restored",
+      "passed": true,
+      "probeAt": 1789986822019,
+      "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/qualification-2026-09-21T10-32-47.923Z/restored.json",
+      "sha256": "7a9dcbba2ea8ae8e522d73eccdaca17823d34bb0a3fd99e7b5d65d7a4dbbe088",
+      "log": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/qualification-2026-09-21T10-32-47.923Z/restored.log"
+    }
+  ],
+  "pass": true,
+  "scope": "Installed unsigned Debug binary 1.0.0 (1) to 1.0.1 (2), same app ID and existing container; no uninstall/reset.",
+  "limitations": [
+    "Simulator only; no physical-device or store-signed upgrade claim.",
+    "Bundled cold boot with disabled update channels and no external resource requests; simulator host network remains enabled, so this is not a network-disabled offline test.",
+    "Game hooks drive recorded input through the live game/result/storage path; Settings and Garage DOM handlers seed choices. Native OS touch qualification is separate.",
+    "No storage corruption or schema migration injected.",
+    "Playable ghost/replay state does not establish visual quality or audible output."
+  ],
+  "priorAttempts": [
+    {
+      "output": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/qualification-2026-09-21T10-30-06.662Z",
+      "pass": false,
+      "error": "/Users/raynos/.nvm/versions/node/v24.18.1/bin/node exited 1; see /Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/qualification-2026-09-21T10-30-06.662Z/seed.log",
+      "simulatorShutdown": true
+    },
+    {
+      "output": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/qualification-2026-09-21T10-31-42.510Z",
+      "pass": false,
+      "error": "Data container changed across install-over-existing-app upgrade",
+      "simulatorShutdown": true
+    }
+  ],
+  "baseline": {
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/Baseline.app",
+    "id": "com.trialsgauntlet.game",
+    "version": "1.0.0",
+    "build": "1",
+    "executableSha256": "15be6a773ae163c9c12205d7484fb3758625df58d13087dc139a3b8640c8594a",
+    "indexSha256": "04ce57154d93cd4bed916c7b8a3939f9c9d2dc77f287df7813551c415e50d66e",
+    "contract": {
+      "schema": 1,
+      "target": "native",
+      "runtime": "native-v1",
+      "saveSchema": 1,
+      "sourceRevision": "d41ff571",
+      "production": false,
+      "channels": null,
+      "publicKeyFingerprint": null
+    }
+  },
+  "upgraded": {
+    "path": "/Users/raynos/.codex/worktrees/a2364e70-1721-41a9-ac16-b99cb920c28f/trials-gauntlet-demo/.native-build/ios-upgrade/Build/Products/Debug-iphonesimulator/App.app",
+    "id": "com.trialsgauntlet.game",
+    "version": "1.0.1",
+    "build": "2",
+    "executableSha256": "d90ab225722490541548443e711ec02e2e855d0f1d5acdfa6f339811f7282a65",
+    "indexSha256": "04ce57154d93cd4bed916c7b8a3939f9c9d2dc77f287df7813551c415e50d66e",
+    "contract": {
+      "schema": 1,
+      "target": "native",
+      "runtime": "native-v1",
+      "saveSchema": 1,
+      "sourceRevision": "d41ff571",
+      "production": false,
+      "channels": null,
+      "publicKeyFingerprint": null
+    }
+  },
+  "beforeContainer": "/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/0D90DF83-9FA2-4F43-9760-2F8CE131F6C2",
+  "input": {
+    "path": "harness/inputs/b1-first-ride/bot-3-pro.json",
+    "sha256": "7a29068d600075a6e25df69c1e50a34952670c73a3baeed4cdcaa9c0348f04ba"
+  },
+  "seed": {
+    "clear": {
+      "faults": 0,
+      "hash": "f0549ee508d870ed",
+      "phase": "finished",
+      "time": 37.96666666666667
+    },
+    "pb": {
+      "time": 37.96666666666667,
+      "faults": 0,
+      "medal": "platinum",
+      "recordingSha256": "2a9b7d4a77f6f82d44d7676f0723ccf838a500326db9429fac8d6a7b0753e3bb"
+    },
+    "last": {
+      "time": 37.96666666666667,
+      "recordingSha256": "2a9b7d4a77f6f82d44d7676f0723ccf838a500326db9429fac8d6a7b0753e3bb"
+    },
+    "entryCount": 10,
+    "reads": {
+      "garage": {
+        "bike": "pro",
+        "outfit": "street-charcoal"
+      },
+      "settings": {
+        "ghost": "on",
+        "sound": "off",
+        "volume": "40%"
+      }
+    },
+    "selectedEntriesSha256": "8cd97c2a2af68d5dd6c922f56b5a4b2cee6c3ad6609779c53d2eba3f75bce5c6"
+  },
+  "afterContainer": "/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/38068D45-0638-4B05-97D5-7A5751C0F5F8",
+  "dataContainerRelocated": true,
+  "upgrade": {
+    "native": {
+      "build": "2",
+      "id": "com.trialsgauntlet.game",
+      "name": "Trials Gauntlet",
+      "version": "1.0.1"
+    },
+    "dataContainerRelocated": true,
+    "entriesByteEqual": true,
+    "ghost": {
+      "bike": "pro",
+      "present": true,
+      "track": "b1-first-ride"
+    },
+    "replay": {
+      "first": {
+        "hash": "f0549ee508d870ed",
+        "phase": "finished",
+        "time": 37.96666666666667
+      },
+      "second": {
+        "hash": "f0549ee508d870ed",
+        "phase": "finished",
+        "time": 37.96666666666667
+      },
+      "equal": true
+    },
+    "restart": {
+      "elapsedMs": 0,
+      "phase": "riding",
+      "tick": 1
+    },
+    "externalResources": [],
+    "selectedEntriesSha256": "8cd97c2a2af68d5dd6c922f56b5a4b2cee6c3ad6609779c53d2eba3f75bce5c6"
+  },
+  "restored": {
+    "native": {
+      "build": "1",
+      "id": "com.trialsgauntlet.game",
+      "name": "Trials Gauntlet",
+      "version": "1.0.0"
+    },
+    "entriesByteEqual": true,
+    "dataContainer": "/Users/raynos/Library/Developer/CoreSimulator/Devices/F3058DD5-DCB6-4D86-93CC-6E56A785B788/data/Containers/Data/Application/60EE7259-4927-405A-92E8-BDB47174DD1C",
+    "selectedEntriesSha256": "8cd97c2a2af68d5dd6c922f56b5a4b2cee6c3ad6609779c53d2eba3f75bce5c6"
+  },
+  "finishedAt": "2026-09-21T10:33:43.117Z",
+  "simulatorShutdown": true,
+  "selectedSaveHashMethod": "SHA-256 of JSON.stringify of the probe’s lexically sorted selected entries object; includes saved settings, bike, outfit, last track, every PB/leaderboard and last-run recording. Probe verifies exact same entries against newest valid checksummed native file slot.",
+  "harnessCorrections": [
+    "First seed attempt clicked the Garage before explicit live readiness after directly leaving results. No upgrade was installed in that attempt; final seed exits via normal Quit then awaits the live Garage.",
+    "Second attempt wrongly required unchanged simulator data-container UUID. iOS relocated its existing contents on replacement; final pass checks exact save bytes and actual running game reads, with container relocation recorded."
+  ],
+  "frozenArtifactScope": {
+    "bundledSourceRevision": "d41ff571",
+    "wrapperCheckout": "859cce51a508498990d7a7b3b8b5665ef3c730c5",
+    "runtimeSaveErrorRepairIncluded": false,
+    "note": "Upgrade artifacts were frozen before the separate Round 5 runtime save-error repair; this result qualifies preservation across native version replacement for those frozen artifacts."
+  }
+}

@@ -78,6 +78,7 @@ export class NativeSaveStorage implements Storage {
   private dirty = false;
   private pending: Promise<void> | null = null;
   private failed = false;
+  private readonly statusListeners = new Set<(failed: boolean) => void>();
   restoredMirror = false;
 
   private constructor(private readonly files: SaveFiles, private readonly mirror: Storage | null) {}
@@ -124,6 +125,20 @@ export class NativeSaveStorage implements Storage {
   }
 
   get saveFailed(): boolean { return this.failed; }
+  subscribeSaveStatus(listener: (failed: boolean) => void): () => void {
+    this.statusListeners.add(listener);
+    listener(this.failed);
+    return () => { this.statusListeners.delete(listener); };
+  }
+
+  private setFailed(failed: boolean): void {
+    if (this.failed === failed) return;
+    this.failed = failed;
+    for (const listener of this.statusListeners) {
+      // A presentation error must never interrupt committing or preserving a save.
+      try { listener(failed); } catch (error) { console.warn('[trials] save status listener failed', error); }
+    }
+  }
   get length(): number { return this.keys().length; }
   key(index: number): string | null { return this.keys()[index] ?? null; }
 
@@ -179,7 +194,8 @@ export class NativeSaveStorage implements Storage {
         this.dirty = false;
         const generation = this.generation + 1;
         if (!Number.isSafeInteger(generation)) {
-          this.dirty = this.failed = true;
+          this.dirty = true;
+          this.setFailed(true);
           throw new Error('Save generation limit reached.');
         }
         const entries = Object.fromEntries([...this.entries].sort(([a], [b]) => a.localeCompare(b)));
@@ -194,13 +210,13 @@ export class NativeSaveStorage implements Storage {
           await this.files.rename(TEMP_FILE, SAVE_SLOTS[slot]);
           this.currentSlot = slot;
           this.generation = generation;
-          this.failed = false;
         } catch (error) {
           this.dirty = true;
-          this.failed = true;
+          this.setFailed(true);
           throw error;
         }
       }
+      this.setFailed(false);
     }).finally(() => { this.pending = null; });
     return this.pending;
   }

@@ -4,6 +4,7 @@ import { App } from '@capacitor/app';
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { bootstrapNativeStorage } from './native-storage';
 import { createNativeUpdater, readUpdateConfig } from './updates';
+import { installNativeSaveNotice } from '../ui/nativeSaveNotice';
 
 export async function prepareNativeApp() {
   const saves = await bootstrapNativeStorage();
@@ -19,6 +20,8 @@ export async function prepareNativeApp() {
     config,
   });
   if (await updater.activateStagedAtBoot() === 'activated') return null;
+  const removeSaveNotice = installNativeSaveNotice(saves.storage);
+  window.addEventListener('pagehide', removeSaveNotice, { once: true });
   return {
     async ready(): Promise<void> {
       await updater.notifyReady();

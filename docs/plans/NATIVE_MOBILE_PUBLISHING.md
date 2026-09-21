@@ -178,6 +178,22 @@ preferences retained in native storage.
 Low-storage/denied-access failures, native binary upgrades, broader save corruption/migration cases,
 older OS coverage and final store-artifact reruns remain open.
 
+Round 5 qualifies a local native binary upgrade from 1.0.0 (1) to 1.0.1 (2) on
+[iOS](../evidence/native-mobile/ios-upgrade-round5.json) and
+[Android](../evidence/native-mobile/android-upgrade-round5.json). Game-earned B1 personal bests,
+ghost recordings and UI-selected preferences survive install-over-existing replacement. Both upgraded
+apps read the saved choices, load the ghost and replay the saved finish time exactly. Android was offline;
+iOS used only bundled resources but its Simulator network was not disabled. These frozen pre-repair
+Debug artifacts do not qualify a store-signed upgrade or a future save-schema migration.
+
+The same round found and repaired silent runtime save failures: native apps now show a warning and
+Retry save until a durable commit succeeds. The [iOS storage probe](../evidence/native-mobile/ios-storage-round5.json)
+and [Android storage probe](../evidence/native-mobile/android-storage-round5.json) use an actual
+temporary-path filesystem obstruction, prove both committed snapshots stay unchanged, then retry and
+verify the new setting on cold launch. Static native screenshot review confirms readable, unclipped
+messages and retry targets of at least 44 CSS pixels on both tested profiles. This `EISDIR` fault is deliberately distinct
+from real disk exhaustion or denied permissions; those OS-specific cases remain open.
+
 ### P0 — Freeze scope and build requirements
 
 - [ ] Record publisher identity, permanent bundle/application IDs, countries, device support and distribution

@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "at": "2026-09-21T10:32:18.142Z",
+  "device": "4AF4B80E-8F16-4883-B556-054C7AE08C10",
+  "pass": true,
+  "appIndexSha256": "f62f4bf568498eca53ea799ed5ffadb275b582144a496c4f4f9dde45f4292b23",
+  "fault": "A directory occupies Library/trials-save-pending.json, causing an actual native filesystem write failure. This is EISDIR, not disk exhaustion or a permission-denial simulation.",
+  "limits": [
+    "Simulator Debug build; DOM Settings/retry handlers, not OS touch or physical-device proof.",
+    "Verifies runtime failure/retry and selected preference preservation. True low-storage and denied-access OS cases remain open."
+  ],
+  "before": [
+    {
+      "slot": "b",
+      "version": 1,
+      "generation": 8,
+      "entries": {
+        "trials.heldTier": "high",
+        "trials.lastTrack": "b1-first-ride",
+        "trials.onboarded": "1",
+        "trials.volume": "0"
+      },
+      "checksum": "54e5819a"
+    },
+    {
+      "slot": "a",
+      "version": 1,
+      "generation": 7,
+      "entries": {
+        "trials.heldTier": "high",
+        "trials.lastTrack": "b1-first-ride",
+        "trials.onboarded": "1",
+        "trials.volume": "0.1"
+      },
+      "checksum": "ad8752a4"
+    }
+  ],
+  "failure": {
+    "token": "3404c682-44c5-4da9-a5d1-9ced16b9297f",
+    "volume": "0.1",
+    "warningVisible": true,
+    "text": "Progress isn’t saved. Retry before closing the app.",
+    "retry": "Retry save",
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "noticeRect": {
+      "x": 142,
+      "y": 12,
+      "width": 560,
+      "height": 66
+    },
+    "buttonRect": {
+      "x": 588.078125,
+      "y": 23,
+      "width": 98.921875,
+      "height": 44
+    }
+  },
+  "duringFailure": [
+    {
+      "slot": "b",
+      "version": 1,
+      "generation": 8,
+      "entries": {
+        "trials.heldTier": "high",
+        "trials.lastTrack": "b1-first-ride",
+        "trials.onboarded": "1",
+        "trials.volume": "0"
+      },
+      "checksum": "54e5819a"
+    },
+    {
+      "slot": "a",
+      "version": 1,
+      "generation": 7,
+      "entries": {
+        "trials.heldTier": "high",
+        "trials.lastTrack": "b1-first-ride",
+        "trials.onboarded": "1",
+        "trials.volume": "0.1"
+      },
+      "checksum": "ad8752a4"
+    }
+  ],
+  "warningScreenshot": ".native-build/ios-storage-layout-round5-failure.png",
+  "retry": {
+    "beforeRetry": {
+      "buttonRect": {
+        "height": 44,
+        "width": 98.921875,
+        "x": 588.078125,
+        "y": 23
+      },
+      "noticeRect": {
+        "height": 66,
+        "width": 560,
+        "x": 142,
+        "y": 12
+      },
+      "retry": "Retry save",
+      "text": "Progress isn’t saved. Retry before closing the app.",
+      "token": "3404c682-44c5-4da9-a5d1-9ced16b9297f",
+      "viewport": {
+        "height": 390,
+        "width": 844
+      },
+      "volume": "0.1",
+      "warningVisible": true
+    },
+    "ready": true,
+    "token": "3404c682-44c5-4da9-a5d1-9ced16b9297f",
+    "volume": "0.1",
+    "warningCleared": true
+  },
+  "afterRetry": [
+    {
+      "slot": "a",
+      "version": 1,
+      "generation": 9,
+      "entries": {
+        "trials.heldTier": "high",
+        "trials.lastTrack": "b1-first-ride",
+        "trials.onboarded": "1",
+        "trials.volume": "0.1"
+      },
+      "checksum": "01add326"
+    },
+    {
+      "slot": "b",
+      "version": 1,
+      "generation": 8,
+      "entries": {
+        "trials.heldTier": "high",
+        "trials.lastTrack": "b1-first-ride",
+        "trials.onboarded": "1",
+        "trials.volume": "0"
+      },
+      "checksum": "54e5819a"
+    }
+  ],
+  "coldLaunch": {
+    "ready": true,
+    "token": "3404c682-44c5-4da9-a5d1-9ced16b9297f",
+    "volume": "0.1",
+    "warningVisible": false
+  },
+  "finishedAt": "2026-09-21T10:32:43.855Z",
+  "sourceRevision": "859cce51 + native save notification changes",
+  "sourceHashes": {
+    "src/platform/native-storage.ts": "31eae75392c89bc5a2b078fae682de9293d44d608b8f40379b83fc0d8675911a",
+    "src/platform/native-bootstrap.ts": "610ccdebe6432a7d275b821b9e626b1e197dad3c305410660ae5bffed79e0321",
+    "src/ui/nativeSaveNotice.ts": "c76375ad6958d4282d385275a97005506cceb031a3b34d90a08537b9f2a0fec5",
+    "scripts/native-ios-storage-suite.mjs": "71514c27f200bf081db207ce7f5ebb322b417f47df1a264352b2fcc123147766"
+  },
+  "beforeFix": {
+    "at": "2026-09-21T10:27:26.396Z",
+    "volumeShown": "0.1",
+    "committedVolume": "0",
+    "committedSlotsUnchanged": true,
+    "saveWarningPresent": false,
+    "scope": "Actual EISDIR write failure, same task iPhone17e; Settings showed10% while latest committed volume stayed0."
+  },
+  "staticUiReview": "Parent inspected the captured native screenshot: full warning and Retry save label are legible, unclipped and within the landscape viewport. This is static UI review, not a played-motion verdict."
+}
