@@ -1,0 +1,58 @@
+--------- beginning of main
+09-22 18:23:43.408  5054  5209 I chromium: [0922/182343.407296:INFO:variations_seed_loader.cc(67)] Failed to open file for reading.: No such file or directory (2)
+09-22 18:23:43.408  5054  5209 I chromium: [0922/182343.408788:INFO:variations_seed_loader.cc(67)] Failed to open file for reading.: No such file or directory (2)
+09-22 18:23:43.770  5054  5289 W chromium: [WARNING:dns_config_service_android.cc(81)] Failed to read DnsConfig.
+09-22 18:23:44.226  5054  5054 I RockhopGate: armed {"clear":["gate\/flat-test.bot-3.json","gate\/b1-first-ride.bot-3.json"],"crash":"gate\/flat-test.crash.json","paced":0,"track":"flat-test","restartReps":20}
+09-22 18:23:44.310  5292  5318 W chromium: [WARNING:runtime_features.cc(560)] Fenced frames cannot be enabled in this configuration. Use --enable-features=FencedFrames instead.
+09-22 18:23:44.310  5292  5318 W chromium: [WARNING:runtime_features.cc(585)] Topics cannot be enabled in this configuration. Use --enable-features=BrowsingTopics in addition.
+09-22 18:23:44.310  5292  5318 W chromium: [WARNING:runtime_features.cc(606)] SharedStorage cannot be enabled in this configuration. Use --enable-features=SharedStorageAPI in addition.
+09-22 18:23:44.311  5054  5352 W chromium: [WARNING:viz_main_impl.cc(85)] VizNullHypothesis is disabled (not a warning)
+09-22 18:23:46.331  5054  5054 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+09-22 18:23:46.342  5054  5054 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+09-22 18:23:46.342  5054  5054 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+09-22 18:23:46.343  5054  5054 I Capacitor/Console: File:  - Line 333 - Msg: {"keys":[]}
+09-22 18:23:46.356  5054  5054 I Capacitor/Console: File: https://localhost/assets/index-DUOxQhuc.js - Line 2 - Msg: [rockhop] storage hydrated: 0 restored, 0 pushed (android)
+09-22 18:23:46.361  5054  5054 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+09-22 18:23:47.109  5054  5054 I Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 1895 - Msg: [trials] physics=createBikePhysics render=ThreeRenderer audio=WebAudioSystem harness=false
+09-22 18:23:54.194  6224  6338 I chromium: [0922/182354.194361:INFO:variations_seed_loader.cc(67)] Failed to open file for reading.: No such file or directory (2)
+09-22 18:23:54.194  6224  6338 I chromium: [0922/182354.194573:INFO:variations_seed_loader.cc(67)] Failed to open file for reading.: No such file or directory (2)
+09-22 18:23:54.383  6224  6371 E chromium: [ERROR:simple_file_enumerator.cc(21)] opendir /data/user/0/com.google.android.googlequicksearchbox/cache/webview_assistant/Profile 1/HTTP Cache/Code Cache/wasm: No such file or directory (2)
+09-22 18:23:54.383  6224  6371 E chromium: [ERROR:simple_index_file.cc(613)] Could not reconstruct index from disk
+09-22 18:23:54.435  6342  6364 W chromium: [WARNING:runtime_features.cc(560)] Fenced frames cannot be enabled in this configuration. Use --enable-features=FencedFrames instead.
+09-22 18:23:54.435  6342  6364 W chromium: [WARNING:runtime_features.cc(585)] Topics cannot be enabled in this configuration. Use --enable-features=BrowsingTopics in addition.
+09-22 18:23:54.435  6342  6364 W chromium: [WARNING:runtime_features.cc(606)] SharedStorage cannot be enabled in this configuration. Use --enable-features=SharedStorageAPI in addition.
+09-22 18:23:54.462  6224  6387 W chromium: [WARNING:viz_main_impl.cc(85)] VizNullHypothesis is disabled (not a warning)
+09-22 18:23:54.523  5054  5054 W Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 907 - Msg: [render] track budget: 11 calls / 177888 tris (cap 20 / 80k)
+09-22 18:23:54.540  5054  5054 I Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 1895 - Msg: [trials] loadTrack b1-first-ride 1500 ms
+09-22 18:23:54.596  6224  6412 W chromium: [0922/182354.596222:WARNING:components/cronet/url_request_context_config.cc:769] Unrecognized Cronet experimental option "enable_telemetry" with params "false
+09-22 18:23:54.596  6224  6412 W chromium: 
+09-22 18:23:54.977  5054  5054 W Capacitor/Console: File: https://localhost/assets/three-C82J6JQB.js - Line 1 - Msg: THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.
+09-22 18:23:58.064  5054  5054 W Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 907 - Msg: [render] track budget: 11 calls / 177888 tris (cap 20 / 80k)
+09-22 18:24:02.747  5054  5054 W Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 881 - Msg: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
+09-22 18:24:43.028  5054  5054 W Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 881 - Msg: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
+09-22 18:24:55.892  5054  5054 W Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 881 - Msg: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
+09-22 18:24:55.994  5054  5054 W Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 907 - Msg: [render] track budget: 11 calls / 177888 tris (cap 20 / 80k)
+09-22 18:24:56.006  5054  5054 I Capacitor/Console: File:  - Line 1 - Msg: [rockhop-gate] boot {"name":"boot","hookMs":3932,"loaderGoneMs":55440,"menuMs":55440,"track":"flat-test","startToRidingMs":12457,"startError":null,"renderer":{"biome":"industrial","zoom":"idle","phase":"riding","tier":"low","dpr":1.5,"devicePixelRatio":1.5,"canvasW":1294,"canvasH":618,"calls":107,"tris":93928,"rtMpx":4.26,"rtMB":38.6,"rtPasses":"shadow 512×512 | scene:hdr 1294.5×618 | composite:graded 1294×618 | smaa
+09-22 18:24:56.007  5054  5054 I Capacitor/Console: File: https://localhost/assets/gate-DQrKvjO2.js - Line 1 - Msg: [rockhop-gate] boot {"name":"boot","hookMs":3932,"loaderGoneMs":55440,"menuMs":55440,"track":"flat-test","startToRidingMs":12457,"startError":null,"renderer":{"biome":"industrial","zoom":"idle","phase":"riding","tier":"low","dpr":1.5,"devicePixelRatio":1.5,"canvasW":1294,"canvasH":618,"calls":107,"tris":93928,"rtMpx":4
+09-22 18:24:57.970  5054  5054 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+09-22 18:24:57.974  5054  5054 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+09-22 18:24:57.977  5054  5054 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+09-22 18:24:57.979  5054  5054 I Capacitor/Console: File:  - Line 333 - Msg: {"keys":[]}
+09-22 18:24:57.980  5054  5054 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+09-22 18:24:57.983  5054  5054 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+09-22 18:24:57.985  5054  5054 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+09-22 18:24:57.988  5054  5054 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+09-22 18:24:57.988  5054  5054 I Capacitor/Console: File: https://localhost/assets/index-DUOxQhuc.js - Line 2 - Msg: [rockhop] storage hydrated: 0 restored, 2 pushed (android)
+09-22 18:24:57.995  5054  5054 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+09-22 18:24:58.164  5054  5054 I Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 1895 - Msg: [trials] physics=createBikePhysics render=ThreeRenderer audio=WebAudioSystem harness=true | compose at 1597 ms since nav; ms: render 124 physics 7 audio 8 game+hud 1
+09-22 18:24:59.121  5054  5054 I Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 1895 - Msg: [trials] loadTrack flat-test 905 ms
+09-22 18:25:00.007  5054  5054 W Capacitor/Console: File: https://localhost/assets/three-C82J6JQB.js - Line 1 - Msg: THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.
+09-22 18:25:09.908  5054  5054 W Capacitor/Console: File: https://localhost/assets/index-CM0oAbyv.js - Line 907 - Msg: [render] track budget: 11 calls / 177888 tris (cap 20 / 80k)
+09-22 18:25:10.505  5054  5054 I Capacitor/Console: File:  - Line 1 - Msg: [rockhop-gate] clear {"name":"clear","rows":[{"file":"gate/flat-test.bot-3.json","trackId":"flat-test","bike":"rookie","ticks":1031,"finishTime":8.591666666666667,"finishTimeHex":"efeeeeeeee2e2140","hash":"622bb2554e0f9a26","cleared":true,"wallMs":440},{"file":"gate/b1-first-ride.bot-3.json","trackId":"b1-first-ride","bike":"rookie","ticks":4810,"finishTime":40.083333333333336,"finishTimeHex":"abaaaaaaaa0a4440","hash"
+09-22 18:25:10.505  5054  5054 I Capacitor/Console: File: https://localhost/assets/gate-DQrKvjO2.js - Line 1 - Msg: [rockhop-gate] clear {"name":"clear","rows":[{"file":"gate/flat-test.bot-3.json","trackId":"flat-test","bike":"rookie","ticks":1031,"finishTime":8.591666666666667,"finishTimeHex":"efeeeeeeee2e2140","hash":"622bb2554e0f9a26","cleared":true,"wallMs":440},{"file":"gate/b1-first-ride.bot-3.json","trackId":"b1-first-ride","b
+09-22 18:26:09.947 11969 12515 W chromium: [0922/182609.945812:WARNING:url_request_context_config.cc(715)] Unrecognized Cronet experimental option "enable_telemetry" with params "true
+09-22 18:26:09.947 11969 12515 W chromium: 
+09-22 18:26:47.053  5054  5054 I Capacitor/Console: File:  - Line 1 - Msg: [rockhop-gate] result {"name":"result","readyMs":3549,"clear":[{"file":"gate/flat-test.bot-3.json","trackId":"flat-test","bike":"rookie","ticks":1031,"finishTime":8.591666666666667,"finishTimeHex":"efeeeeeeee2e2140","hash":"622bb2554e0f9a26","cleared":true,"wallMs":440},{"file":"gate/b1-first-ride.bot-3.json","trackId":"b1-first-ride","bike":"rookie","ticks":4810,"finishTime":40.083333333333336,"finishTimeHex":"abaaaaa
+09-22 18:26:47.053  5054  5054 I Capacitor/Console: File: https://localhost/assets/gate-DQrKvjO2.js - Line 1 - Msg: [rockhop-gate] result {"name":"result","readyMs":3549,"clear":[{"file":"gate/flat-test.bot-3.json","trackId":"flat-test","bike":"rookie","ticks":1031,"finishTime":8.591666666666667,"finishTimeHex":"efeeeeeeee2e2140","hash":"622bb2554e0f9a26","cleared":true,"wallMs":440},{"file":"gate/b1-first-ride.bot-3.json","trackId":"
+09-22 18:26:47.054  5054  5054 I Capacitor/Console: File:  - Line 1 - Msg: [rockhop-gate] done {"name":"done","platform":"android","atMs":110630}
+09-22 18:26:47.054  5054  5054 I Capacitor/Console: File: https://localhost/assets/gate-DQrKvjO2.js - Line 1 - Msg: [rockhop-gate] done {"name":"done","platform":"android","atMs":110630}

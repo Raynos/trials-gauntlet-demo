@@ -13,6 +13,11 @@
  *                             public/ alone, so a JS-only deploy does NOT re-download 7 MB of art.
  *   trials-shell-<build>      the ~25 KB that changes every build: index.html, offline.html,
  *                             manifest.webmanifest, load-manifest.json.
+ *   rockhop-audio             the recorded music (/audio/<cue>-<8 hex>.m4a, src/audio/music/cues.ts):
+ *                             content-addressed, cache-first from the FIRST play, never precached (6.5 MB
+ *                             the player may never hear). Not in the load-manifest, so the immutable prune
+ *                             would drop it: its own cache, which keeps one file per cue (a new hash of
+ *                             `menu` replaces the old one when it is first fetched).
  *
  *   install   precache the critical shell (strict — a failed shell fails install, so the old worker
  *             keeps serving) plus the icons (tolerant: the `art=absent` harness config has none).
@@ -36,7 +41,8 @@ const ASSETS = '__ASSET_ID__';
 const SHELL = `trials-shell-${BUILD}`;
 const STATIC = `trials-static-${ASSETS}`;
 const IMMUTABLE_CACHE = 'trials-immutable';
-const KEEP = [SHELL, STATIC, IMMUTABLE_CACHE];
+const AUDIO_CACHE = 'rockhop-audio';
+const KEEP = [SHELL, STATIC, IMMUTABLE_CACHE, AUDIO_CACHE];
 
 /** Install fails without these: an incomplete shell must not pretend to be installed. */
 const SHELL_CRITICAL = ['./index.html', './offline.html', './manifest.webmanifest'];
@@ -45,6 +51,8 @@ const SHELL_OPTIONAL = ['./art/icons/apple-touch-icon.png', './art/icons/favicon
 
 const IMMUTABLE_RE = /\/assets\/.+-[\w-]{8}\.\w+$|\/models\/[a-f0-9]{16}\/[\w-]+-[a-f0-9]{16}\.glb$/;
 const STATIC_RE = /\/fonts\/|\/art\/|\/models\//;
+/** A music cue: `/audio/<cue>-<8 hex>.m4a`; group 1 is the cue, the part two builds of the same cue share. */
+const AUDIO_RE = /\/audio\/([\w-]+)-[a-f0-9]{8}\.m4a$/;
 
 const cacheFor = (pathname) => (IMMUTABLE_RE.test(pathname) ? IMMUTABLE_CACHE : STATIC);
 
@@ -174,6 +182,13 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(networkFirst(req, SHELL));
     return;
   }
+  const cue = AUDIO_RE.exec(url.pathname);
+  // A Range request (an <audio> element seeking) cannot be answered from, or stored into, Cache Storage whole:
+  // leave it to the network. The game fetches cues whole and decodes them (src/audio/music).
+  if (cue && !req.headers.has('range')) {
+    event.respondWith(audioFirst(req, cue[1]));
+    return;
+  }
   if (IMMUTABLE_RE.test(url.pathname) || STATIC_RE.test(url.pathname)) {
     event.respondWith(cacheFirst(req, cacheFor(url.pathname)));
     return;
@@ -215,6 +230,28 @@ async function cacheFirst(req, name) {
   if (hit) return hit;
   const res = await fetch(req);
   if (res.ok) cache.put(req, res.clone()).catch(() => undefined);
+  return res;
+}
+
+/** Cache-first for a music cue; a first fetch also drops the cue's older hashes, so the cache holds one file per cue. */
+async function audioFirst(req, cue) {
+  const cache = await caches.open(AUDIO_CACHE);
+  const hit = await cache.match(req, MATCH_OPTS);
+  if (hit) return hit;
+  const res = await fetch(req);
+  if (res.status === 200) {
+    const keep = new URL(req.url).pathname;
+    cache
+      .put(req, res.clone())
+      .then(async () => {
+        for (const old of await cache.keys()) {
+          const p = new URL(old.url).pathname;
+          const m = AUDIO_RE.exec(p);
+          if (m && m[1] === cue && p !== keep) await cache.delete(old);
+        }
+      })
+      .catch(() => undefined);
+  }
   return res;
 }
 

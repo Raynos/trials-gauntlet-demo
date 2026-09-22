@@ -48,7 +48,7 @@ import { startTier } from './game/startTier';
 import { loadRiderOutfit } from './ui/outfit';
 import { armCrashTest, crashTestBoot, crashTestMode, showThrown } from './ui/errorModal';
 import { installUpdatePill } from './ui/updatePill';
-import { AUTOMATION_HOOK, DEV_SURFACES } from './core/release';
+import { AUTOMATION_HOOK, DEV_SURFACES, STORE } from './core/release';
 
 type AnyModule = Record<string, unknown>;
 
@@ -440,4 +440,14 @@ function boot(): void {
   }
 }
 
-boot();
+// The native shells (store build only; the web bundle folds this away and emits no platform chunk): durable storage
+// hydrated from @capacitor/preferences, the audio session, system back and — in a gate run — the gate runner, all
+// before the first setting is read (src/platform/index.ts).
+if (STORE) {
+  void import('./platform')
+    .then((p) => p.startPlatform())
+    .catch((e: unknown) => console.warn('[rockhop] platform start failed', e))
+    .finally(boot);
+} else {
+  boot();
+}

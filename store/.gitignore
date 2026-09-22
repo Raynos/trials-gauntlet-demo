@@ -1,0 +1,2 @@
+# Store bundles built by scripts/store-build.mjs (the Capacitor webDir) and their moved-out source maps.
+build/

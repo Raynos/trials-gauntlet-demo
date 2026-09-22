@@ -86,6 +86,20 @@ describe('store build (VITE_STORE=1) compiles out every dev surface', () => {
     expect(store.files.some((f) => f.startsWith('assets/inbox-'))).toBe(false);
   });
 
+  it('the native platform layer (Capacitor, src/platform) ships in the store build only — the web bundle has none of it', () => {
+    // Markers from @capacitor/core and the plugins src/platform registers: present in the store build (so a miss in
+    // the web build is a real absence), and the web build must not carry a byte of it — back.ts is imported
+    // statically by UI code, so its Capacitor import has to stay behind the STORE-guarded dynamic import.
+    const capacitor = ['isNativePlatform', 'registerPlugin("Preferences"', 'registerPlugin("App"'];
+    for (const m of capacitor) expect(store.text, `store build lost marker ${m}`).toContain(m);
+    for (const m of capacitor) expect(web.text, `web build carries Capacitor: ${m}`).not.toContain(m);
+    // The in-app gate runner exists only in the native gate's debug build (VITE_STORE_DEBUG=1), never in a release.
+    for (const b of [web, store]) {
+      expect(b.text).not.toContain('__rockhopGate');
+      expect(b.files.some((f) => /^assets\/gate-[\w-]+\.js$/.test(f))).toBe(false);
+    }
+  });
+
   it('no build deploys a source map (moved to <outDir>-maps) or points at one', () => {
     for (const b of [web, store]) {
       expect(b.files.filter((f) => f.endsWith('.map'))).toEqual([]);

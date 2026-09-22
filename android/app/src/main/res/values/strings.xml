@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rockhop</string>
+    <string name="title_activity_main">Rockhop</string>
+    <string name="package_name">com.jakeverbaten.rockhop</string>
+    <string name="custom_url_scheme">com.jakeverbaten.rockhop</string>
+</resources>
