@@ -251,10 +251,10 @@ describe.each(ALL_TRACKS.map((t) => [t.id, t] as const))('%s', (id, def) => {
     const after = def.obstacles.filter((o) => o.pos.x >= def.finishX + FINISH_RUNOUT.flat - 1e-9);
     expect(after[0]?.kind).toBe('ramp');
     expect(after[1]?.kind === 'box' || after[1]?.kind === 'wall').toBe(true);
-    expect((after[1]?.params as { height: number }).height).toBeGreaterThanOrEqual(FINISH_RUNOUT.catchHeight);
+    expect((after[1]!.params as { height: number }).height).toBeGreaterThanOrEqual(FINISH_RUNOUT.catchHeight);
     expect(def.obstacles.some((o) => o.pos.x > def.finishX && o.pos.x < def.finishX + FINISH_RUNOUT.flat - 1e-9)).toBe(false);
     // the catch stands inside the world: bounds cover it and oobY lies under the run-out
-    const catchEnd = (after[1] as TrackObstacle).pos.x + ((after[1]?.params as { width?: number }).width ?? 4);
+    const catchEnd = (after[1] as TrackObstacle).pos.x + ((after[1]!.params as { width?: number }).width ?? 4);
     expect(track.bounds.maxX).toBeGreaterThanOrEqual(catchEnd);
     expect(track.oobY).toBeLessThan(y0 - 5);
   });

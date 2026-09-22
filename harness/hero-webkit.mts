@@ -23,8 +23,9 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-/* eslint-disable @typescript-eslint/no-explicit-any -- in-page probes read the renderer's private handles through window.__render */
-import { webkit, type Browser, type BrowserContext } from 'playwright';
+/* oxlint-disable typescript/no-explicit-any -- in-page probes read the renderer's private handles through window.__render */
+import { webkit, type Browser, type BrowserContext, type Page } from 'playwright';
+import type { Bone, PerspectiveCamera, Scene, SkinnedMesh, WebGLRenderer, WebGLRenderTarget } from 'three';
 import { launchBrowser } from './lib/browser';
 import { startServer } from './lib/server';
 import { loadRecording } from './lib/recording';
@@ -115,8 +116,8 @@ function probeInPage([inputs, MASK_PX]: [unknown[], number]): Row {
   const rider = r.riderRef;
   const bike = r.bikeRef;
   const THREE = r.debug.THREE;
-  const renderer = r.renderer as import('three').WebGLRenderer;
-  const cam = r.rig.camera as import('three').PerspectiveCamera;
+  const renderer = r.renderer as WebGLRenderer;
+  const cam = r.rig.camera as PerspectiveCamera;
   rider.scene.updateMatrixWorld(true);
   const hand: [number, number] = [0, 0];
   for (let i = 0; i < 2; i++) {
@@ -130,7 +131,7 @@ function probeInPage([inputs, MASK_PX]: [unknown[], number]): Row {
     bike.frame.worldToLocal(p);
     hand[i] = +p.distanceTo(rider.chain.hand[i]).toFixed(4);
   }
-  let sk: import('three').SkinnedMesh | null = null;
+  let sk: SkinnedMesh | null = null;
   rider.scene.traverse((o: any) => {
     if (o.isSkinnedMesh && !sk) sk = o;
   });
@@ -139,7 +140,7 @@ function probeInPage([inputs, MASK_PX]: [unknown[], number]): Row {
   {
     let worst = 0;
     let who = '';
-    for (const [name, b] of rider.bones as Map<string, import('three').Bone>) {
+    for (const [name, b] of rider.bones as Map<string, Bone>) {
       if (name === 'pelvis') continue;
       const rest = rider.restLocalP.get(name);
       if (!rest) continue;
@@ -156,18 +157,18 @@ function probeInPage([inputs, MASK_PX]: [unknown[], number]): Row {
     out.grip = rider.chain.hand[0].toArray().map((n: number) => +n.toFixed(3));
   }
   if (!sk) return out;
-  const mesh = sk as import('three').SkinnedMesh;
+  const mesh = sk as SkinnedMesh;
   // Offscreen target: the canvas aspect at 512 px wide.
   const size = renderer.getDrawingBufferSize(new THREE.Vector2());
   const W = 512;
   const H = Math.max(1, Math.round((W * size.y) / size.x));
-  let rt = w.__heroProbeRT as import('three').WebGLRenderTarget | undefined;
+  let rt = w.__heroProbeRT as WebGLRenderTarget | undefined;
   if (!rt || rt.width !== W || rt.height !== H) {
     rt?.dispose();
-    rt = new THREE.WebGLRenderTarget(W, H, { depthBuffer: true, stencilBuffer: false }) as import('three').WebGLRenderTarget;
+    rt = new THREE.WebGLRenderTarget(W, H, { depthBuffer: true, stencilBuffer: false }) as WebGLRenderTarget;
     w.__heroProbeRT = rt;
   }
-  const target = rt as import('three').WebGLRenderTarget;
+  const target = rt as WebGLRenderTarget;
   // CPU truth: every vertex through the same skin on the CPU, projected with the same camera.
   cam.updateMatrixWorld(true);
   mesh.updateMatrixWorld(true);
@@ -204,7 +205,7 @@ function probeInPage([inputs, MASK_PX]: [unknown[], number]): Row {
   renderer.setClearColor(0x000000, 0);
   renderer.autoClear = true;
   renderer.clear();
-  renderer.render(mesh as unknown as import('three').Scene, cam);
+  renderer.render(mesh as unknown as Scene, cam);
   const buf = new Uint8Array(W * H * 4);
   renderer.readRenderTargetPixels(target, 0, 0, W, H, buf);
   renderer.setRenderTarget(prevRT);
@@ -241,7 +242,7 @@ function probeInPage([inputs, MASK_PX]: [unknown[], number]): Row {
 function envInPage(): Record<string, unknown> {
   const w = window as any;
   const r = w.__render;
-  const renderer = r.renderer as import('three').WebGLRenderer;
+  const renderer = r.renderer as WebGLRenderer;
   const gl = renderer.getContext() as WebGL2RenderingContext;
   const dbg = gl.getExtension('WEBGL_debug_renderer_info');
   const rider = r.riderRef;
@@ -298,7 +299,7 @@ async function launch(engine: string): Promise<{ browser: Browser; context: Brow
 
 type Mode = 'harness' | 'app' | 'bench';
 
-async function openPage(b: { context: BrowserContext }, baseUrl: string, mode: Mode): Promise<{ page: import('playwright').Page; errors: string[] }> {
+async function openPage(b: { context: BrowserContext }, baseUrl: string, mode: Mode): Promise<{ page: Page; errors: string[] }> {
   const page = await b.context.newPage();
   await page.addInitScript('window.__name = function (f) { return f; };'); // tsx keepNames helper inside evaluated functions
   // A fresh context is a first launch: the onboarding card would pause the run behind it (the bench skips it, the live leg must too).
@@ -498,7 +499,7 @@ for (const tier of tiers) {
 if (args.includes('--json')) console.log(JSON.stringify(results.map((r) => ({ engine: r.engine, tier: r.tier, mode: r.mode, env: r.env, rows: r.rows })), null, 0));
 else {
   for (const r of results) {
-    console.log(`\n${r.engine} ${r.tier} ${r.mode}: heroDoc=${r.env.heroDoc} dpr=${r.env.dpr} buffer=${r.env.drawingBuffer} bones=${r.env.bones} boneTex=${JSON.stringify(r.env.boneTexture)} skinIndex=${JSON.stringify(r.env.skinIndex)} errors=${JSON.stringify(r.env.pageErrors)}`);
+    console.log(`\n${r.engine} ${r.tier} ${r.mode}: heroDoc=${String(r.env.heroDoc)} dpr=${String(r.env.dpr)} buffer=${String(r.env.drawingBuffer)} bones=${String(r.env.bones)} boneTex=${JSON.stringify(r.env.boneTexture)} skinIndex=${JSON.stringify(r.env.skinIndex)} errors=${JSON.stringify(r.env.pageErrors)}`);
     console.log('  t      handL   handR   reachL  reachR  drift(mm) bone        cpuBox                    gpuBox                    overhang  scenario');
     for (const row of r.rows) {
       const quiet = row.overhang <= MASK_PX && Math.max(...row.hand) * 100 <= HAND_CM && (row.drift ?? 0) * 1000 <= DRIFT_MM;

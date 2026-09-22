@@ -119,7 +119,7 @@ function normalizeHeroMaterials(gltf: GLTF): void {
   };
   gltf.scene.traverse((o) => {
     const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh || /_blur$/.test(mesh.name)) return; // the spoke blur cards are the one authored blend (SpokeBlur owns them)
+    if (!mesh.isMesh || mesh.name.endsWith('_blur')) return; // the spoke blur cards are the one authored blend (SpokeBlur owns them)
     for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) fix(m);
   });
 }

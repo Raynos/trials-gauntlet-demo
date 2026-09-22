@@ -199,7 +199,7 @@ try {
   await page.evaluate(async () => { await (window as unknown as { __render: { whenReady(): Promise<void> } }).__render.whenReady(); });
   mark('garageLive');
   if (garageQuality) await page.evaluate(async (q) => { (window as unknown as { __trials: { setQuality(t: string): void } }).__trials.setQuality(q); await (window as unknown as { __render: { whenReady(): Promise<void> } }).__render.whenReady(); }, garageQuality);
-  log['garageBoot'] = await page.evaluate(() => { const d = (window as unknown as { __render: { debugInfo(): Record<string, unknown> } }).__render.debugInfo(); return { heroDoc: d['heroDoc'], outfit: d['riderOutfit'], calls: d['calls'], tris: d['tris'], heroTris: d['heroTris'], garage: d['garage'], tier: d['tier'], profile: d['profile'], dpr: d['dpr'], canvas: `${d['canvasW']}x${d['canvasH']}` }; });
+  log['garageBoot'] = await page.evaluate(() => { const d = (window as unknown as { __render: { debugInfo(): Record<string, unknown> } }).__render.debugInfo(); return { heroDoc: d['heroDoc'], outfit: d['riderOutfit'], calls: d['calls'], tris: d['tris'], heroTris: d['heroTris'], garage: d['garage'], tier: d['tier'], profile: d['profile'], dpr: d['dpr'], canvas: `${String(d['canvasW'])}x${String(d['canvasH'])}` }; });
   await page.waitForTimeout(1000);
   // Every outfit; on each, Pro then Rookie so both liveries are seen under every outfit (15 swaps).
   for (const preset of AVAILABLE_RIDER_PRESETS) {
@@ -208,7 +208,7 @@ try {
     await swapTo('bike', 'rookie');
   }
   mark('garageDone');
-  log['garageStats'] = await page.evaluate(() => { const d = (window as unknown as { __render: { debugInfo(): Record<string, unknown> } }).__render.debugInfo(); return { heroDoc: d['heroDoc'], outfit: d['riderOutfit'], calls: d['calls'], tris: d['tris'], heroTris: d['heroTris'], garage: d['garage'], tier: d['tier'], profile: d['profile'], dpr: d['dpr'], canvas: `${d['canvasW']}x${d['canvasH']}` }; });
+  log['garageStats'] = await page.evaluate(() => { const d = (window as unknown as { __render: { debugInfo(): Record<string, unknown> } }).__render.debugInfo(); return { heroDoc: d['heroDoc'], outfit: d['riderOutfit'], calls: d['calls'], tris: d['tris'], heroTris: d['heroTris'], garage: d['garage'], tier: d['tier'], profile: d['profile'], dpr: d['dpr'], canvas: `${String(d['canvasW'])}x${String(d['canvasH'])}` }; });
   await tap('.garage-screen.live .backbtn');
   await page.waitForFunction(() => !!document.querySelector('.menu-screen.live'), null, { timeout: 20_000 });
   mark('backInMenu');

@@ -1,0 +1,928 @@
+{
+  "old": "1647f7cb",
+  "next": "feedc0d",
+  "results": {
+    "webkit.portrait": {
+      "rotatePromptUp": true,
+      "pill": {
+        "mounted": true,
+        "on": true,
+        "visible": true,
+        "state": {
+          "running": "1647f7cb",
+          "server": "feedc0d",
+          "shown": true
+        },
+        "box": {
+          "x": 104,
+          "y": 12,
+          "w": 223,
+          "h": 44
+        },
+        "hitAtCentre": true,
+        "text": "New build · tap to updatefeedc0d"
+      },
+      "shotPill": "01-webkit-portrait-pill-over-rotate-prompt.jpg",
+      "sheetFits": true,
+      "shotSheet": "02-webkit-portrait-boot-crash-sheet.jpg",
+      "portrait_ok": true
+    },
+    "webkit.clean": {
+      "bootMs": 4664,
+      "shotRiding": "03-webkit-clean-riding.jpg",
+      "msToBikeCrash": 859,
+      "shotCrashed": "04-webkit-clean-bike-crashed.jpg",
+      "faultsAfterCrash": 1,
+      "shotRestarted": "05-webkit-clean-restarted-riding.jpg",
+      "phaseAfterRestart": "riding",
+      "crashSheet": false,
+      "pill": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "1647f7cb",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 352,
+          "y": 4,
+          "w": 228,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "d_clean": true,
+      "pageErrors": []
+    },
+    "webkit.update": {
+      "bootMs": 4703,
+      "versionJson": {
+        "build": "1647f7cb",
+        "sha": "1647f7cb9eafd9df63f331c7bfe3a6b5b2414a73",
+        "time": "2026-09-22T20:10:33.334Z"
+      },
+      "running": "1647f7cb",
+      "a_versionMatchesRunning": true,
+      "pillBeforeDeploy": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "1647f7cb",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 352,
+          "y": 4,
+          "w": 228,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "shotMenuBefore": "06-webkit-update-menu-current-build.jpg",
+      "versionFetchesOnResume": 1,
+      "shotPillSeq": [
+        "07-webkit-update-pill-arrives-0.jpg",
+        "08-webkit-update-pill-lit-menu.jpg"
+      ],
+      "pillOnMenu": {
+        "mounted": true,
+        "on": true,
+        "visible": true,
+        "state": {
+          "running": "1647f7cb",
+          "server": "feedc0d",
+          "shown": true
+        },
+        "box": {
+          "x": 332,
+          "y": 12,
+          "w": 268,
+          "h": 44
+        },
+        "hitAtCentre": true,
+        "text": "New build · tap to updatefeedc0d"
+      },
+      "pillOnWorldMap": {
+        "mounted": true,
+        "on": true,
+        "visible": true,
+        "state": {
+          "running": "1647f7cb",
+          "server": "feedc0d",
+          "shown": true
+        },
+        "box": {
+          "x": 332,
+          "y": 12,
+          "w": 268,
+          "h": 44
+        },
+        "hitAtCentre": true,
+        "text": "New build · tap to updatefeedc0d"
+      },
+      "shotWorldMap": "09-webkit-update-pill-world-map.jpg",
+      "shotRiding": "10-webkit-update-riding-no-pill.jpg",
+      "pillDuringRun": [
+        {
+          "t": 0,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 332,
+            "y": 4,
+            "w": 268,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 1,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 332,
+            "y": 4,
+            "w": 268,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 2,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 332,
+            "y": 4,
+            "w": 268,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 3,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 332,
+            "y": 4,
+            "w": 268,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 4,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 332,
+            "y": 4,
+            "w": 268,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 5,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 332,
+            "y": 4,
+            "w": 268,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        }
+      ],
+      "b_hiddenMidRun": true,
+      "pillOnPause": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "1647f7cb",
+          "server": "feedc0d",
+          "shown": false
+        },
+        "box": {
+          "x": 332,
+          "y": 4,
+          "w": 268,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to updatefeedc0d"
+      },
+      "screenAfterQuit": "menu",
+      "pillAfterQuit": {
+        "mounted": true,
+        "on": true,
+        "visible": true,
+        "state": {
+          "running": "1647f7cb",
+          "server": "feedc0d",
+          "shown": true
+        },
+        "box": {
+          "x": 332,
+          "y": 12,
+          "w": 268,
+          "h": 44
+        },
+        "hitAtCentre": true,
+        "text": "New build · tap to updatefeedc0d"
+      },
+      "shotAfterQuit": "11-webkit-update-pill-back-after-run.jpg",
+      "shotTapped": "12-webkit-update-tapped.jpg",
+      "reloadedTo": "/?sw=0&audio=0&b=mud40eib",
+      "bootMsNew": 4542,
+      "runningAfter": "feedc0d",
+      "menuStampAfter": "build feedc0d · 2026-09-22",
+      "pillAfterUpdate": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "feedc0d",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 352,
+          "y": 4,
+          "w": 228,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "shotNewBuild": "13-webkit-update-new-build-menu.jpg",
+      "b_updatedToNext": true,
+      "b_pillOnMenus": true,
+      "crashSheet": false,
+      "pageErrors": []
+    },
+    "webkit.sw": {
+      "hasServiceWorker": true,
+      "bootMs": 4579,
+      "controllerBefore": "http://127.0.0.1:58042/sw.js",
+      "runningBefore": "1647f7cb",
+      "versionThroughWorker": {
+        "build": "feedc0d",
+        "sha": "feedc0de5a1e0000000000000000000000000000",
+        "time": "2026-09-22T20:10:35.441Z"
+      },
+      "versionNetworkOnly": true,
+      "shotPill": "14-webkit-sw-pill-lit.jpg",
+      "shotUpdating": "15-webkit-sw-updating.jpg",
+      "tapToNewMenuMs": 4618,
+      "runningAfter": "feedc0d",
+      "workerBuildAfter": "feedc0d-84f0ccbbe5",
+      "shotAfter": "16-webkit-sw-new-build-menu.jpg",
+      "pillAfter": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "feedc0d",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 352,
+          "y": 4,
+          "w": 228,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "sw_adopted": true,
+      "pageErrors": []
+    },
+    "webkit.crash": {
+      "shotRiding": "17-webkit-crash-riding.jpg",
+      "shotSheetSeq": [
+        "18-webkit-crash-sheet-0ms.jpg",
+        "19-webkit-crash-sheet.jpg"
+      ],
+      "msg": "Error: crash test (?crash=play): thrown inside the game loop at 1.01 s of riding",
+      "stack": "crashTestSetRun@http://127.0.0.1:58042/assets/index-BMK2bRRk.js:32:2460\nrender@http://127.0.0.1:58042/assets/index-BMK2bRRk.js:908:105453\nadvance@http://127.0.0.1:58042/assets/index-BMK2bRRk.js:32:6580\nadvance@http://127.0.0.1:58042/assets/index-BMK2bRRk.js:908:106600\ntickFrameInner@http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1898:33733\ntickFrame@http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1898:30172\nframe@http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1898:23848",
+      "meta": "build 1647f7cb (built 2026-09-22 20:10Z) · crashed 2026-09-22T20:11:46.051Z\nhttp://127.0.0.1:58042/?sw=0&audio=0&crash=play\nMozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\n932×430 · dpr 2 · cores 8",
+      "count": "",
+      "sheets": 1,
+      "loaderShown": false,
+      "loaderFailed": false,
+      "buttons": [
+        {
+          "t": "⟳ Reload",
+          "h": 44
+        },
+        {
+          "t": "Copy report",
+          "h": 44
+        },
+        {
+          "t": "Dismiss",
+          "h": 44
+        }
+      ],
+      "fits": true,
+      "frames": [
+        "crashTestSetRun",
+        "render",
+        "advance",
+        "advance",
+        "tickFrameInner",
+        "tickFrame",
+        "frame"
+      ],
+      "shortNames": [],
+      "c_readable": true,
+      "pillOverSheet": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "1647f7cb",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 352,
+          "y": 4,
+          "w": 228,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "copyLabel": "Copied",
+      "shotCopied": "20-webkit-crash-copy.jpg",
+      "pageErrors": [
+        "Error: crash test (?crash=play): thrown inside the game loop at 1.01 s of riding"
+      ]
+    },
+    "chromium.clean": {
+      "bootMs": 19470,
+      "shotRiding": "21-chromium-clean-riding.jpg",
+      "msToBikeCrash": 1128,
+      "shotCrashed": "22-chromium-clean-bike-crashed.jpg",
+      "faultsAfterCrash": 1,
+      "shotRestarted": "23-chromium-clean-restarted-riding.jpg",
+      "phaseAfterRestart": "riding",
+      "crashSheet": false,
+      "pill": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "1647f7cb",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 509,
+          "y": 4,
+          "w": 263,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "d_clean": true,
+      "pageErrors": []
+    },
+    "chromium.update": {
+      "bootMs": 14563,
+      "versionJson": {
+        "build": "1647f7cb",
+        "sha": "1647f7cb9eafd9df63f331c7bfe3a6b5b2414a73",
+        "time": "2026-09-22T20:10:33.334Z"
+      },
+      "running": "1647f7cb",
+      "a_versionMatchesRunning": true,
+      "pillBeforeDeploy": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "1647f7cb",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 509,
+          "y": 4,
+          "w": 263,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "shotMenuBefore": "24-chromium-update-menu-current-build.jpg",
+      "versionFetchesOnResume": 1,
+      "shotPillSeq": [
+        "25-chromium-update-pill-arrives-0.jpg",
+        "26-chromium-update-pill-lit-menu.jpg"
+      ],
+      "pillOnMenu": {
+        "mounted": true,
+        "on": true,
+        "visible": true,
+        "state": {
+          "running": "1647f7cb",
+          "server": "feedc0d",
+          "shown": true
+        },
+        "box": {
+          "x": 486,
+          "y": 12,
+          "w": 308,
+          "h": 44
+        },
+        "hitAtCentre": true,
+        "text": "New build · tap to updatefeedc0d"
+      },
+      "pillOnWorldMap": {
+        "mounted": true,
+        "on": true,
+        "visible": true,
+        "state": {
+          "running": "1647f7cb",
+          "server": "feedc0d",
+          "shown": true
+        },
+        "box": {
+          "x": 486,
+          "y": 12,
+          "w": 308,
+          "h": 44
+        },
+        "hitAtCentre": true,
+        "text": "New build · tap to updatefeedc0d"
+      },
+      "shotWorldMap": "27-chromium-update-pill-world-map.jpg",
+      "shotRiding": "28-chromium-update-riding-no-pill.jpg",
+      "pillDuringRun": [
+        {
+          "t": 0,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 486,
+            "y": 4,
+            "w": 308,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 1,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 486,
+            "y": 4,
+            "w": 308,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 2,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 486,
+            "y": 4,
+            "w": 308,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 3,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 486,
+            "y": 4,
+            "w": 308,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 4,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 486,
+            "y": 4,
+            "w": 308,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        },
+        {
+          "t": 5,
+          "phase": "riding",
+          "mounted": true,
+          "on": false,
+          "visible": false,
+          "state": {
+            "running": "1647f7cb",
+            "server": "feedc0d",
+            "shown": false
+          },
+          "box": {
+            "x": 486,
+            "y": 4,
+            "w": 308,
+            "h": 44
+          },
+          "hitAtCentre": false,
+          "text": "New build · tap to updatefeedc0d"
+        }
+      ],
+      "b_hiddenMidRun": true,
+      "pillOnPause": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "1647f7cb",
+          "server": "feedc0d",
+          "shown": false
+        },
+        "box": {
+          "x": 486,
+          "y": 4,
+          "w": 308,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to updatefeedc0d"
+      },
+      "screenAfterQuit": "menu",
+      "pillAfterQuit": {
+        "mounted": true,
+        "on": true,
+        "visible": true,
+        "state": {
+          "running": "1647f7cb",
+          "server": "feedc0d",
+          "shown": true
+        },
+        "box": {
+          "x": 486,
+          "y": 12,
+          "w": 308,
+          "h": 44
+        },
+        "hitAtCentre": true,
+        "text": "New build · tap to updatefeedc0d"
+      },
+      "shotAfterQuit": "29-chromium-update-pill-back-after-run.jpg",
+      "shotTapped": "30-chromium-update-tapped.jpg",
+      "reloadedTo": "/?sw=0&audio=0&b=mud42jih",
+      "bootMsNew": 15546,
+      "runningAfter": "feedc0d",
+      "menuStampAfter": "build feedc0d · 2026-09-22",
+      "pillAfterUpdate": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "feedc0d",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 509,
+          "y": 4,
+          "w": 263,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "shotNewBuild": "31-chromium-update-new-build-menu.jpg",
+      "b_updatedToNext": true,
+      "b_pillOnMenus": true,
+      "crashSheet": false,
+      "pageErrors": []
+    },
+    "chromium.sw": {
+      "hasServiceWorker": true,
+      "bootMs": 14666,
+      "controllerBefore": "http://127.0.0.1:58042/sw.js",
+      "runningBefore": "1647f7cb",
+      "versionThroughWorker": {
+        "build": "feedc0d",
+        "sha": "feedc0de5a1e0000000000000000000000000000",
+        "time": "2026-09-22T20:10:35.441Z"
+      },
+      "versionNetworkOnly": true,
+      "shotPill": "32-chromium-sw-pill-lit.jpg",
+      "shotUpdating": "33-chromium-sw-updating.jpg",
+      "tapToNewMenuMs": 17788,
+      "runningAfter": "feedc0d",
+      "workerBuildAfter": "feedc0d-84f0ccbbe5",
+      "shotAfter": "34-chromium-sw-new-build-menu.jpg",
+      "pillAfter": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "feedc0d",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 509,
+          "y": 4,
+          "w": 263,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "sw_adopted": true,
+      "pageErrors": []
+    },
+    "chromium.crash": {
+      "shotRiding": "35-chromium-crash-riding.jpg",
+      "shotSheetSeq": [
+        "36-chromium-crash-sheet-0ms.jpg",
+        "37-chromium-crash-sheet.jpg"
+      ],
+      "msg": "Error: crash test (?crash=play): thrown inside the game loop at 1.07 s of riding",
+      "stack": "    at DomHud.crashTestSetRun (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:32:2451)\n    at Game.render (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:908:105447)\n    at Object.render (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:908:93121)\n    at FixedStepLoop.advance (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:32:6580)\n    at Game.advance (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:908:106593)\n    at App.tickFrameInner (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1898:33726)\n    at App.tickFrame (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1898:30158)\n    at frame (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1898:23839)",
+      "meta": "build 1647f7cb (built 2026-09-22 20:10Z) · crashed 2026-09-22T20:14:16.660Z\nhttp://127.0.0.1:58042/?sw=0&audio=0&crash=play\nMozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36\n1280×720 · dpr 1 · cores 18",
+      "count": "",
+      "sheets": 1,
+      "loaderShown": false,
+      "loaderFailed": false,
+      "buttons": [
+        {
+          "t": "⟳ Reload",
+          "h": 44
+        },
+        {
+          "t": "Copy report",
+          "h": 44
+        },
+        {
+          "t": "Dismiss",
+          "h": 44
+        }
+      ],
+      "fits": true,
+      "frames": [
+        "DomHud.crashTestSetRun",
+        "Game.render",
+        "Object.render",
+        "FixedStepLoop.advance",
+        "Game.advance",
+        "App.tickFrameInner",
+        "App.tickFrame",
+        "frame"
+      ],
+      "shortNames": [],
+      "c_readable": true,
+      "pillOverSheet": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "1647f7cb",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 509,
+          "y": 4,
+          "w": 263,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "copyLabel": "Copied",
+      "shotCopied": "38-chromium-crash-copy.jpg",
+      "pageErrors": [
+        "Error: crash test (?crash=play): thrown inside the game loop at 1.07 s of riding"
+      ]
+    },
+    "chromium.boot": {
+      "shotSheetSeq": [
+        "39-chromium-boot-sheet-0ms.jpg",
+        "40-chromium-boot-sheet.jpg"
+      ],
+      "msg": "Error: crash test (?crash=boot): thrown from a boot step",
+      "stack": "    at crashTestBoot (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:32:2675)\n    at http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1915:6769\n    at async O (http://127.0.0.1:58042/?sw=0&audio=0&crash=boot:157:2523)\n    at async Object.step (http://127.0.0.1:58042/?sw=0&audio=0&crash=boot:157:2720)\n    at async bootFront (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1915:6694)",
+      "meta": "build 1647f7cb (built 2026-09-22 20:10Z) · crashed 2026-09-22T20:14:19.249Z\nhttp://127.0.0.1:58042/?sw=0&audio=0&crash=boot\nMozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36\n1280×720 · dpr 1 · cores 18",
+      "count": "",
+      "sheets": 1,
+      "loaderShown": true,
+      "loaderFailed": true,
+      "buttons": [
+        {
+          "t": "⟳ Reload",
+          "h": 44
+        },
+        {
+          "t": "Copy report",
+          "h": 44
+        },
+        {
+          "t": "Dismiss",
+          "h": 44
+        }
+      ],
+      "fits": true,
+      "frames": [
+        "crashTestBoot",
+        "(anonymous)",
+        "O [inline loader]",
+        "Object.step [inline loader]",
+        "bootFront"
+      ],
+      "shortNames": [],
+      "c_readable": true,
+      "pillOverSheet": {
+        "mounted": false,
+        "on": false,
+        "visible": false,
+        "state": null,
+        "box": null,
+        "hitAtCentre": false
+      },
+      "copyLabel": "Copied",
+      "shotCopied": "41-chromium-boot-copy.jpg",
+      "pageErrors": []
+    },
+    "chromium.reject": {
+      "shotRiding": "42-chromium-reject-riding.jpg",
+      "shotSheetSeq": [
+        "43-chromium-reject-sheet-0ms.jpg",
+        "44-chromium-reject-sheet.jpg"
+      ],
+      "msg": "Unhandled rejection · Error: crash test (?crash=reject): thrown inside the game loop at 1.08 s of riding",
+      "stack": "    at DomHud.crashTestSetRun (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:32:2451)\n    at Game.render (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:908:105447)\n    at Object.render (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:908:93121)\n    at FixedStepLoop.advance (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:32:6580)\n    at Game.advance (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:908:106593)\n    at App.tickFrameInner (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1898:33726)\n    at App.tickFrame (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1898:30158)\n    at frame (http://127.0.0.1:58042/assets/index-BMK2bRRk.js:1898:23839)",
+      "meta": "build 1647f7cb (built 2026-09-22 20:10Z) · crashed 2026-09-22T20:14:46.507Z\nhttp://127.0.0.1:58042/?sw=0&audio=0&crash=reject\nMozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.7922.34 Safari/537.36\n1280×720 · dpr 1 · cores 18",
+      "count": "",
+      "sheets": 1,
+      "loaderShown": false,
+      "loaderFailed": false,
+      "buttons": [
+        {
+          "t": "⟳ Reload",
+          "h": 44
+        },
+        {
+          "t": "Copy report",
+          "h": 44
+        },
+        {
+          "t": "Dismiss",
+          "h": 44
+        }
+      ],
+      "fits": true,
+      "frames": [
+        "DomHud.crashTestSetRun",
+        "Game.render",
+        "Object.render",
+        "FixedStepLoop.advance",
+        "Game.advance",
+        "App.tickFrameInner",
+        "App.tickFrame",
+        "frame"
+      ],
+      "shortNames": [],
+      "c_readable": true,
+      "pillOverSheet": {
+        "mounted": true,
+        "on": false,
+        "visible": false,
+        "state": {
+          "running": "1647f7cb",
+          "server": null,
+          "shown": false
+        },
+        "box": {
+          "x": 509,
+          "y": 4,
+          "w": 263,
+          "h": 44
+        },
+        "hitAtCentre": false,
+        "text": "New build · tap to update"
+      },
+      "copyLabel": "Copied",
+      "shotCopied": "45-chromium-reject-copy.jpg",
+      "pageErrors": [
+        "Error: crash test (?crash=reject): thrown inside the game loop at 1.08 s of riding"
+      ]
+    }
+  }
+}

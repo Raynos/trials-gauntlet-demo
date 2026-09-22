@@ -310,10 +310,10 @@ export function buildBatches(batches: PropBatch[], occluders: OccluderHook | nul
     // Common attribute set across the group.
     const names = new Set<string>();
     for (const l of perChunk.values()) for (const g of l) for (const n of Object.keys(g.attributes)) names.add(n);
-    const common = [...names].filter((n) => [...perChunk.values()].every((l) => l.every((g) => g.getAttribute(n))));
+    const common = new Set([...names].filter((n) => [...perChunk.values()].every((l) => l.every((g) => g.getAttribute(n)))));
     const built: THREE.Object3D[] = [];
     for (const [k, l] of [...perChunk.entries()].sort((a, b) => a[0] - b[0])) {
-      for (const g of l) for (const n of Object.keys(g.attributes)) if (!common.includes(n)) g.deleteAttribute(n);
+      for (const g of l) for (const n of Object.keys(g.attributes)) if (!common.has(n)) g.deleteAttribute(n);
       const indexed = l.every((g) => !!g.index);
       const parts = indexed ? l : l.map((g) => (g.index ? g.toNonIndexed() : g));
       const m = mergeGeometries(parts, false);

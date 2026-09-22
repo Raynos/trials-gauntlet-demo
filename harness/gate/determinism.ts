@@ -48,7 +48,7 @@ export interface ExpectedEntry {
 export type Expected = Record<string, ExpectedEntry>;
 
 /** `expected.json` key: `<trackId>` for Rookie (unchanged from every earlier pin), `<trackId>:pro` for Pro. */
-export function expectedKey(trackId: string, bike?: string | undefined): string {
+export function expectedKey(trackId: string, bike?: string): string {
   return bike && bike !== 'rookie' ? `${trackId}:${bike}` : trackId;
 }
 
@@ -82,7 +82,7 @@ async function pageHashesRange(page: Page, rec: InputRecording, every: number, t
     ([fr, ev, id, seed, bike]) => {
       const t = window.__trials!;
       if (t.setBike) t.setBike(bike);
-      t.loadTrack(id, seed);
+      void t.loadTrack(id, seed);
       const out: string[] = [];
       for (let i = 0; i < fr.length; i++) {
         t.setInput(fr[i]!);
@@ -130,7 +130,7 @@ async function bisectNodeVsBrowser(page: Page, rec: InputRecording): Promise<{ f
     ([fr, id, seed, upto, bike]) => {
       const t = window.__trials!;
       if (t.setBike) t.setBike(bike);
-      t.loadTrack(id, seed);
+      void t.loadTrack(id, seed);
       for (let i = 0; i <= upto; i++) {
         t.setInput(fr[i]!);
         t.step(1);
@@ -289,7 +289,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
           [37, 7],
           [500, 120],
         ] as const) {
-          t.loadTrack(id, seed);
+          void t.loadTrack(id, seed);
           for (let i = 0; i < k; i++) {
             t.setInput(fr[i % fr.length]!);
             t.step(1);
@@ -327,7 +327,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
         if (t.setBike) t.setBike(bike);
         const out: string[] = [];
         for (const chunk of [1, 7, 15, 120]) {
-          t.loadTrack(id, seed);
+          void t.loadTrack(id, seed);
           for (const [count, tt, b, l, flags] of runs) {
             t.setInput({ throttle: tt / 255, brake: b / 255, lean: l / 127, hop: (flags & 1) !== 0, restart: (flags & 2) !== 0 });
             let left = count;
@@ -358,7 +358,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
         const t = window.__trials!;
         // Leak probe on the *other* class too: a Pro golden runs 600 ticks of Rookie first, and vice versa.
         if (t.setBike) t.setBike(bike === 'pro' ? 'rookie' : 'pro');
-        t.loadTrack(id, (seed + 1) >>> 0);
+        void t.loadTrack(id, (seed + 1) >>> 0);
         t.setInput({ throttle: 1, lean: -0.5 });
         t.step(600);
         (window.__trialsRunAs ?? t.runRecording)(j);

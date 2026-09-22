@@ -96,7 +96,7 @@ export async function benchFull(browser: Browser, url: string, opts: { verbose?:
     const by = (id: string): ScenarioRow | undefined => r.report.scenarios.find((s) => s.id === id);
     const tiers = ['low', 'medium', 'high'].map((t) => by('b1-ride-' + t)?.tier);
     expect(tiers.join() === 'low,medium,high', `forced tiers: ${tiers.join()}`);
-    expect(by('b1-ride-high')?.render?.['tier'] === 'high', `renderer tier on the high row: ${by('b1-ride-high')?.render?.['tier']}`);
+    expect(by('b1-ride-high')?.render?.['tier'] === 'high', `renderer tier on the high row: ${String(by('b1-ride-high')?.render?.['tier'])}`);
     expect(by('b1-ride-cap60')?.cap === 60, `cap-60 row cap ${by('b1-ride-cap60')?.cap}`);
     expect(by('b1-ride')?.cap === 30, `phone default cap on the ride row: ${by('b1-ride')?.cap}`);
     expect(r.report.thermal && (r.report.thermal as { scenario: string }).scenario === 'b1-ride-high', `thermal proxy from the high ride: ${JSON.stringify(r.report.thermal)}`);
@@ -153,7 +153,7 @@ export async function benchSuite(browser: Browser, url: string, opts: { verbose?
     // The menu covers the canvas: render off → submit 0 by construction; the garage renders the idle bike.
     expect(menu && menu.submit.max === 0, `menu submit max ${menu?.submit.max} (render is off under the covered canvas)`);
     expect(garage && garage.submit.p50 > 0, `garage submit p50 ${garage?.submit.p50} (expected > 0: the idle bike renders)`);
-    expect(garage?.render && typeof garage.render['calls'] === 'number' && (garage.render['calls'] as number) > 0, `garage debugInfo calls: ${garage?.render?.['calls']}`);
+    expect(garage?.render && typeof garage.render['calls'] === 'number' && (garage.render['calls'] as number) > 0, `garage debugInfo calls: ${String(garage?.render?.['calls'])}`);
     expect(garage?.render && typeof garage.render['tier'] === 'string' && typeof garage.render['rtMpx'] === 'number', `garage debugInfo tier/rtMpx: ${JSON.stringify(garage?.render && { tier: garage.render['tier'], rtMpx: garage.render['rtMpx'] })}`);
     // The report string: markdown table + JSON block, the JSON parses back to the same object.
     expect(text.startsWith('## Trials bench'), 'report text starts with the markdown header');

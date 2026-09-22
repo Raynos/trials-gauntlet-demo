@@ -1,0 +1,103 @@
+# Continuous deployment: every push to main that passes the gates ships to production on Vercel
+# (https://trials-gauntlet-demo.vercel.app). Pull requests run the same gates and deploy nothing.
+# Ported from project-wildshard-singleplayer (ask 84). Pins (v0.x aliases) stay manual: RELEASES.md.
+#
+# Secrets: VERCEL_TOKEN (project-scoped vcp_ token), VERCEL_ORG_ID (team id), VERCEL_PROJECT_ID.
+# Until VERCEL_TOKEN exists the gates still run and the job stays green with a warning.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # re-deploy HEAD by hand: gh workflow run deploy
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  DEPLOY: ${{ github.event_name != 'pull_request' && secrets.VERCEL_TOKEN != '' }}
+  PROD_URL: https://trials-gauntlet-demo.vercel.app
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      # .git is ~8 GB and the tree ~1.5 GB, nearly all captures / masters / evidence the build and the
+      # tests never read. Partial clone + sparse checkout keeps the runner to code + shipped assets;
+      # .vercelignore drops the same dirs from the upload for local deploys.
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            /*
+            !/harness/out/
+            !/assets/blender/
+            !/assets/design/
+            !/docs/evidence/
+            !/project/releases/
+          sparse-checkout-cone-mode: false
+
+      - uses: pnpm/action-setup@v4 # version from package.json packageManager
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # ---- gates: a red step here means no deploy -----------------------------------------------
+      - name: Typecheck (app + harness)
+        run: pnpm run typecheck
+
+      - name: Lint
+        run: pnpm run lint
+
+      # Everything except the wall-clock budgets (µs/tick, synth CPU per frame): a shared runner reads them
+      # 2.5–4× over (probe run 35776724665), so they are measured on real hardware (pnpm harness:bench), not
+      # here. `ffmpeg resolution` checks the local capture toolchain, which the runner does not have. The
+      # runner is also slower, hence the longer per-test timeout.
+      - name: Unit tests
+        run: pnpm exec vitest run --testTimeout=30000 -t '^(?!.*(s/tick|of CPU|ffmpeg resolution)).*$'
+
+      - name: Build
+        run: pnpm run build
+
+      # ---- deploy (main only) ------------------------------------------------------------------
+      - name: No token, no deploy
+        if: github.event_name != 'pull_request' && env.DEPLOY != 'true'
+        run: echo "::warning::VERCEL_TOKEN secret is not set — gates passed but nothing was deployed"
+
+      # A project-scoped token can deploy but `vercel pull` / `vercel build` refuse it (they look the
+      # user up), so link by writing .vercel/project.json and let Vercel build remotely. The remote build
+      # has no .git, and vite.config.ts refuses to stamp a production build without a sha: pass it in.
+      - name: Vercel deploy
+        if: env.DEPLOY == 'true'
+        run: |
+          mkdir -p .vercel
+          printf '{"projectId":"%s","orgId":"%s"}' "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
+          url=$(pnpm dlx vercel@latest deploy --prod --yes --archive=tgz \
+            --build-env VERCEL_GIT_COMMIT_SHA=${{ github.sha }} \
+            --token=${{ secrets.VERCEL_TOKEN }})
+          echo "deployed $url for ${{ github.sha }}"
+          echo "### Deployed \`${{ github.sha }}\` to $url" >> "$GITHUB_STEP_SUMMARY"
+
+      # The deploy command returns once the deployment is ready; prove production now serves this commit.
+      - name: Production serves this commit
+        if: env.DEPLOY == 'true'
+        run: |
+          sha=$(echo "${{ github.sha }}" | cut -c1-7)
+          for i in $(seq 1 30); do
+            live=$(curl -fsS "$PROD_URL/version.json?t=$(date +%s)" || true)
+            case "$live" in *"$sha"*) echo "live: $live"; exit 0;; esac
+            sleep 10
+          done
+          echo "::error::$PROD_URL/version.json does not report $sha after 5 min: $live"
+          exit 1

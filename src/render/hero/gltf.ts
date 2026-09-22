@@ -51,7 +51,7 @@ export function loadGltf(url: string, quiet = false, bytes?: ByteProgress): Prom
         (g) => {
           const tParsed = performance.now();
           shrinkTextures(g.scene);
-          prepareHero(g)
+          void prepareHero(g)
             .catch((err: unknown) => console.warn(`[render] hero prepare for ${url} failed:`, err))
             .then(() => {
               heroLoads.push({ url, bytes: total, fetchMs: tFetched - t0, parseMs: tParsed - tFetched, prepareMs: performance.now() - tParsed, at: t0 });

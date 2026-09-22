@@ -38,7 +38,7 @@ export async function loadRigAt(url: URL, keepMaterials = false): Promise<GLTF> 
   if (keepMaterials) {
     const stripTextures = (o: Record<string, unknown>): void => {
       for (const key of Object.keys(o)) {
-        if (/Texture$/.test(key)) delete o[key];
+        if (key.endsWith('Texture')) delete o[key];
         else if (o[key] && typeof o[key] === 'object') stripTextures(o[key] as Record<string, unknown>);
       }
     };

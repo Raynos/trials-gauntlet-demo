@@ -68,7 +68,7 @@ const plateCache = new Map<string, THREE.CanvasTexture>();
 /** 128² plate face: background + a bold centred number (both proc plates and the glTF add-on plates use it). */
 export function plateTexture(cls: BikeClass): THREE.CanvasTexture {
   const L = LIVERIES[cls];
-  const key = `${cls}`;
+  const key: string = cls;
   let tex = plateCache.get(key);
   if (tex) return tex;
   const c = document.createElement('canvas');

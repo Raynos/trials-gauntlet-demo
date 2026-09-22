@@ -1,6 +1,7 @@
 import type { HeroHarnessWindow } from '../hero-browser';
 /** Real garage failure/retry across the production renderer and persisted preference. Headless only. */
 import { chromium } from 'playwright';
+import type { SkinnedMesh } from 'three';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { startServer } from '../lib/server';
 import { AVAILABLE_RIDER_PRESETS, type RiderOutfit } from '../../src/core/riderPresets';
@@ -85,7 +86,7 @@ try {
           await r.whenReady();
           const materials: string[] = [];
           r.debug.bike.frame.traverse(object => {
-            const mesh = object as import('three').SkinnedMesh;
+            const mesh = object as SkinnedMesh;
             if (!mesh.isSkinnedMesh) return;
             for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) materials.push(material.name);
           });

@@ -379,7 +379,7 @@ async function main(): Promise<void> {
           // Pass 0: manual restart mash on the tick after the crash. Pass 1: no input, the
           // game's auto-respawn. (No inner functions here: tsx's keepNames helper breaks evaluate.)
           for (let pass = 0; pass < 2; pass++) {
-            t.loadTrack(id, seed);
+            void t.loadTrack(id, seed);
             t.skipCountdown();
             t.drainEvents();
             let hit = false;
@@ -441,7 +441,7 @@ async function main(): Promise<void> {
       const r = await page.evaluate(
         ([id]) => {
           const t = window.__trials!;
-          t.loadTrack(id);
+          void t.loadTrack(id);
           t.skipCountdown();
           t.setInput({ throttle: 1 });
           t.step(360);
@@ -505,7 +505,7 @@ async function main(): Promise<void> {
       const frames = expandFrames(rec);
       await page.evaluate(([id]) => {
         const t = window.__trials!;
-        t.loadTrack(id);
+        void t.loadTrack(id);
         t.resize(640, 360); // heap/perf counters do not depend on the viewport; SwiftShader raster cost does
         for (let i = 0; i < 5; i++) t.render(true);
       }, [trackId] as const);

@@ -16,7 +16,9 @@ that exact deployment forever (production `trials-gauntlet-demo.vercel.app` move
 Release media (the trailer, the 15 s cut, the contact sheet, the cut list and the build montage of each pin) is kept
 permanently in `project/releases/<version>/` and served at **https://trials-gauntlet-media.vercel.app/** (`pnpm media:deploy`).
 
-To pin a new one (the v0.2.1 recipe): tag, then `git archive <tag> | tar -x -C <clean dir>`, `pnpm install --frozen-lockfile`,
+Production itself is continuous: every green push to `main` deploys (`.github/workflows/deploy.yml`, remote Vercel
+build of the pushed commit). A pin is still manual: either alias the CI deployment of the tagged commit
+(`vercel ls trials-gauntlet-demo`, then `vercel alias set` below), or rebuild it from a clean export. To pin a new one (the v0.2.1 recipe): tag, then `git archive <tag> | tar -x -C <clean dir>`, `pnpm install --frozen-lockfile`,
 `vercel link --yes --project trials-gauntlet-demo` there (never deploy from `dist/` — the Vercel project's preset is Vite, so a
 bare `dist` upload tries to run `vite build` on the server and fails), `VERCEL_GIT_COMMIT_SHA=<sha> vercel build --prod`
 (the build refuses to stamp without a sha, and an export has no `.git`), `python3 scripts/vercel-deref-func.py .vercel/output/functions/api/inbox.func` (since 2026-09-16 afternoon the upload no longer resolves pnpm's symlinked `filePathMap` — `realpath ENOENT /vercel/path0/node_modules/@vercel/blob` — so the function's deps are copied flat), `vercel deploy --prebuilt --prod --yes --archive=tgz` (34 k files since the flat-copied function; the plain upload is refused above 15 000), then

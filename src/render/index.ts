@@ -590,7 +590,7 @@ export class ThreeRenderer implements GameRenderer {
 
   /** Whether a document is the LOD twin (for `heroDoc` diagnostics). */
   private isLodDoc(doc: GLTF | undefined): boolean {
-    return /-lod\.glb$/.test(this.heroDocUrl.get(doc!) ?? '');
+    return (this.heroDocUrl.get(doc!) ?? '').endsWith('-lod.glb');
   }
 
   setRiderLod(on: boolean): void {

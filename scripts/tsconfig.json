@@ -1,0 +1,4 @@
+{
+  // Type-aware lint (oxlint-tsgolint) resolves each file to its nearest tsconfig.json; this points scripts/ at the harness program.
+  "extends": "../tsconfig.harness.json"
+}

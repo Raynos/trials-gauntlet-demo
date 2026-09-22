@@ -11,7 +11,7 @@ Only the **core-game owner** edits `src/core/**`; others request changes.
 
 | owner | paths | also owns |
 |---|---|---|
-| core-game | `src/core/**`, `src/game/**`, `src/ui/**`, `src/main.ts`, `index.html`, `public/**`, `package.json`, `vite.config.ts`, `tsconfig*.json`, eslint config | `docs/design/game.md`, run clock, fault counter, countdown, auto-respawn, input devices (keyboard/gamepad/touch), quality tiers, menus, HUD |
+| core-game | `src/core/**`, `src/game/**`, `src/ui/**`, `src/main.ts`, `index.html`, `public/**`, `package.json`, `vite.config.ts`, `tsconfig*.json`, `.oxlintrc.json` (lint, incl. the §1 determinism rules) | `docs/design/game.md`, run clock, fault counter, countdown, auto-respawn, input devices (keyboard/gamepad/touch), quality tiers, menus, HUD |
 | physics | `src/physics/**` | `docs/design/physics.md`, all feel numbers |
 | tracks | `src/tracks/**` | `docs/design/tracks.md`, `compileTrack`, curriculum, per-track metrics targets |
 | render | `src/render/**` | `docs/design/rendering.md`, track/obstacle meshes, bike, rider, ragdoll visuals, camera, post, particles, biomes |
@@ -272,7 +272,7 @@ skipCountdown(): void;   // harness convenience; a replay records ticks from GO
 - **Thresholds** live only in `harness/gate/thresholds.json`: boot `ready` p50 ≤ 300 ms, first frame
   ≤ 900 ms; textures ≤ 96 MB; draw calls ≤ 300; triangles ≤ 500 k; physics µs/tick p95 ≤ 60
   (≤ 80 while ragdolling); restart → synced frame ≤ 33 ms; heap growth ≤ 5 MB over 60 s of play;
-  JS bundle ≤ 600 KB gzipped; determinism: two replays hash-identical, `restore(snapshot())` identical.
+  JS bundle ≤ 640 KB gzipped (600 until ask 84: unmangled names for readable phone stacks, +30 KB); determinism: two replays hash-identical, `restore(snapshot())` identical.
 - Texture generation happens **after** `installHook` and is budgeted (≤ 400 ms total on desktop).
 - Corpus gaps: harness sources seesaw + stairs reference clips; `loop` is cut from the curriculum.
 

@@ -121,7 +121,10 @@ export function createLoaderRenderer(root: HTMLElement, build: string, now: () =
 
   // The footer clock — the one thing that moves on its own, and it is a clock.
   const tick = setInterval(() => {
-    if (left || !root.isConnected) return void clearInterval(tick);
+    if (left || !root.isConnected) {
+      clearInterval(tick);
+      return;
+    }
     tEl.textContent = elapsed();
   }, 100);
 

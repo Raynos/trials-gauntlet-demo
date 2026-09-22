@@ -439,7 +439,7 @@ zero-fault finish keeps normal arm attachment/bending through the camera move.
 It is not the user's exact 78.433 s / four-fault reproduction.
 
 Current integration check: **18 failed, 686 passed, 11 todo**, six failed / 50
-passed files. TypeScript and ESLint pass; separate production build passes.
+passed files. TypeScript and lint pass; separate production build passes.
 The failed tests remain explicit physics behavior and cost requirements. No
 thresholds or golden recordings were relaxed. The actual exported model census
 covers **58 recordings / 255,345 input ticks** in two disjoint batches, all
@@ -465,7 +465,7 @@ See [the durable evidence manifest](evidence/blender-r3.json) for source/model/b
 hashes, exact clocks, worst-case witnesses and replay results. Round 2 numbers
 below are historical and do not override this section.
 
-- TypeScript and repository ESLint pass. Combined tests: **18 failed, 673 passed,
+- TypeScript and repository lint pass. Combined tests: **18 failed, 673 passed,
   11 todo**, six failed / 47 passed files. Separate production build passes.
   Seventeen failures reproduce in the owned physics suites; the combined loaded
   host also fails the ragdoll timing test, which passes in the sequential sample.
@@ -537,7 +537,7 @@ The parent froze implementations, ran `pnpm check`, then separately ran
 | Check | Result |
 |---|---|
 | Application + harness TypeScript | Pass |
-| Repository ESLint | Pass |
+| Repository lint | Pass |
 | Full Vitest run | **22 failed, 618 passed, 11 todo; 7 failed / 40 passed files** |
 | Separate production build | Pass; JavaScript 453.7 / 600 KB gzip |
 | Inline loader budget | 8,191 / 8,192 bytes — only one byte of headroom |

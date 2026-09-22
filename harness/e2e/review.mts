@@ -181,7 +181,7 @@ async function phoneFlow(ctx: BrowserContext, url: string, g: { name: string; wi
     const at = document.elementFromPoint(cx, cy);
     return at ? at.className : 'none';
   });
-  expect(/rv-stage|touch-layer|^$/.test(String(clear)), 'centre-clear', `track centre is under ${clear}`);
+  expect(/rv-stage|touch-layer|^$/.test(clear), 'centre-clear', `track centre is under ${clear}`);
 
   // Segment 4.
   await tapSel(page, '.review-ui.live .rv-seg[data-seg="4"]', expect, true);
@@ -191,7 +191,7 @@ async function phoneFlow(ctx: BrowserContext, url: string, g: { name: string; wi
   expect(v.x >= v.segments[3]!.from && v.x < v.segments[3]!.to, 'seg4-x', `x ${v.x} not in segment 4 [${v.segments[3]!.from}, ${v.segments[3]!.to})`);
   expect(await page.evaluate(() => document.querySelector('.rv-seg.on')?.getAttribute('data-seg')) === '4', 'seg4-lit', 'segment 4 not highlighted');
   const title = await page.evaluate(() => document.querySelector('.rv-seg-title')?.textContent ?? '');
-  expect(/^4/.test(title.trim()), 'seg4-title', `card title "${title}"`);
+  expect(title.trim().startsWith('4'), 'seg4-title', `card title "${title}"`);
   await still('segment-strip');
 
   // A note: rating 4, tag too hard, a comment.
@@ -217,7 +217,7 @@ async function phoneFlow(ctx: BrowserContext, url: string, g: { name: string; wi
   if (fenced) {
     const data = JSON.parse(fenced[1]!) as { track: string; build: string; at: string; segments: { i: number; from: number; to: number; rating: number; tags: string[]; comment: string }[] };
     expect(data.track === TRACK, 'json-track', data.track);
-    expect(typeof data.build === 'string' && data.build.length > 0, 'json-build', String(data.build));
+    expect(typeof data.build === 'string' && data.build.length > 0, 'json-build', data.build);
     expect(data.segments.length === 6, 'json-six', String(data.segments.length));
     const s4 = data.segments[3]!;
     expect(s4.i === 4 && s4.rating === 4 && s4.tags.includes('too hard') && s4.comment === COMMENT, 'json-seg4', JSON.stringify(s4));

@@ -1,2 +1,11 @@
 # Vercel builds every file under api/ into a function; the vitest beside the handler is not one.
 api/*.test.ts
+
+# CI deploys upload the source and Vercel builds it remotely; none of these are read by the build
+# (dist/ is the CI gate's own build, rebuilt on Vercel).
+dist/
+harness/out/
+assets/blender/
+assets/design/
+docs/evidence/
+project/releases/
