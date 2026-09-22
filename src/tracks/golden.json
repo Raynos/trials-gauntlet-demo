@@ -201,5 +201,26 @@
     "hazards": 2,
     "obstacles": 26,
     "finishX": 434.521437
+  },
+  "a1-sawdust": {
+    "hash": "cc1fc9249b7e0a40",
+    "colliders": 29,
+    "hazards": 2,
+    "obstacles": 26,
+    "finishX": 393.8
+  },
+  "a2-log-jam": {
+    "hash": "17aa87ab00450408",
+    "colliders": 44,
+    "hazards": 1,
+    "obstacles": 22,
+    "finishX": 391.5
+  },
+  "a3-timberline": {
+    "hash": "64a116a40cb6984d",
+    "colliders": 31,
+    "hazards": 4,
+    "obstacles": 27,
+    "finishX": 343.7
   }
 }
