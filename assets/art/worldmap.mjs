@@ -2,7 +2,7 @@
 // Cut the world-map terrain plates (project/archive/WORLD_MAP.md § 3, ask 54): the world plate and the five region
 // plates, from assets/design/worldmap/build/{world/world-plate,regions/<id>}.png (codex image_gen outputs — briefs
 // beside them, runner build/gen-regions.mjs) into public/art/worldmap/*.webp at two tiers (2x = the 1536 source,
-// 1x = 1024 wide), plus worldmap.json (the per-asset record build.mjs folds into public/art/manifest.json).
+// 1x = 1024 wide), plus worldmap.json (the per-asset record build.mjs folds into the art manifests).
 //   node assets/art/worldmap.mjs
 // Every file is lazy (never on the boot set; the world map probes them on first show). Caps: world ≤ 350 KB per
 // tier, region ≤ 300 KB per tier, by stepping quality down (never below q 48), then a 2x region steps its width to 1408.

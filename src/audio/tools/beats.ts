@@ -2,7 +2,7 @@
  * Measured, not posed (audio round 3, MEGA_PLAN P6): four beats rendered offline through the real v2
  * physics — start gate, wheelie, 2 m landing, crash + respawn — each twice (sha256 must match), written
  * as WAV + spectrogram, and measured against the reference corpus' audio for the same beats (cut from
- * `reference/evolution-gameplay/raw/*.mp4` with ffmpeg; the committed clips are silent).
+ * the local-only reference gameplay videos under `reference/`, with ffmpeg).
  *
  *   npx tsx src/audio/tools/beats.ts <outDir> [--ref <dir with ref WAVs>] [--bike pro]
  *

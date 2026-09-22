@@ -168,7 +168,7 @@ export const BIOMES: Record<BiomeId, Biome> = {
   nightCity: {
     id: 'nightCity',
     // Round 11 recipe: the moon is the one shadow-casting key — cool, LOW, from the camera side
-    // (rising-visuals 04/05: blue moonlight against orange fires); the sodium street lamps are
+    // (reference visuals 04/05: blue moonlight against orange fires); the sodium street lamps are
     // real camera-following spots (`lampLights`, four heads), the fire barrels real point lights
     // (`meltLights`); the sky fill is dropped so the pools and the shop windows carry the frame.
     sunDir: [0.42, 0.46, 0.78],

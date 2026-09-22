@@ -315,7 +315,7 @@ const ROOKIE: TuningV2 = {
     gear: 17.8,
     clutchRpm: 3500,
     clutchSpeed: 7,
-    // R10 reverse: a walking-pace creep (Trials HD / Fusion back up at ~2-3 m/s). 450 N at the rim is 0.31 g on the
+    // R10 reverse: a walking-pace creep (backing up at ~2-3 m/s). 450 N at the rim is 0.31 g on the
     // 148 kg Rookie - a gentle ramp that also holds the creep on a ~18 deg backward slope; engage after 0.2 s
     // (a tap is a brake), ramp 0.6 s; steeper than that the calipers come back and cap the roll near 2 x vmax.
     reverse: { vmax: 2.5, engageV: 0.3, engageS: 0.2, rampS: 0.6, F: 450, gain: 700 },

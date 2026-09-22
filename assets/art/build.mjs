@@ -2,14 +2,16 @@
 // Build public/art/** from raw generations.
 // usage: node assets/art/build.mjs <rawRoot>       (rawRoot/<name>/<name>.png as written by generate.mjs)
 // Reads assets/art/selection.json (which raw candidate each asset uses + per-asset crop hints) and
-// assets/art/prompts.mjs (the prompt text), writes public/art/{menu,world,plates}/* and public/art/manifest.json,
+// assets/art/prompts.mjs (the prompt text), writes public/art/{menu,world,plates}/*, the full manifest
+// assets/art/manifest.json and the prompt-free runtime one public/art/manifest.json (runtime-manifest.mjs),
 // and copies each accepted raw PNG into assets/art/raw/.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, statSync, readFileSync, writeFileSync, copyFileSync, existsSync } from 'node:fs';
+import { mkdirSync, statSync, readFileSync, writeFileSync, copyFileSync, existsSync, rmSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import jobs, { TRACKS } from './prompts.mjs';
+import { RETIRED, fullManifest, writeManifests } from './runtime-manifest.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '../..');
@@ -38,6 +40,7 @@ const src = id => {
 const manifest = [];
 function record(id, rel, kind, tags, name) {
   const f = join(pub, rel);
+  if (RETIRED.has(id)) return rmSync(f, { force: true }); // store release P0.2: never shipped
   const [w, h] = rel.endsWith('.svg') ? [128, 128] : dims(f);
   const job = jobByName[name];
   // `v`: 8 hex of the file's own bytes (ask 58). The art URLs carry it as `?v=`, which is what lets
@@ -341,10 +344,6 @@ for (const bike of ['rookie', 'pro']) {
 }
 
 // --- manifest -----------------------------------------------------------------------------------------
-const folders = {};
-for (const m of manifest) { const f = m.path.split('/').length > 2 ? m.path.split('/')[1] : 'root'; folders[f] = (folders[f] || 0) + m.bytes; }
-const MENU_CRITICAL = new Set(['keyart', 'tier-card', 'track-card', 'medal']);
-const menuCritical = manifest.filter(m => MENU_CRITICAL.has(m.kind) || m.id === 'wordmark-plate');
-const out = { generatedAt: new Date().toISOString(), generator: 'OpenAI image generation via Codex CLI; optimised with ImageMagick + cwebp + pngquant + oxipng', counts: { total: manifest.length, byFolder: Object.fromEntries(Object.entries(folders).map(([k]) => [k, manifest.filter(m => (m.path.split('/').length > 2 ? m.path.split('/')[1] : 'root') === k).length])) }, bytesByFolder: folders, totalBytes: Object.values(folders).reduce((a, b) => a + b, 0), menuCritical: { note: 'first menu screen: key art, wordmark plate, tier + track cards, medals', count: menuCritical.length, bytes: menuCritical.reduce((a, m) => a + m.bytes, 0) }, rejected: sel.rejected, assets: manifest };
-writeFileSync(join(pub, 'manifest.json'), JSON.stringify(out, null, 1));
-console.log('\nbytes by folder', folders, 'total', out.totalBytes, 'menu-critical', out.menuCritical.bytes);
+const out = fullManifest(manifest, sel.rejected);
+writeManifests(out);
+console.log('\nbytes by folder', out.bytesByFolder, 'total', out.totalBytes, 'menu-critical', out.menuCritical.bytes);

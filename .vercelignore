@@ -9,3 +9,7 @@ assets/blender/
 assets/design/
 docs/evidence/
 project/releases/
+
+# Store release P0.2: source maps never deploy (vite.config.ts moves them to dist-maps/; belt and braces here).
+*.map
+dist-maps/

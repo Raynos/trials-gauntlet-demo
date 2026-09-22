@@ -1,5 +1,5 @@
 /**
- * Camera rig (techniques.md obs 1–6, rising obs 1–4): three speed-driven zoom
+ * Camera rig (reference notes: techniques obs 1–6, visuals obs 1–4): three speed-driven zoom
  * states (idle ≈40 % frame height, riding ≈24 %, fast/air ≈9 %), bike at
  * x≈30 % / y≈55 % when moving, yaw toward travel + pitch down in the riding
  * state flattening when tight, velocity lookahead, landing shake, crash

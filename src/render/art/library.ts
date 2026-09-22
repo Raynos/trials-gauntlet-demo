@@ -47,7 +47,8 @@ const SKIP_PREFIX = 'art/menu/';
 const REJECTED = new Set(['stencil-apex', 'stencil-taro', 'tyremark-straight', 'mask-rivet-drips', 'mask-rust-streaks']);
 
 /** Back-wall decals (industrial + foundry): not needed for the title, requested with the track. */
-const HALL_DECAL_IDS = ['poster-trials-night', 'poster-tyres', 'sign-hard-hat', 'sign-overhead-crane', 'sign-forklift', 'sign-exit', 'graffiti-rise', 'graffiti-grind', 'graffiti-nofear', 'graffiti-skull', 'graffiti-tag-wall', 'graffiti-wheel'];
+/** Store release P0.2: `poster-trials-night`, `graffiti-rise` and `graffiti-nofear` (a real brand) are retired from the pack. */
+const HALL_DECAL_IDS = ['poster-tyres', 'sign-hard-hat', 'sign-overhead-crane', 'sign-forklift', 'sign-exit', 'graffiti-grind', 'graffiti-skull', 'graffiti-tag-wall', 'graffiti-wheel'];
 
 /** Ids a biome's world draws (loaded ones are used; missing ones fall back to procedural). Ask 62: `crowd-night` is no longer requested (the crowd is painted; see `world/gates.ts` CROWD_PHOTO_SHEET). */
 export function idsFor(biome: string): string[] {

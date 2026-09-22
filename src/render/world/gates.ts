@@ -43,7 +43,7 @@ const TEAM = ['#2a5cc8', '#e0b83a', '#c8443a', '#3a9a68', '#e07a30', '#e8e6e0', 
 // series text. No real-world company or trademark string anywhere in the renderer.
 const SPONSORS = ['VORTEX OIL', 'KESTREL', 'NORDVIK', 'APEX', 'BOLT', 'IRONWORKS', 'TRIALS'];
 /** Manifest ids of the sponsor banners (all fictional brands). */
-const BANNER_IDS = ['banner-vortex-oil', 'banner-kestrel-tyres', 'banner-nordvik', 'banner-apex-suspension', 'banner-bolt-energy', 'banner-ironworks-series'];
+const BANNER_IDS = ['banner-vortex-oil', 'banner-kestrel-tyres', 'banner-nordvik', 'banner-apex-suspension', 'banner-bolt-energy'];
 
 function plaqueTexture(n: number): { map: THREE.CanvasTexture; emissive: THREE.CanvasTexture } {
   const [c, g] = canvas(256, 128);

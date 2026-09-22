@@ -10,7 +10,7 @@
  * game with `setQuality('high')`, render one frame at 1280x720 and write
  * public/art/thumbs/<track>.webp at 768x432 (<= 60 KB), plus a 1280x720 PNG proof in
  * assets/art/raw/thumbs/. Re-run every release; `node assets/art/build.mjs` then folds the
- * thumbs into public/art/manifest.json (kind `thumb`).
+ * thumbs into the art manifests (runtime-manifest.mjs) (kind `thumb`).
  */
 import fs from 'node:fs';
 import path from 'node:path';

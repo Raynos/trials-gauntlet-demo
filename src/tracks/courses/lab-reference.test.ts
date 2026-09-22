@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { compileTrack, getTrack, isLabTrackId, LAB_TRACKS } from '../index';
 import { LAB_BOX_CLIMB, LAB_BOX_GEOMETRY, LAB_RAMP_JUMP, LAB_RAMP_GEOMETRY } from './lab-reference';
 
-describe('Evolution maneuver labs', () => {
+describe('Reference maneuver labs', () => {
   it('exposes both compact courses in Labs, with the ordinary restart and finish run-out', () => {
     for (const def of [LAB_BOX_CLIMB, LAB_RAMP_JUMP]) {
       expect(getTrack(def.id)).toBe(def);

@@ -874,9 +874,9 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
       const m = fogify(new THREE.MeshStandardMaterial({ map: t, roughness: 0.85, transparent: alpha, alphaTest: alpha ? 0.3 : 0, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }));
       return new PropBatch(`decal:${id}`, new THREE.PlaneGeometry(w, h).translate(0, h / 2, 0), m, false);
     };
-    const posters = ['poster-trials-night', 'poster-tyres'].map((id) => decal(id, 1.2, 1.8, false)).filter((b): b is PropBatch => !!b);
+    const posters = ['poster-tyres'].map((id) => decal(id, 1.2, 1.8, false)).filter((b): b is PropBatch => !!b);
     const signsArt = ['sign-hard-hat', 'sign-overhead-crane', 'sign-forklift', 'sign-exit'].map((id) => decal(id, 0.9, 0.9, false)).filter((b): b is PropBatch => !!b);
-    const graffiti = ['graffiti-rise', 'graffiti-grind', 'graffiti-nofear', 'graffiti-skull', 'graffiti-tag-wall', 'graffiti-wheel'].map((id) => decal(id, 2.6, 2.6, true)).filter((b): b is PropBatch => !!b);
+    const graffiti = ['graffiti-grind', 'graffiti-skull', 'graffiti-tag-wall', 'graffiti-wheel'].map((id) => decal(id, 2.6, 2.6, true)).filter((b): b is PropBatch => !!b);
     for (let x = x0 + 9, i = 0; x < x1 - 6; x += 12, i++) {
       // Between the window banks (bay x 10–12 m) the brick is bare: posters + a sign there.
       const bx = x + 1.5 + rng.range(-0.5, 0.5);

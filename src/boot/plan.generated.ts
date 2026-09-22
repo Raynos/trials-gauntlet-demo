@@ -18,7 +18,6 @@ export const PUBLIC_BYTES = {
   "art:apple-touch-icon": 4529,
   "art:banner-apex-suspension": 60508,
   "art:banner-bolt-energy": 53096,
-  "art:banner-ironworks-series": 55976,
   "art:banner-kestrel-tyres": 46692,
   "art:banner-nordvik": 40342,
   "art:banner-vortex-oil": 47568,
@@ -36,8 +35,6 @@ export const PUBLIC_BYTES = {
   "art:favicon-svg": 4173,
   "art:garage-plate": 141300,
   "art:graffiti-grind": 40586,
-  "art:graffiti-nofear": 39292,
-  "art:graffiti-rise": 37860,
   "art:graffiti-skull": 33308,
   "art:graffiti-tag-wall": 40446,
   "art:graffiti-wheel": 39478,
@@ -73,7 +70,6 @@ export const PUBLIC_BYTES = {
   "art:plate-industrial": 40574,
   "art:plate-nightcity": 62428,
   "art:plate-snow": 25236,
-  "art:poster-trials-night": 38330,
   "art:poster-tyres": 38340,
   "art:results-canyon": 42880,
   "art:results-credits": 40632,
@@ -170,4 +166,4 @@ export const PUBLIC_BYTES = {
 // The offline pack as each device tier downloads it (`packMembership`, src/boot/asset-totals.ts):
 // tier-free assets in both, og.jpg in neither, one of the 1x/2x pair each. Generated, so the module
 // path and `__BOOT_TOTALS__` are the same numbers rather than two sums that could drift (totals.ts).
-export const OFFLINE_PACK_BYTES = { '1x': 5909005, '2x': 7257423 };
+export const OFFLINE_PACK_BYTES = { '1x': 5793523, '2x': 7141941 };

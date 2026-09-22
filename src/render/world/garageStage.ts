@@ -643,7 +643,7 @@ export function buildGarageStage(lib: MaterialLibrary, art: ArtLibrary | null): 
     decal('banner', 'banner-kestrel-tyres', 3.6, 0.9, S.x, S.height + 1.35, R.backZ + 0.03);
     decal('poster', 'poster-tyres', 1.1, 1.65, R.halfW - 2.2, 2.4, R.backZ + 0.03);
     decal('exit', 'sign-exit', 0.7, 0.7, S.x - S.width / 2 - 1.0, S.height + 0.6, R.backZ + 0.03);
-    decal('poster2', 'poster-trials-night', 1.1, 1.65, R.halfW - 0.03, 2.3, 0.4, -Math.PI / 2);
+    decal('poster2', 'poster-tyres', 1.1, 1.65, R.halfW - 0.03, 2.3, 0.4, -Math.PI / 2);
   }
   group.updateMatrixWorld(true);
   return {

@@ -1,5 +1,5 @@
 // Every generation prompt for the Trials art pack. `node assets/art/prompts.mjs > jobs.json` emits the job list
-// consumed by generate.mjs. Names double as asset ids in public/art/manifest.json.
+// consumed by generate.mjs. Names double as asset ids in assets/art/manifest.json.
 
 const CINE = 'Cinematic photoreal video-game key art, grounded and moody, physically plausible lighting with volumetric dust and haze, sharp detail, natural film grade. No text, no lettering, no logos, no watermark, no cartoon or illustration style, no UI.';
 const BIKE = 'a trials motorcycle (small light frame, no seat, long-travel forks, knobbly tyres) with a rider in dark armoured gear and full-face helmet standing on the footpegs';
