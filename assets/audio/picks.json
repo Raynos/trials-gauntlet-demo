@@ -1,5 +1,5 @@
 {
- "total_bytes": 6483010,
+ "total_bytes": 7735667,
  "cues": {
   "menu": {
    "stem": "menu-b-s47",
@@ -361,6 +361,79 @@
      "bpm": 103.36,
      "err_pct": -0.62,
      "ibi_cv_pct": 1.87
+    },
+    "body_silence_s": 0.0
+   },
+   "sting": null
+  },
+  "snowline": {
+   "stem": "coast-b-s47",
+   "entry": {
+    "file": "snowline-9710fc81.m4a",
+    "loop": true,
+    "pre": 0.5,
+    "len": 60.945021,
+    "gainDb": 0,
+    "bpm": 126,
+    "bytes": 1252657
+   },
+   "verify": {
+    "decoded_len": 2974656,
+    "expected_len": 2973361,
+    "lufs": -16.14,
+    "tp_dbtp": -1.2,
+    "decoder_shift_samples": 0,
+    "periodic_err_db": -16.4,
+    "seam": {
+     "seam_click": 0.386,
+     "seam_step_db": 0.07,
+     "seam_flux_x": 0.994,
+     "seam_err_db": -15.3
+    },
+    "seam_offset2112": {
+     "seam_click": 0.069,
+     "seam_step_db": 0.2,
+     "seam_flux_x": 1.003,
+     "seam_err_db": -20.5
+    },
+    "bands": {
+     "sub": -6.0,
+     "engine": -5.33,
+     "lowmid": -10.39,
+     "presence": -11.66,
+     "air": -14.74
+    }
+   },
+   "caption": "upbeat instrumental beach rock, clean jangly guitars, steel drum accents, found-metal percussion hits, punchy snare, tambourine, busy bassline, sunny coastal scrapyard, rhythmic and playful",
+   "seed": 47,
+   "dit": "acestep-v15-turbo",
+   "lm": "acestep-5Hz-lm-1.7B",
+   "loop": {
+    "t0_s": 4.8297,
+    "t0": 231828,
+    "len": 2925361,
+    "len_s": 60.94502,
+    "bars": 32,
+    "seam_sim": 0.7237,
+    "seam_chroma": 0.9835,
+    "seam_xcorr": 0.2083,
+    "bpm_exact": 126.015,
+    "seam_click": 0.174,
+    "seam_step_db": 1.78,
+    "seam_flux_x": 0.928,
+    "seam_err_db": 2.7,
+    "body_lufs": -17.08,
+    "body_bands": {
+     "sub": -6.56,
+     "engine": -4.59,
+     "lowmid": -10.75,
+     "presence": -12.5,
+     "air": -15.61
+    },
+    "body_tempo": {
+     "bpm": 129.2,
+     "err_pct": 2.54,
+     "ibi_cv_pct": 2.34
     },
     "body_silence_s": 0.0
    },

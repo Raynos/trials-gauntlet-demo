@@ -13,17 +13,21 @@ was made by measurement. **The user can swap any pick** (see [Swapping a pick](#
 | ride: COAST | **yes** | `coast-4ec96bd3.m4a` 1.25 MB | 32 bars @ 126 bpm = 60.95 s | ACE-Step `coast-b-s11` |
 | ride: ALPINE | **yes** | `alpine-fa9271c0.m4a` 1.02 MB | 24 bars @ 116 bpm = 49.66 s | ACE-Step `alpine-a-s11` |
 | ride: QUARRY | **yes** | `quarry-06f54be7.m4a` 1.51 MB | 32 bars @ 104 bpm = 73.85 s | ACE-Step `quarry-b-s23` |
-| ride: SNOWLINE | gap | none: rides the ALPINE loop (`RIDE_FALLBACK`, src/audio/music/player.ts) | none | not rendered (below) |
-| results sting | gap | none: the procedural finish fanfare + results bed carry it, as before | none | not rendered (below) |
+| ride: SNOWLINE | **yes** | `snowline-9710fc81.m4a` 1.25 MB | 32 bars @ 126 bpm = 60.95 s | ACE-Step `coast-b-s47`, a runner-up reassigned (see [SNOWLINE](#snowline-a-runner-up-reassigned)) |
+| results sting | **procedural** | none: the synth's finish fanfare (D5 F♯5 A5 D6) and the results bed, `src/audio/dsp/{voices,music}.ts` | none | original, composed in code (below) |
 
-Total under `public/audio/`: **6.48 MB** (budget 15 MB). The music never loads before the first gesture, and never under automation.
+Total under `public/audio/`: **7.74 MB** (budget 15 MB). The music never loads before the first gesture, and never under automation.
 
-**Why two cues are missing.** On 2026-09-22 ACE-Step turbo thrashed this machine: RAM swung between 23 and 99 GB, swap filled
+**How the last two cues were closed.** On 2026-09-22 ACE-Step turbo thrashed this machine: RAM swung between 23 and 99 GB, swap filled
 and macOS reported out-of-memory while other sessions were running the harness. On the user's instruction the renders and the
 weight downloads were killed, and ACE-Step is not to be relaunched. Round 1 had finished 30 of its 42 renders (menu, map, coast,
-alpine and quarry, 6 each), and those are what ship. The next step for SNOWLINE and the sting is a small model: Stable Audio
-Open Small (~341 M params), one render at a time, only when swap is below 2 GB and nothing else heavy is running. Its licence
-(Stability AI Community Licence) must be re-checked and recorded here first. A CC0 library loop is the other option.
+alpine and quarry, 6 each). The 6 snowline and 6 results jobs never ran. No other model is used: Stable Audio Open Small was
+considered and dropped (gated download, and its licence requires commercial users to register).
+- **SNOWLINE** ships the round-1 runner-up that measures most like a cold, tense, fast ride. It is chosen from the 25 unpicked renders
+  and is not the alpine pick's prompt and seed, so the two zones sound distinct.
+- **The results sting** stays procedural. The synth's finish fanfare and results bed are composed in code from seeded original
+  chord progressions (`src/audio/dsp/music.ts`, the stinger voices in `src/audio/dsp/voices.ts`), in D, so the fanfare
+  resolves into the bed. They are original and license-free, and nothing recorded replaces them.
 
 ## Generator
 
@@ -99,7 +103,7 @@ render are in `assets/audio/candidates/`, git-ignored and made by `publish.py --
 | coast-a-s47 | coast | A | 47 | 126 | E major | 100 | 35.9 |
 | **coast-b-s11** | coast | B | 11 | 126 | E major | 100 | 39.4 |
 | coast-b-s23 | coast | B | 23 | 126 | E major | 100 | 34.8 |
-| coast-b-s47 | coast | B | 47 | 126 | E major | 100 | 37.7 |
+| **coast-b-s47** (ships as SNOWLINE) | coast | B | 47 | 126 | E major | 100 | 37.7 |
 | **alpine-a-s11** | alpine | A | 11 | 116 | A major | 100 | 37.3 |
 | alpine-a-s23 | alpine | A | 23 | 116 | A major | 100 | 30.7 |
 | alpine-a-s47 | alpine | A | 47 | 116 | A major | 100 | 29.9 |
@@ -148,6 +152,7 @@ that one decoder trims and another does not. Each `.m4a` is then decoded and mea
 | coast | −16.02 | −2.33 | 0 | 0.233 / 0.11 / 1.015 / −19.9 | 0.116 / −0.06 / 0.988 / −23.9 | −19.8 | −5.40 |
 | alpine | −16.03 | −1.73 | 0 | 0.107 / −0.00 / 0.980 / −26.1 | 0.012 / 0.06 / 0.998 / −23.3 | −17.8 | −6.17 |
 | quarry | −16.10 | −1.31 | 0 | 0.350 / −0.12 / 1.002 / −29.1 | 0.002 / −0.13 / 0.999 / −22.9 | −19.2 | −6.23 |
+| snowline | −16.14 | −1.20 | 0 | 0.386 / 0.07 / 0.994 / −15.3 | 0.069 / 0.20 / 1.003 / −20.5 | −16.4 | −5.33 |
 
 How to read the seam columns: `click` below 1 means the jump across the wrap is smaller than the loudest 0.1 % of ordinary sample steps. `step` is the level step the wrap adds over the music's own step, in dB, and `flux ×` is the
 spectral change of the wrap divided by the music's own change, where 1.00 means the wrap sounds like the music simply continuing. `err` compares the 50 ms after the wrap with
@@ -163,6 +168,7 @@ the 50 ms that really follows, and what remains is AAC coding noise. The engine 
 | coast | −17.72 | 7.81 | 94 / 779 | 0.80 | 0.33 | −17.70 |
 | alpine | −17.76 | 11.39 | 98 / 1386 | 0.82 | 0.31 | −15.92 |
 | quarry | −17.76 | 11.79 | 83 / 1880 | 0.90 | 0.23 | −14.25 |
+| snowline | −19.12 | 11.75 | 134 / 2303 | 0.63 | 0.48 | −13.75 |
 
 ### In-game levels (src/audio/music/player.ts `MUSIC_LEVELS`)
 
@@ -170,6 +176,40 @@ These are measured against the synth offline at master 1: the procedural menu be
 bus measures −15.7 and the whole ride mix −14.4. Given that, the front end and map play at −6 dB (→ −22 LUFS, level with the bed they replace), and ride loops at −8 dB (→ −24 LUFS).
 Ride loops also duck under the engine by `1 + 3·load` dB, scaled by the engine's gain, so the music sits about 10 LU under the engine and 4 dB lower at full throttle.
 The master volume scales everything, and `setMusicVolume` (0..1) scales the music alone.
+
+### SNOWLINE: a runner-up reassigned
+
+No snowline render exists, so `assets/audio/pipeline/snowline.py` ranks the unpicked round-1 renders. It keeps only renders that pass every
+ledger gate, are not a shipped pick, and are not the alpine pick's prompt and seed. Each is scored on tempo, brightness (energy above 4 kHz and at 1–4 kHz),
+a sparse low end (sub + engine band, which also leaves the engine room) and loop quality (a quarter of the ledger seam score):
+
+| render | bpm | air >4k dB | presence 1–4k dB | sub+engine dB | seam score | snowline score |
+|---|---|---|---|---|---|---|
+| coast-b-s47 | 129.2 | -15.61 | -12.5 | -2.45 | 2.813 | 3.05 **PICK** |
+| menu-b-s23 | 107.67 | -16.95 | -11.41 | -4.92 | 4.49 | 1.959 |
+| coast-a-s47 | 123.05 | -17.86 | -13.48 | -3.28 | 3.362 | 1.484 |
+| coast-a-s23 | 129.2 | -19.48 | -14.48 | -2.34 | 3.538 | 0.658 |
+| coast-a-s11 | 123.05 | -17.65 | -16.9 | -3.10 | 3.478 | 0.52 |
+| alpine-b-s11 | 117.45 | -17.21 | -15.09 | -2.52 | 3.038 | 0.382 |
+| coast-b-s23 | 129.2 | -19.55 | -18.26 | -2.54 | 2.773 | -0.624 |
+| alpine-b-s23 | 117.45 | -17.58 | -18.47 | -2.43 | 2.829 | -0.905 |
+| menu-b-s11 | 107.67 | -18.26 | -14.45 | -2.71 | 2.159 | -1.074 |
+| quarry-a-s23 | 103.36 | -20.58 | -13.06 | -3.13 | 2.709 | -1.943 |
+| quarry-a-s11 | 103.36 | -18.79 | -15.47 | -0.88 | 2.382 | -2.751 |
+| map-a-s11 | 95.7 | -20.04 | -15.73 | -3.06 | 3.271 | -3.129 |
+| quarry-b-s11 | 103.36 | -20.53 | -16.29 | -3.51 | 0.855 | -3.199 |
+| map-b-s23 | 95.7 | -19.31 | -15.63 | -2.58 | 1.703 | -3.315 |
+| map-b-s47 | 95.7 | -21.63 | -15.41 | -1.91 | 3.323 | -4.275 |
+| quarry-a-s47 | 103.36 | -23.29 | -17.93 | -1.65 | 4.102 | -5.002 |
+
+**Pick: `coast-b-s47`.** It is the fastest render (129 bpm measured, 32 bars in 60.95 s = 126.0 bpm exact), the brightest (air −15.6 dB), and has the
+leanest low end (−2.45 dB). The repo critic confirms it: its p90 centroid of 2.3 kHz and −13.75 dB above 3 kHz are the brightest of the six shipped loops, and it is
+also the widest (L/R corr 0.63). Its prompt is the coast B prompt (steel drum accents, found-metal percussion, tight snare, tambourine,
+busy bassline) with a different seed from the coast pick (s47 vs s11). It is mastered as a ride loop like the others (the 180 Hz engine EQ, −16 LUFS, −2 dBTP limit)
+and published with `publish.py --pick snowline=coast-b-s47`. Its decoded seam has the highest `err` of the six (−15.3 dB at the edit-list
+position, −20.5 dB at +2112). Its flux × (0.994) and level step (0.07 dB) still match the music's own continuation, and its periodicity error is −16.4 dB. If
+the user wants a colder texture, the next two in the ranking are the options (`menu-b-s23`, `coast-a-s47`), or snowline can be dropped from
+the manifest so it rides the alpine loop again (`RIDE_FALLBACK`).
 
 ## Metrics per render (round 1)
 

@@ -142,11 +142,12 @@ def verify(path, cue, L, src):
     return v
 
 
-def render_cue(render_dir, stem, out_dir, named=True):
+def render_cue(render_dir, stem, out_dir, named=True, cue=None):
+    """`cue` ships the render as another cue (snowline reuses a runner-up); default: the cue it was rendered for."""
     m = json.load(open(os.path.join(render_dir, stem + ".metrics.json")))
     side = json.load(open(os.path.join(render_dir, stem + ".json")))
     x, sr = sf.read(os.path.join(render_dir, stem + ".wav"), dtype="float64", always_2d=True)
-    cue = m["cue"]
+    cue = cue or m["cue"]
     body, L = master(x, cue, m.get("loop"))
     if L:
         P = int(PRE * SR)
@@ -194,7 +195,7 @@ def main():
     for cue, stem in picks.items():
         for old in glob.glob(os.path.join(PUBLIC, f"{cue}-*.m4a")):
             os.remove(old)
-        entry, v, m, side = render_cue(a.render_dir, stem, PUBLIC)
+        entry, v, m, side = render_cue(a.render_dir, stem, PUBLIC, cue=cue)
         entries[cue] = entry
         report[cue] = dict(stem=stem, entry=entry, verify=v, caption=side["caption"], seed=side["seed"], dit=side["dit"],
                            lm=side["lm"], loop=m.get("loop"), sting=m.get("sting"))
