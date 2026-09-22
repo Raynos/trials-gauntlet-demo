@@ -22,6 +22,7 @@
  */
 
 import { copyText } from './clipboard';
+import { AUTOMATION_HOOK } from '../core/release';
 
 declare const __BUILD_ID__: string | undefined;
 declare const __BUILD_TIME__: string | undefined;
@@ -222,7 +223,7 @@ export function installErrorModal(): void {
   if (typeof window === 'undefined') return;
   const w = window as CrashWindow;
   if (w.__trialsCrash) return;
-  if (/[?&]harness=1/.test(location.search)) return;
+  if (AUTOMATION_HOOK && /[?&]harness=1/.test(location.search)) return;
   w.__trialsCrash = { count: crashCount, show: showError };
   let leaving = false;
   const bye = (): void => {

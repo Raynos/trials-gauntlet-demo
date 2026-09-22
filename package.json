@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:store": "VITE_STORE=1 vite build",
+    "ip-audit": "node scripts/ip-audit.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.harness.json --noEmit",
     "test": "vitest run",

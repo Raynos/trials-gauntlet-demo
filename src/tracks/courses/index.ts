@@ -1,5 +1,6 @@
 /** Curriculum order: 5 tiers x 3 tracks, the two harness fixtures first, the lab tracks last. */
 import type { TrackDef } from '../../core/types';
+import { DEV_SURFACES } from '../../core/release';
 import { FLAT_TEST_TRACK, GAP_TEST_TRACK } from './test-tracks';
 import { B1, B2, B3 } from './beginner';
 import { E1, E2, E3 } from './easy';
@@ -17,5 +18,6 @@ export const CURRICULUM: readonly TrackDef[] = [B1, B2, B3, E1, E2, E3, M1, M2, 
 /**
  * Everything the registry knows: fixtures first, then the curriculum, then the playgrounds (`p*-*`, tracks round 10: one
  * beginner course per biome, shown in a "Playgrounds" row above Lab), then the lab tracks (`lab-*`, shown last under "Lab").
+ * A store build (`VITE_STORE=1`, src/core/release.ts) has no Labs: they are dev proving grounds, never shipped.
  */
-export const ALL_TRACKS: readonly TrackDef[] = [FLAT_TEST_TRACK, GAP_TEST_TRACK, ...CURRICULUM, ...PLAYGROUND_TRACKS, ...LAB_TRACKS];
+export const ALL_TRACKS: readonly TrackDef[] = [FLAT_TEST_TRACK, GAP_TEST_TRACK, ...CURRICULUM, ...PLAYGROUND_TRACKS, ...(DEV_SURFACES ? LAB_TRACKS : [])];

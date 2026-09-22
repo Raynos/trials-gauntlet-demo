@@ -32,7 +32,7 @@ import type { AudioSystem } from './audio';
 import type { PhysicsWorld } from './physics';
 import type { GameRenderer } from './render';
 import { App, Game, MockPhysics, installHook, isPhone, type HookExtras } from './game';
-import { parseBenchParams } from './game/bench';
+import { parseBenchParams, type BenchOptions } from './game/bench';
 import { resolveBoot } from './game/flow';
 import { getTrack } from './tracks';
 import { ArtManifest, BestTimes, DomHud, injectStyles, loadBikeChoice, loadHeldTier, loadModelChoice, loadQualityOverride, menuPlate, type ModelChoice } from './ui';
@@ -48,6 +48,7 @@ import { startTier } from './game/startTier';
 import { loadRiderOutfit } from './ui/outfit';
 import { armCrashTest, crashTestBoot, crashTestMode, showThrown } from './ui/errorModal';
 import { installUpdatePill } from './ui/updatePill';
+import { AUTOMATION_HOOK, DEV_SURFACES } from './core/release';
 
 type AnyModule = Record<string, unknown>;
 
@@ -158,9 +159,22 @@ interface Composed {
 type Preparable = Partial<{ prepare(run: StepRunner<PrepareStep>): Promise<void> }>;
 
 function boot(): void {
-  const params = new URLSearchParams(location.search);
+  // A store build reads no `?` parameter at all (src/core/release.ts): every dev mode above is compiled out.
+  // The harness route survives only where the automation hook does.
+  const params = new URLSearchParams(DEV_SURFACES ? location.search : AUTOMATION_HOOK && /[?&]harness=1(&|$)/.test(location.search) ? 'harness=1' : '');
   const route = resolveBoot(params, (id) => getTrack(id) !== undefined);
-  const harness = route.mode === 'harness';
+  const harness = AUTOMATION_HOOK && route.mode === 'harness';
+  // The front end's `?` dev switches, set in one statement-level branch so a store build drops the lot (a
+  // `DEV_SURFACES && …` nested in the App options is not folded by Rollup; an `if` is).
+  const devModes: { touchDebug: boolean; perf: boolean; trace: boolean; lab: boolean; bench: BenchOptions | undefined; review: string | undefined } = { touchDebug: false, perf: false, trace: false, lab: false, bench: undefined, review: undefined };
+  if (DEV_SURFACES) {
+    devModes.touchDebug = params.get('touchdebug') === '1';
+    devModes.perf = params.get('perf') === '1';
+    devModes.trace = params.get('trace') === '1';
+    devModes.lab = params.get('lab') === '1';
+    devModes.bench = parseBenchParams(params) ?? undefined;
+    devModes.review = params.get('review') ?? undefined;
+  }
   const physicsHz = Number(params.get('hz')) || DEFAULT_PHYSICS_HZ;
   const app = document.getElementById('app');
   if (!app) throw new Error('#app missing');
@@ -216,7 +230,7 @@ function boot(): void {
     return composed;
   };
 
-  if (harness) {
+  if (AUTOMATION_HOOK && harness) {
     // `ready` first, at module-evaluation time. The hook resolves the game on first use, so
     // any harness call is correct regardless of task order; normally the composition task
     // below (renderer + WebGL context, physics, audio, HUD) and the track load have already
@@ -244,7 +258,7 @@ function boot(): void {
    */
   async function bootFront(): Promise<void> {
     const plan = await takeBootPlan();
-    const crashTest = crashTestMode(location.search);
+    const crashTest = DEV_SURFACES ? crashTestMode(location.search) : null;
     try {
       const sRenderer = await plan.step('renderer', async () => {
         await nextPaint();
@@ -324,7 +338,7 @@ function boot(): void {
           setCameraOverride: (o) => {
             if (typeof renderer.setCameraOverride === 'function') renderer.setCameraOverride(o);
           },
-          touchDebug: params.get('touchdebug') === '1',
+          touchDebug: devModes.touchDebug,
           modelsSupported: typeof (renderer as Partial<{ setModels: unknown }>).setModels === 'function',
           applyModels: (m) => {
             const r = renderer as Partial<{ setModels(o: ModelChoices): void }>;
@@ -333,12 +347,12 @@ function boot(): void {
             return true;
           },
           art,
-          perf: params.get('perf') === '1',
-          trace: params.get('trace') === '1',
-          lab: params.get('lab') === '1',
+          perf: devModes.perf,
+          trace: devModes.trace,
+          lab: devModes.lab,
           physics: { current: params.get('physics') === 'v1' ? 'v1' : params.get('physics') === 'v2' ? 'v2' : 'default', available: physicsVersions(), live: physicsVersion },
-          bench: parseBenchParams(params) ?? undefined,
-          initialReview: params.get('review') ?? undefined,
+          bench: devModes.bench,
+          initialReview: devModes.review,
           // Per-class livery when the render owner exports it (`setBikeClass(bike)`); otherwise the garage card carries the colour.
           onBikeChange: (bike) => {
             const r = renderer as Partial<{ setBikeClass(b: 'rookie' | 'pro'): void }>;
@@ -351,14 +365,16 @@ function boot(): void {
           const r = renderer as Partial<{ setDeviceClass(c: 'phone' | 'desktop'): void }>;
           if (typeof r.setDeviceClass === 'function') r.setDeviceClass(isPhone() ? 'phone' : 'desktop');
         }
-        const hook = installHook(game, false, extras);
-        hook.lastRun = () => game.lastRunRecording()?.json ?? null;
-        hook.replay = shell.replayApi();
-        hook.review = shell.reviewApi();
-        hook.navLog = () => shell.navLog.all();
-        hook.app = shell.testApi();
-        const benchApi = shell.benchApi();
-        if (benchApi) hook.bench = benchApi;
+        if (AUTOMATION_HOOK) {
+          const hook = installHook(game, false, extras);
+          hook.lastRun = () => game.lastRunRecording()?.json ?? null;
+          hook.replay = shell.replayApi();
+          hook.review = shell.reviewApi();
+          hook.navLog = () => shell.navLog.all();
+          hook.app = shell.testApi();
+          const benchApi = shell.benchApi();
+          if (benchApi) hook.bench = benchApi;
+        }
         return shell;
       });
       const shell = sFront.value;
@@ -413,7 +429,8 @@ function boot(): void {
       });
       sFonts.done();
       // After the boot, never inside it: the version check must not sit in the boot's byte count or requests.
-      installUpdatePill();
+      // A store build loads no code from a server (Apple 2.5.2): no version check, no pill.
+      if (DEV_SURFACES) installUpdatePill();
     } catch (e) {
       console.error('[trials] boot failed', e);
       plan.fail(`Startup failed: ${e instanceof Error ? e.message : String(e)}`);

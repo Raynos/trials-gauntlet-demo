@@ -7,6 +7,7 @@
  * aware, tokens from styles.ts only.
  */
 import type { BikeClass, RiderOutfit } from '../core/types';
+import { DEV_SURFACES } from '../core/release';
 import { offlineHeld, offlineLine } from './offlineStatus';
 import type { ArtEntry, ArtManifest } from './art';
 import type { FpsChoice, ModelChoice } from './best';
@@ -350,7 +351,8 @@ export class MainMenuScreen extends Screen {
     this.list.setItems([
       { id: 'play', label: 'Play' },
       { id: 'garage', label: 'Garage', icon: MENU_ICON.garage },
-      { id: 'review', label: 'Review', icon: MENU_ICON.review },
+      // The level reviewer (docs/design/game.md §21) is a dev tool: a store build has no REVIEW tile.
+      ...(DEV_SURFACES ? [{ id: 'review', label: 'Review', icon: MENU_ICON.review }] : []),
       { id: 'settings', label: 'Settings', icon: MENU_ICON.settings },
       { id: 'credits', label: 'Credits', minor: true },
     ]);
@@ -495,13 +497,14 @@ export class SettingsScreen extends Screen {
     seg('ghost', 'Ghost', 'Your personal-best run rides alongside', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().ghost ? 'on' : 'off'), (v) => this.cb.setGhost(v === 'on'));
     // The rider model (Classic / Blender / Img2) and the outfit live in the Garage only (garage round); the bike
     // mesh choice stays here because it applies on the next track load.
-    if (s().models) {
+    if (DEV_SURFACES && s().models) {
       seg('bike', 'Bike model', 'Applies on the next track load', [{ v: 'proc', l: 'Procedural' }, { v: 'gltf', l: 'Modelled' }], () => s().bike, (v) => this.cb.setModel('bike', v as ModelChoice));
     }
 
-    seg('telemetry', 'Run log', 'Keeps attempts, faults and crash spots on this device only', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().telemetry ? 'on' : 'off'), (v) => this.cb.setTelemetry(v === 'on'));
+    // The run log (telemetry) and its export are dev surfaces: a store build collects nothing (STORE_RELEASE.md P0.3).
+    if (DEV_SURFACES) seg('telemetry', 'Run log', 'Keeps attempts, faults and crash spots on this device only', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().telemetry ? 'on' : 'off'), (v) => this.cb.setTelemetry(v === 'on'));
     const phys = s().physics;
-    if (s().dev && phys && phys.available.length > 0 && this.cb.setPhysics) {
+    if (DEV_SURFACES && s().dev && phys && phys.available.length > 0 && this.cb.setPhysics) {
       // Hidden dev row (physics v2 A/B, docs/plans/physics-v2.md §16.2): reloads the page with `?physics=`.
       const opts = [{ v: 'default', l: phys.current === 'default' && phys.live ? `Default (${phys.live.toUpperCase()})` : 'Default' }, ...phys.available.map((v) => ({ v, l: v.toUpperCase() }))];
       const live = phys.live ? `Live solver: ${phys.live.toUpperCase()}` : 'Live solver: mock';
@@ -509,7 +512,7 @@ export class SettingsScreen extends Screen {
     }
 
     // Run log export: Copy (clipboard JSON) · Share (Web Share API, text) — never leaves the device otherwise.
-    {
+    if (DEV_SURFACES) {
       const el = h('div', 'setting');
       el.innerHTML = `<div class="lab">Export run log<small></small></div><div class="btns"><button type="button" class="btn" data-a="copy">Copy</button><button type="button" class="btn" data-a="share">Share</button></div>`;
       const small = el.querySelector('small')!;
@@ -582,8 +585,9 @@ export class SettingsScreen extends Screen {
       list.appendChild(el);
     }
 
-    // Reload game: the only way to pick up a new build from a home-screen install (no browser chrome).
-    {
+    // Reload game: the only way to pick up a new build from a home-screen install (no browser chrome). A store
+    // build is bundled whole in the app and updates through the store: no row.
+    if (DEV_SURFACES) {
       const el = h('div', 'setting');
       el.innerHTML = `<div class="lab">Reload game<small>Fetches the latest build · settings and best times stay</small></div><button type="button" class="btn">⟳ Reload</button>`;
       const btn = el.querySelector<HTMLButtonElement>('button')!;
@@ -728,7 +732,6 @@ export class CreditsScreen extends Screen {
         <dt>Type</dt><dd>Barlow Condensed by Jeremy Tribby (SIL OFL 1.1).</dd>
         <dt>Art</dt><dd>Key art, track cards and medals generated for this build; procedural biomes in-engine.</dd>
         <dt>Hero</dt><dd>Rider and bike authored in Blender by Astra (five outfits, two liveries). Body and skin from <b>MPFB / MakeHuman</b> system assets (CC0) and the Blender Studio human base meshes (CC0); hair from <b>Daniel Bystedt</b>'s Hair Styles demo (CC BY-SA), baked to a curl shell for the game; beard and moustache by <b>grinsegold</b> (MakeHuman bodyparts06, CC-BY); the study head <b>Infinite, 3D Head Scan by Lee Perry-Smith</b> (CC BY 3.0, via three.js); cotton and denim from <b>Poly Haven</b> (CC0). Full provenance and licences ship with the source.</dd>
-        <dt>Thanks</dt><dd>Trials Evolution and Trials Rising for the read-outs, the crash stamp and the checkpoint restart.</dd>
       </dl>`;
     this.root.append(h('div', 'grain'), wrap);
     this.addBackButton('Menu');

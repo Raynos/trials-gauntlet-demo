@@ -70,6 +70,16 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      # Store release bar 1 (docs/plans/STORE_RELEASE.md P0.4): the store bundle's denylist hits, reported,
+      # never blocking until Phase 6 turns on --strict. Rebuilds dist/ as the store build — the deploy below
+      # uploads the source and Vercel builds the web bundle itself, so this dist/ is never shipped.
+      - name: IP audit (store build, report only)
+        continue-on-error: true
+        run: |
+          pnpm run build:store
+          node scripts/ip-audit.mjs | tee ip-audit.txt
+          { echo '### IP audit (store build)'; echo '```'; head -40 ip-audit.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       # ---- deploy (main only) ------------------------------------------------------------------
       - name: No token, no deploy
         if: github.event_name != 'pull_request' && env.DEPLOY != 'true'

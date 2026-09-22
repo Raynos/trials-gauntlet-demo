@@ -41,51 +41,54 @@ export const LAB_CREST = { length: 20, height: 0.6 } as const;
  * wants 15); §15 fixes it there on purpose (a 7-8 m/s arrival is the hop's working speed), so the
  * checkpoint rule is off for this track and the test suite pins that exact single violation.
  */
-export const LAB_PHYSICS_TEST: TrackDef = course('lab-physics-test', 'Physics Test', 'medium')
-  .meta({
-    biome: 'industrial',
-    technique: 'the bunny hop',
-    demands: 'one hop from an 11 deg lip onto a ledge 0.3 m above it across a 3 m dry pit; full gas over a crest without looping',
-    attemptsBand: [3, 8],
-    targetTimeS: 12, // round 7 gold (physics v2): skill-3 bot 8.13 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
-  })
-  .camera({ mode: 'side' })
-  .hint('physics')
-  .flat(30)
-  .checkpoint()
-  .flat(10)
-  .ramp({ length: LAB_TAKEOFF.length, height: LAB_TAKEOFF.height, surface: 'wood' })
-  .box({ width: LAB_TAKEOFF.lip, height: LAB_TAKEOFF.height, surface: 'wood' })
-  .gap({ width: LAB_PIT.width, depth: LAB_PIT.depth, rise: LAB_PIT.ledge, hazard: 'none', floor: 'rubber' })
-  .flat(12.7)
-  .checkpoint()
-  .flat(8)
-  .wave(LAB_CREST.length, LAB_CREST.height)
-  .flat(10)
-  .finish(30, { checkpointRule: false });
+export const LAB_PHYSICS_TEST: TrackDef = /* @__PURE__ */ (() =>
+  course('lab-physics-test', 'Physics Test', 'medium')
+    .meta({
+      biome: 'industrial',
+      technique: 'the bunny hop',
+      demands: 'one hop from an 11 deg lip onto a ledge 0.3 m above it across a 3 m dry pit; full gas over a crest without looping',
+      attemptsBand: [3, 8],
+      targetTimeS: 12, // round 7 gold (physics v2): skill-3 bot 8.13 s x 1.6 (the v1 stranger/bot clean ratio), rounded up to 5 s and kept non-decreasing through the tier; platinum = 0.85 x this (core rules)
+    })
+    .camera({ mode: 'side' })
+    .hint('physics')
+    .flat(30)
+    .checkpoint()
+    .flat(10)
+    .ramp({ length: LAB_TAKEOFF.length, height: LAB_TAKEOFF.height, surface: 'wood' })
+    .box({ width: LAB_TAKEOFF.lip, height: LAB_TAKEOFF.height, surface: 'wood' })
+    .gap({ width: LAB_PIT.width, depth: LAB_PIT.depth, rise: LAB_PIT.ledge, hazard: 'none', floor: 'rubber' })
+    .flat(12.7)
+    .checkpoint()
+    .flat(8)
+    .wave(LAB_CREST.length, LAB_CREST.height)
+    .flat(10)
+    .finish(30, { checkpointRule: false }))();
 
 /**
  * `lab-flat-200`: 200 m of flat dirt, nothing on it, checkpoints every 50 m, finish + catch. The envelope
  * instrument: 0 -> 16 m/s time, top speed, brake distance from 10 / 16 / 20 m/s, stationary and rolling
  * hop apex, wheelie hold, loop-out threshold — every flat-ground FEEL row of physics-v2 §14.2.
  */
-export const LAB_FLAT_200: TrackDef = course('lab-flat-200', 'Flat 200', 'beginner')
-  .meta({
-    biome: 'industrial',
-    technique: 'envelope measurement',
-    demands: 'nothing: 200 m of flat dirt for the physics engineer',
-    attemptsBand: [1, 1],
-    targetTimeS: 17, // round 7 (physics v2): reflex `good` median clear 15.9 s x 1.05
-  })
-  .camera({ mode: 'side' })
-  .hint('physics')
-  .flat(50)
-  .checkpoint()
-  .flat(50)
-  .checkpoint()
-  .flat(50)
-  .checkpoint()
-  .flat(50)
-  .finish();
+export const LAB_FLAT_200: TrackDef = /* @__PURE__ */ (() =>
+  course('lab-flat-200', 'Flat 200', 'beginner')
+    .meta({
+      biome: 'industrial',
+      technique: 'envelope measurement',
+      demands: 'nothing: 200 m of flat dirt for the physics engineer',
+      attemptsBand: [1, 1],
+      targetTimeS: 17, // round 7 (physics v2): reflex `good` median clear 15.9 s x 1.05
+    })
+    .camera({ mode: 'side' })
+    .hint('physics')
+    .flat(50)
+    .checkpoint()
+    .flat(50)
+    .checkpoint()
+    .flat(50)
+    .checkpoint()
+    .flat(50)
+    .finish())();
 
+/** Each lab track is built in a `@__PURE__` IIFE so a store build, which never lists them (courses/index.ts), drops them whole. */
 export const LAB_TRACKS: readonly TrackDef[] = [LAB_PHYSICS_TEST, LAB_FLAT_200, LAB_BOX_CLIMB, LAB_RAMP_JUMP];

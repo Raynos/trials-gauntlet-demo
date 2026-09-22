@@ -19,8 +19,10 @@ import { selectedBootTotals } from './outfit';
 declare const __BOOT_CORE__: [path: string, bytes: number][];
 declare const __BOOT_TOTALS__: DeclaredBootTotals;
 declare const __BOOT_BUILD__: string;
-/** Production builds only: dev has no `sw.js` and a stale worker there would serve yesterday's bundle. */
+/** Production web builds only: dev has no `sw.js` and a stale worker there would serve yesterday's bundle; a store build (`VITE_STORE=1`) ships none. */
 declare const __BOOT_SW__: boolean;
+/** The `?harness=1` route (src/core/release.ts `AUTOMATION_HOOK`): every build but a store release. */
+declare const __BOOT_HOOK__: boolean;
 
 (function boot(): void {
   const root = document.getElementById('loader');
@@ -34,7 +36,7 @@ declare const __BOOT_SW__: boolean;
     document.head.appendChild(s);
   };
   // The harness owns the clock and expects the hook at once: no loader in its way, no plan.
-  if (/[?&]harness=1/.test(location.search)) {
+  if (__BOOT_HOOK__ && /[?&]harness=1/.test(location.search)) {
     root.remove();
     insertEntry(() => undefined);
     return;
@@ -68,7 +70,7 @@ declare const __BOOT_SW__: boolean;
   plan
     // The worker first, capped: it must control this page before the boot asks for its 27 MB, or the
     // first visit caches nothing and offline needs a second visit (docs/plans/PWA_OFFLINE.md §1.2.1).
-    .step('core', () => swBoot(__BOOT_SW__).then(() => Promise.all([worker(), worker(), worker(), worker()])))
+    .step('core', () => (__BOOT_SW__ ? swBoot(true) : Promise.resolve()).then(() => Promise.all([worker(), worker(), worker(), worker()])))
     .then((afterCore) => {
       let release!: () => void;
       const evaluated = afterCore.step('evaluate', () => new Promise<void>((r) => (release = r)));

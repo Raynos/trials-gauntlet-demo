@@ -6,6 +6,7 @@
  * same frames and `animations: disabled` screenshots cannot hide a banner.
  */
 import type { BikeClass, GameEvent, InputDevice, Medal, PhysicsState, RunInfo, RunResult, TrackDef } from '../core/types';
+import { DEV_SURFACES } from '../core/release';
 import { BOARD_SIZE, type BoardEntry } from './best';
 import { formatDelta, formatTime } from './format';
 import type { Hud, HudAction } from './index';
@@ -208,7 +209,9 @@ export class DomHud implements Hud {
 
     this.flashEl = el('div', 'flash');
     this.root.append(this.flashEl, top, this.bannersEl, this.hintsEl, this.results);
-    if (reviewEnabled()) {
+    // `DEV_SURFACES &&`: a store build has no review inbox (a password-gated hidden feature, Apple 2.3.1) and never
+    // emits its lazy chunk or calls `/api/inbox` (src/core/release.ts).
+    if (DEV_SURFACES && reviewEnabled()) {
       this.noteBtn = document.createElement('button');
       this.noteBtn.type = 'button';
       this.noteBtn.className = 'hud-note';
@@ -328,7 +331,7 @@ export class DomHud implements Hud {
     this.animateFlash();
     this.animateResults();
 
-    // Deferred CRASH! stamp (0.2 s after the fault, Rising timing).
+    // Deferred CRASH! stamp (0.2 s after the fault, so the tumble reads before the word).
     if (this.pendingCrashAt >= 0 && this.simTime >= this.pendingCrashAt) {
       this.pendingCrashAt = -1;
       this.crashBanner = this.spawn('crash', 'Crash!', 1.4);
@@ -437,12 +440,12 @@ export class DomHud implements Hud {
       return;
     }
     this.flashEl.className = `flash ${this.flashKind}`;
-    // Snap on, decay out (Evolution's white burst / green checkpoint light).
+    // Snap on, decay out (a white burst on a fault, a green light on a checkpoint).
     const k = age / life;
     s.opacity = ((1 - k) * (1 - k)).toFixed(3);
   }
 
-  /** Layered reveal (Evolution results): headline → faults → medal row → earned medal burst → PB line → actions. */
+  /** Layered reveal: headline → faults → medal row → earned medal burst → PB line → actions. */
   private animateResults(): void {
     if (this.resultsAt < 0) return;
     const age = this.simTime - this.resultsAt;
@@ -677,7 +680,7 @@ export class DomHud implements Hud {
     const fadeT = b.life - age; // seconds remaining
     switch (b.kind) {
       case 'count': {
-        const k = easeOut(clamp01(age / 0.15)); // tall-and-thin snap (Evolution squash-and-stretch)
+        const k = easeOut(clamp01(age / 0.15)); // tall-and-thin snap (squash-and-stretch)
         sx = 0.55 + 0.45 * k;
         sy = 1.45 - 0.45 * k;
         if (fadeT < 0.2) {

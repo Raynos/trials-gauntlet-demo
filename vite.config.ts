@@ -16,6 +16,34 @@ interface Esbuild {
 }
 const esbuild = createRequire(createRequire(import.meta.url).resolve('vite'))('esbuild') as Esbuild;
 
+/**
+ * `pnpm build:store` (docs/plans/STORE_RELEASE.md P0.3): the App Store / Google Play bundle. The game reads the
+ * same flag as `import.meta.env.VITE_STORE` (src/core/release.ts); here it drops the service worker, the version
+ * probe and the inline loader's `?harness=1` route. `VITE_STORE_DEBUG=1` keeps the automation hook (native gate).
+ */
+const STORE_BUILD = process.env['VITE_STORE'] === '1';
+const STORE_DEBUG = process.env['VITE_STORE_DEBUG'] === '1';
+
+/**
+ * `src/core/release.ts` as literal constants for this build. The module itself reads `import.meta.env` (so vitest
+ * and the tsx harness get a normal build), but a derived const is not something Rollup folds at every import
+ * site; literal exports are, so each `if (DEV_SURFACES)` / `AUTOMATION_HOOK &&` branch is dropped whole.
+ */
+function releaseFlags(): Plugin {
+  let file = path.resolve('src', 'core', 'release.ts');
+  return {
+    name: 'trials:release-flags',
+    enforce: 'pre',
+    configResolved(c) {
+      file = path.resolve(c.root, 'src', 'core', 'release.ts');
+    },
+    load(id) {
+      if (path.resolve(id.split('?')[0]!) !== file) return null;
+      return `export const STORE = ${STORE_BUILD};\nexport const DEV_SURFACES = ${!STORE_BUILD};\nexport const AUTOMATION_HOOK = ${!STORE_BUILD || STORE_DEBUG};\n`;
+    },
+  };
+}
+
 /** The inline loader script (`src/boot/inline.ts` bundled) must paint with the first HTML bytes: ≤ 8 KB minified. */
 const INLINE_BUDGET_BYTES = 8 * 1024;
 
@@ -216,7 +244,7 @@ export async function buildInline(root: string, core: LoadItem[], totals: Declar
     minify,
     charset: 'utf8',
     legalComments: 'none',
-    define: { __BOOT_CORE__: JSON.stringify(core.map((i) => [i.path, i.bytes])), __BOOT_TOTALS__: JSON.stringify(totals), __BOOT_BUILD__: JSON.stringify(id), __BOOT_SW__: JSON.stringify(minify) },
+    define: { __BOOT_CORE__: JSON.stringify(core.map((i) => [i.path, i.bytes])), __BOOT_TOTALS__: JSON.stringify(totals), __BOOT_BUILD__: JSON.stringify(id), __BOOT_SW__: JSON.stringify(minify && !STORE_BUILD), __BOOT_HOOK__: JSON.stringify(!STORE_BUILD || STORE_DEBUG) },
   });
   const code = res.outputFiles[0]?.text.trim() ?? '';
   if (minify && Buffer.byteLength(code) > INLINE_BUDGET_BYTES) throw new Error(`inline loader is ${Buffer.byteLength(code)} B, budget ${INLINE_BUDGET_BYTES} B`);
@@ -354,6 +382,63 @@ function pruneFlatModels(): Plugin {
   };
 }
 
+/**
+ * Store release P0.2: production source maps never deploy. They are built `hidden` (no `sourceMappingURL`
+ * comment) and then moved out of the output dir to `<outDir>-maps/` — Vercel builds remotely and serves
+ * `dist/`, and the store shells bundle `dist/`, so neither ever carries the source and its comments. The
+ * crash screen shows the raw (unmangled, `readableStacks`) stack; a stack is symbolicated locally against
+ * `dist-maps/` when it has to be.
+ */
+function sourcemapsOut(): Plugin {
+  let outDir = 'dist';
+  return {
+    name: 'trials:sourcemaps-out',
+    apply: 'build',
+    enforce: 'post',
+    configResolved(c) {
+      outDir = path.resolve(c.root, c.build.outDir);
+    },
+    writeBundle() {
+      const dest = `${outDir}-maps`;
+      fs.rmSync(dest, { recursive: true, force: true });
+      let n = 0;
+      const walk = (dir: string): void => {
+        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+          const p = path.join(dir, e.name);
+          if (e.isDirectory()) walk(p);
+          else if (e.name.endsWith('.map')) {
+            const to = path.join(dest, path.relative(outDir, p));
+            fs.mkdirSync(path.dirname(to), { recursive: true });
+            fs.renameSync(p, to);
+            n += 1;
+          }
+        }
+      };
+      walk(outDir);
+      if (n) this.info(`moved ${n} source maps out of the deploy to ${path.relative(process.cwd(), dest) || dest}`);
+    },
+  };
+}
+
+/**
+ * Store build only: `public/` files a store bundle must not carry. `bench/b1-bot-3.json` is the on-device bench's
+ * golden (`?bench=1`, src/game/bench.ts) — the web build keeps it, the store build has no bench.
+ */
+function storePrune(): Plugin {
+  let outDir = 'dist';
+  return {
+    name: 'trials:store-prune',
+    apply: 'build',
+    enforce: 'post',
+    configResolved(c) {
+      outDir = path.resolve(c.root, c.build.outDir);
+    },
+    writeBundle() {
+      for (const rel of ['bench']) fs.rmSync(path.join(outDir, rel), { recursive: true, force: true });
+    },
+  };
+}
+
 function pwa(id: string): Plugin {
   let root = process.cwd();
   return {
@@ -477,13 +562,14 @@ export default defineConfig({
   // (Vercel preview folders, file listings, the harness preview server).
   base: './',
   // versionJson last: its `generateBundle` must run after the load manifest and the worker stamp are taken.
-  plugins: [readableStacks((name) => name === 'three'), bundleBudget(), ...loadManifest(buildId()), pwa(buildId()), pruneFlatModels(), versionJson(buildId())],
+  // A store build has no service worker and no update probe (Apple 2.5.2: nothing loads code from a server).
+  plugins: [releaseFlags(), readableStacks((name) => name === 'three'), bundleBudget(), ...loadManifest(buildId()), ...(STORE_BUILD ? [] : [pwa(buildId())]), pruneFlatModels(), ...(STORE_BUILD ? [storePrune()] : [versionJson(buildId())]), sourcemapsOut()],
   // Unmangled identifiers in production: the crash screen's stack must name functions on a phone (`readableStacks`).
   esbuild: { minifyIdentifiers: false },
   worker: { plugins: () => [readableStacks(() => true)] },
   build: {
     target: 'es2022',
-    sourcemap: true,
+    sourcemap: 'hidden',
     chunkSizeWarningLimit: 700,
     // three is large; a dedicated chunk keeps the game bundle cacheable.
     rollupOptions: {

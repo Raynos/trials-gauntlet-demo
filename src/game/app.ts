@@ -69,6 +69,7 @@ import { applyOrientation } from '../ui/orientation';
 import { loadRiderOutfit, saveRiderOutfit } from '../ui/outfit';
 import { copyText } from '../ui/clipboard';
 import { Bench, type BenchOptions, type FrameSplit } from './bench';
+import { DEV_SURFACES } from '../core/release';
 import { FrameCadence } from './cadence';
 import { BACKDROP_TRACK } from './flow';
 import { Percentiles, type Game } from './game';
@@ -269,7 +270,8 @@ export class App {
     this.soundOn = loadSoundEnabled();
     this.volume = loadVolume();
     this.ghostOn = loadGhostEnabled();
-    this.telemetryOn = loadTelemetryEnabled();
+    // A store build keeps no run log (STORE_RELEASE.md P0.3: "Data not collected"); the Settings rows are gone too.
+    this.telemetryOn = DEV_SURFACES && loadTelemetryEnabled();
     this.bikeChoice = loadBikeChoice();
     this.riderOutfit = o.riderOutfit ?? loadRiderOutfit();
     this.qualityWhy = this.qualityChoice === 'auto' ? 'pending probe' : 'manual (settings)';
@@ -298,7 +300,7 @@ export class App {
       bike: o.models.bike,
       dev: o.dev ?? false,
       lastPlayed: this.lastTrackId,
-      models: o.modelsSupported ?? false,
+      models: DEV_SURFACES && (o.modelsSupported ?? false),
       bikeClass: this.bikeInEffect(),
       telemetry: this.telemetryOn,
       runlog: this.runLog.summary(),
@@ -462,7 +464,8 @@ export class App {
       quit: () => this.quit('pause:quit'),
     });
     mountRotatePrompt(o.uiRoot);
-    this.bench = o.bench
+    // `DEV_SURFACES &&`: a store build compiles the bench out whole (src/core/release.ts).
+    this.bench = DEV_SURFACES && o.bench
       ? new Bench(
           o.uiRoot,
           {
