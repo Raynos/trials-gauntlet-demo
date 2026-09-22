@@ -119,3 +119,7 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 81 | "What is left, can we release the new poses?" | **in flight** | Resolve standing-pose handling and recovery regressions, refresh exact replay/stranger evidence, run full ship gate, then release when qualified. |
 
 | 82 | "Trailer is good thats done, mark it done." | **done** | HR-12 removed from the queue; ask 63 marked accepted; ask 64 (round 3) dropped. The cut stays local-only and gitignored (`harness/out/trailer/`), re-renderable with `capture-ui.sh <sha7>`. |
+
+| 83 | "If you need me to review iphone, then deploy first lol then ill review." | **done** | Preview of `c7885c4` at https://trials-gauntlet-review.vercel.app (alias of `trials-gauntlet-demo-1xkfxvbd1-raynos-projects.vercel.app`), 200 + sha stamp verified. Not production: HEAD carries the ask-80 candidate with open hop/climb regressions. No gate run (review build, not a pin). HR-14 points at it. |
+
+| 83 | "What recent features were added to games wildshard prototype that we might want to port here? Like for example continuous deployment on push?" | **done — answered** | Surveyed project-wildshard-singleplayer (326 commits since 09-01). Port candidates: CD on push (GitHub Actions + project-scoped Vercel token; needs VERCEL_GIT_COMMIT_SHA passed to the remote build, sparse checkout for the 8 GB repo), /version.json + build pill that lights up on a newer deploy (iOS PWA), full-screen uncaught-exception modal, readable stacks. Awaiting the user's pick. |
