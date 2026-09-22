@@ -12,7 +12,9 @@ import type { TrackDef } from '../../core/types';
 import { rockhopMeta, medalTargets, type MedalTargets } from './builder';
 import { ALPINE_TRACKS } from './alpine';
 import { COAST_TRACKS } from './coast';
+import { ROCKHOP_ZONE_PLAYGROUNDS } from './playgrounds';
 import { QUARRY_TRACKS } from './quarry';
+import { SNOWLINE_TRACKS } from './snowline';
 import { ZONE_ORDER, type ZoneId } from './zones';
 
 export { ROCKHOP_ZONE_BIOME, ZONE_ORDER, ZONE_LABEL, ZONE_CODE, type ZoneId } from './zones';
@@ -31,10 +33,10 @@ export interface RockhopEntry {
 }
 
 /** The twelve tracks in progression order C1 -> S3. */
-export const ROCKHOP_TRACK_DEFS: readonly TrackDef[] = [...COAST_TRACKS, ...ALPINE_TRACKS, ...QUARRY_TRACKS];
+export const ROCKHOP_TRACK_DEFS: readonly TrackDef[] = [...COAST_TRACKS, ...ALPINE_TRACKS, ...QUARRY_TRACKS, ...SNOWLINE_TRACKS];
 
 /** One free-ride playground per zone, zone order (no medals, outside progression; ids `p-<zone>`). */
-export const ROCKHOP_PLAYGROUND_DEFS: readonly TrackDef[] = [];
+export const ROCKHOP_PLAYGROUND_DEFS: readonly TrackDef[] = [...ROCKHOP_ZONE_PLAYGROUNDS];
 
 function entry(def: TrackDef): RockhopEntry {
   const m = rockhopMeta(def);

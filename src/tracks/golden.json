@@ -243,5 +243,54 @@
     "hazards": 22,
     "obstacles": 43,
     "finishX": 454.8
+  },
+  "s1-lift-line": {
+    "hash": "9882fd73452a726e",
+    "colliders": 49,
+    "hazards": 5,
+    "obstacles": 39,
+    "finishX": 437.865276
+  },
+  "s2-cornice": {
+    "hash": "345175460bb9e25d",
+    "colliders": 45,
+    "hazards": 11,
+    "obstacles": 43,
+    "finishX": 459.424243
+  },
+  "s3-whiteout": {
+    "hash": "7613685097facee4",
+    "colliders": 47,
+    "hazards": 13,
+    "obstacles": 46,
+    "finishX": 425.1
+  },
+  "p-coast": {
+    "hash": "76b951e17c82a097",
+    "colliders": 26,
+    "hazards": 1,
+    "obstacles": 23,
+    "finishX": 368.1
+  },
+  "p-alpine": {
+    "hash": "30b10d5d8b71fe22",
+    "colliders": 28,
+    "hazards": 1,
+    "obstacles": 22,
+    "finishX": 350.9
+  },
+  "p-quarry": {
+    "hash": "430bdc8a91b86209",
+    "colliders": 24,
+    "hazards": 1,
+    "obstacles": 21,
+    "finishX": 404.396973
+  },
+  "p-snowline": {
+    "hash": "9aa772c98bae3ef7",
+    "colliders": 27,
+    "hazards": 1,
+    "obstacles": 22,
+    "finishX": 323.7
   }
 }
