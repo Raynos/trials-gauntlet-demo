@@ -5,6 +5,8 @@
  * tiny private context created on first use. Silent until `unlock()` (a user
  * gesture) like everything else, and it follows the Sound setting.
  */
+import { silentAutomation } from '../audio/automation';
+
 interface ContextSource {
   context?: AudioContext | null;
 }
@@ -16,7 +18,7 @@ export class UiSfx {
   private enabled = true;
   private lastTick = 0;
 
-  constructor(private readonly source?: ContextSource | undefined) {}
+  constructor(private readonly source?: ContextSource) {}
 
   setVolume(v: number): void {
     this.volume = Math.max(0, Math.min(1, v));
@@ -32,7 +34,7 @@ export class UiSfx {
     const shared = this.source?.context ?? null;
     const ctx = shared ?? this.ctx;
     if (!ctx) {
-      if (typeof AudioContext === 'undefined') return null;
+      if (typeof AudioContext === 'undefined' || silentAutomation()) return null;
       try {
         this.ctx = new AudioContext({ latencyHint: 'interactive' });
       } catch {

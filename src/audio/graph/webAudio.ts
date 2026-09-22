@@ -18,6 +18,7 @@ import type { AudioSystem } from '../index';
 import { ModelDriver, type AudioScene } from '../driver';
 import { createOfflineRenderer, type OfflineOptions } from '../offline';
 import { FallbackGraph } from './fallback';
+import { silentAutomation } from '../automation';
 
 const WORKLET_NAME = 'trials-synth';
 
@@ -93,6 +94,7 @@ export class WebAudioSystem implements AudioSystem {
 
   unlock(): Promise<void> {
     if (this.disposed) return Promise.resolve();
+    if (!this.ctx && !this.opts.context && silentAutomation()) return Promise.resolve();
     if (!this.ctx) {
       // Synchronous creation inside the gesture — this is the iOS requirement.
       try {
