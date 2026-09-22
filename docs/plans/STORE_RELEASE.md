@@ -44,6 +44,7 @@ shipped level layouts (12 new ones), the music, and every dev/debug surface a st
 | D20 | World looks (ask 98) | **B-ride (alpine), B-ride-snow (snowline), C-ride (coastal) and W-worldmap are the targets;** A-ride (quarry) rejected — the desert quarry needs a new look in the spirit of B/C. |
 | D21 | HUD + controls (ask 98) | **Unchanged: today's HUD layout and the four strip keys at the bottom stay exactly as they are.** Phase 2's "HUD reskin" shrinks to words only (faults → BAILS, no "CRASH!"/"Track finished!", CLEAN LINE finish) + the new results screen. |
 | D22 | Rider + bike (ask 98) | **Ship as is,** no livery change. |
+| D23 | Round 2 (ask 104) | **Taken as final** ("just build it"): quarry look = **Q2** (late-afternoon open pit, ore cart, gantry gate) with Q1's props in the kit; app icon **I1**; Play feature graphic **F1**; home art **M1 (harbour) + A-menu (quarry)**, following the player's current zone. |
 
 **On D11 — the closed test cannot be skipped.** Google enforces it for personal accounts created after 2023-11-13:
 production access unlocks only after a closed test with **≥ 12 testers opted in for 14 continuous days**. The only
