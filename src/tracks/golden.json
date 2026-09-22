@@ -201,5 +201,47 @@
     "hazards": 2,
     "obstacles": 26,
     "finishX": 434.521437
+  },
+  "a1-sawdust": {
+    "hash": "cc1fc9249b7e0a40",
+    "colliders": 29,
+    "hazards": 2,
+    "obstacles": 26,
+    "finishX": 393.8
+  },
+  "a2-log-jam": {
+    "hash": "17aa87ab00450408",
+    "colliders": 44,
+    "hazards": 1,
+    "obstacles": 22,
+    "finishX": 391.5
+  },
+  "a3-timberline": {
+    "hash": "64a116a40cb6984d",
+    "colliders": 31,
+    "hazards": 4,
+    "obstacles": 27,
+    "finishX": 343.7
+  },
+  "d1-dust-devil": {
+    "hash": "9c08223d67891ce3",
+    "colliders": 24,
+    "hazards": 1,
+    "obstacles": 21,
+    "finishX": 374
+  },
+  "d2-conveyor": {
+    "hash": "5cbc9bf494995e9e",
+    "colliders": 46,
+    "hazards": 3,
+    "obstacles": 39,
+    "finishX": 457.751169
+  },
+  "d3-rope-walk": {
+    "hash": "f87d306df9368989",
+    "colliders": 32,
+    "hazards": 22,
+    "obstacles": 43,
+    "finishX": 454.8
   }
 }
