@@ -128,6 +128,8 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 
 | 89 | "74 pixelated, did you fix it ? if it fixed then its not inflight lol fix it." | **done** | Yes: `4fa79c3e` (Wildshard half-float HDR + final SMAA on every tier, phone DPR 1 → 1.5) is in the review build. Row 74 was stale "in flight" only for deploy + device check; deploy landed, device check is HR-14. Flipped 74 to done. |
 
+| 86 | "Make a new plan in ./docs/plans: deploy to Android Play Store & iOS App Store. Problem is copyright (Ubisoft): called trials, looks like trials, carbon-copy levels, copyrighted music. Same gameplay, unique levels, new name, new music, anything else. MEGAPLAN it, ask me questions. Don't rebuild from scratch." + "we need to stop taking the piss lol, we need something that passes app store review" | **done — plan written** | IP audit run; 12 decisions asked and recorded (D1–D12); plan `docs/plans/STORE_RELEASE.md`, top priority; HR-16 (store accounts) filed. Building it is a new ask. |
+
 | 90 | "What's left / what's next ?" | **done** | Status relayed 2026-09-22: 80/81 pose regressions block release; local main is 9 ahead of origin incl. the regressed candidate, and a push to main now deploys production. |
 
 | 91 | "push" | **done** | Pushed local main (9 commits incl. the ask-80 standing-forward candidate `151061bb`) to origin on the user's call after the regression warning. origin has no deploy workflow yet (the CD work of ask 84 is uncommitted), so this push deployed nothing; production stays `35366fe`. |
