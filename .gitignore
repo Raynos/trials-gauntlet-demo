@@ -34,3 +34,18 @@ harness/out/trailer/trailer-ui-*
 
 # Python bytecode from the trailer editor
 harness/trailer/__pycache__/
+
+# Store release P0.1 (D8): Trials footage, frames and audio cuts stay local, never in the public tree.
+# Only text (README/notes/manifests with YouTube ids) under reference/ may be tracked.
+reference/**
+!reference/**/
+!reference/**/*.md
+!reference/**/manifest.json
+assets/blender/pose-study/ref-*
+assets/blender/pose-study/compare-*
+assets/blender/previews/_cmp/ref-*
+assets/blender/previews/compare-reference.png
+docs/research/frames/
+
+# Production source maps, moved out of the deploy by vite.config.ts `sourcemapsOut` (store release P0.2).
+dist-maps/
