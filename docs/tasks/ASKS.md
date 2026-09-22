@@ -143,3 +143,7 @@ Status: **open** (nobody on it) · **in flight** (owner named) · **needs pick**
 | 99 | "heres your token vcp_…" (VERCEL_TOKEN for CI) | **done** | Stored as the repo Actions secret only (never committed); scope checked: 200 on trials-gauntlet-demo, 404 on another project. HR-15 closed. |
 
 | 100 | "mark HR-14 as done i played it already. Do i really need a rockhop domain lol can we skip that bruv." | **done** | HR-14 closed (user played the review build; no notes given). HR-17 dropped: no custom domain, the privacy/support pages go on rockhop.vercel.app (STORE_RELEASE D17). |
+
+| 101 | (parent, from 84) the first green push to `main` is the first real deploy: the `Vercel deploy` and `Production serves this commit` steps have never run with the real token (only a preview of the same remote-build command, 25406de, proved the path) | **queued** | Whoever pushes the first green main watches the run (`gh run watch`), confirms `https://trials-gauntlet-demo.vercel.app/version.json` names the SHA, and flips this row with the run id. |
+
+| 102 | (parent, from 85) oxlint determinism rules (`no-restricted-properties` / `no-restricted-globals`, CONTRACT §1) match `*.ts` only, as ESLint did, so `src/physics/**/*.mts` probes are unchecked; `src/audio/automation.ts` header still says "ask 86" (it is 93) | **queued** | Extend the determinism override globs to `*.mts` (or keep probes out of src/physics); fix the comment when that file is not mid-edit by the store session. |
