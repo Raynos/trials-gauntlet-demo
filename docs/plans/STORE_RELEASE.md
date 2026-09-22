@@ -38,6 +38,12 @@ shipped level layouts (12 new ones), the music, and every dev/debug surface a st
 | D14 | Where the reskin lands (ask 95) | **`main`, visible as it lands** — no store flag for the reskin; production web changes progressively. (`VITE_STORE=1` still strips dev UI, P0.3.) |
 | D15 | Closed-test testers (ask 95) | **Need to recruit** — the user has fewer than 12; recruiting (tester-exchange communities) is part of Phase 6 and starts before the first renamed build. |
 | D16 | App ID prefix (ask 95) | **`com.jakeverbaten.<name>`** — permanent on both stores. |
+| D17 | Name (ask 98) | **ROCKHOP.** R1 shrank to a clearance check of this one name: **clear with caveats** (`docs/evidence/store-release/name-clearance-rockhop.md` — no live mark in 9/41, no same-name app; Specialized's "Rockhopper" is class 12, so never "Rockhopper" and never a mountain-bike angle), so the app ID is **`com.jakeverbaten.rockhop`**; domain is HR-17; store name proposal "Rockhop: Dirt Bike Physics". Identity kit from `assets/design/store-release/round1/A-brand` (survey-marker O, cream/teal/vermilion). |
+| D18 | Home screen (ask 98) | **Both A-menu (quarry) and C-menu (harbour) art liked**, under the ROCKHOP wordmark. |
+| D19 | Results screen (ask 98) | **A-results** — the "CLEAN LINE" survey-ticket card, OBSIDIAN top medal, BAILS. |
+| D20 | World looks (ask 98) | **B-ride (alpine), B-ride-snow (snowline), C-ride (coastal) and W-worldmap are the targets;** A-ride (quarry) rejected — the desert quarry needs a new look in the spirit of B/C. |
+| D21 | HUD + controls (ask 98) | **Unchanged: today's HUD layout and the four strip keys at the bottom stay exactly as they are.** Phase 2's "HUD reskin" shrinks to words only (faults → BAILS, no "CRASH!"/"Track finished!", CLEAN LINE finish) + the new results screen. |
+| D22 | Rider + bike (ask 98) | **Ship as is,** no livery change. |
 
 **On D11 — the closed test cannot be skipped.** Google enforces it for personal accounts created after 2023-11-13:
 production access unlocks only after a closed test with **≥ 12 testers opted in for 14 continuous days**. The only
