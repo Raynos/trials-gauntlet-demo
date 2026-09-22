@@ -9,8 +9,10 @@
  *  - AudioWorklet is tried first; if `addModule` throws or times out the
  *    oscillator-bank FallbackGraph takes over with the same param stream.
  *
- * Everything musical lives in the model + synth; this file only moves a
- * Float32Array per frame.
+ * The engine, tyres, crowd, stingers and the procedural bed live in the model + synth; this file moves
+ * a Float32Array per frame. The recorded music (src/audio/music) is the one exception: AudioBuffers
+ * on the same context, beside the synth, created with the backend (so never before the first gesture
+ * and never under automation), ducked under the engine from the model's own load / engine gain.
  */
 import type { BikeClass, CompiledTrack, GameEvent, InputFrame, PhysicsState } from '../../core/types';
 import type { PhysicsFactory } from '../../physics';
@@ -19,6 +21,9 @@ import { ModelDriver, type AudioScene } from '../driver';
 import { createOfflineRenderer, type OfflineOptions } from '../offline';
 import { FallbackGraph } from './fallback';
 import { silentAutomation } from '../automation';
+import { MusicPlayer, type MusicPlayerOptions } from '../music/player';
+import { zoneOf, type MusicZone } from '../music/zone';
+import { SCENE_MENU, SCENE_RESULTS } from '../model/mapParams';
 
 const WORKLET_NAME = 'trials-synth';
 
@@ -32,6 +37,17 @@ export interface WebAudioOptions {
   offline?: OfflineOptions;
   /** ms to wait for the worklet module before falling back (default 4000). */
   workletTimeoutMs?: number;
+  /** Recorded music: false = procedural bed only; an object overrides the player (tests: cues, fetch). */
+  music?: boolean | Omit<MusicPlayerOptions, 'onBed'>;
+}
+
+/**
+ * Music ducking under the engine (dB): the ride loop gives way as the throttle opens —
+ * 1 dB at a closed throttle, 4 dB wide open; nothing when the engine bus is silent (crash, menu).
+ */
+export function engineDuckDb(engineGain: number, load: number): number {
+  const g = Math.max(0, Math.min(1, engineGain));
+  return g * (1 + 3 * Math.max(0, Math.min(1, load)));
 }
 
 type Backend = { kind: 'worklet'; node: AudioWorkletNode } | { kind: 'fallback'; graph: FallbackGraph };
@@ -46,6 +62,10 @@ export class WebAudioSystem implements AudioSystem {
   private track: CompiledTrack | null = null;
   private seed = 0;
   private onVisibility: (() => void) | null = null;
+  private music: MusicPlayer | null = null;
+  private appScene: AudioScene | null = null;
+  private zone: MusicZone | null = null;
+  private musicVolume = 1;
   readonly renderOffline: ((recordingJson: string, seconds: number) => Promise<Float32Array>) | undefined;
 
   constructor(private readonly opts: WebAudioOptions = {}) {
@@ -65,6 +85,8 @@ export class WebAudioSystem implements AudioSystem {
   setTrack(track: CompiledTrack, seed: number): void {
     this.track = track;
     this.seed = seed >>> 0;
+    this.zone = zoneOf(track);
+    this.music?.setZone(this.zone);
     this.driver.setTrack(track, this.seed);
     if (this.backend?.kind === 'worklet') {
       this.backend.node.port.postMessage({ seed: this.seed });
@@ -83,19 +105,52 @@ export class WebAudioSystem implements AudioSystem {
    * after a finish, run again on the next restart. Pass null to return to inference.
    */
   setScene(scene: AudioScene | null): void {
+    this.appScene = scene;
     this.driver.setScene(scene);
     this.postScene();
+  }
+
+  /** The music-only slider (0..1). Scales the recorded cues; the master scales everything. */
+  setMusicVolume(v: number): void {
+    this.musicVolume = Math.max(0, Math.min(1, v));
+    this.music?.setMusicVolume(this.musicVolume);
+  }
+
+  /** The recorded-music player, once the context exists (null before the first gesture / under automation). */
+  get musicPlayer(): MusicPlayer | null {
+    return this.music;
+  }
+
+  /** The scene the music follows: the app's word when it gave one, else the model's inference. */
+  private musicScene(): AudioScene {
+    if (this.appScene) return this.appScene;
+    const s = this.driver.scene;
+    return s === SCENE_MENU ? 'menu' : s === SCENE_RESULTS ? 'results' : 'run';
   }
 
   private postScene(): void {
     const b = this.backend;
     if (b?.kind === 'worklet') b.node.port.postMessage({ scene: this.driver.scene });
+    this.music?.setScene(this.musicScene(), this.zone ?? undefined);
+  }
+
+  private postBed(on: boolean): void {
+    const b = this.backend;
+    if (b?.kind === 'worklet') b.node.port.postMessage({ bed: on });
   }
 
   unlock(): Promise<void> {
     if (this.disposed) return Promise.resolve();
     if (!this.ctx && !this.opts.context && silentAutomation()) return Promise.resolve();
     if (!this.ctx) {
+      // iOS: an ambient session — the silent switch mutes the game and other apps' audio keeps playing
+      // (Safari 17+ / WKWebView; the native shells also set it, store release Phase 5).
+      try {
+        const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
+        if (session) session.type = 'ambient';
+      } catch {
+        /* not supported */
+      }
       // Synchronous creation inside the gesture — this is the iOS requirement.
       try {
         this.ctx = this.opts.context ?? new AudioContext({ latencyHint: 'interactive' });
@@ -159,10 +214,27 @@ export class WebAudioSystem implements AudioSystem {
     if (this.disposed) return;
     this.backend = backend;
     if (this.track) this.driver.setTrack(this.track, this.seed);
+    if (this.opts.music !== false) {
+      const mo = typeof this.opts.music === 'object' ? this.opts.music : {};
+      try {
+        this.music = new MusicPlayer(ctx, ctx.destination, { ...mo, onBed: (on) => this.postBed(on) });
+        this.music.setVolume(this.master);
+        this.music.setMusicVolume(this.musicVolume);
+        this.music.setScene(this.musicScene(), this.zone ?? undefined);
+      } catch {
+        this.music = null; // the procedural bed stays
+      }
+    }
   }
 
   update(state: PhysicsState, dt: number, input?: Readonly<InputFrame>): void {
     const packed = this.driver.update(state, dt, input);
+    const m = this.music;
+    if (m) {
+      const p = this.driver.params;
+      m.setDuckDb(this.driver.scene === SCENE_MENU || this.driver.scene === SCENE_RESULTS ? 0 : engineDuckDb(p.engineGain, p.load));
+      if (!this.appScene) m.setScene(this.musicScene(), this.zone ?? undefined);
+    }
     const b = this.backend;
     if (b && this.ctx && this.ctx.state === 'running') {
       if (b.kind === 'worklet') b.node.port.postMessage(packed);
@@ -181,6 +253,7 @@ export class WebAudioSystem implements AudioSystem {
   setMasterVolume(v: number): void {
     const p = Math.max(0, Math.min(1, v));
     this.master = p * p; // perceptual
+    this.music?.setVolume(this.master);
     const b = this.backend;
     if (!b) return;
     if (b.kind === 'worklet') b.node.port.postMessage({ master: this.master });
@@ -197,6 +270,8 @@ export class WebAudioSystem implements AudioSystem {
       b.node.disconnect();
     }
     this.backend = null;
+    this.music?.dispose();
+    this.music = null;
     if (this.ctx && !this.opts.context) void this.ctx.close().catch(() => undefined);
     this.ctx = null;
   }

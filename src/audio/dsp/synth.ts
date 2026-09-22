@@ -109,6 +109,9 @@ export class TrialsSynth {
   private readonly kMaster: number;
   private duckGain = 1;
   private duckTarget = 1;
+  /** Procedural music bed gate: 0 while a recorded cue (src/audio/music) carries the scene. */
+  private bedGain = 1;
+  private bedTarget = 1;
   private readonly kDuckAtt: number;
   private readonly kDuckRel: number;
   private limEnv = 0;
@@ -166,6 +169,11 @@ export class TrialsSynth {
 
   setSolo(solo: SynthOptions['solo']): void {
     this.solo = solo;
+  }
+
+  /** Recorded music is playing (false) or not (true): the procedural bed yields over ~0.3 s. */
+  setBed(on: boolean): void {
+    this.bedTarget = on ? 1 : 0;
   }
 
   /** Music scene without a params frame (the front end posts no frames): 0 run, 1 menu, 2 results. */
@@ -316,8 +324,9 @@ export class TrialsSynth {
         if (--this.reverbHold === 0) this.reverb.clear();
       }
       const rev = this.reverbHold > 0 ? 0 : this.reverb.process(send);
-      const musL = mL[i]! * gM;
-      const musR = mR[i]! * gM;
+      this.bedGain += (this.bedTarget - this.bedGain) * this.kDuckRel;
+      const musL = mL[i]! * gM * this.bedGain;
+      const musR = mR[i]! * gM * this.bedGain;
 
       let l = (gameL * this.duckGain + uiL + rev + musL) * TRIMS.master * this.masterGain;
       let r = (gameR * this.duckGain + uiR + rev + musR) * TRIMS.master * this.masterGain;

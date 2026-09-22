@@ -5,6 +5,7 @@
  *   { master: number }      master volume (0..1, already perceptual-scaled)
  *   { seed: number }        reseed → new synth
  *   { scene: number }       music scene (0 run, 1 menu, 2 results) — the front end posts no frames
+ *   { bed: boolean }        procedural music bed on/off (off while a recorded cue plays, src/audio/music)
  *   { stop: true }          let the processor be garbage-collected
  * The processor name is 'trials-synth' (mirrored in webAudio.ts; do not
  * import this module from the main thread — it calls registerProcessor).
@@ -22,16 +23,21 @@ class TrialsSynthProcessor extends AudioWorkletProcessor {
   private synth = new TrialsSynth(sampleRate);
   private alive = true;
   private scene = 0;
+  private bed = true;
 
   constructor() {
     super();
     this.port.onmessage = (ev: MessageEvent) => {
-      const d = ev.data as Float32Array | { master?: number; seed?: number; scene?: number; stop?: boolean };
+      const d = ev.data as Float32Array | { master?: number; seed?: number; scene?: number; bed?: boolean; stop?: boolean };
       if (d instanceof Float32Array) this.synth.setParams(d);
       else if (typeof d.master === 'number') this.synth.setMaster(d.master);
       else if (typeof d.seed === 'number') {
         this.synth = new TrialsSynth(sampleRate, { seed: d.seed });
         this.synth.setScene(this.scene);
+        this.synth.setBed(this.bed);
+      } else if (typeof d.bed === 'boolean') {
+        this.bed = d.bed;
+        this.synth.setBed(d.bed);
       } else if (typeof d.scene === 'number') {
         this.scene = d.scene;
         this.synth.setScene(d.scene);

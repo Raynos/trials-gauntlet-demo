@@ -1,0 +1,3 @@
+# Runner-up renders (store release Phase 4): local only, re-made by pipeline/publish.py --candidates.
+candidates/
+__pycache__/

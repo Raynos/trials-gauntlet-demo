@@ -10,8 +10,10 @@ import { applyEvent } from './model/events';
 import { SCENE_MENU, SCENE_RESULTS, SCENE_RUN, createScratch, mapParams, resetScratch, standsOf, type ModelScratch } from './model/mapParams';
 import { PACKED_LENGTH, biomeIndex, createParams, packParams, type AudioParams } from './params';
 
-export type AudioScene = 'run' | 'menu' | 'results';
-export const SCENE_INDEX: Record<AudioScene, number> = { run: SCENE_RUN, menu: SCENE_MENU, results: SCENE_RESULTS };
+import type { AudioScene } from './index';
+export type { AudioScene };
+/** The procedural bed has no map loop: the map is a menu to it. */
+export const SCENE_INDEX: Record<AudioScene, number> = { run: SCENE_RUN, menu: SCENE_MENU, map: SCENE_MENU, results: SCENE_RESULTS };
 
 export const AUDIO_SEED_SALT = 0xa0d10;
 

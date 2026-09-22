@@ -13,7 +13,8 @@
  */
 import type { BikeClass, CompiledTrack, GameEvent, InputFrame, PhysicsState } from '../core/types';
 
-export type AudioScene = 'run' | 'menu' | 'results';
+/** `map` (the world map) is additive (store release Phase 4): its own recorded cue; the procedural bed treats it as `menu`. */
+export type AudioScene = 'run' | 'menu' | 'map' | 'results';
 
 export interface AudioSystem {
   /** Must be called from a user gesture in browsers; no-op when already live. */
@@ -32,6 +33,8 @@ export interface AudioSystem {
   setBike?(bike: BikeClass): void;
   /** Additive (round 3): the app's screen for the music bed; null = infer from events. */
   setScene?(scene: AudioScene | null): void;
+  /** Additive (store release Phase 4): the music-only slider, 0..1 (default 1). The master still scales it. */
+  setMusicVolume?(v: number): void;
 }
 
 export class NullAudio implements AudioSystem {
@@ -56,3 +59,6 @@ export {
   type OfflineResult,
 } from './offline';
 export type { AudioParams, Transient, TransientKind } from './params';
+export { MusicPlayer, MUSIC_LEVELS } from './music/player';
+export { MUSIC_CUES, type MusicCue, type CueFile } from './music/cues';
+export { zoneOf, type MusicZone } from './music/zone';

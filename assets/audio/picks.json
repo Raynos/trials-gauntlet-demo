@@ -1,0 +1,370 @@
+{
+ "total_bytes": 6483010,
+ "cues": {
+  "menu": {
+   "stem": "menu-b-s47",
+   "entry": {
+    "file": "menu-c017aa05.m4a",
+    "loop": true,
+    "pre": 0.5,
+    "len": 71.111479,
+    "gainDb": 0,
+    "bpm": 108,
+    "bytes": 1458085
+   },
+   "verify": {
+    "decoded_len": 3463104,
+    "expected_len": 3461351,
+    "lufs": -16.02,
+    "tp_dbtp": -2.15,
+    "decoder_shift_samples": 0,
+    "periodic_err_db": -24.6,
+    "seam": {
+     "seam_click": 0.085,
+     "seam_step_db": 0.04,
+     "seam_flux_x": 1.007,
+     "seam_err_db": -28.0
+    },
+    "seam_offset2112": {
+     "seam_click": 0.074,
+     "seam_step_db": -0.05,
+     "seam_flux_x": 1.006,
+     "seam_err_db": -28.4
+    },
+    "bands": {
+     "sub": -6.66,
+     "engine": -4.5,
+     "lowmid": -9.28,
+     "presence": -14.83,
+     "air": -19.26
+    }
+   },
+   "caption": "cheerful instrumental indie rock theme, jangly clean guitars, bouncy bass, tight live drums, bright marimba lead melody, optimistic sunlit outdoor adventure, playful and confident, major key",
+   "seed": 47,
+   "dit": "acestep-v15-turbo",
+   "lm": "acestep-5Hz-lm-1.7B",
+   "loop": {
+    "t0_s": 11.192,
+    "t0": 537217,
+    "len": 3413351,
+    "len_s": 71.11148,
+    "bars": 32,
+    "seam_sim": 0.9579,
+    "seam_chroma": 0.9959,
+    "seam_xcorr": 0.9392,
+    "bpm_exact": 107.999,
+    "seam_click": 0.088,
+    "seam_step_db": 1.21,
+    "seam_flux_x": 1.119,
+    "seam_err_db": -12.1,
+    "body_lufs": -14.1,
+    "body_bands": {
+     "sub": -6.66,
+     "engine": -4.51,
+     "lowmid": -9.28,
+     "presence": -14.79,
+     "air": -19.18
+    },
+    "body_tempo": {
+     "bpm": 107.67,
+     "err_pct": -0.31,
+     "ibi_cv_pct": 1.54
+    },
+    "body_silence_s": 0.0
+   },
+   "sting": null
+  },
+  "map": {
+   "stem": "map-a-s23",
+   "entry": {
+    "file": "map-88c58de3.m4a",
+    "loop": true,
+    "pre": 0.5,
+    "len": 59.997854,
+    "gainDb": 0,
+    "bpm": 96,
+    "bytes": 1233707
+   },
+   "verify": {
+    "decoded_len": 2929600,
+    "expected_len": 2927897,
+    "lufs": -16.02,
+    "tp_dbtp": -3.26,
+    "decoder_shift_samples": 0,
+    "periodic_err_db": -22.9,
+    "seam": {
+     "seam_click": 0.103,
+     "seam_step_db": -0.1,
+     "seam_flux_x": 1.02,
+     "seam_err_db": -29.9
+    },
+    "seam_offset2112": {
+     "seam_click": 0.018,
+     "seam_step_db": -0.08,
+     "seam_flux_x": 0.988,
+     "seam_err_db": -28.0
+    },
+    "bands": {
+     "sub": -10.06,
+     "engine": -4.22,
+     "lowmid": -9.06,
+     "presence": -13.9,
+     "air": -18.28
+    }
+   },
+   "caption": "light exploratory instrumental, plucked acoustic guitar, marimba, soft shaker, warm upright bass, gentle brushed drums, curious and sunny, planning a summer expedition, major key",
+   "seed": 23,
+   "dit": "acestep-v15-turbo",
+   "lm": "acestep-5Hz-lm-1.7B",
+   "loop": {
+    "t0_s": 5.7353,
+    "t0": 275296,
+    "len": 2879897,
+    "len_s": 59.99785,
+    "bars": 24,
+    "seam_sim": 0.664,
+    "seam_chroma": 0.9928,
+    "seam_xcorr": 0.6882,
+    "bpm_exact": 96.003,
+    "seam_click": 0.035,
+    "seam_step_db": 1.25,
+    "seam_flux_x": 0.88,
+    "seam_err_db": -8.0,
+    "body_lufs": -12.67,
+    "body_bands": {
+     "sub": -10.06,
+     "engine": -4.22,
+     "lowmid": -9.06,
+     "presence": -13.86,
+     "air": -18.21
+    },
+    "body_tempo": {
+     "bpm": 95.7,
+     "err_pct": -0.31,
+     "ibi_cv_pct": 1.46
+    },
+    "body_silence_s": 0.0
+   },
+   "sting": null
+  },
+  "coast": {
+   "stem": "coast-b-s11",
+   "entry": {
+    "file": "coast-4ec96bd3.m4a",
+    "loop": true,
+    "pre": 0.5,
+    "len": 60.954458,
+    "gainDb": 0,
+    "bpm": 126,
+    "bytes": 1253087
+   },
+   "verify": {
+    "decoded_len": 2975680,
+    "expected_len": 2973814,
+    "lufs": -16.02,
+    "tp_dbtp": -2.33,
+    "decoder_shift_samples": 0,
+    "periodic_err_db": -19.8,
+    "seam": {
+     "seam_click": 0.233,
+     "seam_step_db": 0.11,
+     "seam_flux_x": 1.015,
+     "seam_err_db": -19.9
+    },
+    "seam_offset2112": {
+     "seam_click": 0.116,
+     "seam_step_db": -0.06,
+     "seam_flux_x": 0.988,
+     "seam_err_db": -23.9
+    },
+    "bands": {
+     "sub": -6.4,
+     "engine": -5.4,
+     "lowmid": -12.23,
+     "presence": -16.79,
+     "air": -18.58
+    }
+   },
+   "caption": "upbeat instrumental beach rock, clean jangly guitars, steel drum accents, found-metal percussion hits, punchy snare, tambourine, busy bassline, sunny coastal scrapyard, rhythmic and playful",
+   "seed": 11,
+   "dit": "acestep-v15-turbo",
+   "lm": "acestep-5Hz-lm-1.7B",
+   "loop": {
+    "t0_s": 16.6487,
+    "t0": 799138,
+    "len": 2925814,
+    "len_s": 60.95446,
+    "bars": 32,
+    "seam_sim": 0.7756,
+    "seam_chroma": 0.9884,
+    "seam_xcorr": 0.2239,
+    "bpm_exact": 125.996,
+    "seam_click": 0.272,
+    "seam_step_db": 0.63,
+    "seam_flux_x": 0.857,
+    "seam_err_db": -0.4,
+    "body_lufs": -13.49,
+    "body_bands": {
+     "sub": -6.99,
+     "engine": -4.65,
+     "lowmid": -12.61,
+     "presence": -17.69,
+     "air": -19.59
+    },
+    "body_tempo": {
+     "bpm": 123.05,
+     "err_pct": -2.34,
+     "ibi_cv_pct": 0.87
+    },
+    "body_silence_s": 0.0
+   },
+   "sting": null
+  },
+  "alpine": {
+   "stem": "alpine-a-s11",
+   "entry": {
+    "file": "alpine-fa9271c0.m4a",
+    "loop": true,
+    "pre": 0.5,
+    "len": 49.655479,
+    "gainDb": 0,
+    "bpm": 116,
+    "bytes": 1024921
+   },
+   "verify": {
+    "decoded_len": 2432960,
+    "expected_len": 2431463,
+    "lufs": -16.03,
+    "tp_dbtp": -1.73,
+    "decoder_shift_samples": 0,
+    "periodic_err_db": -17.8,
+    "seam": {
+     "seam_click": 0.107,
+     "seam_step_db": -0.0,
+     "seam_flux_x": 0.98,
+     "seam_err_db": -26.1
+    },
+    "seam_offset2112": {
+     "seam_click": 0.012,
+     "seam_step_db": 0.06,
+     "seam_flux_x": 0.998,
+     "seam_err_db": -23.3
+    },
+    "bands": {
+     "sub": -5.42,
+     "engine": -6.17,
+     "lowmid": -10.03,
+     "presence": -14.82,
+     "air": -17.46
+    }
+   },
+   "caption": "warm driving instrumental folk rock, strummed acoustic guitars, banjo, stomp and clap percussion, upright bass, fiddle melody, forest trail energy, uplifting and confident",
+   "seed": 11,
+   "dit": "acestep-v15-turbo",
+   "lm": "acestep-5Hz-lm-1.7B",
+   "loop": {
+    "t0_s": 30.3485,
+    "t0": 1456727,
+    "len": 2383463,
+    "len_s": 49.65548,
+    "bars": 24,
+    "seam_sim": 0.9084,
+    "seam_chroma": 0.9978,
+    "seam_xcorr": 0.775,
+    "bpm_exact": 115.999,
+    "seam_click": 0.067,
+    "seam_step_db": -1.33,
+    "seam_flux_x": 1.488,
+    "seam_err_db": -7.2,
+    "body_lufs": -13.47,
+    "body_bands": {
+     "sub": -5.89,
+     "engine": -5.34,
+     "lowmid": -10.28,
+     "presence": -15.6,
+     "air": -18.3
+    },
+    "body_tempo": {
+     "bpm": 117.45,
+     "err_pct": 1.25,
+     "ibi_cv_pct": 3.32
+    },
+    "body_silence_s": 0.0
+   },
+   "sting": null
+  },
+  "quarry": {
+   "stem": "quarry-b-s23",
+   "entry": {
+    "file": "quarry-06f54be7.m4a",
+    "loop": true,
+    "pre": 0.5,
+    "len": 73.846292,
+    "gainDb": 0,
+    "bpm": 104,
+    "bytes": 1513210
+   },
+   "verify": {
+    "decoded_len": 3594176,
+    "expected_len": 3592622,
+    "lufs": -16.1,
+    "tp_dbtp": -1.31,
+    "decoder_shift_samples": 0,
+    "periodic_err_db": -19.2,
+    "seam": {
+     "seam_click": 0.35,
+     "seam_step_db": -0.12,
+     "seam_flux_x": 1.002,
+     "seam_err_db": -29.1
+    },
+    "seam_offset2112": {
+     "seam_click": 0.002,
+     "seam_step_db": -0.13,
+     "seam_flux_x": 0.999,
+     "seam_err_db": -22.9
+    },
+    "bands": {
+     "sub": -7.38,
+     "engine": -6.23,
+     "lowmid": -11.23,
+     "presence": -13.16,
+     "air": -15.27
+    }
+   },
+   "caption": "instrumental desert groove, twangy slide guitar, hand percussion, djembe and cajon, rolling bass, dry dusty heat, rhythmic and driving, bright midday sun",
+   "seed": 23,
+   "dit": "acestep-v15-turbo",
+   "lm": "acestep-5Hz-lm-1.7B",
+   "loop": {
+    "t0_s": 13.8855,
+    "t0": 666506,
+    "len": 3544622,
+    "len_s": 73.84629,
+    "bars": 32,
+    "seam_sim": 0.9548,
+    "seam_chroma": 0.998,
+    "seam_xcorr": 0.9643,
+    "bpm_exact": 104.0,
+    "seam_click": 0.31,
+    "seam_step_db": 2.28,
+    "seam_flux_x": 1.179,
+    "seam_err_db": -9.3,
+    "body_lufs": -16.14,
+    "body_bands": {
+     "sub": -8.0,
+     "engine": -5.39,
+     "lowmid": -11.59,
+     "presence": -13.86,
+     "air": -16.13
+    },
+    "body_tempo": {
+     "bpm": 103.36,
+     "err_pct": -0.62,
+     "ibi_cv_pct": 1.87
+    },
+    "body_silence_s": 0.0
+   },
+   "sting": null
+  }
+ }
+}
