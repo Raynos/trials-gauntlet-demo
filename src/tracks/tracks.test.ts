@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { Collider, ColliderPolyline, CompiledTrack, TrackDef, TrackObstacle, Vec2 } from '../core/types';
-import { ALL_TRACKS, CURRICULUM, LAB_FLAT_200, LAB_PHYSICS_TEST, LAB_TRACKS, PLAYGROUND_TRACKS, SHIP_SEGMENTS, compileTrack, describeTrack, getTrack, isLabTrackId, isPlaygroundTrackId, listTrackIds, segmentsOf } from './index';
+import { ALL_TRACKS, CURRICULUM, ROCKHOP_ALL, LAB_FLAT_200, LAB_PHYSICS_TEST, LAB_TRACKS, PLAYGROUND_TRACKS, SHIP_SEGMENTS, compileTrack, describeTrack, getTrack, isLabTrackId, isPlaygroundTrackId, listTrackIds, segmentsOf } from './index';
 import { CHECKPOINT_RULE, FEEL, FINISH_RUNOUT, SPAWN_CLEAR_AHEAD, SPAWN_CLEAR_BEHIND, auditCheckpoints, validateFinishRunout } from './author';
 import { cancelSharedEdges, segmentsCross, type OwnedEdge } from './geometry';
 import { OBSTACLE_KINDS, footprint, type ObstacleKind } from './kinds';
@@ -20,8 +20,10 @@ import { OBSTACLE_KINDS, footprint, type ObstacleKind } from './kinds';
 const GOLDEN_PATH = fileURLToPath(new URL('./golden.json', import.meta.url));
 type Golden = Record<string, { hash: string; colliders: number; hazards: number; obstacles: number; finishX: number }>;
 
+/** Every course this suite checks: the registered (listed) set and the staged ROCKHOP set (store release Phase 3). */
+const EVERY_TRACK: readonly TrackDef[] = [...ALL_TRACKS, ...ROCKHOP_ALL];
 const compiled = new Map<string, CompiledTrack>();
-for (const t of ALL_TRACKS) compiled.set(t.id, compileTrack(t));
+for (const t of EVERY_TRACK) compiled.set(t.id, compileTrack(t));
 
 function polylineEdges(c: ColliderPolyline): OwnedEdge[] {
   const out: OwnedEdge[] = [];
@@ -172,7 +174,7 @@ describe('registry', () => {
   });
 });
 
-describe.each(ALL_TRACKS.map((t) => [t.id, t] as const))('%s', (id, def) => {
+describe.each(EVERY_TRACK.map((t) => [t.id, t] as const))('%s', (id, def) => {
   const track = compiled.get(id) as CompiledTrack;
 
   it('compiles deterministically', () => {
@@ -222,7 +224,7 @@ describe.each(ALL_TRACKS.map((t) => [t.id, t] as const))('%s', (id, def) => {
 
   it('checkpoint rule (round 4): 15 m run-up before the first speed obstacle, no checkpoint within 8 m of a landing', () => {
     // gap-test is a harness fixture with recorded inputs (10 m run-up by design): the rule is a curriculum rule
-    if (!CURRICULUM.some((t) => t.id === def.id)) return;
+    if (!CURRICULUM.some((t) => t.id === def.id) && !ROCKHOP_ALL.some((t) => t.id === def.id)) return;
     const { rows, violations } = auditCheckpoints(def);
     expect(violations.map((v) => v.message)).toEqual([]);
     expect(rows).toHaveLength(def.checkpoints.length + 1);
@@ -409,9 +411,9 @@ function looseOverlap(a: Collider, b: Collider): boolean {
 }
 
 describe('golden collider hashes', () => {
-  it('match golden.json for every registered track', () => {
+  it('match golden.json for every registered track and every staged ROCKHOP course', () => {
     const actual: Golden = {};
-    for (const t of ALL_TRACKS) {
+    for (const t of EVERY_TRACK) {
       const c = compiled.get(t.id) as CompiledTrack;
       actual[t.id] = { hash: c.hash, colliders: c.colliders.length, hazards: c.hazards.length, obstacles: t.obstacles.length, finishX: t.finishX };
     }
@@ -419,7 +421,7 @@ describe('golden collider hashes', () => {
       writeFileSync(GOLDEN_PATH, `${JSON.stringify(actual, null, 2)}\n`);
     }
     const golden = JSON.parse(readFileSync(GOLDEN_PATH, 'utf8')) as Golden;
-    for (const t of ALL_TRACKS) {
+    for (const t of EVERY_TRACK) {
       expect(golden[t.id], `${t.id} missing from golden.json (UPDATE_GOLDEN=1 to add)`).toBeDefined();
       expect(actual[t.id], t.id).toEqual(golden[t.id]);
     }

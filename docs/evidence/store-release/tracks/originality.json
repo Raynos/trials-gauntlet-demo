@@ -1,0 +1,582 @@
+{
+  "limit": 0.6,
+  "retired": [
+    "b1-first-ride",
+    "b2-lean-back",
+    "b3-kicker-row",
+    "e1-uphill-weight",
+    "e2-rear-wheel-first",
+    "e3-stairway",
+    "m1-hop-up",
+    "m2-drum-roll",
+    "m3-see-saw",
+    "h1-wheelie-wire",
+    "h2-gap-chain",
+    "h3-fire-line",
+    "x1-vertical-limit",
+    "x2-pipe-dream",
+    "x3-gauntlet",
+    "p1-container-yard",
+    "p2-canyon-run",
+    "p3-snow-line",
+    "p4-night-circuit",
+    "p5-foundry-floor",
+    "lab-physics-test",
+    "lab-flat-200",
+    "lab-box-climb",
+    "lab-ramp-jump"
+  ],
+  "rows": [
+    {
+      "id": "c1-low-tide",
+      "name": "Low Tide",
+      "code": "C1",
+      "max": 0.498,
+      "closest": "lab-ramp-jump",
+      "pass": true,
+      "cells": [
+        {
+          "retired": "lab-ramp-jump",
+          "score": 0.498,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.498
+        },
+        {
+          "retired": "p1-container-yard",
+          "score": 0.495,
+          "metric": 0.495,
+          "metricLagM": 145.5,
+          "stretched": 0.265
+        },
+        {
+          "retired": "e1-uphill-weight",
+          "score": 0.475,
+          "metric": 0.475,
+          "metricLagM": -117.5,
+          "stretched": 0.239
+        },
+        {
+          "retired": "m1-hop-up",
+          "score": 0.463,
+          "metric": 0.463,
+          "metricLagM": -120.5,
+          "stretched": 0.273
+        },
+        {
+          "retired": "x3-gauntlet",
+          "score": 0.462,
+          "metric": 0.449,
+          "metricLagM": 202,
+          "stretched": 0.462
+        },
+        {
+          "retired": "e3-stairway",
+          "score": 0.43,
+          "metric": 0.43,
+          "metricLagM": -73,
+          "stretched": 0.232
+        },
+        {
+          "retired": "lab-box-climb",
+          "score": 0.415,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.415
+        },
+        {
+          "retired": "x2-pipe-dream",
+          "score": 0.411,
+          "metric": 0.411,
+          "metricLagM": -105.5,
+          "stretched": 0.14
+        },
+        {
+          "retired": "b2-lean-back",
+          "score": 0.403,
+          "metric": 0.403,
+          "metricLagM": 6,
+          "stretched": 0.278
+        },
+        {
+          "retired": "lab-physics-test",
+          "score": 0.4,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.4
+        },
+        {
+          "retired": "b1-first-ride",
+          "score": 0.397,
+          "metric": 0.397,
+          "metricLagM": -65,
+          "stretched": 0.116
+        },
+        {
+          "retired": "h1-wheelie-wire",
+          "score": 0.377,
+          "metric": 0.268,
+          "metricLagM": -67,
+          "stretched": 0.377
+        },
+        {
+          "retired": "b3-kicker-row",
+          "score": 0.367,
+          "metric": 0.367,
+          "metricLagM": 165,
+          "stretched": 0.109
+        },
+        {
+          "retired": "m2-drum-roll",
+          "score": 0.34,
+          "metric": 0.34,
+          "metricLagM": -72,
+          "stretched": 0.272
+        },
+        {
+          "retired": "p5-foundry-floor",
+          "score": 0.33,
+          "metric": 0.33,
+          "metricLagM": -2,
+          "stretched": 0.329
+        },
+        {
+          "retired": "p3-snow-line",
+          "score": 0.318,
+          "metric": 0.318,
+          "metricLagM": 47.5,
+          "stretched": 0.286
+        },
+        {
+          "retired": "p2-canyon-run",
+          "score": 0.3,
+          "metric": 0.287,
+          "metricLagM": 50,
+          "stretched": 0.3
+        },
+        {
+          "retired": "x1-vertical-limit",
+          "score": 0.294,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.294
+        },
+        {
+          "retired": "m3-see-saw",
+          "score": 0.278,
+          "metric": 0.278,
+          "metricLagM": -72,
+          "stretched": 0.16
+        },
+        {
+          "retired": "p4-night-circuit",
+          "score": 0.272,
+          "metric": 0.258,
+          "metricLagM": 89.5,
+          "stretched": 0.272
+        },
+        {
+          "retired": "h2-gap-chain",
+          "score": 0.246,
+          "metric": 0.246,
+          "metricLagM": 78.5,
+          "stretched": 0.214
+        },
+        {
+          "retired": "h3-fire-line",
+          "score": 0.182,
+          "metric": 0.182,
+          "metricLagM": -46,
+          "stretched": 0.042
+        },
+        {
+          "retired": "e2-rear-wheel-first",
+          "score": 0.135,
+          "metric": 0.099,
+          "metricLagM": 173.5,
+          "stretched": 0.135
+        },
+        {
+          "retired": "lab-flat-200",
+          "score": 0,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0
+        }
+      ]
+    },
+    {
+      "id": "c2-crane-hop",
+      "name": "Crane Hop",
+      "code": "C2",
+      "max": 0.373,
+      "closest": "m1-hop-up",
+      "pass": true,
+      "cells": [
+        {
+          "retired": "m1-hop-up",
+          "score": 0.373,
+          "metric": 0.373,
+          "metricLagM": 170.5,
+          "stretched": 0.237
+        },
+        {
+          "retired": "p2-canyon-run",
+          "score": 0.367,
+          "metric": 0.229,
+          "metricLagM": -25,
+          "stretched": 0.367
+        },
+        {
+          "retired": "b2-lean-back",
+          "score": 0.359,
+          "metric": 0.359,
+          "metricLagM": 156,
+          "stretched": 0.189
+        },
+        {
+          "retired": "x3-gauntlet",
+          "score": 0.338,
+          "metric": 0.274,
+          "metricLagM": -39,
+          "stretched": 0.338
+        },
+        {
+          "retired": "b3-kicker-row",
+          "score": 0.322,
+          "metric": 0.322,
+          "metricLagM": 98.5,
+          "stretched": 0.318
+        },
+        {
+          "retired": "b1-first-ride",
+          "score": 0.317,
+          "metric": 0.317,
+          "metricLagM": -15,
+          "stretched": 0.188
+        },
+        {
+          "retired": "e1-uphill-weight",
+          "score": 0.312,
+          "metric": 0.312,
+          "metricLagM": 89,
+          "stretched": 0.277
+        },
+        {
+          "retired": "e3-stairway",
+          "score": 0.311,
+          "metric": 0.311,
+          "metricLagM": -31.5,
+          "stretched": 0.259
+        },
+        {
+          "retired": "p5-foundry-floor",
+          "score": 0.308,
+          "metric": 0.249,
+          "metricLagM": -14,
+          "stretched": 0.308
+        },
+        {
+          "retired": "p4-night-circuit",
+          "score": 0.295,
+          "metric": 0.262,
+          "metricLagM": -43,
+          "stretched": 0.295
+        },
+        {
+          "retired": "p3-snow-line",
+          "score": 0.29,
+          "metric": 0.228,
+          "metricLagM": -64,
+          "stretched": 0.29
+        },
+        {
+          "retired": "p1-container-yard",
+          "score": 0.284,
+          "metric": 0.284,
+          "metricLagM": -18,
+          "stretched": 0.24
+        },
+        {
+          "retired": "e2-rear-wheel-first",
+          "score": 0.26,
+          "metric": 0.249,
+          "metricLagM": 181,
+          "stretched": 0.26
+        },
+        {
+          "retired": "h3-fire-line",
+          "score": 0.256,
+          "metric": 0.226,
+          "metricLagM": 168,
+          "stretched": 0.256
+        },
+        {
+          "retired": "m3-see-saw",
+          "score": 0.249,
+          "metric": 0.249,
+          "metricLagM": 0.5,
+          "stretched": 0.17
+        },
+        {
+          "retired": "m2-drum-roll",
+          "score": 0.248,
+          "metric": 0.248,
+          "metricLagM": 140.5,
+          "stretched": 0.177
+        },
+        {
+          "retired": "lab-box-climb",
+          "score": 0.241,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.241
+        },
+        {
+          "retired": "x2-pipe-dream",
+          "score": 0.194,
+          "metric": 0.194,
+          "metricLagM": 92.5,
+          "stretched": 0.171
+        },
+        {
+          "retired": "x1-vertical-limit",
+          "score": 0.188,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.188
+        },
+        {
+          "retired": "lab-ramp-jump",
+          "score": 0.153,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.153
+        },
+        {
+          "retired": "h2-gap-chain",
+          "score": 0.116,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.116
+        },
+        {
+          "retired": "h1-wheelie-wire",
+          "score": 0.104,
+          "metric": 0.008,
+          "metricLagM": 136.5,
+          "stretched": 0.104
+        },
+        {
+          "retired": "lab-flat-200",
+          "score": 0,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0
+        },
+        {
+          "retired": "lab-physics-test",
+          "score": -0.008,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": -0.008
+        }
+      ]
+    },
+    {
+      "id": "c3-hull-breach",
+      "name": "Hull Breach",
+      "code": "C3",
+      "max": 0.553,
+      "closest": "x1-vertical-limit",
+      "pass": true,
+      "cells": [
+        {
+          "retired": "x1-vertical-limit",
+          "score": 0.553,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.553
+        },
+        {
+          "retired": "p4-night-circuit",
+          "score": 0.452,
+          "metric": 0.452,
+          "metricLagM": 199,
+          "stretched": 0.12
+        },
+        {
+          "retired": "p5-foundry-floor",
+          "score": 0.425,
+          "metric": 0.425,
+          "metricLagM": 150,
+          "stretched": 0.148
+        },
+        {
+          "retired": "h1-wheelie-wire",
+          "score": 0.42,
+          "metric": 0.373,
+          "metricLagM": 247.5,
+          "stretched": 0.42
+        },
+        {
+          "retired": "h2-gap-chain",
+          "score": 0.414,
+          "metric": 0.366,
+          "metricLagM": 197.5,
+          "stretched": 0.414
+        },
+        {
+          "retired": "e1-uphill-weight",
+          "score": 0.412,
+          "metric": 0.412,
+          "metricLagM": 185.5,
+          "stretched": 0.385
+        },
+        {
+          "retired": "p2-canyon-run",
+          "score": 0.382,
+          "metric": 0.382,
+          "metricLagM": 197,
+          "stretched": 0.091
+        },
+        {
+          "retired": "b2-lean-back",
+          "score": 0.369,
+          "metric": 0.321,
+          "metricLagM": 37.5,
+          "stretched": 0.369
+        },
+        {
+          "retired": "e2-rear-wheel-first",
+          "score": 0.361,
+          "metric": 0.361,
+          "metricLagM": 155.5,
+          "stretched": 0.206
+        },
+        {
+          "retired": "lab-box-climb",
+          "score": 0.349,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.349
+        },
+        {
+          "retired": "b1-first-ride",
+          "score": 0.32,
+          "metric": 0.32,
+          "metricLagM": -54.5,
+          "stretched": 0.305
+        },
+        {
+          "retired": "e3-stairway",
+          "score": 0.313,
+          "metric": 0.313,
+          "metricLagM": 196,
+          "stretched": 0.192
+        },
+        {
+          "retired": "p3-snow-line",
+          "score": 0.311,
+          "metric": 0.311,
+          "metricLagM": 195,
+          "stretched": 0.104
+        },
+        {
+          "retired": "x2-pipe-dream",
+          "score": 0.282,
+          "metric": 0.282,
+          "metricLagM": 50.5,
+          "stretched": 0.164
+        },
+        {
+          "retired": "h3-fire-line",
+          "score": 0.271,
+          "metric": 0.222,
+          "metricLagM": -26,
+          "stretched": 0.271
+        },
+        {
+          "retired": "m1-hop-up",
+          "score": 0.27,
+          "metric": 0.27,
+          "metricLagM": -42,
+          "stretched": 0.231
+        },
+        {
+          "retired": "m3-see-saw",
+          "score": 0.27,
+          "metric": 0.27,
+          "metricLagM": -38.5,
+          "stretched": 0.162
+        },
+        {
+          "retired": "x3-gauntlet",
+          "score": 0.262,
+          "metric": 0.262,
+          "metricLagM": -12.5,
+          "stretched": 0.199
+        },
+        {
+          "retired": "m2-drum-roll",
+          "score": 0.261,
+          "metric": 0.228,
+          "metricLagM": -2,
+          "stretched": 0.261
+        },
+        {
+          "retired": "lab-ramp-jump",
+          "score": 0.237,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.237
+        },
+        {
+          "retired": "lab-physics-test",
+          "score": 0.188,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.188
+        },
+        {
+          "retired": "p1-container-yard",
+          "score": 0.183,
+          "metric": 0.183,
+          "metricLagM": 201.5,
+          "stretched": 0.057
+        },
+        {
+          "retired": "b3-kicker-row",
+          "score": 0.17,
+          "metric": 0.142,
+          "metricLagM": -39,
+          "stretched": 0.17
+        },
+        {
+          "retired": "lab-flat-200",
+          "score": 0,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0
+        }
+      ]
+    }
+  ],
+  "internal": [
+    {
+      "a": "c2-crane-hop",
+      "b": "c3-hull-breach",
+      "score": 0.617
+    },
+    {
+      "a": "c1-low-tide",
+      "b": "c3-hull-breach",
+      "score": 0.478
+    },
+    {
+      "a": "c1-low-tide",
+      "b": "c2-crane-hop",
+      "score": 0.387
+    }
+  ]
+}

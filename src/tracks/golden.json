@@ -180,5 +180,26 @@
     "hazards": 0,
     "obstacles": 6,
     "finishX": 38
+  },
+  "c1-low-tide": {
+    "hash": "dd7b6858129de8ec",
+    "colliders": 16,
+    "hazards": 0,
+    "obstacles": 15,
+    "finishX": 443.6
+  },
+  "c2-crane-hop": {
+    "hash": "60e41032d028a771",
+    "colliders": 26,
+    "hazards": 2,
+    "obstacles": 24,
+    "finishX": 395.9
+  },
+  "c3-hull-breach": {
+    "hash": "c68f23944d4f118f",
+    "colliders": 31,
+    "hazards": 2,
+    "obstacles": 26,
+    "finishX": 434.521437
   }
 }

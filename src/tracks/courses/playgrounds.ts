@@ -21,8 +21,8 @@
 import type { TrackDef, TrackMeta } from '../../core/types';
 import { course, type CourseBuilder } from '../author';
 
-/** Playground ids: `p1-` ... `p9-`. */
-export const PLAYGROUND_ID_PREFIX = /^p\d-/;
+/** Playground ids: `p1-` ... `p9-` (the retired set) and `p-<zone>` (the ROCKHOP zone playgrounds, `src/tracks/rockhop`). */
+export const PLAYGROUND_ID_PREFIX = /^p\d?-/;
 export function isPlaygroundTrackId(id: string): boolean {
   return PLAYGROUND_ID_PREFIX.test(id);
 }

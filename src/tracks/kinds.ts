@@ -32,7 +32,74 @@ import type { Collider, HazardZone, SurfaceKind, Vec2 } from '../core/types';
  */
 export interface BaseParams {
   variant: number;
+  /**
+   * ROCKHOP zone prop (store release Phase 3, `PROPS`): what the collider IS in the zone's kit — an ore cart,
+   * a buoy, a conveyor belt. Dressing only: never read by compile, never hashed. Render falls back to the
+   * base kind's body until it meshes the prop.
+   */
+  prop?: PropId;
 }
+
+/**
+ * ROCKHOP zone props (store release Phase 3, `src/tracks/rockhop/`). The new courses are built from each zone's
+ * own kit; physics is frozen (bar 3), so every prop rides on an existing collider kind (`base`) and carries its
+ * identity in `params.prop`. `mesh` is the brief for the World owner. A prop never changes a collider or the hash;
+ * a renderer that ignores `prop` draws the base kind's body (the neutral fallback).
+ */
+export type PropId =
+  | 'container'
+  | 'pallet'
+  | 'tyre'
+  | 'buoy'
+  | 'hull'
+  | 'gangway'
+  | 'pier'
+  | 'hung-container'
+  | 'log'
+  | 'log-stack'
+  | 'timber-deck'
+  | 'flume'
+  | 'truck-bed'
+  | 'stump'
+  | 'block'
+  | 'ore-cart'
+  | 'conveyor'
+  | 'pulley'
+  | 'rope-bridge'
+  | 'rubble'
+  | 'ice-ledge'
+  | 'lift-tower'
+  | 'cornice'
+  | 'snowcat'
+  | 'fence';
+
+export const PROPS: { readonly [P in PropId]: { readonly zone: 'coast' | 'alpine' | 'quarry' | 'snowline'; readonly base: readonly ObstacleKind[]; readonly mesh: string } } = {
+  container: { zone: 'coast', base: ['box'], mesh: 'ribbed shipping container, 2.4 m deep, rust / teal liveries by variant; the collider is its top and flanks' },
+  pallet: { zone: 'coast', base: ['ramp', 'ledge'], mesh: 'stacked timber pallets under a ramp or kerb face' },
+  tyre: { zone: 'coast', base: ['drum'], mesh: 'half-buried truck / tractor tyre lying across the course (a sunk drum)' },
+  buoy: { zone: 'coast', base: ['pole', 'drum'], mesh: 'teal / yellow banded navigation buoy: upright (pole cap) or beached on its side (sunk drum)' },
+  hull: { zone: 'coast', base: ['plank', 'box', 'ramp'], mesh: 'rusted hull plating with ribs: the listing deck (plank), the hull body (box), the bow ramp' },
+  gangway: { zone: 'coast', base: ['ramp', 'plank'], mesh: 'steel gangway with handrails and treads' },
+  pier: { zone: 'coast', base: ['box', 'ramp'], mesh: 'timber pier deck on piles over the water, bollards and a rope rail' },
+  'hung-container': { zone: 'coast', base: ['plank'], mesh: 'a container hanging from a crane spreader on four chains; the plank is its roof (one-way)' },
+  log: { zone: 'alpine', base: ['drum', 'logpile'], mesh: 'barked pine log lying across the course, cut end rings visible (not a cable spool)' },
+  'log-stack': { zone: 'alpine', base: ['box', 'ledge'], mesh: 'stacked log ends (a timber stack face) with chains' },
+  'timber-deck': { zone: 'alpine', base: ['box', 'ramp', 'plank', 'stair'], mesh: 'rough-sawn timber deck / ramp on log cribbing' },
+  flume: { zone: 'alpine', base: ['ramp', 'box'], mesh: 'water flume trough on trestles (the kicker is its lip, water sheeting off)' },
+  'truck-bed': { zone: 'alpine', base: ['box'], mesh: 'logging truck trailer bed with bolsters and a log load behind the rider' },
+  stump: { zone: 'alpine', base: ['pole', 'ledge'], mesh: 'sawn stump / cribbing post, ringed top' },
+  block: { zone: 'quarry', base: ['box', 'ledge', 'wall', 'stair', 'ramp'], mesh: 'cut sandstone block with drill scars and chisel marks' },
+  'ore-cart': { zone: 'quarry', base: ['box', 'seesaw'], mesh: 'rusted ore cart on a rail stub, rubble load; on a see-saw it rides a tipping rail section' },
+  conveyor: { zone: 'quarry', base: ['plank', 'ramp'], mesh: 'inclined belt conveyor on a lattice truss, rollers visible, rubble on the belt' },
+  pulley: { zone: 'quarry', base: ['drum'], mesh: 'conveyor head / tail pulley drum with lagging and a belt wrap (spins with `rolls`)' },
+  'rope-bridge': { zone: 'quarry', base: ['plank', 'box', 'ledge'], mesh: 'plank-and-rope bridge deck with hand ropes; slots between deck boards are the kill gaps' },
+  rubble: { zone: 'quarry', base: ['drum', 'logpile'], mesh: 'rubble / boulder pile (sunk drums read as boulders)' },
+  'ice-ledge': { zone: 'snowline', base: ['box', 'ledge', 'wall', 'ramp'], mesh: 'glacier ice shelf: blue translucent face, snow cap on the top' },
+  'lift-tower': { zone: 'snowline', base: ['pole', 'box'], mesh: 'ski-lift tower: lattice pylon, the cap is its sheave-wheel platform' },
+  cornice: { zone: 'snowline', base: ['box', 'ramp'], mesh: 'wind-sculpted snow cornice overhanging the lip' },
+  snowcat: { zone: 'snowline', base: ['box', 'drum', 'ramp'], mesh: 'snow-cat: the cab / blade as a platform or ramp, its track rollers as spinning drums' },
+  fence: { zone: 'snowline', base: ['plank', 'ledge'], mesh: 'avalanche snow fence: timber slats on posts' },
+};
 
 export type ObstacleKind =
   | 'ramp'
