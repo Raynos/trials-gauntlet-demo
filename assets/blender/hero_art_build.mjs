@@ -65,7 +65,7 @@ export async function build(name, { lod, stage = 0, scratch, dry = false }) {
     '--stage', String(stage), '--no-meshopt'];
   if (lod) blenderArgs.push('--lod', '--min-tris', spec.kind === 'bike' ? '24' : '120');
   const t0 = Date.now();
-  const log = run(BLENDER, blenderArgs, `blender ${outName}`);
+  run(BLENDER, blenderArgs, `blender ${outName}`);
   const blenderSeconds = (Date.now() - t0) / 1000;
   const packed = path.join(scratch, `${outName}.glb`);
   const packReport = await pack(rawOut, packed, {});

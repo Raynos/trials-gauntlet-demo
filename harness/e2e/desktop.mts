@@ -318,7 +318,7 @@ class Flow {
 
     // Results: stage 3+ (tiles up), the device's legend, ←/→ moves the focus, confirm picks → a new run.
     const cls = await this.page.evaluate(TO_STAGE(3)) as string;
-    this.expect(await this.waitFor(`/\\bstage-[345]\\b/.test(document.querySelector('.results').className) && document.querySelector('.results').classList.contains('show')`, 10000), 'results-stage3', `results never reached stage 3: '${cls}' → '${await this.page.evaluate(`document.querySelector('.results').className`)}'`);
+    this.expect(await this.waitFor(`/\\bstage-[345]\\b/.test(document.querySelector('.results').className) && document.querySelector('.results').classList.contains('show')`, 10000), 'results-stage3', `results never reached stage 3: '${cls}' → '${String(await this.page.evaluate(`document.querySelector('.results').className`))}'`);
     await this.expectLegend('.results .legend', 'D3-results-legend');
     await this.expectScreens([], 'results-no-screens');
     await this.expectNoTouch('D2-results');
@@ -339,7 +339,7 @@ class Flow {
     for (let i = 0; i < 4 && !(await tiles()).includes(`${target}*`); i++) { await this.press('right'); await this.page.waitForTimeout(60); }
     this.expect((await tiles()).includes(`${target}*`), 'results-target', `could not focus ${target}: ${await tiles()}`);
     await this.press('confirm');
-    this.expect(await this.waitFor(`!document.querySelector('.results.show') && window.__trials.app.screen() === 'run' && ['countdown','riding'].includes(window.__trials.phase())`, 60000), 'D4-results-pick', `${target} did not start a new run: ${JSON.stringify(await this.state())} results='${await this.page.evaluate(`document.querySelector('.results').className`)}'`);
+    this.expect(await this.waitFor(`!document.querySelector('.results.show') && window.__trials.app.screen() === 'run' && ['countdown','riding'].includes(window.__trials.phase())`, 60000), 'D4-results-pick', `${target} did not start a new run: ${JSON.stringify(await this.state())} results='${String(await this.page.evaluate(`document.querySelector('.results').className`))}'`);
     const track1 = await this.page.evaluate(`window.__trials.info().trackId`) as string;
     if (target === 'next') this.expect(track1 !== finishTrack, 'next-track', `NEXT should load a different track (was ${finishTrack}, now ${track1})`);
     else this.expect(track1 === finishTrack, 'retry-track', `RETRY should re-run ${finishTrack}, got ${track1}`);

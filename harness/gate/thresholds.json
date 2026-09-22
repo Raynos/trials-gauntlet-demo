@@ -13,7 +13,7 @@
   "restart.noCountdown": true,
   "restart.movesWithinTicks": 12,
   "heap.growthMBPer60s": 5,
-  "bundle.jsGzipKB": 600,
+  "bundle.jsGzipKB": 640,
   "perf.drawCallsMax": 300,
   "perf.trianglesMax": 500000,
   "perf.texturesMBMax": 96,

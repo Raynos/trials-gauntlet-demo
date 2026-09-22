@@ -1704,7 +1704,7 @@ recordings, since the working-tree physics no longer replays the committed golde
 ### Checks
 
 `pnpm typecheck` both configs: clean except `src/render/hero/img2Rider.ts` (another owner's in-progress file,
-`import.meta.glob` typing — not this round's). `pnpm lint` (`eslint src/render harness/bench`): clean.
+`import.meta.glob` typing — not this round's). `pnpm lint` (scoped to `src/render harness/bench`): clean.
 `pnpm vitest run src/render`: 109 → 121 tests with Astra's two files; 12 fail in `hero/gltfRiderPhysical.test.ts`
 ("follows actual production Game playback through the E2 impact window") — they pass with the working tree's
 uncommitted `src/physics/v2/bike.ts` / `tuning.ts` stashed, so they are the physics R8 mid-round, not the renderer.

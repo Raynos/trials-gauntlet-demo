@@ -161,4 +161,4 @@ function main(): void {
   }
 }
 
-if (process.argv[1] && /trackSweep\.ts$/.test(process.argv[1])) main();
+if (process.argv[1] && process.argv[1].endsWith('trackSweep.ts')) main();

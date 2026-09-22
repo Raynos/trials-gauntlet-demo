@@ -22,6 +22,7 @@
  *             the document: cache-first with a background revalidate (a flapping link must never
  *             hold the first paint — the plan's B-SLOW), offline.html as the last resort;
  *             load-manifest.json / sw.js / manifest.webmanifest: network-first, cache fallback;
+ *             version.json: network-only, never cached (the "new build" pill must hear the server);
  *             /api/**, cross-origin and `?harness=1`: untouched.
  *   message   { type: 'SKIP_WAITING' } → activate now (the boot's start-of-load update, src/boot/sw.ts)
  *             { type: 'VERSION' }      → what this worker holds, back on the message port.
@@ -161,6 +162,9 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.includes('/api/')) return; // the review inbox: network-only, queued in localStorage when it fails
   if (url.searchParams.get('harness') === '1') return; // the evidence harness measures the network, not the cache
+  // Network-only, never cached: the "new build" pill (src/ui/updatePill.ts) asks the SERVER which build is live.
+  // A cached answer would be this worker's own build and the pill could never light; offline it fails and stays dark.
+  if (url.pathname.endsWith('/version.json')) return;
   const isDoc = req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('/index.html');
   if (isDoc) {
     event.respondWith(documentResponse(event, req));

@@ -175,7 +175,7 @@ async function checkIsolation(page: Page, flow: string): Promise<void> {
         const r = el.getBoundingClientRect();
         if (r.width < 2 || r.height < 2) continue;
         const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-        if (hit && scr.contains(hit)) out.push(`${scr.className} > ${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0]}`);
+        if (hit && scr.contains(hit)) out.push(`${scr.className} > ${el.tagName.toLowerCase()}.${(el.getAttribute('class') ?? '').split(' ')[0]}`);
       }
     }
     return out;
@@ -445,7 +445,7 @@ async function flowFront(ctx: BrowserContext, url: string, g: Geom): Promise<voi
     }
     expect((await visibleScreens(page)).join() === 'garage', flow, 'G2-drag-stays', `drag left the garage: ${await visibleScreens(page)}`);
     const pe = await page.evaluate(`'targets=' + window.__pe.join(',')`);
-    expect(Math.abs(yaw1 - (yaw0 as number)) > 0.2, flow, 'G2-drag-rotates', `camera x ${yaw0} → ${yaw1} (${pe})`);
+    expect(Math.abs(yaw1 - (yaw0 as number)) > 0.2, flow, 'G2-drag-rotates', `camera x ${String(yaw0)} → ${String(yaw1)} (${String(pe)})`);
     await tapSel(page, flow, '.garage-screen.live button[data-outfit="street-openface"]');
     await page.waitForTimeout(300);
     expect((await visibleScreens(page)).join() === 'garage', flow, 'G2-tag-stays', `outfit tap left the garage: ${await visibleScreens(page)}`);
@@ -457,7 +457,7 @@ async function flowFront(ctx: BrowserContext, url: string, g: Geom): Promise<voi
     await tapSel(page, flow, '.garage-screen.live button[data-bike="pro"]');
     await page.waitForTimeout(300);
     const pro = await page.evaluate(`document.querySelector('.garage-screen button[data-bike="pro"]').getAttribute('aria-pressed')`);
-    expect(pro === 'true', flow, 'G2-bike-tap', `Pro tag aria-pressed ${pro}`);
+    expect(pro === 'true', flow, 'G2-bike-tap', `Pro tag aria-pressed ${String(pro)}`);
     await tapSel(page, flow, '.garage-screen.live button[data-bike="rookie"]');
     await page.waitForTimeout(300);
     const g4 = await page.evaluate(`(function () { var r = window.__render; var i = r.debugInfo(); return { setTrack: window.__setTrackCalls, livery: window.__liveryCalls, hidden0: window.__hidden0, hidden: i.garage.hidden, on: i.garage.on }; })()`) as { setTrack: number; livery: number; hidden0: number; hidden: number; on: boolean } | null;

@@ -30,7 +30,7 @@ export function conditionSleeveSkin(mesh: THREE.SkinnedMesh): () => void {
   if (chest < 0) return () => {};
   const arms = ['L', 'R'].map(s => mesh.skeleton.bones.findIndex(b => b.name === `upperArm${s}` || b.name === `upperArm.${s}`));
   const forearms = ['L', 'R'].map(s => mesh.skeleton.bones.findIndex(b => b.name === `forearm${s}` || b.name === `forearm.${s}`));
-  const retained = ['neck', 'head'].map(name => mesh.skeleton.bones.findIndex(b => b.name === name));
+  const retained = new Set(['neck', 'head'].map(name => mesh.skeleton.bones.findIndex(b => b.name === name)));
   const extras: [number, number][][] = [];
   for (let i = 0; i < positions.count; i++) {
     let arm = -1, allowed = true, total = 0, value = 0, distal = 0;
@@ -39,7 +39,7 @@ export function conditionSleeveSkin(mesh: THREE.SkinnedMesh): () => void {
       const w = weights.getComponent(i, j), b = indices.getComponent(i, j);
       if (w <= 1e-6) continue;
       total += w;
-      if (retained.includes(b)) { extra.push([b, w]); continue; }
+      if (retained.has(b)) { extra.push([b, w]); continue; }
       if (b !== chest) {
         const s = Math.max(arms.indexOf(b), forearms.indexOf(b));
         if (s < 0 || (arm >= 0 && arm !== s)) allowed = false;

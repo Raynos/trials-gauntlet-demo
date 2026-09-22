@@ -9,6 +9,7 @@
 - A recorded input replays to a byte-identical finish time, or the physics is broken.
 - One commit per round; the subject states the finding.
 - Ship gate every third round: cold boot, clear a track, crash, instant restart.
+- A push to `main` is a production deploy (`.github/workflows/deploy.yml`: typecheck, lint, tests, build, then Vercel). Watch the run and confirm `/version.json` names your SHA; a red run is yours to fix now. Work players must not get yet stays off `main`. No hand `vercel deploy --prod`; `gh workflow run deploy` re-ships HEAD.
 - Never announce completion while budget remains.
 - This game should be playable on mobile iOS safari & desktop.
 - Favor subagents over workflows where possible, as subagents are resumable.

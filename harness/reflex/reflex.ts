@@ -444,7 +444,7 @@ async function main(): Promise<void> {
     const skillFlag = typeof flags.skill === 'string' ? flags.skill : skill;
     const skillList: SkillName[] = skillFlag === 'all' ? ['novice', 'average', 'good'] : skillFlag.split(',').map((x) => parseSkill({ skill: x.trim() }));
     const paramsLine = (sk: SkillName): string =>
-      `Reaction ${SKILLS[sk].reactionS.map((s) => `${(s * 1000).toFixed(0)}`).join('–')} ms, glances ${SKILLS[sk].perceiveHz} Hz, pitch noise ±${SKILLS[sk].pitchNoiseDeg}°, speed noise ±${(SKILLS[sk].speedNoiseFrac * 100).toFixed(0)}%, taps ${(SKILLS[sk].tapS * 1000).toFixed(0)} ms, lapses every ~${SKILLS[sk].lapseMeanS} s.`;
+      `Reaction ${SKILLS[sk].reactionS.map((s) => (s * 1000).toFixed(0)).join('–')} ms, glances ${SKILLS[sk].perceiveHz} Hz, pitch noise ±${SKILLS[sk].pitchNoiseDeg}°, speed noise ±${(SKILLS[sk].speedNoiseFrac * 100).toFixed(0)}%, taps ${(SKILLS[sk].tapS * 1000).toFixed(0)} ms, lapses every ~${SKILLS[sk].lapseMeanS} s.`;
     // Round 12: the whole matrix is one pool of independent cells (bike x skill x track x seed), merged back per
     // (bike, track) in the serial order; each (bike, track) metrics file is written once with every skill.
     const simCap = flagNum(flags, 'max-sim-seconds', 300);

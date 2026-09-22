@@ -262,8 +262,8 @@ export function checkRunupJumps(def: TrackDef): string[] {
     if (rp.direction === 'down' || !touching(prev.pos.x + rp.length, o.pos.x)) continue;
     // Flat run-up: back from the ramp foot to the nearer of the previous solid's end and the last spawn.
     const foot = prev.pos.x;
-    const before = solids.filter((s) => s.x1 <= foot + 1e-6 && s.x1 < foot - 1e-6).pop();
-    const spawn = spawns.filter((x) => x <= foot).pop() ?? 0;
+    const before = solids.findLast((s) => s.x1 <= foot + 1e-6 && s.x1 < foot - 1e-6);
+    const spawn = spawns.findLast((x) => x <= foot) ?? 0;
     const from = Math.max(before?.x1 ?? -Infinity, spawn);
     const runup = foot - from;
     if (runup < VALIDATOR_RULES.runup.minFlat) continue;

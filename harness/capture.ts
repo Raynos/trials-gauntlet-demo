@@ -330,7 +330,7 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
           }
           let rider: RiderSample = null;
           if (rp) {
-            /* eslint-disable @typescript-eslint/no-explicit-any -- the renderer's private handles through window.__render (as hero-webkit.mts) */
+            /* oxlint-disable typescript/no-explicit-any -- the renderer's private handles through window.__render (as hero-webkit.mts) */
             const r = (window as any).__render;
             const rb = state.riderBody;
             const physRel = rb ? Math.atan2(Math.sin(rb.angle - state.bike.angle), Math.cos(rb.angle - state.bike.angle)) : NaN;
@@ -356,7 +356,7 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
               meshTorso = Math.atan2(up.x, up.y);
             }
             rider = { present: !!rb, physRel, chainTorso, meshTorso, physicalPose, additiveWeight };
-            /* eslint-enable @typescript-eslint/no-explicit-any */
+            /* oxlint-enable typescript/no-explicit-any */
           }
           return { state, dataUrl, camera, rider };
         },

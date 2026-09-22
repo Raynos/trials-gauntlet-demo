@@ -18,9 +18,12 @@
  *   ?sw=0           do not register the service worker (production builds register it from the inline loader; harness never does)
  *   ?trace=1        live InputFrame bars (gas / brake / lean) under the HUD timer — for filming the phone
  *   ?lab=1          physics lab HUD + ghost of the last attempt on every track (automatic on `lab-*` tracks)
+ *   ?crash=play|reject|boot   prove the crash screen: throw (or reject) inside the game loop after 1 s of riding, or from a boot step
  *   ?bench=1        the on-device benchmark (src/game/bench.ts, docs/device/README.md): START card → scenarios → Copy report;
  *                   `&quick=1` (menu + garage, 3 s), `&no=audio,hud,render,touch`, `&cap=60`
  */
+// FIRST: the crash screen listens before any other game module evaluates (src/ui/errorModal.ts).
+import './ui/errorModalInstall';
 import { DEFAULT_PHYSICS_HZ, type PhysicsVersion } from './core';
 import * as audioMod from './audio';
 import * as physicsMod from './physics';
@@ -43,6 +46,8 @@ import type { PrepareStep } from './boot/steps';
 import type { BikeClass, QualityTier, RiderOutfit, RiderOutfitRenderer } from './core/types';
 import { startTier } from './game/startTier';
 import { loadRiderOutfit } from './ui/outfit';
+import { armCrashTest, crashTestBoot, crashTestMode, showThrown } from './ui/errorModal';
+import { installUpdatePill } from './ui/updatePill';
 
 type AnyModule = Record<string, unknown>;
 
@@ -239,9 +244,11 @@ function boot(): void {
    */
   async function bootFront(): Promise<void> {
     const plan = await takeBootPlan();
+    const crashTest = crashTestMode(location.search);
     try {
       const sRenderer = await plan.step('renderer', async () => {
         await nextPaint();
+        if (crashTest === 'boot') crashTestBoot();
         // The two downloads boot awaits (hero glTF, boot art set) start in the renderer's constructor, each with its
         // DOWNLOAD reader; per-track art after the boot set is an `after` item.
         return makeRenderer(appRoot, false, models, start, { heroBytes: plan.reader('heroModels'), artBytes: plan.reader('bootArt'), onTrackArt: (done, total) => plan.after('trackArt', done, total) });
@@ -267,6 +274,7 @@ function boot(): void {
         appRoot.appendChild(ui);
         const bestTimes = new BestTimes();
         const hud = new DomHud(ui, (id) => bestTimes.get(id), (id, bike) => bestTimes.board(id, bike));
+        if (crashTest === 'play' || crashTest === 'reject') armCrashTest(hud, crashTest);
         const game = new Game({
           physicsHz,
           physics,
@@ -404,9 +412,13 @@ function boot(): void {
         if (f) await f.ready;
       });
       sFonts.done();
+      // After the boot, never inside it: the version check must not sit in the boot's byte count or requests.
+      installUpdatePill();
     } catch (e) {
       console.error('[trials] boot failed', e);
       plan.fail(`Startup failed: ${e instanceof Error ? e.message : String(e)}`);
+      // One screen for every exception (src/ui/errorModal.ts): the sheet, with the stack, covers the loader.
+      showThrown(e);
     }
   }
 }

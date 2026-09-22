@@ -92,10 +92,10 @@ async function main(): Promise<void> {
           if (inputs.length < n) tr.step(n - inputs.length);
           tr.render();
           const s = tr.getState();
-          /* eslint-disable @typescript-eslint/no-explicit-any -- private renderer handles, as capture.ts */
+          /* oxlint-disable typescript/no-explicit-any -- private renderer handles, as capture.ts */
           const c = (tr as any).camera() as Record<string, number | string | boolean>;
           const d = (window as any).__render?.debugInfo?.() as { occluder?: { ms: number; tested: number; hits: number; count: number } } | undefined;
-          /* eslint-enable @typescript-eslint/no-explicit-any */
+          /* oxlint-enable typescript/no-explicit-any */
           const o = d?.occluder ?? { ms: 0, tested: 0, hits: 0, count: 0 };
           return {
             tick: s.tick,

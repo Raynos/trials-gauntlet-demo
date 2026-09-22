@@ -387,7 +387,7 @@ export const CRITIC_HEADER = [
   '|--|--|--|--|--|--|--|--|--|--|',
 ].join('\n');
 
-if (process.argv[1] && /critic\.ts$/.test(process.argv[1])) {
+if (process.argv[1] && process.argv[1].endsWith('critic.ts')) {
   const file = process.argv[2];
   if (!file) throw new Error('usage: critic.ts <wav> [--repeat a0,a1,b0,b1] [--json]');
   const ri = process.argv.indexOf('--repeat');

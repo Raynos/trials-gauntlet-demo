@@ -1,13 +1,13 @@
 ---
 name: prepare-to-exit
-description: Checkpoint the session and prepare to exit — commit your own paths, flip the ledgers, queue every leftover, report, then print the BYE / OOPS banner. User-invoked only.
+description: Checkpoint the session and prepare to exit — commit your own paths, flip the ledgers, queue every leftover, push (which deploys) and confirm the CI run went live, report, then print the BYE / OOPS banner. User-invoked only.
 disable-model-invocation: true
 ---
 
 # Prepare to exit
 
 Ported from `house` / `kami-kakushi` on 2026-09-17; the steps are this repo's (AGENTS.md is canon). Execute in
-order; don't paraphrase or shortcut. Nothing here deploys — a deploy is its own ask.
+order; don't paraphrase or shortcut. The push in step 5 deploys (CI, since ask 84); a pin is its own ask.
 
 ## Steps
 
@@ -33,11 +33,14 @@ order; don't paraphrase or shortcut. Nothing here deploys — a deploy is its ow
 4. **Subagents.** Don't kill running subagents to exit — a checkpoint resumes committed state; live work notifies
    when done. List every owner still alive with what it holds. Owners are idle by default when they have reported;
    say so. `TaskStop` only if the user asks.
-5. **Push — best effort, and blocked is normal here.** `git push` is refused for this repo until HR-11 (the
-   142 MB trailer in history / the 2 GB pack) is decided; `origin/main` holds the first 150 first-parent commits.
-   Try nothing destructive; report the local HEAD and the `origin/main` SHA. An unpushed commit is **not** an OOPS
-   while another session is live or the queue names the blocker; it **is** an OOPS if you are the last session and
-   nothing in the queue says why the work is not on the remote.
+5. **Push — and a push IS a deploy.** `.github/workflows/deploy.yml` runs typecheck → lint → unit tests → build on
+   every push to `main` and, all green, ships that commit to https://trials-gauntlet-demo.vercel.app. So:
+   `git push origin main` (rejected → `git fetch && git merge origin/main`, never rebase), then
+   `gh run watch $(gh run list --limit 1 --json databaseId -q '.[0].databaseId') --exit-status` and confirm
+   `curl -s https://trials-gauntlet-demo.vercel.app/version.json` names your HEAD's short SHA — put that build in
+   the ASKS row. A red run on your push is your red: fix it before the banner. Work that must not reach players
+   yet does not go on `main` (a preview deploy instead). Never `vercel deploy --prod` by hand while CI is healthy;
+   `gh workflow run deploy` re-ships HEAD. An unpushed commit **is** an OOPS unless the queue names why.
 6. **Memory.** If this session learned something the next one must know that the repo does not record (a tool
    gotcha, a user rule, a decision's why), write it to the memory directory and index it in `MEMORY.md`.
 7. **Report**, then the banner. The report names: commits (SHAs + one line each), what is deployed and pinned,

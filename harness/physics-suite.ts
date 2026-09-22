@@ -289,7 +289,7 @@ async function main(): Promise<void> {
         let summary = '';
         let ok = r.code === 0;
         try {
-          const last = r.stdout.trim().split('\n').filter((l) => l.startsWith('{')).pop();
+          const last = r.stdout.trim().split('\n').findLast((l) => l.startsWith('{'));
           const j = last ? (JSON.parse(last) as Record<string, unknown>) : null;
           if (j && 'error' in j) ok = false;
           summary = j ? Object.entries(j).filter(([k]) => ['x', 'phase', 'attempts', 'faulted', 'finished', 'finishTime', 'cleared', 'strangerAttempts', 'error', 'sessionId', 'runTime'].includes(k)).map(([k, v]) => `${k}=${typeof v === 'object' ? JSON.stringify(v) : String(v)}`).join(' ') : (r.stderr || r.stdout).trim().split('\n').pop() ?? '';

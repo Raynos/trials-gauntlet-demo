@@ -1,0 +1,133 @@
+{
+  // Trials lint gate (`pnpm lint` = `oxlint`). Type-aware through oxlint-tsgolint: each file is typed by its nearest
+  // tsconfig.json (root for src/, harness|api|scripts/tsconfig.json → tsconfig.harness.json for the node side).
+  // correctness, suspicious and perf are errors wholesale; the `rules` block adds the rest of the pre-oxlint set (JS recommended +
+  // TypeScript recommended + the house rules) from the other categories and lists what is switched off, with why.
+  // The determinism rules (CONTRACT.md §1) are the override on the deterministic paths below.
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "promise"],
+  "options": {
+    "typeAware": true,
+    "denyWarnings": true,
+    "reportUnusedDisableDirectives": "error"
+  },
+  "env": { "browser": true, "node": true, "es2024": true },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "rules": {
+    // ── pre-oxlint rules that live outside the three categories above ───── ──────────────────────────────────────────────
+    "no-case-declarations": "error",
+    "no-fallthrough": "error",
+    "no-prototype-builtins": "error",
+    "no-redeclare": "error",
+    "no-empty": "error",
+    "no-regex-spaces": "error",
+    "no-array-constructor": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrors": "none" }],
+    "no-console": ["error", { "allow": ["info", "warn", "error"] }],
+    "typescript/ban-ts-comment": "error",
+    "typescript/no-empty-object-type": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-namespace": "error",
+    "typescript/no-require-imports": "error",
+    "typescript/no-unsafe-function-type": "error",
+    "typescript/consistent-type-imports": ["error", { "prefer": "type-imports", "fixStyle": "inline-type-imports" }],
+    "import/no-unassigned-import": ["error", { "allow": ["**/*.css", "**/*Install"] }], // side-effect installers (`./ui/errorModalInstall`) must evaluate before any other module
+    "typescript/no-non-null-assertion": "off", // noUncheckedIndexedAccess makes `a[i]!` the typed-array idiom
+
+    // ── type-aware promise safety beyond the pre-oxlint set (low volume, real bugs) ─────────────────────────────────
+    "typescript/no-misused-promises": ["error", { "checksVoidReturn": { "arguments": false } }], // async node `createServer` handlers are fine; conditionals and spreads of promises stay flagged
+    "typescript/restrict-template-expressions": ["error", { "allowNumber": true, "allowBoolean": true, "allowNullish": true, "allowArray": true, "allowAny": true, "allowRegExp": true, "allowNever": true }], // diagnostic strings print arrays, flags and possibly-missing readings on purpose (`never` = a closure-assigned `let` TS narrowed away); objects and `unknown` still flagged
+
+    // ── off: fire on intentional idioms ──────────────────────────────────────────────────────────────────────────
+    "no-await-in-loop": "off", // harness drives one browser page / one file queue in order; sequential awaits are the point
+    "typescript/no-unsafe-type-assertion": "off", // three.js hands back base types (Material, Object3D) and page.evaluate returns unknown; `as` downcasts are the idiom
+    "no-underscore-dangle": "off", // `_scratch` vectors and `_unused` params (the no-unused-vars ignore pattern)
+    "unicorn/consistent-function-scoping": "off", // closures over per-frame / per-test locals are intentional
+    "unicorn/no-array-sort": "off", // in-place sort of a freshly built local array avoids an allocation
+    "unicorn/no-array-reverse": "off", // same, for reverse
+    "no-shadow": "off", // short math locals (t, x, dt, p) reused in nested closures; not in the pre-oxlint set
+    "unicorn/require-post-message-target-origin": "off", // every postMessage here is Worker/MessagePort, which take no targetOrigin
+    "unicorn/prefer-add-event-listener": "off", // `el.onclick =` is used where the handler must replace, not stack
+    "typescript/no-unnecessary-type-assertion": "off", // ~360 hits, nearly all a uniform `a[i]!` on typed-array reads after a narrowing write; erased at emit, and TS 7 (tsgolint) narrows differently from the TS 5.9 typecheck
+    "typescript/unbound-method": "off", // 37 hits, all false: closure-backed members declared with method syntax (`reader.add`, `renderer.paint`, `runRecording`), three.js `onBeforeCompile` chaining, and vitest spies in `expect(obj.fn)`
+    "oxc/no-map-spread": "off", // every hit copies shared defaults / fixtures on purpose, at setup time; no per-frame path spreads in map
+    "unicorn/no-new-array": "off", // `new Array<T>(n)` with an explicit element type is the preallocation idiom (physics ragdoll/seesaw pools, histograms)
+    "typescript/no-redundant-type-constituents": "off", // `'sky' | 'banner' | string` is the deliberate open union that keeps editor completion for the known keys
+    "typescript/no-unnecessary-type-parameters": "off", // `readJson<T>(): T` and friends are the typed-JSON idiom; the parameter documents the expected shape
+    "unicorn/no-useless-spread": "off", // every hit copies a live collection (Set, children, NodeList) before removing from it inside the loop
+    "unicorn/no-useless-fallback-in-spread": "off", // `...(x ?? {})` spells out an optional source; harmless and clearer than relying on spreading undefined
+    "promise/no-callback-in-promise": "off", // these sites bridge a promise into a callback API (`done()`, service-worker install), which is the point
+    "no-unmodified-loop-condition": "off", // loop guards are flipped by closures the rule cannot see (`step()` crash hooks, server events) or are feature constants
+    "typescript/no-base-to-string": "off", // `String(v)` on `unknown` JSON fields is the intended coercion; `${object}` is still caught by restrict-template-expressions
+    "typescript/no-unnecessary-boolean-literal-compare": "off", // DOM flags typed boolean are undefined in jsdom / older WebKit (`isContentEditable`, `navigator.onLine`, `crossOriginIsolated`); `=== true` is the guard
+    "typescript/no-confusing-non-null-assertion": "off", // `F[i]! === 0` is the typed-array read idiom (see no-unnecessary-type-assertion)
+    "typescript/consistent-return": "off", // exhaustive `switch`es over a union read as a missing return to it; tsc already checks every path against the annotated return type
+    "promise/always-return": "off", // `.then` side-effect callbacks in the harness end a chain; nothing reads their value
+    "oxc/approx-constant": "off" // tuning values such as 3.14 / 6.28 feed seeded placement; replacing them shifts baked output
+  },
+  "overrides": [
+    {
+      // CLI tools and tests print. `.mts` files are all node-run probes and e2e drivers (the old config only held `*.ts` to no-console).
+      "files": ["harness/**/*.ts", "vite.config.ts", "**/*.test.ts", "src/**/tools/**/*.ts", "**/*.mts"],
+      "rules": { "no-console": "off" }
+    },
+    {
+      // Node scripts outside the TS graph (art generation, build helpers): node globals only, undeclared names are errors.
+      "files": ["**/*.mjs", "**/*.cjs", "assets/**/*.js"],
+      "env": { "browser": false, "node": true, "es2024": true },
+      "rules": { "no-console": "off", "no-undef": "error" }
+    },
+    {
+      // Service worker source (emitted by the trials:pwa Vite plugin with the build id baked in).
+      "files": ["src/pwa/sw.js"],
+      "env": { "browser": false, "node": false, "serviceworker": true, "es2024": true },
+      "rules": { "no-undef": "error" }
+    },
+    {
+      // Determinism (CONTRACT §1): no wall clock, no unseeded randomness in physics, tracks, the audio model or core.
+      "files": ["src/physics/**/*.ts", "src/tracks/**/*.ts", "src/audio/model/**/*.ts", "src/core/**/*.ts"],
+      "rules": {
+        "no-restricted-properties": [
+          "error",
+          { "object": "Math", "property": "random", "message": "Use the seeded Rng from src/core/rng.ts (CONTRACT §1)." },
+          { "object": "performance", "property": "now", "message": "No wall clock in deterministic code (CONTRACT §1)." },
+          { "object": "Date", "property": "now", "message": "No wall clock in deterministic code (CONTRACT §1)." },
+          { "object": "window", "property": "performance", "message": "No wall clock in deterministic code (CONTRACT §1)." },
+          { "object": "globalThis", "property": "performance", "message": "No wall clock in deterministic code (CONTRACT §1)." }
+        ],
+        "no-restricted-globals": [
+          "error",
+          { "name": "Date", "message": "No wall clock in deterministic code, `new Date()` included (CONTRACT §1)." },
+          { "name": "performance", "message": "No wall clock in deterministic code (CONTRACT §1)." },
+          { "name": "requestAnimationFrame", "message": "Deterministic code is clocked by ticks, not frames." },
+          { "name": "setTimeout", "message": "Deterministic code is clocked by ticks, not timers." },
+          { "name": "setInterval", "message": "Deterministic code is clocked by ticks, not timers." }
+        ]
+      }
+    },
+    {
+      // Tests and the real-time loop driver may read the clock.
+      "files": ["**/*.test.ts", "src/core/loop.ts"],
+      "rules": { "no-restricted-properties": "off", "no-restricted-globals": "off" }
+    }
+  ],
+  "ignorePatterns": [
+    "dist/",
+    "node_modules/",
+    "harness/out/",
+    "reference/",
+    "**/*.d.ts",
+    // Frozen records: evidence scripts and archived plans are history, not code under maintenance.
+    "docs/evidence/",
+    "docs/reviews/evidence/",
+    "project/archive/"
+  ]
+}

@@ -31,7 +31,7 @@ export function goldenOrder(bike: BikeClass = DEFAULT_BIKE): string[] {
 
 /** Class a golden file name encodes (`bot-3-pro.json` -> pro). */
 export function goldenBike(file: string): BikeClass {
-  return /-pro\.json$/.test(path.basename(file)) ? 'pro' : DEFAULT_BIKE;
+  return path.basename(file).endsWith('-pro.json') ? 'pro' : DEFAULT_BIKE;
 }
 
 /** `src=<8 hex>` from a recording's header note, or null when unstamped/unreadable. */

@@ -13,7 +13,8 @@
  *  2. **Take the new build now, not with a toast.** If a newer worker is waiting, it is activated
  *     and the page reloads immediately — the player sees one loading screen and comes up on the new
  *     build. The caches are split so that reload costs only what actually changed (src/pwa/sw.js).
- *     There is no update toast and no mid-session reload.
+ *     A build published while the app is already open is announced by the "new build" pill on the
+ *     menu screens (src/ui/updatePill.ts, which reuses `handOver` below) — never applied under a run.
  *
  * The boot is never held hostage: everything here races a `CAP_MS` timeout, and any failure resolves.
  */
@@ -21,8 +22,18 @@
 /** The longest the loading screen waits for the worker to take control (or to hand over to a new build). */
 const CAP_MS = 2500;
 
+/**
+ * THE hand-over to a waiting worker: `SKIP_WAITING` → it activates and `clients.claim()`s → `controllerchange`
+ * → reload onto the new build. One copy, used by the boot below and by the "new build" pill (src/ui/updatePill.ts).
+ */
+export const handOver = (sw: ServiceWorkerContainer, w: ServiceWorker): void => {
+  sw.addEventListener('controllerchange', () => location.reload(), { once: true });
+  w.postMessage({ type: 'SKIP_WAITING' });
+};
+
 export function swBoot(enabled: boolean): Promise<void> {
-  const sw = typeof navigator === 'undefined' ? null : navigator.serviceWorker;
+  // Browser-only (the inline loader): `navigator` exists; `serviceWorker` is undefined outside a secure context.
+  const sw = navigator.serviceWorker as ServiceWorkerContainer | undefined;
   if (!enabled || !sw || /[?&]sw=0/.test(location.search)) return Promise.resolve();
   return new Promise<void>((resolve) => {
     let timer = setTimeout(resolve, CAP_MS);
@@ -35,8 +46,7 @@ export function swBoot(enabled: boolean): Promise<void> {
       if (!w) return done();
       clearTimeout(timer);
       timer = setTimeout(resolve, CAP_MS); // …unless the hand-over never lands: then boot what we have
-      sw.addEventListener('controllerchange', () => location.reload(), { once: true });
-      w.postMessage({ type: 'SKIP_WAITING' });
+      handOver(sw, w);
     };
     void sw.register('./sw.js', { scope: './' }).then(async (reg) => {
       // Standalone installs live for days: keep discovering updates so the next launch adopts one for free.

@@ -106,24 +106,21 @@ export async function pack(input, output, options = {}) {
       }
       if (plan) {
         const count = a.count;
-        let filtered = source, decodedExpect = source;
+        let filtered = source;
         if (plan.filter === 'EXPONENTIAL') {
           const floats = new Float32Array(source.buffer.slice(source.byteOffset, source.byteOffset + source.byteLength));
           filtered = MeshoptEncoder.encodeFilterExp(floats, count, plan.stride, plan.bits, 'SharedVector');
-          decodedExpect = null;
         } else if (plan.filter === 'OCTAHEDRAL') {
           const xyz = new Float32Array(source.buffer.slice(source.byteOffset, source.byteOffset + source.byteLength));
           const floats = new Float32Array(count * 4); // the octahedral filter reads 4 floats per element
           for (let i = 0; i < count; i++) { floats[i * 4] = xyz[i * 3]; floats[i * 4 + 1] = xyz[i * 3 + 1]; floats[i * 4 + 2] = xyz[i * 3 + 2]; floats[i * 4 + 3] = 1; }
           filtered = MeshoptEncoder.encodeFilterOct(floats, count, plan.stride, plan.bits);
-          decodedExpect = null;
           a.componentType = plan.stride === 4 ? 5120 : 5122;
           a.normalized = true;
           delete a.min; delete a.max;
         } else if (plan.filter === 'QUATERNION') {
           const floats = new Float32Array(source.buffer.slice(source.byteOffset, source.byteOffset + source.byteLength));
           filtered = MeshoptEncoder.encodeFilterQuat(floats, count, plan.stride, plan.bits);
-          decodedExpect = null;
           a.componentType = 5122;
           a.normalized = true;
           delete a.min; delete a.max;

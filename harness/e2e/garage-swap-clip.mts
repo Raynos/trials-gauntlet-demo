@@ -16,7 +16,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { chromium, webkit, type Page } from 'playwright';
+import { chromium, webkit, type Page, type Request } from 'playwright';
 import { startServer } from '../lib/server';
 import { REPO_ROOT } from '../lib/paths';
 import { resolveFfmpeg } from '../lib/ffmpeg';
@@ -46,7 +46,7 @@ const page: Page = await ctx.newPage();
 let timeOrigin = 0;
 const requests: ModelReq[] = [];
 // Keyed by the Request object: the same URL is fetched twice per swap (the twin's prefetch, then its parse).
-const pending = new Map<import('playwright').Request, ModelReq>();
+const pending = new Map<Request, ModelReq>();
 page.on('request', (r) => { const m = /\/models\/[0-9a-f]+\/(.+?)-[0-9a-f]{16}\.glb$/.exec(r.url()); if (!m) return; const req: ModelReq = { name: `${m[1]}.glb`, bytes: null, status: null, fromCache: false, startMs: Date.now(), endMs: null }; requests.push(req); pending.set(r, req); });
 page.on('response', (r) => { const req = pending.get(r.request()); if (!req) return; req.status = r.status(); req.fromCache = r.fromServiceWorker() || /HIT|memory|disk/i.test(r.headers()['x-cache'] ?? ''); void r.body().then((b) => { req.bytes = b.length; }).catch(() => undefined).finally(() => { req.endMs = Date.now(); pending.delete(r.request()); }); });
 page.on('requestfinished', (r) => { const req = pending.get(r); if (req && req.endMs === null) req.endMs = Date.now(); });

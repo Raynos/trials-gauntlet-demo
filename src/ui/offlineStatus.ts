@@ -24,7 +24,7 @@ export function offlineHeld(timeoutMs = 8000): Promise<OfflineHeld | null> {
     ch.port1.onmessage = (e: MessageEvent): void => {
       clearTimeout(timer);
       const d = e.data as Partial<OfflineHeld> | null;
-      resolve(d && typeof d.bytes === 'number' ? { build: String(d.build ?? ''), entries: Number(d.entries ?? 0), models: Number(d.models ?? 0), bytes: d.bytes } : null);
+      resolve(d && typeof d.bytes === 'number' ? { build: d.build ?? '', entries: d.entries ?? 0, models: d.models ?? 0, bytes: d.bytes } : null);
     };
     try {
       sw.controller!.postMessage({ type: 'VERSION' }, [ch.port2]);

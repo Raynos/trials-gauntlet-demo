@@ -175,7 +175,7 @@ export function simFingerprint(root: string): string {
       h = Math.imul(h, 0x01000193) >>> 0;
     }
   };
-  const isSource = (name: string): boolean => /\.ts$/.test(name) && !/\.test\.ts$/.test(name) && !/\.d\.ts$/.test(name);
+  const isSource = (name: string): boolean => name.endsWith('.ts') && !name.endsWith('.test.ts') && !name.endsWith('.d.ts');
   const file = (p: string): void => {
     mix(new TextEncoder().encode(path.relative(root, p)));
     mix(fs.readFileSync(p));
