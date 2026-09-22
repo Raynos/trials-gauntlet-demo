@@ -34,6 +34,10 @@ shipped level layouts (12 new ones), the music, and every dev/debug surface a st
 | D10 | Web build + old URLs | **Rebrand the web build; retire the old `trials-gauntlet-*` URLs.** |
 | D11 | Android | **Personal account + closed test ASAP.** The user has one Android phone and one iPhone. |
 | D12 | iPad | **iPhone only** (`TARGETED_DEVICE_FAMILY = 1`); iPad runs it in compatibility mode. |
+| D13 | Phase 0 timing (ask 95) | **Start now,** in parallel with the design rounds. |
+| D14 | Where the reskin lands (ask 95) | **`main`, visible as it lands** — no store flag for the reskin; production web changes progressively. (`VITE_STORE=1` still strips dev UI, P0.3.) |
+| D15 | Closed-test testers (ask 95) | **Need to recruit** — the user has fewer than 12; recruiting (tester-exchange communities) is part of Phase 6 and starts before the first renamed build. |
+| D16 | App ID prefix (ask 95) | **`com.jakeverbaten.<name>`** — permanent on both stores. |
 
 **On D11 — the closed test cannot be skipped.** Google enforces it for personal accounts created after 2023-11-13:
 production access unlocks only after a closed test with **≥ 12 testers opted in for 14 continuous days**. The only

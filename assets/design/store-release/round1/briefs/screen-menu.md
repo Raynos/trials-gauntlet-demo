@@ -1,0 +1,3 @@
+
+## THIS IMAGE: the MAIN MENU / TITLE SCREEN (phone framing)
+Full-bleed key art of the direction's hero zone (A: desert quarry, B: alpine forest trail, C: coastal scrapyard) with the rider mid-air on the bike, dust or spray flying, taking most of the screen. The wordmark large top-left. A tiny "v1.0" under it. Buttons along the bottom third in the direction's style: a big primary PLAY button bottom-RIGHT in the accent colour, then GARAGE and SETTINGS as secondary buttons to its left, and a small CREDITS text link bottom-left. There is NO "REVIEW" button and NO build hash — this is the store build. Any banner in the art uses the game's name or the invented sponsors only.
