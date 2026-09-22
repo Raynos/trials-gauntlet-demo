@@ -82,8 +82,8 @@ describe('store build (VITE_STORE=1) compiles out every dev surface', () => {
       expect(web.files).toContain(f);
       expect(store.files).not.toContain(f);
     }
-    expect(web.files.some((f) => /^assets\/inbox-/.test(f))).toBe(true);
-    expect(store.files.some((f) => /^assets\/inbox-/.test(f))).toBe(false);
+    expect(web.files.some((f) => f.startsWith('assets/inbox-'))).toBe(true);
+    expect(store.files.some((f) => f.startsWith('assets/inbox-'))).toBe(false);
   });
 
   it('no build deploys a source map (moved to <outDir>-maps) or points at one', () => {

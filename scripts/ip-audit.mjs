@@ -39,7 +39,7 @@ function levelNames() {
     }
   };
   walk(join(repo, 'src', 'tracks', 'courses'));
-  return [...names].sort();
+  return [...names].sort((a, b) => a.localeCompare(b));
 }
 
 const TEXT = /\.(js|mjs|cjs|html|htm|css|json|webmanifest|txt|md|xml|plist|strings|svg|gltf|entitlements|storyboard|xib|gradle|properties|kt|java|swift|pbxproj|xcprivacy)$/i;
