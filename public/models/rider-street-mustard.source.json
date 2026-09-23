@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/street01-rider-round33-lossless.glb",
   "sourceSha256": "989d1d3c4d963e73714a4b6aed7fa88e6c7de76f8871f6644a4892f0f04d143a",
   "decodedSha256": "ec0a08fd24b588b34372583ace39a67ee001a12e55315cf1a2c5c611f2f74c1f",
-  "exportSha256": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+  "exportSha256": "c08dabf79dc45d2f3d36d8caa5971ff85008b63ea84431d23730c86afd0caa52",
   "kind": "rider",
   "lod": false,
   "stage": 1,
@@ -347,8 +347,8 @@
     "packedBytes": 3616252
   },
   "verified": {
-    "bytes": 3616252,
-    "sha256": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+    "bytes": 3616248,
+    "sha256": "c08dabf79dc45d2f3d36d8caa5971ff85008b63ea84431d23730c86afd0caa52",
     "triangles": 58967,
     "vertices": 44917,
     "draws": 6,
@@ -539,5 +539,10 @@
       }
     ]
   },
-  "blenderSeconds": 10.7
+  "blenderSeconds": 10.7,
+  "extrasScrub": {
+    "script": "assets/art/scrub-glb-extras.mjs",
+    "previousSha256": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+    "note": "provenance extras only; BIN chunk byte-identical"
+  }
 }

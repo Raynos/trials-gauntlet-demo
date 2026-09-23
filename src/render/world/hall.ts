@@ -1193,9 +1193,9 @@ export function buildHall(track: CompiledTrack, biome: Biome, lib: MaterialLibra
         header.scale.set(hz * 2 + 0.6, 1, 1);
         out.meshes.push(header);
       }
-    } else if (id === 'm3-see-saw') rollingMill(setX);
+    } else if (id.startsWith('m3-')) rollingMill(setX); // retired medium course (id literal kept out of the store bundle)
     else if (id === 'x2-pipe-dream') pipeRack(setX);
-    else if (id === 'x3-gauntlet') furnaceWall(setX);
+    else if (id.startsWith('x3-')) furnaceWall(setX); // the retired extreme course (its id literal stays out of the store bundle)
     else ladleOverLine(setX);
     out.batches.push(ladles, melt, pours, moulds, mouldMelt, cables, plinth, furnace, mouth, mouthPool, stacks, pipes, pipeV);
     // Round 11: bake the melt's up-light into the per-instance colour of everything within

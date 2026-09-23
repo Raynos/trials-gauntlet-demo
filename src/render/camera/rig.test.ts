@@ -100,6 +100,6 @@ describe('camera rig orbit override (garage model explorer)', () => {
     a.update(fa.build(parked(40), 1));
     b.update(fb.build(parked(40), 1));
     expect(pose(b)).toEqual(pose(a));
-    expect(b.overrideMode).toBeNull();
+    expect(b.overrideKind).toBeNull();
   });
 });

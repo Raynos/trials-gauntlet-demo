@@ -2091,7 +2091,7 @@ export class ThreeRenderer implements GameRenderer {
       prepare: this.prepareTimeline,
       biome: this.biome.id,
       zoom: this.rig.zoomState,
-      occluder: { ms: +this.occluderMs.toFixed(4), tested: this.world?.occluders.lastTested ?? 0, hits: this.world?.occluders.lastHits ?? 0, count: this.world?.occluders.count ?? 0, override: this.rig.overrideMode },
+      occluder: { ms: +this.occluderMs.toFixed(4), tested: this.world?.occluders.lastTested ?? 0, hits: this.world?.occluders.lastHits ?? 0, count: this.world?.occluders.count ?? 0, override: this.rig.overrideKind },
       garage: { on: this.stageOn, draws: this.stage?.draws ?? 0, hidden: this.stageHidden.size, textureMB: +((this.stage?.textureBytes ?? 0) / 1048576).toFixed(2), reflection: !!this.reflection },
       phase: this.phase,
       tier: this.tier,

@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/street-openface-remaster.glb",
   "sourceSha256": "f01c3abc274d457a812af51753ba1ed54e7ad979f7c60a8564c2f08f359ee7df",
   "decodedSha256": "21275ff4c9e372e334dd98f6c4344eee4bdd9998480fbc79909b7647f0ec0ece",
-  "exportSha256": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
+  "exportSha256": "438e972824940b5537716c7e22657b15ccc9dc1a0d394a685088d10f08073db8",
   "kind": "rider",
   "lod": false,
   "stage": 1,
@@ -331,8 +331,8 @@
     "packedBytes": 3015120
   },
   "verified": {
-    "bytes": 3015120,
-    "sha256": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
+    "bytes": 3015116,
+    "sha256": "438e972824940b5537716c7e22657b15ccc9dc1a0d394a685088d10f08073db8",
     "triangles": 58816,
     "vertices": 41917,
     "draws": 5,
@@ -499,5 +499,10 @@
       }
     ]
   },
-  "blenderSeconds": 5.966
+  "blenderSeconds": 5.966,
+  "extrasScrub": {
+    "script": "assets/art/scrub-glb-extras.mjs",
+    "previousSha256": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
+    "note": "provenance extras only; BIN chunk byte-identical"
+  }
 }

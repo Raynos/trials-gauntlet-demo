@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/race-charcoalyellow.glb",
   "sourceSha256": "5a7682d8d5bb6aaa0caaa960c3eef7d9b7617e35c4b0169c8f70f6a91cac65cf",
   "decodedSha256": "5a7682d8d5bb6aaa0caaa960c3eef7d9b7617e35c4b0169c8f70f6a91cac65cf",
-  "exportSha256": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a",
+  "exportSha256": "31229d98fde8964c0d0e42ba109f3bc1f392be9e9cd766b73dde71bbfc1e19bc",
   "kind": "rider",
   "lod": true,
   "stage": 1,
@@ -295,7 +295,7 @@
   },
   "verified": {
     "bytes": 912696,
-    "sha256": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a",
+    "sha256": "31229d98fde8964c0d0e42ba109f3bc1f392be9e9cd766b73dde71bbfc1e19bc",
     "triangles": 7815,
     "vertices": 7547,
     "draws": 2,
@@ -403,5 +403,10 @@
       }
     ]
   },
-  "blenderSeconds": 2.656
+  "blenderSeconds": 2.656,
+  "extrasScrub": {
+    "script": "assets/art/scrub-glb-extras.mjs",
+    "previousSha256": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a",
+    "note": "provenance extras only; BIN chunk byte-identical"
+  }
 }

@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/bike-pro-art.glb",
   "sourceSha256": "187514df4677c40063856f4d5e955311820f872866f60b49c450428bcf84e48e",
   "decodedSha256": "1ec25ad166c1fc961bbc56d527911261e5b61f3eb1246d95f01c5a38776b1071",
-  "exportSha256": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
+  "exportSha256": "0acc9ac86eeca76cc1812f8870eab36e2e25ca76d6a5cbe86d4a46a36cc12a86",
   "kind": "bike",
   "lod": false,
   "stage": 1,
@@ -171,8 +171,8 @@
     "packedBytes": 2270544
   },
   "verified": {
-    "bytes": 2270544,
-    "sha256": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
+    "bytes": 2270540,
+    "sha256": "0acc9ac86eeca76cc1812f8870eab36e2e25ca76d6a5cbe86d4a46a36cc12a86",
     "triangles": 33204,
     "vertices": 38844,
     "draws": 23,
@@ -636,5 +636,10 @@
       }
     ]
   },
-  "blenderSeconds": 9.612
+  "blenderSeconds": 9.612,
+  "extrasScrub": {
+    "script": "assets/art/scrub-glb-extras.mjs",
+    "previousSha256": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
+    "note": "provenance extras only; BIN chunk byte-identical"
+  }
 }

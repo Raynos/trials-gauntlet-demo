@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/race-bluewhite.glb",
   "sourceSha256": "a20663e0002ef4c98ae48ccb6864540397d3a07678656c6e7b567ee12db72e91",
   "decodedSha256": "a20663e0002ef4c98ae48ccb6864540397d3a07678656c6e7b567ee12db72e91",
-  "exportSha256": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515",
+  "exportSha256": "2bbe14c984d760e593e1a6042185ef0cba1f100d59f0074c8b1ce5ccc2032b42",
   "kind": "rider",
   "lod": true,
   "stage": 1,
@@ -295,7 +295,7 @@
   },
   "verified": {
     "bytes": 946824,
-    "sha256": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515",
+    "sha256": "2bbe14c984d760e593e1a6042185ef0cba1f100d59f0074c8b1ce5ccc2032b42",
     "triangles": 7815,
     "vertices": 7547,
     "draws": 2,
@@ -403,5 +403,10 @@
       }
     ]
   },
-  "blenderSeconds": 2.66
+  "blenderSeconds": 2.66,
+  "extrasScrub": {
+    "script": "assets/art/scrub-glb-extras.mjs",
+    "previousSha256": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515",
+    "note": "provenance extras only; BIN chunk byte-identical"
+  }
 }

@@ -232,7 +232,7 @@ export class CameraRig {
     this.override = o;
   }
 
-  get overrideMode(): string | null {
+  get overrideKind(): string | null {
     return this.override?.mode ?? null;
   }
 
@@ -477,7 +477,7 @@ export class CameraRig {
       if (st < 0.8) {
         const env = Math.exp(-st / 0.18) * Math.sin(2 * Math.PI * 9 * st);
         shakeY = this.shakeAmp * env;
-        shakeRoll = 0; // Trials never rolls the camera (only a CameraKey.roll may)
+        shakeRoll = 0; // the rig never rolls the camera (only a CameraKey.roll may)
       } else this.shakeT = -1;
     }
 

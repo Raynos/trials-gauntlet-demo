@@ -2,7 +2,7 @@
   "source": "assets/blender/hero-art/delivery/bike-rookie-art.glb",
   "sourceSha256": "7877404ef7e9e2f5f25550a7d979b8f62e6e20774109294221a14e9877c8d9de",
   "decodedSha256": "38c0c1f22b2ac9c165403ebe0e7ea9eaf5ee060c5caffdae8426f66053e7eca4",
-  "exportSha256": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+  "exportSha256": "e55919d60267849358ef5e97f4731f42fac6eb2835b9998e1d146d056c0f10f7",
   "kind": "bike",
   "lod": false,
   "stage": 1,
@@ -171,8 +171,8 @@
     "packedBytes": 2283040
   },
   "verified": {
-    "bytes": 2283040,
-    "sha256": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+    "bytes": 2283036,
+    "sha256": "e55919d60267849358ef5e97f4731f42fac6eb2835b9998e1d146d056c0f10f7",
     "triangles": 33204,
     "vertices": 38844,
     "draws": 23,
@@ -636,5 +636,10 @@
       }
     ]
   },
-  "blenderSeconds": 9.531
+  "blenderSeconds": 9.531,
+  "extrasScrub": {
+    "script": "assets/art/scrub-glb-extras.mjs",
+    "previousSha256": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+    "note": "provenance extras only; BIN chunk byte-identical"
+  }
 }
