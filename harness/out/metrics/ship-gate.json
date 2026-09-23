@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "kind": "gate",
-  "runId": "20260922-223148-cfc460",
-  "startedAt": "2026-09-23T03:31:48.408Z",
-  "wallMs": 296150,
-  "git": "unknown",
+  "runId": "20260923-025343-4078b0",
+  "startedAt": "2026-09-23T07:53:43.746Z",
+  "wallMs": 206604,
+  "git": "2566ea92",
   "srcFingerprint": "79e5b6f3",
   "node": "v24.18.1",
   "chromium": "151.0.7922.34",
@@ -12,9 +12,9 @@
   "thresholdsFile": "harness/gate/thresholds.json",
   "softwareGL": false,
   "build": {
-    "distBytes": 48418797,
-    "jsGzipBytes": 645793,
-    "buildMs": 3659.3923749999994
+    "distBytes": 49319143,
+    "jsGzipBytes": 647892,
+    "buildMs": 0
   },
   "browser": {
     "version": "151.0.7922.34",
@@ -24,15 +24,15 @@
   "checks": [
     {
       "id": "boot.readyP50Ms",
-      "value": 290.8344170000055,
+      "value": 224.20691599999554,
       "limit": 300,
       "pass": true,
       "unit": "ms",
-      "note": "runs 293/280/293/291/142 min 142 loadavg 7.26/18"
+      "note": "runs 226/218/254/112/224 min 112 loadavg 5.79/18"
     },
     {
       "id": "boot.firstFrameMs",
-      "value": 587.5050001144409,
+      "value": 450.5700001716614,
       "limit": 900,
       "pass": true,
       "unit": "ms",
@@ -98,14 +98,14 @@
     },
     {
       "id": "restart.wallMsP95",
-      "value": 0.17999982833862305,
+      "value": 0.10000038146972656,
       "limit": 5,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "restart.frameMsP95",
-      "value": 10.150000095367432,
+      "value": 5.975000381469727,
       "limit": 33,
       "pass": true,
       "unit": "ms",
@@ -121,7 +121,7 @@
     },
     {
       "id": "heap.growthMBPer60s",
-      "value": 2.8426856994628906,
+      "value": 2.8302955627441406,
       "limit": 5,
       "pass": true,
       "unit": "MB",
@@ -148,33 +148,33 @@
     },
     {
       "id": "perf.physicsUsPerTickP95",
-      "value": 45.00007629394531,
+      "value": 24.99985694885254,
       "limit": 60,
       "pass": true,
       "unit": "us"
     },
     {
       "id": "perf.renderSubmitMsP95",
-      "value": 1.3350000381469727,
+      "value": 0.6999998092651367,
       "limit": 4,
       "pass": true,
       "unit": "ms"
     },
     {
       "id": "perf.renderSyncedMsP95",
-      "value": 71.90499973297119,
+      "value": 4.815000057220459,
       "limit": 16,
-      "pass": false,
+      "pass": true,
       "unit": "ms",
-      "note": "render + readPixels sync [annotated after the run, by the ship-gate owner: host GPU contention, not the build. An unmodified 24bfc071 build probed the same way on the same host minutes later gave synced renders 4.5/39/38/33/23/39 ms, then 36-341 ms, while a different project's agent-browser Chrome instances (pids 62855, 75494; later 4019, 95387, 332 at 66-165 % CPU) held the GPU. The same code on 46fa2d44 measured 3.9 ms (parent's run). A 45 min wait found no quiet window (load1 < 6 and foreign Chrome < 20 % CPU); a re-run on 0fa32d30 under heavier contention read 572.58 ms.]"
+      "note": "render + readPixels sync"
     },
     {
       "id": "bundle.jsGzipKB",
-      "value": 630.6572265625,
+      "value": 632.70703125,
       "limit": 640,
       "pass": true,
       "unit": "KB",
-      "note": "player JS (every assets/*.js but the manifest's dev phase); dev-only, not counted: audio-offline-BWsmQtqJ.js, retired-DijvUozc.js 25.8 KB gz; dist 47284 KB raw"
+      "note": "player JS (every assets/*.js but the manifest's dev phase); dev-only, not counted: audio-offline-B6GvVq1Y.js, retired-Co8QQ9vE.js 25.8 KB gz; dist 48163 KB raw"
     },
     {
       "id": "determinism.pass",
@@ -185,7 +185,7 @@
     },
     {
       "id": "offline.coldStartPlayable",
-      "value": "100/100 done=true in 17250 ms",
+      "value": "100/100 done=true in 14647 ms",
       "limit": true,
       "pass": true,
       "note": "10/10 offline e2e checks pass"
@@ -196,7 +196,7 @@
       "limit": 0,
       "pass": true,
       "unit": "frames out of box while riding",
-      "note": "bot-3.json; clamped 14.4 % (reported); 178 s; camera: PASS out-of-box 0/924 (riding 0), clamped 133 (14.4%), max|roll| 2.8e-17"
+      "note": "bot-3.json; clamped 14.4 % (reported); 117 s; camera: PASS out-of-box 0/924 (riding 0), clamped 133 (14.4%), max|roll| 2.8e-17"
     },
     {
       "id": "stranger.medianAttempts",
@@ -248,32 +248,32 @@
       "note": "no harness/out/hero-webkit run yet — pnpm harness:hero-webkit (informational)"
     }
   ],
-  "failed": 1,
-  "pass": false,
+  "failed": 0,
+  "pass": true,
   "boot": {
     "runs": [
-      293.471292000002,
-      279.79683300000033,
-      293.4141660000023,
-      290.8344170000055,
-      141.84808299998986
+      225.518167000002,
+      218.23320899999817,
+      254.35512500000186,
+      112.45008299998881,
+      224.20691599999554
     ],
-    "p50": 290.8344170000055,
-    "min": 141.84808299998986,
-    "max": 293.471292000002,
+    "p50": 224.20691599999554,
+    "min": 112.45008299998881,
+    "max": 254.35512500000186,
     "firstFrameMs": [
-      2537.6400003433228,
-      696.2550001144409,
-      587.5050001144409,
-      584.0300002098083,
-      581.1050000190735
+      476.4500002861023,
+      450.5700001716614,
+      486.25,
+      442.07999992370605,
+      440.4599995613098
     ],
-    "loadavg1": 7.26,
+    "loadavg1": 5.79,
     "cores": 18,
     "retried": false
   },
   "clear": {
-    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/69da8569-dc52-4189-8f16-391525c57baf/scratchpad/g1/harness/inputs/c1-low-tide/bot-3.json",
+    "recording": "/private/tmp/rockhop-quietgate-2566ea92/harness/inputs/c1-low-tide/bot-3.json",
     "finishTime": 29.716666666666665,
     "expected": 29.716666666666665,
     "hash": "cde355087a245c52",
@@ -282,7 +282,7 @@
     "hashOk": true
   },
   "crash": {
-    "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/69da8569-dc52-4189-8f16-391525c57baf/scratchpad/g1/harness/inputs/c1-low-tide/crash.json",
+    "recording": "/private/tmp/rockhop-quietgate-2566ea92/harness/inputs/c1-low-tide/crash.json",
     "faultTick": 103,
     "faultTime": 0.8583333333333333,
     "reason": "crash"
@@ -290,48 +290,48 @@
   "restart": {
     "ticks": 1,
     "wallMs": [
-      0.28999996185302734,
-      0.15000009536743164,
-      0.11999988555908203,
-      0.11499977111816406,
-      0.17999982833862305,
-      0.11499977111816406,
+      0.1700000762939453,
+      0.10000038146972656,
+      0.09000015258789062,
       0.07499980926513672,
-      0.07000017166137695,
-      0.10500001907348633,
+      0.059999942779541016,
+      0.04999971389770508,
+      0.05500030517578125,
       0.06500005722045898,
-      0.04500007629394531,
       0.04499959945678711,
-      0.07999992370605469,
+      0.039999961853027344,
+      0.02500009536743164,
       0.04500007629394531,
-      0.05000019073486328,
-      0.05000019073486328,
-      0.04499959945678711,
-      0.05499982833862305,
-      0.03000020980834961,
-      0.04999971389770508
+      0.04999971389770508,
+      0.034999847412109375,
+      0.04000043869018555,
+      0.019999980926513672,
+      0.034999847412109375,
+      0.039999961853027344,
+      0.029999732971191406,
+      0.034999847412109375
     ],
     "frameMs": [
-      55.86999988555908,
-      5.990000247955322,
-      4.784999847412109,
-      9.25,
-      5.744999885559082,
-      10.150000095367432,
-      3.7849998474121094,
-      3.184999942779541,
-      3.6500000953674316,
-      3.4600000381469727,
-      3.6600003242492676,
-      2.6050000190734863,
-      4.204999923706055,
-      4.285000324249268,
-      3.6050000190734863,
-      2.429999828338623,
-      3.3949999809265137,
-      2.5399999618530273,
-      3.325000286102295,
-      4.034999847412109
+      30.369999885559082,
+      4.365000247955322,
+      5.975000381469727,
+      2.9549999237060547,
+      3.1649999618530273,
+      3.1599998474121094,
+      3.7750000953674316,
+      3.0250000953674316,
+      2.939999580383301,
+      2.4599995613098145,
+      2.4800000190734863,
+      3.940000057220459,
+      2.4850001335144043,
+      2.6449999809265137,
+      2.4100003242492676,
+      1.924999713897705,
+      2.3899998664855957,
+      2.7150001525878906,
+      2.174999713897705,
+      2.315000057220459
     ],
     "noCountdown": true,
     "movesOnFirstTick": true,
@@ -344,31 +344,31 @@
     "autoRespawnMs": 1016.6666666666666
   },
   "heap": {
-    "beforeMB": 21.503963470458984,
-    "afterMB": 24.346649169921875,
-    "growthMB": 2.8426856994628906,
+    "beforeMB": 21.522560119628906,
+    "afterMB": 24.352855682373047,
+    "growthMB": 2.8302955627441406,
     "seconds": 60
   },
   "perf": {
     "drawCalls": 155,
     "triangles": 347822,
     "texturesMB": 51.66272152709957,
-    "physicsUsPerTickP95": 45.00007629394531,
-    "renderSubmitMsP95": 1.3350000381469727,
-    "renderSyncedMsP95": 71.90499973297119
+    "physicsUsPerTickP95": 24.99985694885254,
+    "renderSubmitMsP95": 0.6999998092651367,
+    "renderSyncedMsP95": 4.815000057220459
   },
   "determinism": {
     "schema": 1,
     "kind": "determinism",
-    "runId": "20260922-223152-abe6a9",
-    "startedAt": "2026-09-23T03:31:52.698Z",
-    "wallMs": 7513,
-    "git": "unknown",
+    "runId": "20260923-025344-cf32b9",
+    "startedAt": "2026-09-23T07:53:44.048Z",
+    "wallMs": 3732,
+    "git": "2566ea92",
     "srcFingerprint": "79e5b6f3",
     "node": "v24.18.1",
     "chromium": "151.0.7922.34",
     "physics": "bikePhysicsFactory-v2",
-    "recordingFile": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/69da8569-dc52-4189-8f16-391525c57baf/scratchpad/g1/harness/inputs/c1-low-tide/bot-3.json",
+    "recordingFile": "/private/tmp/rockhop-quietgate-2566ea92/harness/inputs/c1-low-tide/bot-3.json",
     "ticks": 3566,
     "checks": [
       {
@@ -459,9 +459,10 @@
         "name": "pinned-hash",
         "pass": true,
         "hashes": [
+          "f31ce3e0c1e91f83",
           "f31ce3e0c1e91f83"
         ],
-        "note": "pinned now (first run)"
+        "note": "pinned physics=bikePhysicsFactory-v2"
       }
     ],
     "pass": true
@@ -927,7 +928,7 @@
   "clearPro": [
     {
       "trackId": "flat-test",
-      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/69da8569-dc52-4189-8f16-391525c57baf/scratchpad/g1/harness/inputs/flat-test/bot-3-pro.json",
+      "recording": "/private/tmp/rockhop-quietgate-2566ea92/harness/inputs/flat-test/bot-3-pro.json",
       "finishTime": 8.95,
       "expected": 8.95,
       "hash": "d32110eb8eb945c1",
@@ -937,7 +938,7 @@
     },
     {
       "trackId": "b1-first-ride",
-      "recording": "/private/tmp/claude-501/-Users-raynos-projects-game-demos-trials-gauntlet-demo/69da8569-dc52-4189-8f16-391525c57baf/scratchpad/g1/harness/inputs/b1-first-ride/bot-3-pro.json",
+      "recording": "/private/tmp/rockhop-quietgate-2566ea92/harness/inputs/b1-first-ride/bot-3-pro.json",
       "finishTime": 38.825,
       "expected": 38.825,
       "hash": "5f78ab40a954f176",
@@ -945,12 +946,5 @@
       "faults": 0,
       "fresh": false
     }
-  ],
-  "annotation": {
-    "by": "ship-gate owner, after the run",
-    "measuredCommit": "3e4a712e (clean git archive export; the report says git unknown because gitHead had no fallback until 9d201138)",
-    "row": "perf.renderSyncedMsP95",
-    "cause": "host GPU contention from another project's agent-browser Chrome",
-    "verdictUnchanged": "NO-SHIP 30/31 as measured"
-  }
+  ]
 }
