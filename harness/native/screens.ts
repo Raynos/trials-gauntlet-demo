@@ -57,7 +57,9 @@ const STORE_RIDES = [
 const STORE_PLAY_OUT = ['c2-crane-hop', 'a3-timberline', 'd1-dust-devil', 's3-whiteout'];
 function defaultSpec(): string {
   const rides = platform === 'play' ? STORE_RIDES.slice(0, 6) : STORE_RIDES;
-  return [...rides, ...STORE_PLAY_OUT.map((t) => `${t}/bot-3.json@`), 's1-lift-line/bot-3.json@results'].join(';');
+  const ridden = new Set(rides.map((r) => r.split('/')[0]!));
+  const rest = [...STORE_RIDES.map((r) => r.split('/')[0]!), ...STORE_PLAY_OUT].filter((t) => !ridden.has(t));
+  return [...rides, ...[...new Set(rest)].map((t) => `${t}/bot-3.json@`), 's1-lift-line/bot-3.json@results'].join(';');
 }
 
 type Shot = { recording: string; at: number[]; exact?: boolean };
