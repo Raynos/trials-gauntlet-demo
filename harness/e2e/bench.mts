@@ -53,12 +53,12 @@ async function runOnce(ctx: BrowserContext, url: string, query: string, log: (m:
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   });
   await page.touchscreen.tap(c.x, c.y);
-  await page.waitForFunction(() => (window as unknown as { __trials?: { bench?: { state(): { running: boolean } } } }).__trials?.bench?.state().running === true, null, { timeout: 5000 });
+  await page.waitForFunction(() => (window as unknown as { __rockhop?: { bench?: { state(): { running: boolean } } } }).__rockhop?.bench?.state().running === true, null, { timeout: 5000 });
   log(`bench started (${query || 'baseline'})`);
-  await page.waitForFunction(() => (window as unknown as { __trials: { bench: { state(): { done: boolean } } } }).__trials.bench.state().done, null, { timeout: quick ? 90000 : 600000 });
+  await page.waitForFunction(() => (window as unknown as { __rockhop: { bench: { state(): { done: boolean } } } }).__rockhop.bench.state().done, null, { timeout: quick ? 90000 : 600000 });
   const ms = Date.now() - t0;
-  const report = (await page.evaluate(() => (window as unknown as { __trials: { bench: { report(): unknown } } }).__trials.bench.report())) as Report;
-  const text = (await page.evaluate(() => (window as unknown as { __trials: { bench: { text(): string } } }).__trials.bench.text())) ?? '';
+  const report = (await page.evaluate(() => (window as unknown as { __rockhop: { bench: { report(): unknown } } }).__rockhop.bench.report())) as Report;
+  const text = (await page.evaluate(() => (window as unknown as { __rockhop: { bench: { text(): string } } }).__rockhop.bench.text())) ?? '';
   if (errors.length) throw new Error(`page errors: ${errors.join('; ')}`);
   return { report, text, page, ms };
 }
@@ -101,7 +101,7 @@ export async function benchFull(browser: Browser, url: string, opts: { verbose?:
     expect(by('b1-ride')?.cap === 30, `phone default cap on the ride row: ${by('b1-ride')?.cap}`);
     expect(r.report.thermal && (r.report.thermal as { scenario: string }).scenario === 'b1-ride-high', `thermal proxy from the high ride: ${JSON.stringify(r.report.thermal)}`);
     // Back on the menu with the tier / toggles restored, the report up.
-    const after = await r.page.evaluate(() => ({ screen: (window as unknown as { __trials: { app: { screen(): string } } }).__trials.app.screen(), copy: !!document.querySelector('.bench-copy') }));
+    const after = await r.page.evaluate(() => ({ screen: (window as unknown as { __rockhop: { app: { screen(): string } } }).__rockhop.app.screen(), copy: !!document.querySelector('.bench-copy') }));
     expect(after.screen === 'menu' && after.copy, `ends on the menu with the report: ${JSON.stringify(after)}`);
     await r.page.close();
   } catch (e) {
@@ -138,7 +138,7 @@ export async function benchSuite(browser: Browser, url: string, opts: { verbose?
     const b = await runOnce(ctx, url, '', log);
     baseline = b;
     const { report: r, text, page } = b;
-    expect(r && r.kind === 'trials-bench' && r.v === 1, `report kind/v: ${JSON.stringify(r && { kind: r.kind, v: r.v })}`);
+    expect(r && r.kind === 'rockhop-bench' && r.v === 1, `report kind/v: ${JSON.stringify(r && { kind: r.kind, v: r.v })}`);
     for (const f of REPORT_FIELDS) expect(r && f in (r as unknown as Record<string, unknown>), `report field missing: ${f}`);
     for (const f of DEVICE_FIELDS) expect(r?.device && f in r.device, `device field missing: ${f}`);
     expect(r?.scenarios?.length === 2, `quick run has 2 scenarios, got ${r?.scenarios?.length}`);
@@ -193,16 +193,16 @@ export async function benchSuite(browser: Browser, url: string, opts: { verbose?
     expect(panel.status === true, 'status line hidden after the run');
     expect(/fps/.test(panel.meter), `fps meter still present: "${panel.meter}"`);
     expect(panel.share === panel.canShare, `Share button iff navigator.share (${panel.share} vs ${panel.canShare})`);
-    // The bench report also lands in the local telemetry (`trials.benchlog`) and in the run-log export.
+    // The bench report also lands in the local telemetry (`rockhop.benchlog`) and in the run-log export.
     const stored = await page.evaluate(() => {
       try {
-        const v = JSON.parse(localStorage.getItem('trials.benchlog') ?? '[]') as unknown[];
+        const v = JSON.parse(localStorage.getItem('rockhop.benchlog') ?? '[]') as unknown[];
         return v.length;
       } catch {
         return -1;
       }
     });
-    expect(stored === 1, `trials.benchlog holds ${stored} report(s)`);
+    expect(stored === 1, `rockhop.benchlog holds ${stored} report(s)`);
     await page.screenshot({ path: 'harness/out/bench/report-panel.png' }).catch(() => undefined);
     await page.close();
 

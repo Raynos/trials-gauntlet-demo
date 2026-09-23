@@ -1,8 +1,8 @@
-import type { TrialsHook } from './types';
+import type { RockhopHook } from './types';
 
 declare global {
   interface Window {
-    __trials?: TrialsHook;
+    __rockhop?: RockhopHook;
   }
 }
 

@@ -17,8 +17,8 @@ describe('boot totals (ask 50: every hero file in the one bar)', () => {
     ] as const) {
       localStorage.clear();
       if (outfit) localStorage.setItem(RIDER_OUTFIT_KEY, outfit);
-      if (cls) localStorage.setItem('trials.bikeClass', cls);
-      if (quality) localStorage.setItem('trials.quality', quality);
+      if (cls) localStorage.setItem('rockhop.bikeClass', cls);
+      if (quality) localStorage.setItem('rockhop.quality', quality);
       history.replaceState(null, '', '/' + search);
       expect(selectedBootTotals(totals)).toEqual({ heroModels: 821, bootArt: 40, offlinePack: 7400 }); // jsdom is DPR 1 / 1024 px wide → the 1x tier
       const fallback = await takeBootPlan();

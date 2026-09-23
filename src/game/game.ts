@@ -581,7 +581,7 @@ export class Game {
       this.ghost = new GhostRunner(this.physicsFactory(this.physicsHz), this.compiled, rec, this.ticks.autoRespawn);
       this.ghostSource = rec;
     } catch (e) {
-      console.warn('[trials] ghost recording unusable', e);
+      console.warn('[rockhop] ghost recording unusable', e);
       this.ghost = null;
       this.ghostSource = null;
     }

@@ -1,4 +1,4 @@
-/** `m:ss.mmm` (the Trials read-out). */
+/** `m:ss.mmm`, the run clock read-out. */
 export function formatTime(seconds: number): string {
   const ms = Math.max(0, Math.round(seconds * 1000));
   const m = Math.floor(ms / 60000);
@@ -13,4 +13,5 @@ export function formatDelta(seconds: number): string {
   return sign + formatTime(Math.abs(seconds));
 }
 
-export const MEDAL_LABEL = { platinum: 'Platinum', gold: 'Gold', silver: 'Silver', bronze: 'Bronze' } as const;
+/** Player-facing medal names; the top tier is OBSIDIAN (`platinum` stays the key). */
+export const MEDAL_LABEL = { platinum: 'Obsidian', gold: 'Gold', silver: 'Silver', bronze: 'Bronze' } as const;

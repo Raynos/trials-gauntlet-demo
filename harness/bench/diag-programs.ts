@@ -20,7 +20,7 @@ import { startServer } from '../lib/server';
 import { TRACKS } from './bench';
 
 const SRC = `(function (inputs, tpf, frames) {
-  var t = window.__trials; var R = window.__render; var gl = R.renderer;
+  var t = window.__rockhop; var R = window.__render; var gl = R.renderer;
   var props = gl.properties;
   var rbd = gl.__diagOrig || gl.renderBufferDirect.bind(gl);
   gl.__diagOrig = rbd;
@@ -81,7 +81,7 @@ async function main(): Promise<void> {
     const hook = new HookClient(page);
     for (const tier of tiers) {
       await hook.loadTrack(trackId);
-      await page.evaluate(([q]) => { window.__trials!.setQuality(q as QualityTier); (window as unknown as { __render: { resize(w: number, h: number, d: number): void } }).__render.resize(233, 108, 3); }, [tier] as const);
+      await page.evaluate(([q]) => { window.__rockhop!.setQuality(q as QualityTier); (window as unknown as { __render: { resize(w: number, h: number, d: number): void } }).__render.resize(233, 108, 3); }, [tier] as const);
       for (let i = 0; i < 20; i++) await hook.render();
       const r = (await page.evaluate(`(${SRC})(${JSON.stringify(inputs)}, ${tpf}, 120)`)) as { materials: number; offenders: { name: string; type: string; kinds: Record<string, number>; objects: Record<string, number>; switches: number; draws: number; versionBumps: number; lightsBumps?: number; bumpInside?: number; flags?: string }[]; drawsPerFrame: number; switchesPerFrame: number };
       console.log(`== ${tier} ${trackId}: ${r.materials} materials, ${r.drawsPerFrame} draws/frame, ${r.switchesPerFrame.toFixed(1)} program re-acquisitions/frame`);

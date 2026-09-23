@@ -1,6 +1,6 @@
 /**
  * Local, opt-in run log (MEGA_PLAN P3; default ON, Settings → Telemetry). Every finished run
- * appends one `RunTelemetry` to `localStorage['trials.runlog']`, bounded to `RUNLOG_MAX`
+ * appends one `RunTelemetry` to `localStorage['rockhop.runlog']`, bounded to `RUNLOG_MAX`
  * entries (oldest dropped). Nothing leaves the device: Settings → "Copy run log" puts the JSON
  * on the clipboard, "Share run log" hands it to the Web Share API (iOS share sheet) as text.
  *
@@ -10,7 +10,7 @@
 import type { BikeClass, FaultReason, InputTraceRun, Medal, NavEvent, PhysicsVersion, QualityTier, RunTelemetry } from '../core/types';
 import { Percentiles } from './game';
 
-export const RUNLOG_KEY = 'trials.runlog';
+export const RUNLOG_KEY = 'rockhop.runlog';
 export const RUNLOG_MAX = 200;
 
 function store(): Storage | null {
@@ -59,7 +59,7 @@ export class RunLog {
   /** Pretty JSON with a small header so a pasted log is self-describing; `bench` = the device bench reports on this device (`?bench=1`). */
   exportJson(build: string, bench: unknown[] = []): string {
     const runs = this.read();
-    return JSON.stringify({ kind: 'trials-runlog', v: 1, build, exportedAt: new Date().toISOString(), runs, ...(bench.length ? { bench } : {}) }, null, 1);
+    return JSON.stringify({ kind: 'rockhop-runlog', v: 1, build, exportedAt: new Date().toISOString(), runs, ...(bench.length ? { bench } : {}) }, null, 1);
   }
 
   /** Per-track summary for the settings row ("12 runs · 3 tracks"). */
@@ -69,7 +69,7 @@ export class RunLog {
   }
 }
 
-export const BENCHLOG_KEY = 'trials.benchlog';
+export const BENCHLOG_KEY = 'rockhop.benchlog';
 export const BENCHLOG_MAX = 10;
 
 /** `?bench=1` reports on this device (src/game/bench.ts), newest last, bounded; exported with the run log. */

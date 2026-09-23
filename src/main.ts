@@ -2,7 +2,7 @@
  * Browser entry. Composes whatever the physics / render / audio modules
  * export today (they land in parallel), the DOM HUD and the app shell.
  *
- *   ?harness=1      no real-time driver; the headless harness owns the clock via window.__trials
+ *   ?harness=1      no real-time driver; the headless harness owns the clock via window.__rockhop
  *   ?countdown=1    keep the 3-2-1-GO in harness mode (captures of the countdown)
  *   ?physics=mock   force the scaffold MockPhysics even when the real bike physics exists
  *   ?physics=v1|v2  pick `createBikePhysicsV1` / `createBikePhysicsV2` from the physics barrel when exported (A/B during the v2 migration); default = `createBikePhysics`
@@ -48,6 +48,7 @@ import { startTier } from './game/startTier';
 import { loadRiderOutfit } from './ui/outfit';
 import { armCrashTest, crashTestBoot, crashTestMode, showThrown } from './ui/errorModal';
 import { installUpdatePill } from './ui/updatePill';
+import { migrateLegacyStorage } from './ui/storageMigration';
 import { AUTOMATION_HOOK, DEV_SURFACES, STORE } from './core/release';
 
 type AnyModule = Record<string, unknown>;
@@ -134,7 +135,7 @@ function makeAudio(makePhysics: PhysicsFactoryFn, muted: boolean): { audio: Audi
       audio = new Web({ makePhysics });
       kind = 'WebAudioSystem';
     } catch (e) {
-      console.warn('[trials] WebAudioSystem failed to construct, using NullAudio', e);
+      console.warn('[rockhop] WebAudioSystem failed to construct, using NullAudio', e);
     }
   }
   if (!audio) {
@@ -159,6 +160,8 @@ interface Composed {
 type Preparable = Partial<{ prepare(run: StepRunner<PrepareStep>): Promise<void> }>;
 
 function boot(): void {
+  // The rebrand's one-time storage copy (trials.* → rockhop.*), before the first setting or best time is read.
+  migrateLegacyStorage();
   // A store build reads no `?` parameter at all (src/core/release.ts): every dev mode above is compiled out.
   // The harness route survives only where the automation hook does.
   const params = new URLSearchParams(DEV_SURFACES ? location.search : AUTOMATION_HOOK && /[?&]harness=1(&|$)/.test(location.search) ? 'harness=1' : '');
@@ -220,7 +223,7 @@ function boot(): void {
     const tGame = performance.now();
     extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind, rider: models.riderModel, bike: models.bikeModel };
     console.info(
-      `[trials] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=${harness} | compose at ${t0.toFixed(0)} ms since nav; ms: render ${(tRender - t0).toFixed(0)} physics ${(tPhysics - tRender).toFixed(0)} audio ${(tAudio - tPhysics).toFixed(0)} game+hud ${(tGame - tAudio).toFixed(0)}`,
+      `[rockhop] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=${harness} | compose at ${t0.toFixed(0)} ms since nav; ms: render ${(tRender - t0).toFixed(0)} physics ${(tPhysics - tRender).toFixed(0)} audio ${(tAudio - tPhysics).toFixed(0)} game+hud ${(tGame - tAudio).toFixed(0)}`,
     );
     if (harness) {
       renderer.resize(window.innerWidth, window.innerHeight, 1);
@@ -240,7 +243,7 @@ function boot(): void {
     setTimeout(() => {
       const { game } = compose();
       if (!game.currentTrack) game.loadTrack(initialTrack);
-      console.info(`[trials] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
+      console.info(`[rockhop] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
     }, 0);
     return;
   }
@@ -303,7 +306,7 @@ function boot(): void {
           physicsVersion,
         });
         extras.modules = { physics: physicsKind, render: renderKind, audio: audioParts.kind, rider: models.riderModel, bike: models.bikeModel };
-        console.info(`[trials] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=false`);
+        console.info(`[rockhop] physics=${physicsKind} render=${renderKind} audio=${audioParts.kind} harness=false`);
         return { ui, bestTimes, hud, game };
       });
       const { ui, bestTimes, hud, game } = sGame.value;
@@ -410,7 +413,7 @@ function boot(): void {
         p.detail(getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track');
         await nextPaint();
         shell.start(); // loads the track (compile + physics + renderer world) and shows the menu
-        console.info(`[trials] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
+        console.info(`[rockhop] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
         await nextPaint();
       });
       // The renderer's eight steps (hero meshes … first frame), delegated: its runner accepts only those keys
@@ -432,7 +435,7 @@ function boot(): void {
       // A store build loads no code from a server (Apple 2.5.2): no version check, no pill.
       if (DEV_SURFACES) installUpdatePill();
     } catch (e) {
-      console.error('[trials] boot failed', e);
+      console.error('[rockhop] boot failed', e);
       plan.fail(`Startup failed: ${e instanceof Error ? e.message : String(e)}`);
       // One screen for every exception (src/ui/errorModal.ts): the sheet, with the stack, covers the loader.
       showThrown(e);

@@ -69,7 +69,7 @@ interface BrowserRunResult {
 
 async function runInPage(page: Page, json: string): Promise<BrowserRunResult> {
   return page.evaluate((j) => {
-    const t = window.__trials!;
+    const t = window.__rockhop!;
     const state = (window.__trialsRunAs ?? t.runRecording)(j);
     return { hash: t.hashState(), finishTime: state.finishTime, tick: state.tick, state };
   }, json);
@@ -80,7 +80,7 @@ async function pageHashesRange(page: Page, rec: InputRecording, every: number, t
   const frames = expandFrames(rec).slice(0, to);
   return page.evaluate(
     ([fr, ev, id, seed, bike]) => {
-      const t = window.__trials!;
+      const t = window.__rockhop!;
       if (t.setBike) t.setBike(bike);
       void t.loadTrack(id, seed);
       const out: string[] = [];
@@ -128,7 +128,7 @@ async function bisectNodeVsBrowser(page: Page, rec: InputRecording): Promise<{ f
   if (first < 0) return { firstDivergentTick: -1, diffPaths: ['<no per-tick divergence found; final hash differs — check drainEvents/post-run state>'] };
   const browserState = await page.evaluate(
     ([fr, id, seed, upto, bike]) => {
-      const t = window.__trials!;
+      const t = window.__rockhop!;
       if (t.setBike) t.setBike(bike);
       void t.loadTrack(id, seed);
       for (let i = 0; i <= upto; i++) {
@@ -281,7 +281,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
     await openGame(page, server.url);
     const r = await page.evaluate(
       ([fr, id, seed, bike]) => {
-        const t = window.__trials!;
+        const t = window.__rockhop!;
         if (t.setBike) t.setBike(bike);
         const out: string[] = [];
         for (const [k, m] of [
@@ -323,7 +323,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
     await openGame(page, server.url);
     const r = await page.evaluate(
       ([runs, id, seed, j, bike]) => {
-        const t = window.__trials!;
+        const t = window.__rockhop!;
         if (t.setBike) t.setBike(bike);
         const out: string[] = [];
         for (const chunk of [1, 7, 15, 120]) {
@@ -355,7 +355,7 @@ export async function runDeterminism(rec: InputRecording, recordingFile: string,
     await openGame(page, server.url);
     const r = await page.evaluate(
       ([id, seed, j, bike]) => {
-        const t = window.__trials!;
+        const t = window.__rockhop!;
         // Leak probe on the *other* class too: a Pro golden runs 600 ticks of Rookie first, and vice versa.
         if (t.setBike) t.setBike(bike === 'pro' ? 'rookie' : 'pro');
         void t.loadTrack(id, (seed + 1) >>> 0);

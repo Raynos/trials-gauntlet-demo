@@ -1,6 +1,6 @@
 /**
  * `OnboardingCard`: the single first-launch card explaining gas / lean, dismissed once
- * (`trials.onboarded`). Shown over the first countdown with the game paused.
+ * (`rockhop.onboarded`). Shown over the first countdown with the game paused.
  *
  * A waiting build is adopted at the very start of the loading screen (src/boot/sw.ts); a build that
  * lands while the game is open lights the menu's update pill (src/ui/updatePill.ts), never a mid-run prompt.

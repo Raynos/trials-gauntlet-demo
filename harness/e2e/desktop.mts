@@ -29,13 +29,13 @@ const GEOMS: Geom[] = [
 ];
 
 /** Steps until the run leaves riding / crashed (auto-respawns ride on), full throttle, neutral lean; cap 90 s of sim. */
-const FINISH_SRC = `(() => { const t = window.__trials; if (t.phase() === 'countdown') t.skipCountdown(); t.setInput({ throttle: 1, brake: 0, lean: 0 }); let n = 0; while ((t.phase() === 'riding' || t.phase() === 'crashed') && n < 120 * 90) { t.step(1); n++; } t.setInput({ throttle: 0, brake: 0, lean: 0 }); t.app.frame(); return { phase: t.phase(), n, x: t.getState().bike.pos.x }; })()`;
+const FINISH_SRC = `(() => { const t = window.__rockhop; if (t.phase() === 'countdown') t.skipCountdown(); t.setInput({ throttle: 1, brake: 0, lean: 0 }); let n = 0; while ((t.phase() === 'riding' || t.phase() === 'crashed') && n < 120 * 90) { t.step(1); n++; } t.setInput({ throttle: 0, brake: 0, lean: 0 }); t.app.frame(); return { phase: t.phase(), n, x: t.getState().bike.pos.x }; })()`;
 /** Gas + lean back from the start: the front wheel lifts and the bike loops — a crash within a couple of seconds of sim. */
-const CRASH_SRC = `(() => { const t = window.__trials; if (t.phase() === 'countdown') t.skipCountdown(); t.setInput({ throttle: 1, brake: 0, lean: -1 }); let n = 0; while (t.phase() === 'riding' && n < 120 * 20) { t.step(1); n++; } t.setInput({ throttle: 0, brake: 0, lean: 0 }); t.app.frame(); return { phase: t.phase(), n, faults: t.faults() }; })()`;
+const CRASH_SRC = `(() => { const t = window.__rockhop; if (t.phase() === 'countdown') t.skipCountdown(); t.setInput({ throttle: 1, brake: 0, lean: -1 }); let n = 0; while (t.phase() === 'riding' && n < 120 * 20) { t.step(1); n++; } t.setInput({ throttle: 0, brake: 0, lean: 0 }); t.app.frame(); return { phase: t.phase(), n, faults: t.faults() }; })()`;
 /** Stage k of the results = RESULTS_DELAY (0.4 s) + the stage's age threshold, stepped in sim ticks then rendered (touch.mts's TO_STAGE). */
 const STAGE_AGE_S = [0, 0.15, 0.35, 0.6, 0.9, 1.1];
-const TO_STAGE = (k: number) => `(() => { const t = window.__trials; const r = document.querySelector('.results'); let n = 0; while (!r.classList.contains('show') && n < 240) { t.step(1); n++; } t.step(${Math.ceil(STAGE_AGE_S[k]! * 120) + 1}); t.render(); t.app.frame(); return r.className; })()`;
-const STATE_SRC = `(() => { const t = window.__trials; return { phase: t.phase(), faults: t.faults(), x: t.getState().bike.pos.x, screen: t.app.screen(), paused: t.app.paused(), runTime: t.runTime() }; })()`;
+const TO_STAGE = (k: number) => `(() => { const t = window.__rockhop; const r = document.querySelector('.results'); let n = 0; while (!r.classList.contains('show') && n < 240) { t.step(1); n++; } t.step(${Math.ceil(STAGE_AGE_S[k]! * 120) + 1}); t.render(); t.app.frame(); return r.className; })()`;
+const STATE_SRC = `(() => { const t = window.__rockhop; return { phase: t.phase(), faults: t.faults(), x: t.getState().bike.pos.x, screen: t.app.screen(), paused: t.app.paused(), runTime: t.runTime() }; })()`;
 /** Installed before the app boots: one connected standard-mapping pad, driven by `__padSet` / `__padAxis`. */
 const PAD_INIT = `(() => {
   window.__pad = { id: 'e2e', index: 0, connected: true, mapping: 'standard', timestamp: 0, axes: [0, 0, 0, 0], buttons: Array.from({ length: 17 }, () => ({ pressed: false, touched: false, value: 0 })) };
@@ -151,11 +151,11 @@ class Flow {
 
   /** One app input poll (the app's own rAF loop also polls; this makes an edge deterministic). */
   private async frame(): Promise<void> {
-    await this.page.evaluate(`window.__trials.app.frame()`);
+    await this.page.evaluate(`window.__rockhop.app.frame()`);
   }
 
   private async padSet(btn: number, value: number): Promise<void> {
-    await this.page.evaluate(`window.__padSet(${btn}, ${value}); window.__trials.app.frame();`);
+    await this.page.evaluate(`window.__padSet(${btn}, ${value}); window.__rockhop.app.frame();`);
   }
 
   /** A confirm / back / pause / nav edge on the active device. */
@@ -195,7 +195,7 @@ class Flow {
     this.page.on('pageerror', (e) => this.expect(false, 'pageerror', e.message));
     await this.page.goto(`${this.url}/?sw=0`);
     await this.page.waitForFunction(() => !document.getElementById('loader'), null, { timeout: 180000 });
-    await this.waitFor(`!!(window.__trials && window.__trials.app)`, 30000);
+    await this.waitFor(`!!(window.__rockhop && window.__rockhop.app)`, 30000);
     await this.page.waitForTimeout(300);
     this.log(`${flow} booted`);
 
@@ -243,9 +243,9 @@ class Flow {
     this.expect(card && !card.disabled && !/locked/.test(card.cls), 'tracks-focus', `focused marker ${JSON.stringify(card)}`);
     await this.press('confirm');
     // SwiftShader stalls the main thread for seconds on the run's first frames: wait for the handoff, don't time it.
-    this.expect(await this.waitFor(`window.__trials.app.screen() === 'run' && ![...document.querySelectorAll('.screen')].some((el) => el.classList.contains('show'))`, 60000), 'card→run', `run did not start after confirm on the focused pin: screens [${await this.screens()}]`);
+    this.expect(await this.waitFor(`window.__rockhop.app.screen() === 'run' && ![...document.querySelectorAll('.screen')].some((el) => el.classList.contains('show'))`, 60000), 'card→run', `run did not start after confirm on the focused pin: screens [${await this.screens()}]`);
     await this.expectScreens([], 'run-no-screens');
-    const track0 = await this.page.evaluate(`window.__trials.info().trackId`) as string;
+    const track0 = await this.page.evaluate(`window.__rockhop.info().trackId`) as string;
     this.log(`in run on ${track0}`);
 
     // First-launch onboarding card: confirm dismisses it.
@@ -257,11 +257,11 @@ class Flow {
     await this.expectNoTouch('D2-run');
 
     // Gas: the bike must move once the countdown is over.
-    this.expect(await this.waitFor(`['countdown','riding'].includes(window.__trials.phase()) && !window.__trials.app.paused()`, 30000), 'run-live', `run never went live: ${JSON.stringify(await this.state())}`);
-    await this.page.evaluate(`window.__trials.skipCountdown()`);
+    this.expect(await this.waitFor(`['countdown','riding'].includes(window.__rockhop.phase()) && !window.__rockhop.app.paused()`, 30000), 'run-live', `run never went live: ${JSON.stringify(await this.state())}`);
+    await this.page.evaluate(`window.__rockhop.skipCountdown()`);
     const x0 = (await this.state()).x;
     await this.hold('gas', true);
-    const moved = await this.waitFor(`window.__trials.getState().bike.pos.x > ${x0} + 1`, 20000);
+    const moved = await this.waitFor(`window.__rockhop.getState().bike.pos.x > ${x0} + 1`, 20000);
     await this.hold('gas', false);
     const s1 = await this.state();
     this.expect(moved, 'D4-gas-moves', `bike x ${x0.toFixed(2)} → ${s1.x.toFixed(2)} while holding gas (${JSON.stringify(s1)})`);
@@ -270,32 +270,32 @@ class Flow {
 
     // Pause (Esc / Start) → overlay with this device's legend → same key resumes.
     await this.press('pause');
-    this.expect(await this.waitFor(`!!document.querySelector('.pause-overlay.show') && window.__trials.app.paused()`, 10000), 'D4-pause', 'pause overlay did not show');
+    this.expect(await this.waitFor(`!!document.querySelector('.pause-overlay.show') && window.__rockhop.app.paused()`, 10000), 'D4-pause', 'pause overlay did not show');
     await this.expectLegend('.pause-overlay .legend', 'D3-pause-legend');
     await this.expectScreens([], 'pause-no-screens');
     await this.expectNoTouch('D2-pause');
     await this.page.waitForTimeout(300);
     await this.press('pause');
-    this.expect(await this.waitFor(`!document.querySelector('.pause-overlay.show') && !window.__trials.app.paused()`, 10000), 'D4-resume', 'pause overlay still up after the second press');
+    this.expect(await this.waitFor(`!document.querySelector('.pause-overlay.show') && !window.__rockhop.app.paused()`, 10000), 'D4-resume', 'pause overlay still up after the second press');
     if (this.device === 'pad') {
       // B while paused = back = resume too.
       await this.press('pause');
       await this.waitFor(`!!document.querySelector('.pause-overlay.show')`, 10000);
       await this.page.waitForTimeout(300);
       await this.press('back');
-      this.expect(await this.waitFor(`!document.querySelector('.pause-overlay.show') && !window.__trials.app.paused()`, 10000), 'D5-b-resumes', 'B did not resume from the pause overlay');
+      this.expect(await this.waitFor(`!document.querySelector('.pause-overlay.show') && !window.__rockhop.app.paused()`, 10000), 'D5-b-resumes', 'B did not resume from the pause overlay');
     }
 
     // Crash through the hook (gas + lean back), then the auto-respawn: riding again with a fault.
     const crash = await this.page.evaluate(CRASH_SRC) as { phase: string; n: number; faults: number };
     this.expect(crash.phase === 'crashed', 'crash', `expected crashed after gas+lean back, got ${JSON.stringify(crash)}`);
     // The 1 s auto-respawn runs on the app's rAF clock: under a loaded SwiftShader that is tens of wall seconds. Poll, then judge the state itself.
-    const respawned = (await this.waitFor(`window.__trials.phase() === 'riding' && window.__trials.faults() >= 1`, 30000)) || (await this.state().then((s) => s.phase === 'riding' && s.faults >= 1));
+    const respawned = (await this.waitFor(`window.__rockhop.phase() === 'riding' && window.__rockhop.faults() >= 1`, 30000)) || (await this.state().then((s) => s.phase === 'riding' && s.faults >= 1));
     this.expect(respawned, 'respawn', `no auto-respawn with a fault: ${JSON.stringify(await this.state())}`);
 
     // Full restart: R / B held ≥ 0.6 s → faults 0, countdown / riding from the start.
     await this.hold('restart', true);
-    const restarted = await this.waitFor(`window.__trials.faults() === 0 && ['countdown','riding'].includes(window.__trials.phase())`, 10000);
+    const restarted = await this.waitFor(`window.__rockhop.faults() === 0 && ['countdown','riding'].includes(window.__rockhop.phase())`, 10000);
     await this.hold('restart', false);
     const s2 = await this.state();
     this.expect(restarted && s2.faults === 0, 'D4-hold-restart', `held restart should reset the run: ${JSON.stringify(s2)}`);
@@ -307,8 +307,8 @@ class Flow {
     if (fin.phase !== 'finished') {
       // FINISH fallback: b1-first-ride was not cleared by full throttle + neutral lean (see the report); flat-test is.
       this.log(`${track0} not cleared flat out (${JSON.stringify(fin)}); switching to flat-test`);
-      await this.page.evaluate(`window.__trials.app.play('flat-test')`);
-      this.expect(await this.waitFor(`window.__trials.app.screen() === 'run' && window.__trials.info().trackId === 'flat-test' && ['countdown','riding'].includes(window.__trials.phase())`, 60000), 'flat-test-load', 'flat-test did not load for the finish half');
+      await this.page.evaluate(`window.__rockhop.app.play('flat-test')`);
+      this.expect(await this.waitFor(`window.__rockhop.app.screen() === 'run' && window.__rockhop.info().trackId === 'flat-test' && ['countdown','riding'].includes(window.__rockhop.phase())`, 60000), 'flat-test-load', 'flat-test did not load for the finish half');
       if (await this.page.evaluate(`!!document.querySelector('.onboard.show')`)) await this.press('confirm');
       await this.page.waitForTimeout(200);
       fin = await this.page.evaluate(FINISH_SRC) as { phase: string; n: number; x: number };
@@ -339,8 +339,8 @@ class Flow {
     for (let i = 0; i < 4 && !(await tiles()).includes(`${target}*`); i++) { await this.press('right'); await this.page.waitForTimeout(60); }
     this.expect((await tiles()).includes(`${target}*`), 'results-target', `could not focus ${target}: ${await tiles()}`);
     await this.press('confirm');
-    this.expect(await this.waitFor(`!document.querySelector('.results.show') && window.__trials.app.screen() === 'run' && ['countdown','riding'].includes(window.__trials.phase())`, 60000), 'D4-results-pick', `${target} did not start a new run: ${JSON.stringify(await this.state())} results='${String(await this.page.evaluate(`document.querySelector('.results').className`))}'`);
-    const track1 = await this.page.evaluate(`window.__trials.info().trackId`) as string;
+    this.expect(await this.waitFor(`!document.querySelector('.results.show') && window.__rockhop.app.screen() === 'run' && ['countdown','riding'].includes(window.__rockhop.phase())`, 60000), 'D4-results-pick', `${target} did not start a new run: ${JSON.stringify(await this.state())} results='${String(await this.page.evaluate(`document.querySelector('.results').className`))}'`);
+    const track1 = await this.page.evaluate(`window.__rockhop.info().trackId`) as string;
     if (target === 'next') this.expect(track1 !== finishTrack, 'next-track', `NEXT should load a different track (was ${finishTrack}, now ${track1})`);
     else this.expect(track1 === finishTrack, 'retry-track', `RETRY should re-run ${finishTrack}, got ${track1}`);
     await this.expectScreens([], 'new-run-no-screens');

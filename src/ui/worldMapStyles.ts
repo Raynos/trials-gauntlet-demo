@@ -101,7 +101,7 @@ export const WORLD_MAP_CSS = `
 /* The tier gate: three amber chevrons across the road where it enters the locked land, and the rule on a plate. */
 .wm-gate { position: absolute; width: 0; height: 0; transform: scale(var(--inv)); transform-origin: 0 0; z-index: 2; }
 .wm-gate .wm-hit { position: absolute; left: -23px; top: -23px; width: 46px; height: 46px; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer; }
-.wm-gate .chev { position: absolute; left: -24px; top: -13px; width: 48px; display: flex; justify-content: center; transform-origin: 24px 13px; font: 900 26px/26px var(--display); font-style: italic; color: var(--amber); text-shadow: 0 0 8px rgba(255,176,32,1), 0 0 2px #000, 0 1px 2px #000; letter-spacing: -.12em; pointer-events: none; animation: wm-chev 1.2s ease-in-out infinite alternate; }
+.wm-gate .chev { position: absolute; left: -24px; top: -13px; width: 48px; display: flex; justify-content: center; transform-origin: 24px 13px; font: 400 26px/26px var(--display); color: var(--amber); text-shadow: 0 0 8px rgba(255,176,32,1), 0 0 2px #000, 0 1px 2px #000; letter-spacing: -.12em; pointer-events: none; animation: wm-chev 1.2s ease-in-out infinite alternate; }
 @keyframes wm-chev { from { opacity: .7; } to { opacity: 1; } }
 .wm-gate .wm-plate { position: absolute; left: 24px; top: -28px; display: block; padding: 3px 7px; border-radius: 3px; background: rgba(9,11,15,.88); box-shadow: 0 0 0 1px rgba(255,176,32,.45), 0 2px 8px rgba(0,0,0,.5); font: 700 9px/1.25 var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--amber); white-space: nowrap; pointer-events: none; }
 .wm-gate .wm-plate small { display: block; font-size: 8px; color: var(--ink-dim); letter-spacing: .08em; margin-top: 2px; }
@@ -117,7 +117,7 @@ export const WORLD_MAP_CSS = `
 .wm-scene.far .wm-card.up { transform: translate(18px, -90%) scale(calc(var(--inv) * .7)); transform-origin: -18px 90%; }
 .wm-card .head { font: 700 9.5px/1 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wm-card .head b { color: var(--amber); }
-.wm-card .name { margin-top: 3px; font: italic 900 17px/1 var(--display); text-transform: uppercase; letter-spacing: .01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wm-card .name { margin-top: 3px; font: 400 17px/1 var(--display); text-transform: uppercase; letter-spacing: .01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wm-card .times { margin-top: 4px; font: 700 12px/1 var(--mono); color: var(--ink-dim); white-space: nowrap; }
 .wm-card .times b { color: var(--green); font-size: 14px; }
 .wm-card .times b.none { color: var(--ink-mute); }
@@ -132,19 +132,19 @@ export const WORLD_MAP_CSS = `
 /* Screen-space chrome: the badge + build stamp top-left, ‹ MENU top-right, progress bottom-left, RIDE + GHOST bottom-right. */
 .wm-brand { position: absolute; left: calc(var(--s5) + var(--sal)); top: calc(var(--s4) + var(--sat)); z-index: 4; pointer-events: none; }
 .wm-brand .plate { display: inline-flex; align-items: center; gap: .6em; min-height: 34px; padding: 0 1.3em 0 .9em; background: rgba(9,11,15,.88); box-shadow: inset 4px 0 0 var(--amber), 0 4px 14px rgba(0,0,0,.4); clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%); }
-.wm-brand .plate b { font: italic 900 1.05rem/1 var(--display); text-transform: uppercase; letter-spacing: .01em; color: var(--ink); }
+.wm-brand .plate b.wordmark { width: 7.2rem; filter: none; }
 .wm-brand .plate span { font: 700 .62rem/1 var(--font); letter-spacing: .34em; text-transform: uppercase; color: var(--amber); padding-left: .6em; border-left: 1px solid rgba(255,255,255,.2); }
 .wm-brand .stamp { margin-top: 4px; padding-left: .9em; font: 500 .6rem/1 var(--font); letter-spacing: .06em; color: var(--ink-mute); text-shadow: 0 1px 2px #000; }
 .worldmap-screen .backbtn { top: calc(var(--s4) + var(--sat)); }
 .wm-progress { position: absolute; left: calc(var(--s5) + var(--sal)); bottom: calc(var(--s4) + var(--sab)); z-index: 4; display: flex; align-items: center; gap: 1.1em; min-height: 40px; padding: 0 1em 0 .9em; border-radius: 6px; background: rgba(9,11,15,.86); box-shadow: 0 0 0 1px rgba(255,255,255,.14), 0 4px 14px rgba(0,0,0,.4); pointer-events: none; white-space: nowrap; }
-.wm-progress .n { font: italic 900 1.15rem/1 var(--display); text-transform: uppercase; color: var(--ink); }
+.wm-progress .n { font: 400 1.15rem/1 var(--display); text-transform: uppercase; color: var(--ink); }
 .wm-progress .n b { color: var(--amber); font-size: 1.35rem; }
 .wm-progress .dots { display: flex; gap: .9em; font: 700 .62rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); }
 .wm-progress .dots span { display: inline-flex; align-items: center; gap: .4em; }
 .wm-progress .dots i { width: 9px; height: 9px; border-radius: 50%; background: currentColor; box-shadow: 0 0 6px currentColor; }
 .wm-progress .dots .platinum { color: var(--plat); } .wm-progress .dots .gold { color: var(--gold); } .wm-progress .dots .silver { color: var(--silver); } .wm-progress .dots .bronze { color: var(--bronze); }
 .wm-actions { position: absolute; right: calc(var(--s5) + var(--sar)); bottom: calc(var(--s4) + var(--sab)); z-index: 4; display: flex; gap: 10px; }
-.wm-actions button { display: inline-flex; align-items: center; gap: .55em; min-height: 46px; padding: 0 1.2em; border: 0; border-radius: 6px; cursor: pointer; font: italic 900 1.05rem/1 var(--display); text-transform: uppercase; letter-spacing: .02em; -webkit-tap-highlight-color: transparent; }
+.wm-actions button { display: inline-flex; align-items: center; gap: .55em; min-height: 46px; padding: 0 1.2em; border: 0; border-radius: 6px; cursor: pointer; font: 400 1.05rem/1 var(--display); text-transform: uppercase; letter-spacing: .02em; -webkit-tap-highlight-color: transparent; }
 .wm-actions .wm-ride { background: linear-gradient(180deg, #ffd25a, #ffb020 60%, #f0951a); color: var(--amber-ink); box-shadow: 0 0 0 1px rgba(0,0,0,.5), 0 6px 18px rgba(255,176,32,.35); clip-path: polygon(0 0, 100% 0, calc(100% - .5em) 100%, .5em 100%); padding: 0 1.5em; }
 .wm-actions .wm-ride small { font: 700 .72rem/1 var(--font); letter-spacing: .1em; opacity: .8; }
 .wm-actions .wm-ride .arrow { font-size: 1.1em; }

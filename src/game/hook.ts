@@ -1,9 +1,9 @@
 /**
- * Installs `window.__trials`, the headless test hook (CONTRACT.md §2.9).
+ * Installs `window.__rockhop`, the headless test hook (CONTRACT.md §2.9).
  * Everything is synchronous so a Playwright `page.evaluate` can drive
  * thousands of ticks in one round trip.
  */
-import type { InputFrame, PhysicsSnapshot, TrialsHook } from '../core/types';
+import type { InputFrame, PhysicsSnapshot, RockhopHook } from '../core/types';
 import { listTrackIds } from '../tracks';
 import type { Game, GameCounters } from './game';
 
@@ -21,14 +21,14 @@ export interface HookExtras {
  * (and `ready`) can be installed before the renderer/WebGL context exists; every
  * method resolves the game synchronously, so correctness never depends on task order.
  */
-export function installHook(source: Game | (() => Game), harness: boolean, extras: HookExtras = {}): TrialsHook {
+export function installHook(source: Game | (() => Game), harness: boolean, extras: HookExtras = {}): RockhopHook {
   let cached: Game | null = typeof source === 'function' ? null : source;
   const g = (): Game => {
     if (!cached) cached = (source as () => Game)();
     return cached;
   };
   const readyAtMs = performance.now();
-  const hook: TrialsHook = {
+  const hook: RockhopHook = {
     ready: true,
     info: () => ({
       version: GAME_VERSION,
@@ -96,7 +96,7 @@ export function installHook(source: Game | (() => Game), harness: boolean, extra
     const renderOffline = extras.renderOffline;
     hook.audio = { renderOffline: (json, seconds) => renderOffline(json, seconds) };
   }
-  window.__trials = hook;
+  window.__rockhop = hook;
   return hook;
 }
 

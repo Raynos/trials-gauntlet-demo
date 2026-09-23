@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { TrialsHook } from '../core/types';
+import type { RockhopHook } from '../core/types';
 import { InboxSheet, NoteQueue, PASSWORD_KEY, QUEUE_KEY, captureContext, captureScreenshot, contextChips, dataUrlBytes, postNote, reviewEnabled, type QueuedNote, type SendResult } from './inbox';
 import { LIVE_DELAY_MS, resetLive, setLiveClock, tickLive } from './live';
 
@@ -18,15 +18,15 @@ afterEach(() => {
   localStorage.clear();
 });
 
-function fakeHook(over: Partial<ReturnType<TrialsHook['info']>> = {}): TrialsHook {
+function fakeHook(over: Partial<ReturnType<RockhopHook['info']>> = {}): RockhopHook {
   return {
     info: () => ({ version: '0.2.1-core', physicsHz: 120, trackId: 'b1', seed: 7, bike: 'pro', harness: false, quality: 'high', qualityWhy: 'governor start high', render: { dpr: 1.5, canvasW: 1398, canvasH: 645, tier: 'high', deviceClass: 'phone' }, ...over }),
-    getState: () => ({ tick: 4321, checkpoint: 2 }) as unknown as ReturnType<TrialsHook['getState']>,
+    getState: () => ({ tick: 4321, checkpoint: 2 }) as unknown as ReturnType<RockhopHook['getState']>,
     runTime: () => 36.0166667,
     faults: () => 3,
     phase: () => 'riding',
     render: vi.fn(() => 0),
-  } as unknown as TrialsHook;
+  } as unknown as RockhopHook;
 }
 
 const entry = (note = 'the seesaw launches me'): QueuedNote => ({ note, context: captureContext(fakeHook(), { trackName: 'Basics', device: 'touch' }), screenshot: null, queuedAt: '2026-09-16T00:00:00.000Z' });
@@ -37,8 +37,8 @@ function fetchReturning(status: number, body: unknown): typeof fetch {
 
 describe('review inbox: context capture', () => {
   it('reads the reproduction state from the hook, storage and the HUD, every field a string or number', () => {
-    localStorage.setItem('trials.riderModel', 'gltf');
-    localStorage.setItem('trials.riderOutfit', 'street-mustard');
+    localStorage.setItem('rockhop.riderModel', 'gltf');
+    localStorage.setItem('rockhop.riderOutfit', 'street-mustard');
     const c = captureContext(fakeHook(), { trackName: 'Basics', device: 'touch' }, localStorage, { userAgent: 'UA/1' }, { innerWidth: 932, innerHeight: 430, devicePixelRatio: 3, location: { href: 'http://x/?review=1' } });
     expect(c).toMatchObject({ trackId: 'b1', trackName: 'Basics', tick: 4321, runTime: 36.017, faults: 3, phase: 'riding', checkpoint: 2, bike: 'pro', seed: 7, device: 'touch', quality: 'high', dpr: 1.5, canvas: '1398×645', tier: 'high', deviceClass: 'phone', riderModel: 'gltf', riderOutfit: 'street-mustard', version: '0.2.1-core', build: 'dev', ua: 'UA/1', viewport: '932×430@3', url: 'http://x/?review=1' });
     for (const v of Object.values(c)) expect(['string', 'number']).toContain(typeof v);
@@ -62,7 +62,7 @@ describe('review inbox: context capture', () => {
   it('captureScreenshot renders until a frame is actually drawn (a paused game skips unchanged frames)', () => {
     let frames = 0;
     let calls = 0;
-    const hook = { renderedFrames: () => frames, render: () => { if (++calls === 31) frames++; return 0; } } as unknown as TrialsHook;
+    const hook = { renderedFrames: () => frames, render: () => { if (++calls === 31) frames++; return 0; } } as unknown as RockhopHook;
     const canvas = document.createElement('canvas');
     canvas.width = 100;
     canvas.height = 50;
@@ -70,7 +70,7 @@ describe('review inbox: context capture', () => {
     expect(calls).toBe(31);
     calls = 0;
     frames = 0;
-    const live = { renderedFrames: () => frames, render: () => { calls++; frames++; return 0; } } as unknown as TrialsHook;
+    const live = { renderedFrames: () => frames, render: () => { calls++; frames++; return 0; } } as unknown as RockhopHook;
     captureScreenshot(canvas, live);
     expect(calls).toBe(1);
     expect(captureScreenshot(null, live)).toBeNull();

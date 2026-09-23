@@ -10,7 +10,7 @@
  * results. The menu renders over the live 3D scene with `BACKDROP_TRACK`
  * loaded in the `menu` phase (the key art plate covers it once decoded).
  */
-import type { BikeClass, CameraOverride, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RiderOutfit, RunResult, TrackDef, TrialsHook } from '../core/types';
+import type { BikeClass, CameraOverride, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RiderOutfit, RunResult, TrackDef, RockhopHook } from '../core/types';
 import type { AudioScene, AudioSystem } from '../audio';
 import { getTrack, listTrackIds } from '../tracks';
 import {
@@ -44,6 +44,8 @@ import {
   loadSoundEnabled,
   loadTelemetryEnabled,
   loadVolume,
+  loadMusicVolume,
+  saveMusicVolume,
   mountRotatePrompt,
   saveBikeChoice,
   saveGhostEnabled,
@@ -68,8 +70,11 @@ import { tickLive } from '../ui/live';
 import { applyOrientation } from '../ui/orientation';
 import { loadRiderOutfit, saveRiderOutfit } from '../ui/outfit';
 import { copyText } from '../ui/clipboard';
+import { ExitConfirm } from '../ui/exitConfirm';
 import { Bench, type BenchOptions, type FrameSplit } from './bench';
 import { DEV_SURFACES } from '../core/release';
+import { persistentStorage } from '../platform/storage';
+import { onSystemBack, exitApp } from '../platform/back';
 import { FrameCadence } from './cadence';
 import { BACKDROP_TRACK } from './flow';
 import { Percentiles, type Game } from './game';
@@ -130,7 +135,7 @@ export interface AppOptions {
 }
 
 const DEVICE_SHOW_FRAMES = 90;
-const LAST_TRACK_KEY = 'trials.lastTrack';
+const LAST_TRACK_KEY = 'rockhop.lastTrack';
 const TOUCH_SETTLE_S = 3;
 
 /** Grace after a screen change during which the polled menu buttons (keyboard / pad confirm, back, nav) are ignored: the edge that changed screens must not act twice. */
@@ -227,6 +232,9 @@ export class App {
   private fpsWorstMs = 0;
   private soundOn: boolean;
   private volume: number;
+  private musicVolume: number;
+  /** "Exit ROCKHOP?" — Android system back on the home screen. */
+  private readonly exitConfirm: ExitConfirm;
   private ghostOn: boolean;
   private lastNow = 0;
   private raf = 0;
@@ -250,7 +258,7 @@ export class App {
       .map((id) => getTrack(id))
       .filter((t): t is TrackDef => t !== undefined);
     try {
-      this.lastTrackId = localStorage.getItem(LAST_TRACK_KEY);
+      this.lastTrackId = persistentStorage()?.getItem(LAST_TRACK_KEY) ?? null;
     } catch {
       this.lastTrackId = null;
     }
@@ -269,6 +277,7 @@ export class App {
     o.uiRoot.appendChild(this.fpsEl);
     this.soundOn = loadSoundEnabled();
     this.volume = loadVolume();
+    this.musicVolume = loadMusicVolume();
     this.ghostOn = loadGhostEnabled();
     // A store build keeps no run log (STORE_RELEASE.md P0.3: "Data not collected"); the Settings rows are gone too.
     this.telemetryOn = DEV_SURFACES && loadTelemetryEnabled();
@@ -279,6 +288,7 @@ export class App {
     this.sfx.setEnabled(this.soundOn);
     this.sfx.setVolume(this.volume);
     this.audio?.setMasterVolume(this.soundOn ? this.volume : 0);
+    this.audio?.setMusicVolume?.(this.musicVolume);
     this.art = o.art ?? new ArtManifest();
     if (!this.art.ready) void this.art.load();
     this.art.whenReady(() => {
@@ -295,6 +305,7 @@ export class App {
       fpsInEffect: this.frameCapHz(),
       sound: this.soundOn,
       volume: this.volume,
+      ...(typeof this.audio?.setMusicVolume === 'function' ? { music: this.musicVolume } : {}),
       ghost: this.ghostOn,
       rider: o.models.rider,
       bike: o.models.bike,
@@ -330,6 +341,11 @@ export class App {
         saveVolume(v);
         this.sfx.setVolume(v);
         this.audio?.setMasterVolume(this.soundOn ? v : 0);
+      },
+      setMusicVolume: (v: number) => {
+        this.musicVolume = v;
+        saveMusicVolume(v);
+        this.audio?.setMusicVolume?.(v);
       },
       setGhost: (on: boolean) => {
         this.ghostOn = on;
@@ -369,7 +385,7 @@ export class App {
         this.bestTimes.clear();
         this.lastTrackId = null;
         try {
-          localStorage.removeItem(LAST_TRACK_KEY);
+          persistentStorage()?.removeItem(LAST_TRACK_KEY);
         } catch {
           /* storage unavailable */
         }
@@ -464,6 +480,20 @@ export class App {
       quit: () => this.quit('pause:quit'),
     });
     mountRotatePrompt(o.uiRoot);
+    this.exitConfirm = new ExitConfirm(o.uiRoot, () => exitApp());
+    // Android system back (src/platform/back.ts; a no-op on the web): the home screen asks before leaving; everywhere
+    // else back is the Escape the game already reads (pause mid-ride, back out of a screen).
+    onSystemBack(() => {
+      if (this.exitConfirm.visible) {
+        this.exitConfirm.hide();
+        return true;
+      }
+      if (this.screen === 'menu') {
+        this.exitConfirm.show();
+        return true;
+      }
+      return false;
+    });
     // `DEV_SURFACES &&`: a store build compiles the bench out whole (src/core/release.ts).
     this.bench = DEV_SURFACES && o.bench
       ? new Bench(
@@ -699,8 +729,8 @@ export class App {
     this.goto('review');
   }
 
-  /** Harness / QA surface (`window.__trials.review`): the reviewer's state and controls without a pointer. */
-  reviewApi(): NonNullable<TrialsHook['review']> {
+  /** Harness / QA surface (`window.__rockhop.review`): the reviewer's state and controls without a pointer. */
+  reviewApi(): NonNullable<RockhopHook['review']> {
     return {
       open: (id, seg) => this.enterReview(id, seg ?? 0),
       close: () => this.leaveReview(),
@@ -718,8 +748,8 @@ export class App {
     };
   }
 
-  /** Harness / e2e surface (`window.__trials.app`): one synchronous app frame, the flow methods, the state. */
-  testApi(): NonNullable<TrialsHook['app']> {
+  /** Harness / e2e surface (`window.__rockhop.app`): one synchronous app frame, the flow methods, the state. */
+  testApi(): NonNullable<RockhopHook['app']> {
     return {
       frame: () => {
         this.tickFrame(0, false); // input poll + flow only: no render (a SwiftShader frame per call would dominate the e2e)
@@ -734,14 +764,14 @@ export class App {
     };
   }
 
-  /** `window.__trials.bench` (`?bench=1` only): start, state, the finished report. */
-  benchApi(): NonNullable<TrialsHook['bench']> | undefined {
+  /** `window.__rockhop.bench` (`?bench=1` only): start, state, the finished report. */
+  benchApi(): NonNullable<RockhopHook['bench']> | undefined {
     const b = this.bench;
     if (!b) return undefined;
     return { start: () => b.start(), state: () => b.state(), report: () => b.report(), text: () => b.text() };
   }
 
-  /** Harness / QA surface (`window.__trials.replay`). */
+  /** Harness / QA surface (`window.__rockhop.replay`). */
   replayApi(): { open(json?: string): boolean; seek(tick: number): void; info(): ReturnType<ReplaySession['info']>; close(): void } {
     return {
       open: (json) => {
@@ -845,7 +875,7 @@ export class App {
     }
     this.screen = screen;
     this.screenAt = performance.now();
-    this.setAudioScene('menu');
+    this.setAudioScene(screen === 'tracks' ? 'map' : 'menu');
     this.touch.setEnabled(false);
     this.pause.hide();
     this.menu.hide();
@@ -865,6 +895,7 @@ export class App {
     scene?.classList.toggle('garage', screen === 'garage');
     const dev = this.mux.activeDevice();
     if (screen === 'menu') {
+      this.menu.setZone(this.zoneUpTo());
       this.menu.setDevice(dev);
       this.menu.show();
     } else if (screen === 'garage') {
@@ -908,7 +939,7 @@ export class App {
     this.setAudioScene('run');
     this.lastTrackId = id;
     try {
-      localStorage.setItem(LAST_TRACK_KEY, id);
+      persistentStorage()?.setItem(LAST_TRACK_KEY, id);
     } catch {
       /* storage unavailable */
     }
@@ -954,7 +985,7 @@ export class App {
 
   /**
    * Garage: focusing a card previews it (the menu backdrop reloads with that class, renderer
-   * repaints), confirming commits it (`trials.bikeClass`). Leaving without confirming previews back.
+   * repaints), confirming commits it (`rockhop.bikeClass`). Leaving without confirming previews back.
    */
   private applyBike(b: BikeClass, commit: boolean): void {
     if (commit) {
@@ -996,7 +1027,7 @@ export class App {
   private async shareRunLog(): Promise<boolean> {
     if (typeof navigator.share !== 'function') return this.copyRunLog();
     try {
-      await navigator.share({ title: 'Trials Gauntlet run log', text: this.runLog.exportJson(BUILD_STAMP, this.benchLog.read()) });
+      await navigator.share({ title: 'ROCKHOP run log', text: this.runLog.exportJson(BUILD_STAMP, this.benchLog.read()) });
       return true;
     } catch {
       return false; // AbortError (sheet dismissed) or unsupported payload
@@ -1102,6 +1133,13 @@ export class App {
     const ship = shipTracks(this.tracks, this.o.dev ?? false);
     const i = ship.findIndex((t) => t.id === this.lastTrackId);
     return ship[i + 1]?.name ?? null;
+  }
+
+  /** The zone the player is up to (the home screen's key art follows it): the first zone with an unmedalled track. */
+  private zoneUpTo(): string {
+    const medalOf = (id: string) => this.bestTimes.get(id)?.medal ?? null;
+    const open = shipTracks(this.tracks, false).find((t) => medalOf(t.id) === null) ?? shipTracks(this.tracks, false).at(-1);
+    return (open?.meta as { zone?: string } | undefined)?.zone ?? 'coast';
   }
 
   // -- per frame ----------------------------------------------------------------

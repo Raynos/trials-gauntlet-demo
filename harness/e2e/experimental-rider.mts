@@ -1,9 +1,9 @@
 /**
  * Headless production outfit switching — garage round: the five outfit tags live in the GARAGE only; the main
  * menu and the pause overlay carry none (asserted here). Asks 30 / 31 / 41: the rider-model row is gone from the
- * garage (asserted) and the img2 rider code is gone from the tree; a stored `trials.riderModel = img2` from before
+ * garage (asserted) and the img2 rider code is gone from the tree; a stored `rockhop.riderModel = img2` from before
  * still boots and is read as the Blender rider (no chip could leave it, no code could load it).
- * Covers: every outfit tag commits `trials.riderModel = gltf` + the outfit; a run paused mid-track has no
+ * Covers: every outfit tag commits `rockhop.riderModel = gltf` + the outfit; a run paused mid-track has no
  * cosmetic rows and the paused physics never advances while the garage's choices are applied; the played
  * frames after resume.
  */
@@ -21,13 +21,13 @@ const checks: string[] = [];
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, recordVideo: { dir: `${out}/video`, size: { width: 1280, height: 720 } } });
   const video = page.video()!;
-  await page.addInitScript(() => localStorage.setItem('trials.onboarded', '1'));
+  await page.addInitScript(() => localStorage.setItem('rockhop.onboarded', '1'));
   page.on('pageerror', error => errors.push(error.message));
   page.on('response', r => { if (r.status() >= 400) missing.push(`${r.status()} ${r.url()}`); });
-  const ready = () => page.waitForFunction(() => !!window.__trials?.app && (!document.querySelector('#loader') || document.querySelector('#loader')?.getAttribute('data-done') === '1'), undefined, { timeout: 90_000 });
+  const ready = () => page.waitForFunction(() => !!window.__rockhop?.app && (!document.querySelector('#loader') || document.querySelector('#loader')?.getAttribute('data-done') === '1'), undefined, { timeout: 90_000 });
   const expectModel = (model: string) => page.waitForFunction(model => (window as unknown as HeroHarnessWindow).__render.debugInfo().heroDoc.includes(model), model, { timeout: 60_000 });
   const toGarage = async () => {
-    await page.evaluate(() => window.__trials!.app!.goto('garage'));
+    await page.evaluate(() => window.__rockhop!.app!.goto('garage'));
     await page.waitForSelector('.garage-screen.live', { timeout: 30_000 });
   };
   await page.goto(`${server.url}?sw=0`, { waitUntil: 'domcontentloaded' });
@@ -43,7 +43,7 @@ try {
   checks.push('garage has no rider-model row');
   await page.screenshot({ path: `${out}/garage.png` });
   // A stored img2 choice from before the chips (and the code) left still boots, as the Blender rider.
-  await page.evaluate(() => localStorage.setItem('trials.riderModel', 'img2'));
+  await page.evaluate(() => localStorage.setItem('rockhop.riderModel', 'img2'));
   await page.reload({ waitUntil: 'domcontentloaded' }); await ready();
   await expectModel(' rider');
   const storedDoc = await page.evaluate(() => (window as unknown as HeroHarnessWindow).__render.debugInfo().heroDoc);
@@ -53,36 +53,36 @@ try {
   await toGarage();
   for (const p of AVAILABLE_RIDER_PRESETS) {
     await page.locator(`.garage-screen [data-outfit="${p.id}"]`).click();
-    await page.waitForFunction(id => (window as unknown as HeroHarnessWindow).__render.debugInfo().riderOutfit === id && localStorage.getItem('trials.riderModel') === 'gltf', p.id, { timeout: 60_000 });
+    await page.waitForFunction(id => (window as unknown as HeroHarnessWindow).__render.debugInfo().riderOutfit === id && localStorage.getItem('rockhop.riderModel') === 'gltf', p.id, { timeout: 60_000 });
     checks.push(`garage outfit ${p.id}`);
   }
   // The reflection twin follows the hero through the swaps (it exists only while the stage is up).
   const withReflection = await page.evaluate(() => (window as unknown as HeroHarnessWindow).__render.debugInfo().garage.reflection);
   if (!withReflection) throw new Error('mirrored hero missing after outfit swaps');
   checks.push('mirrored hero rebuilt through outfit swaps');
-  await page.evaluate(() => window.__trials!.app!.play('b1-first-ride'));
-  await page.waitForFunction(() => window.__trials?.app?.screen() === 'run');
+  await page.evaluate(() => window.__rockhop!.app!.play('b1-first-ride'));
+  await page.waitForFunction(() => window.__rockhop?.app?.screen() === 'run');
   const offStage = await page.evaluate(() => { const d = (window as unknown as HeroHarnessWindow).__render.debugInfo(); return !d.garage.on && d.occluder.override === null && !d.garage.reflection; });
   if (!offStage) throw new Error('garage stage / orbit camera still up on a run');
   checks.push('stage and orbit released on play');
-  await page.waitForFunction(() => window.__trials?.phase() === 'riding', undefined, { timeout: 30_000 });
-  await page.evaluate(() => window.__trials!.app!.togglePause());
+  await page.waitForFunction(() => window.__rockhop?.phase() === 'riding', undefined, { timeout: 30_000 });
+  await page.evaluate(() => window.__rockhop!.app!.togglePause());
   await page.locator('.pause-overlay.show').waitFor();
   if (!await page.evaluate(() => getComputedStyle(document.querySelector('.banners')!).visibility === 'hidden')) throw new Error('HUD banners cover pause controls');
   if (await page.locator('.pause-overlay [data-which], .pause-overlay [data-outfit], .pause-overlay .visuals, .pause-outfits').count() !== 0) throw new Error('pause overlay still carries rider-model / outfit rows');
   checks.push('pause overlay has no rider-model / outfit rows');
-  const tick = await page.evaluate(() => window.__trials!.getState().tick);
+  const tick = await page.evaluate(() => window.__rockhop!.getState().tick);
   await page.screenshot({ path: `${out}/pause.png` });
   await page.setViewportSize({ width: 844, height: 390 });
   await page.screenshot({ path: `${out}/pause-mobile.png` });
   const scroll = await page.evaluate(() => ({ window: window.scrollY, ui: document.querySelector('#ui')!.scrollTop, body: document.body.scrollTop }));
   if (Object.values(scroll).some(n => n !== 0)) throw new Error(`Viewport scrolled: ${JSON.stringify(scroll)}`);
-  if (await page.evaluate(() => window.__trials!.getState().tick) !== tick) throw new Error('Pause advanced physics');
+  if (await page.evaluate(() => window.__rockhop!.getState().tick) !== tick) throw new Error('Pause advanced physics');
   checks.push('mobile pause: no scroll, paused physics unchanged');
   await page.setViewportSize({ width: 1280, height: 720 });
-  await page.evaluate(() => window.__trials!.app!.togglePause());
+  await page.evaluate(() => window.__rockhop!.app!.togglePause());
   await page.keyboard.down('ArrowUp');
-  await page.waitForFunction(t => window.__trials!.getState().tick > t + 240, tick, { timeout: 30_000 });
+  await page.waitForFunction(t => window.__rockhop!.getState().tick > t + 240, tick, { timeout: 30_000 });
   await page.keyboard.up('ArrowUp');
   await page.screenshot({ path: `${out}/riding.png` });
   const debug = await page.evaluate(() => (window as unknown as HeroHarnessWindow).__render.debugInfo());

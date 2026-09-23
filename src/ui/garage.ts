@@ -7,16 +7,17 @@
  * bike lowest, under the thumb; every tag ≥ 44 px, two per row, no scrolling), the metadata sits in a panel
  * on the RIGHT (the chosen bike's class, POWER / GRIP / WEIGHT bars and note, the outfit line, the load
  * status), badge plate top-left, ‹ MENU top-right, the gesture hint under the hero.
- * Pointer + Esc only (ask 32): a bike chip highlights under the pointer and commits on click (`trials.bikeClass`;
+ * Pointer + Esc only (ask 32): a bike chip highlights under the pointer and commits on click (`rockhop.bikeClass`;
  * the staged hero swaps livery with no track reload — ask 29; the sheet follows the click, not the pointer —
  * ask 40); an outfit commits on click
- * (`trials.riderOutfit`). The rider-model row is gone (asks 30 / 31): the Blender rider is the rider;
+ * (`rockhop.riderOutfit`). The rider-model row is gone (asks 30 / 31): the Blender rider is the rider;
  * `?rider=` stays a harness / debug override. Copy states the physics v2 R3 numbers (physics.md "v2 status — R3").
  */
 import type { BikeClass, RiderOutfit } from '../core/types';
 import { RIDER_PRESETS } from '../core/riderPresets';
 import type { ArtManifest } from './art';
-import { BUILD_STAMP_SHORT, GAME_NAME, escapeHtml } from './front';
+import { BUILD_STAMP_SHORT, escapeHtml } from './front';
+import { wordmarkSvg } from './brand';
 import type { UiSfx } from './sfx';
 import { conceal, isLiveTarget, reveal } from './live';
 import { DEFAULT_RIDER_OUTFIT, OUTFIT_DETAIL, OUTFIT_LABEL } from './outfit';
@@ -178,7 +179,7 @@ export class GarageScreen {
     this.stage = h('div', 'garage-stage');
     this.stage.setAttribute('aria-label', 'Model explorer: drag to rotate, pinch or scroll to zoom');
     this.bindExplorer();
-    const badge = h('div', 'garage-badge', `<div class="garage-plate"><span class="wordmark">${escapeHtml(GAME_NAME)}</span><span class="garage-title">Garage</span></div><div class="garage-build">${escapeHtml(BUILD_STAMP_SHORT)}</div>`);
+    const badge = h('div', 'garage-badge', `<div class="garage-plate"><span class="wordmark">${wordmarkSvg()}</span><span class="garage-title">Garage</span></div><div class="garage-build">${escapeHtml(BUILD_STAMP_SHORT)}</div>`);
     this.hint = h('div', 'garage-hint', '<i></i>Drag to rotate · pinch to zoom');
     // --- The rail (left edge): outfit, bike class — bike lowest (SPEC §5: under the thumb). Pointer + Esc only
     // (ask 32): a chip previews under the pointer and commits on click; no key rows, no Tab-follow.

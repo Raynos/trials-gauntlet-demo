@@ -15,6 +15,7 @@ import type { QualityChoice } from './menu';
 import type { UiSfx } from './sfx';
 import { conceal, reveal, isLiveTarget } from './live';
 import { artTier } from '../boot/tier';
+import { APP_VERSION, GAME_TITLE, wordmarkSvg } from './brand';
 
 export type FrontScreen = 'menu' | 'garage' | 'tracks' | 'settings' | 'credits' | 'review';
 
@@ -30,6 +31,8 @@ export interface FrontCallbacks {
   setFps(v: FpsChoice): void;
   setSound(on: boolean): void;
   setVolume(v: number): void;
+  /** Settings · Music: the recorded music's own level (0..1), under the master. */
+  setMusicVolume?(v: number): void;
   setGhost(on: boolean): void;
   setModel(which: 'rider' | 'bike', v: ModelChoice): void;
   resetProgress(): void;
@@ -50,6 +53,8 @@ export interface FrontState {
   fpsInEffect: 30 | 60;
   sound: boolean;
   volume: number;
+  /** Music level (0..1); the row shows only when the audio system has a music bus (`setMusicVolume`). */
+  music?: number;
   ghost: boolean;
   rider: ModelChoice;
   bike: ModelChoice;
@@ -69,7 +74,7 @@ export interface FrontState {
 
 export const BIKE_NAME: Record<BikeClass, string> = { rookie: 'Rookie', pro: 'Pro' };
 
-export const GAME_NAME = 'Trials Gauntlet';
+export const GAME_NAME = GAME_TITLE;
 declare const __BUILD_ID__: string | undefined;
 declare const __BUILD_TIME__: string | undefined;
 export const BUILD_STAMP = `build ${typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'}${typeof __BUILD_TIME__ === 'string' ? ' · ' + __BUILD_TIME__ : ''}`;
@@ -298,60 +303,69 @@ export class FocusList {
 // Main menu
 // ---------------------------------------------------------------------------
 
-/** Tile icons (24-unit viewBox, `currentColor`): bike / clapperboard / gear, drawn above the word. */
+/** Card icons (24-unit viewBox, `currentColor`): the garage's shutter door / clapperboard / gear, left of the word. */
 const MENU_ICON: Record<'garage' | 'review' | 'settings', string> = {
-  garage: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="16" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18.5" cy="16" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 16l3.2-6.2h4.6l2.6 3.4h2.6M8.7 9.8L7 7.2h3.4M13.3 9.8l1.6-3.2h2.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  review: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5h18V19a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19z" fill="currentColor"/><path d="M3.6 8.6L2.7 5.4 19.9 2.6l.9 3.2z" fill="currentColor"/><path d="M6.4 5.6l1.9 2.6M10.6 4.9l1.9 2.6M14.8 4.2l1.9 2.6" stroke="#0c0e12" stroke-width="1.4"/></svg>`,
-  settings: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4l1.9 1 2.1-.5 1.3 1.8 2 .8.1 2.2 1.5 1.6-1 2 .4 2.1-1.8 1.3-.8 2-2.2.1-1.6 1.5-2-1-2.1.4-1.3-1.8-2-.8-.1-2.2-1.5-1.6 1-2-.4-2.1 1.8-1.3.8-2 2.2-.1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>`,
+  garage: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 9.2L12 3.5l9.5 5.7V21h-3.2v-9.3H5.7V21H2.5z" fill="currentColor"/><path d="M7 13.4h10M7 15.8h10M7 18.2h10M7 20.6h10" stroke="currentColor" stroke-width="1.7"/></svg>`,
+  review: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5h18V19a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19z" fill="currentColor"/><path d="M3.6 8.6L2.7 5.4 19.9 2.6l.9 3.2z" fill="currentColor"/><path d="M6.4 5.6l1.9 2.6M10.6 4.9l1.9 2.6M14.8 4.2l1.9 2.6" stroke="#EFE3C8" stroke-width="1.4"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M10.3 1.8h3.4l.5 2.7a8 8 0 0 1 2 1.2l2.6-.9 1.7 2.9-2.1 1.8a8 8 0 0 1 0 2.3l2.1 1.8-1.7 2.9-2.6-.9a8 8 0 0 1-2 1.2l-.5 2.7h-3.4l-.5-2.7a8 8 0 0 1-2-1.2l-2.6.9-1.7-2.9 2.1-1.8a8 8 0 0 1 0-2.3L3.5 7.7l1.7-2.9 2.6.9a8 8 0 0 1 2-1.2zM12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2z"/></svg>`,
 };
 
-/** Nalati grassland tint shown in the strip until the plate decodes (the biome is not in `BIOME_TINT`: it is not built yet). */
-const NALATI_TINT = 'linear-gradient(180deg, #3f7fc8 0%, #8fbde8 44%, #7aa63f 56%, #3d6a25 100%)';
+/** The two home-screen plates (D23): the harbour for the first two zones, the quarry from the quarry on. */
+export type HomeArt = 'harbour' | 'quarry';
+
+/** Which plate a player sees: the zone they are up to (the first with an unmedalled track). New players: the harbour. */
+export function homeArtForZone(zone: string | null | undefined): HomeArt {
+  return zone === 'quarry' || zone === 'snowline' ? 'quarry' : 'harbour';
+}
+
+/** Sky-to-ground tints shown until the plate decodes (the harbour's sea blue, the quarry's teal sky over sandstone). */
+const HOME_TINT: Record<HomeArt, string> = {
+  harbour: 'linear-gradient(180deg, #3d8fd0 0%, #9cc9ea 42%, #2a7f96 58%, #5b3a26 100%)',
+  quarry: 'linear-gradient(180deg, #1f7f9a 0%, #8ec3d3 40%, #d9b98a 58%, #8a5d36 100%)',
+};
 
 /**
- * The strip's plate: `keyart-nalati-*` from the art pack (`kind: keyart`, `biome: nalati` — a key-art plate, not a
- * biome, until Nalati is built), at the device's tier (`artTier()`, the one the offline pack fetched); null
- * (the tint stays) when the pack lacks it.
+ * The home plate: `keyart-harbour-*` (biome `coast`) or `keyart-quarry-*` (biome `quarry`) from the art pack at the
+ * device's tier (`artTier()`, the one the offline pack fetched); the harbour when the quarry is missing; null (the
+ * tint stays) when the pack has neither.
  */
-export function menuPlate(art: ArtManifest): ArtEntry | null {
-  const list = art.all().filter((e) => e.kind === 'keyart' && (e.biome as string) === 'nalati');
-  if (list.length === 0) return null;
-  return list.find((e) => e.variant === artTier()) ?? list[0]!;
+export function menuPlate(art: ArtManifest, which: HomeArt = 'harbour'): ArtEntry | null {
+  const pick = (biome: string): ArtEntry | null => {
+    const list = art.all().filter((e) => e.kind === 'keyart' && (e.biome as string) === biome);
+    return list.find((e) => e.variant === artTier()) ?? list[0] ?? null;
+  };
+  return pick(which === 'quarry' ? 'quarry' : 'coast') ?? pick('coast');
 }
 
 /**
- * Main menu, round 3 B2 "Strip" (assets/design/menu/round3/SPEC.md § B2, ask #42): the boot screen — there is
- * no title step. The Lobby split turned sideways: a wide cinematic strip of the Nalati jump across the top
- * (the `keyart-nalati` plate, cropped by the band, a grassland tint until it decodes) with the wordmark large
- * in two lines over the sky at the left and the build stamp on a small amber-edged plate under it; a charcoal band with the
- * amber edge along the bottom holding one row of four big tiles — GARAGE · REVIEW · SETTINGS (icon above the
- * word) and PLAY at the right, amber, 1.6× wider — and CREDITS small under GARAGE. Nothing else: this is the
- * title menu, not a status board — no track, session, progress, best time or bike class is read here
- * (the level select and the garage keep their own). The list's DOM order stays play · garage · review ·
- * settings · credits (keys / pad / e2e); PLAY is moved to the right end visually with `order`.
+ * Home screen (store release D18, mockups `round2/M1` + `round1/A-menu`): the key art full bleed — the harbour or the
+ * quarry, following the zone the player is up to — the ROCKHOP wordmark top-left in cream with the version under it,
+ * and one row along the bottom: cream GARAGE and SETTINGS cards (icon · rule · word, contour paper), the big
+ * vermilion PLAY card at the right, and CREDITS as a small underlined link under GARAGE. A dev build adds a REVIEW
+ * card (the level reviewer); a store build never has one. Nothing else: no track, time, count or bike class (ask 42).
+ * The list's DOM order stays play · garage · review · settings · credits (keys / pad / e2e); PLAY is moved to the
+ * right end visually with `order`.
  */
 export class MainMenuScreen extends Screen {
   private readonly list: FocusList;
   private readonly keyart: HTMLDivElement;
+  private readonly art: ArtManifest;
+  private homeArt: HomeArt = 'harbour';
 
   constructor(parent: HTMLElement, sfx: UiSfx, art: ArtManifest, private readonly cb: FrontCallbacks) {
     super(parent, 'menu-screen');
+    this.art = art;
     this.keyart = h('div', 'menu-keyart');
-    this.keyart.style.backgroundImage = NALATI_TINT; // never the shorthand: it would reset background-size
-    // The big title (near-white display face over the sky), then the build stamp alone on the slanted amber-edged plate
-    // (ask 45: the plate no longer repeats the name under the title).
+    this.keyart.style.backgroundImage = HOME_TINT.harbour; // never the shorthand: it would reset background-size
     const head = h('div', 'menu-head');
-    const title = h('div', 'menu-title', `<span>Trials</span><span>Gauntlet</span>`);
-    const plate = h('div', 'menu-plate');
-    plate.appendChild(h('div', 'menu-build', escapeHtml(BUILD_STAMP_SHORT)));
-    head.append(title, plate);
+    head.innerHTML = `<h1 class="menu-title">${wordmarkSvg({ className: 'menu-wordmark' })}</h1><div class="menu-ver">v${APP_VERSION}${DEV_SURFACES ? `<span>${escapeHtml(BUILD_STAMP_SHORT)}</span>` : ''}</div>`;
     const band = h('div', 'menu-band');
     this.list = new FocusList(band, sfx, 'menu-list tiles', 'x');
-    this.root.append(this.keyart, h('div', 'grain'), head, band);
+    this.root.append(this.keyart, h('div', 'menu-shade'), head, band);
     this.list.setItems([
       { id: 'play', label: 'Play' },
       { id: 'garage', label: 'Garage', icon: MENU_ICON.garage },
-      // The level reviewer (docs/design/game.md §21) is a dev tool: a store build has no REVIEW tile.
+      // The level reviewer (docs/design/game.md §21) is a dev tool: a store build has no REVIEW card.
       ...(DEV_SURFACES ? [{ id: 'review', label: 'Review', icon: MENU_ICON.review }] : []),
       { id: 'settings', label: 'Settings', icon: MENU_ICON.settings },
       { id: 'credits', label: 'Credits', minor: true },
@@ -368,10 +382,36 @@ export class MainMenuScreen extends Screen {
       else if (id === 'settings') this.cb.goto('settings');
       else if (id === 'credits') this.cb.goto('credits');
     };
-    art.whenReady(() => art.applyBackground(this.keyart, menuPlate(art)));
+    art.whenReady(() => this.applyArt());
     window.addEventListener('resize', () => {
       if (this.visible) this.list.render(false);
     });
+  }
+
+  /** The zone the player is up to picks the plate (the app calls this before `show`). */
+  setZone(zone: string | null | undefined): void {
+    const next = homeArtForZone(zone);
+    if (next === this.homeArt) return;
+    this.homeArt = next;
+    this.keyart.classList.remove('loaded');
+    this.keyart.style.backgroundImage = HOME_TINT[next];
+    this.art.whenReady(() => this.applyArt());
+  }
+
+  /** Touch: no focus ring on the cards (the finger is the focus); keys / pad keep it. */
+  override setDevice(d: 'keyboard' | 'gamepad' | 'touch' | null): void {
+    super.setDevice(d);
+    this.root.classList.toggle('touchdev', d === 'touch');
+  }
+
+  /** Which plate is up (`harbour` / `quarry`), for the harness. */
+  get plate(): HomeArt {
+    return this.homeArt;
+  }
+
+  private applyArt(): void {
+    this.keyart.dataset['art'] = this.homeArt;
+    this.art.applyBackground(this.keyart, menuPlate(this.art, this.homeArt));
   }
 
   override show(): void {
@@ -382,7 +422,7 @@ export class MainMenuScreen extends Screen {
 
   nav(dx: number, dy: number): void {
     if (!this.visible || !isLiveTarget(this.root)) return;
-    // One row of tiles: either axis steps along it (the garage owns every customisation row now).
+    // One row of cards: either axis steps along it (the garage owns every customisation row now).
     this.list.move(dx || dy);
   }
   confirm(): void {
@@ -397,7 +437,7 @@ export class MainMenuScreen extends Screen {
 // Settings
 // ---------------------------------------------------------------------------
 
-type SettingId = 'quality' | 'fps' | 'sound' | 'volume' | 'ghost' | 'rider' | 'bike' | 'telemetry' | 'runlog' | 'reset' | 'reload' | 'physics';
+type SettingId = 'quality' | 'fps' | 'sound' | 'volume' | 'music' | 'ghost' | 'rider' | 'bike' | 'telemetry' | 'runlog' | 'reset' | 'reload' | 'physics';
 
 interface SettingRow {
   id: SettingId;
@@ -413,6 +453,7 @@ export class SettingsScreen extends Screen {
   private index = 0;
   private resetArmed = 0;
   private runlogPaint: (() => void) | null = null;
+  private readonly sliderPaint: (() => void)[] = [];
 
   constructor(
     parent: HTMLElement,
@@ -467,18 +508,18 @@ export class SettingsScreen extends Screen {
     seg('fps', 'Frame rate', 'Auto = 60 · the meter top-right shows what you get', [{ v: 'auto', l: `Auto (${s().fpsInEffect})` }, { v: '30', l: '30' }, { v: '60', l: '60' }], () => s().fps, (v) => this.cb.setFps(v as FpsChoice));
     seg('sound', 'Sound', 'Engine, impacts, menu cues', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().sound ? 'on' : 'off'), (v) => this.cb.setSound(v === 'on'));
 
-    // Volume slider row.
-    {
+    // Slider rows: master volume, then the music under it (when the audio system has a music bus).
+    const slider = (id: 'volume' | 'music', label: string, sub: string, get: () => number, set: (v: number) => void): void => {
       const el = h('div', 'setting');
-      el.innerHTML = `<div class="lab">Volume<small>Master level</small></div><div class="slider"><button type="button" data-d="-1" aria-label="quieter">−</button><div class="bar"><i></i></div><button type="button" data-d="1" aria-label="louder">+</button><span class="val"></span></div>`;
+      el.dataset['row'] = id;
+      el.innerHTML = `<div class="lab">${label}<small>${sub}</small></div><div class="slider"><button type="button" data-d="-1" aria-label="quieter">−</button><div class="bar"><i></i></div><button type="button" data-d="1" aria-label="louder">+</button><span class="val"></span></div>`;
       const paint = (): void => {
-        const v = s().volume;
+        const v = get();
         el.querySelector<HTMLElement>('.bar i')!.style.width = `${Math.round(v * 100)}%`;
         el.querySelector('.val')!.textContent = `${Math.round(v * 100)}%`;
       };
       const step = (d: number): void => {
-        const v = Math.max(0, Math.min(1, Math.round((s().volume + d * 0.1) * 10) / 10));
-        this.cb.setVolume(v);
+        set(Math.max(0, Math.min(1, Math.round((get() + d * 0.1) * 10) / 10)));
         this.sfx.tick();
         paint();
       };
@@ -490,9 +531,12 @@ export class SettingsScreen extends Screen {
       });
       el.addEventListener('pointerenter', () => this.focusRow(this.rows.findIndex((r) => r.el === el), true));
       paint();
-      this.rows.push({ id: 'volume', el, step, activate: () => step(1) });
+      this.rows.push({ id, el, step, activate: () => step(1) });
+      this.sliderPaint.push(paint);
       list.appendChild(el);
-    }
+    };
+    slider('volume', 'Volume', 'Master level', () => s().volume, (v) => this.cb.setVolume(v));
+    if (typeof s().music === 'number' && this.cb.setMusicVolume) slider('music', 'Music', 'The soundtrack, under the master', () => s().music ?? 1, (v) => this.cb.setMusicVolume?.(v));
 
     seg('ghost', 'Ghost', 'Your personal-best run rides alongside', [{ v: 'on', l: 'On' }, { v: 'off', l: 'Off' }], () => (s().ghost ? 'on' : 'off'), (v) => this.cb.setGhost(v === 'on'));
     // The rider model (Classic / Blender / Img2) and the outfit live in the Garage only (garage round); the bike
@@ -625,12 +669,7 @@ export class SettingsScreen extends Screen {
     this.rows.forEach((r) => {
       r.el.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) => b.classList.toggle('on', b.dataset['v'] === currentValue(r.id, this.state())));
     });
-    const vol = this.rows.find((r) => r.id === 'volume');
-    if (vol) {
-      const v = this.state().volume;
-      vol.el.querySelector<HTMLElement>('.bar i')!.style.width = `${Math.round(v * 100)}%`;
-      vol.el.querySelector('.val')!.textContent = `${Math.round(v * 100)}%`;
-    }
+    for (const paint of this.sliderPaint) paint();
   }
 
   nav(dx: number, dy: number): void {
@@ -722,16 +761,17 @@ export class CreditsScreen extends Screen {
     super(parent, 'credits-screen');
     const plate = h('div', 'plate-bg');
     this.root.appendChild(plate);
-    art.whenReady(() => art.applyBackground(plate, art.byId('results-credits') ?? art.plate('results-bg')));
+    art.whenReady(() => art.applyBackground(plate, art.byId('results-coast') ?? art.byId('results-credits') ?? art.plate('results-bg')));
     const wrap = h('div', 'credits-wrap rise');
     wrap.innerHTML = `<h1>Credits</h1>
       <dl>
-        <dt>Game</dt><dd><b>${GAME_NAME}</b> — a 2.5D physics trials-bike demo.</dd>
+        <dt>Game</dt><dd><b>${GAME_NAME}</b> — dirt bikes, rocks, higher lines. A 2.5D motorbike physics game by Jake Verbaten.</dd>
         <dt>Engine</dt><dd>TypeScript · three.js · WebGL2 · Web Audio. 120 Hz fixed-step bike physics; every run replays byte-identical.</dd>
         <dt>Design</dt><dd>Attempts-to-clear and restart latency, measured by a bot and a stranger every round.</dd>
-        <dt>Type</dt><dd>Barlow Condensed by Jeremy Tribby (SIL OFL 1.1).</dd>
-        <dt>Art</dt><dd>Key art, track cards and medals generated for this build; procedural biomes in-engine.</dd>
-        <dt>Hero</dt><dd>Rider and bike authored in Blender by Astra (five outfits, two liveries). Body and skin from <b>MPFB / MakeHuman</b> system assets (CC0) and the Blender Studio human base meshes (CC0); hair from <b>Daniel Bystedt</b>'s Hair Styles demo (CC BY-SA), baked to a curl shell for the game; beard and moustache by <b>grinsegold</b> (MakeHuman bodyparts06, CC-BY); the study head <b>Infinite, 3D Head Scan by Lee Perry-Smith</b> (CC BY 3.0, via three.js); cotton and denim from <b>Poly Haven</b> (CC0). Full provenance and licences ship with the source.</dd>
+        <dt>Music</dt><dd>Music generated with <b>ACE-Step 1.5</b> (MIT). Engine, tyres, crowd and ambience are synthesised in code.</dd>
+        <dt>Type</dt><dd><b>Archivo Black</b> and <b>Archivo</b> by Omnibus-Type; <b>Barlow Condensed</b> by Jeremy Tribby (all SIL OFL 1.1).</dd>
+        <dt>Art</dt><dd>Key art, icons, medals and world textures generated for ROCKHOP; the zones are built in-engine.</dd>
+        <dt>Hero</dt><dd>Rider and bike authored in Blender by Astra (five outfits, two liveries). Body and skin from <b>MPFB / MakeHuman</b> system assets (CC0) and the Blender Studio human base meshes (CC0); hair from <b>Daniel Bystedt</b>'s Hair Styles (CC BY-SA), baked to a curl shell for the game; beard and moustache by <b>grinsegold</b> (MakeHuman bodyparts06, CC-BY); the study head <b>Infinite, 3D Head Scan by Lee Perry-Smith</b> (CC BY 3.0, via three.js); cotton and denim from <b>Poly Haven</b> (CC0). Full provenance and licences ship with the source.</dd>
       </dl>`;
     this.root.append(h('div', 'grain'), wrap);
     this.addBackButton('Menu');

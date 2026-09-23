@@ -1,6 +1,6 @@
 /**
  * Local per-track leaderboard (docs/design/game.md § leaderboard): top 5 per track per class in
- * `trials.best.<id>[@pro]#board`, seeded from a pre-board PB, additive to the PB entries.
+ * `rockhop.best.<id>[@pro]#board`, seeded from a pre-board PB, additive to the PB entries.
  */
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { RunResult } from '../core/types';

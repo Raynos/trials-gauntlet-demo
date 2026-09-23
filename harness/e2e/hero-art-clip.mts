@@ -55,7 +55,7 @@ const ctx = await browser.newContext({
   viewport: { width: W, height: H }, deviceScaleFactor: DPR, isMobile: true, hasTouch: true, recordVideo: { dir: out, size: { width: W, height: H } },
   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
 });
-await ctx.addInitScript(() => localStorage.setItem('trials.onboarded', '1'));
+await ctx.addInitScript(() => localStorage.setItem('rockhop.onboarded', '1'));
 const page: Page = await ctx.newPage();
 const t0 = Date.now();
 const now = (): number => Date.now() - t0;
@@ -95,7 +95,7 @@ async function swapTo(kind: 'outfit' | 'bike', target: string): Promise<void> {
   const tapMs = now();
   await tap(kind === 'outfit' ? `button[data-outfit="${target}"]` : `button[data-bike="${target}"]`);
   if (kind === 'outfit') {
-    await page.waitForFunction((id) => localStorage.getItem('trials.riderOutfit') === id && (window as unknown as { __render: { debugInfo(): { riderOutfit: string | null } } }).__render.debugInfo().riderOutfit === id
+    await page.waitForFunction((id) => localStorage.getItem('rockhop.riderOutfit') === id && (window as unknown as { __render: { debugInfo(): { riderOutfit: string | null } } }).__render.debugInfo().riderOutfit === id
       && !/Loading/.test(document.querySelector('.outfit-current')?.textContent ?? ''), target, { timeout: 60_000 });
   } else {
     await page.waitForFunction((id) => document.querySelector(`button[data-bike="${id}"]`)?.getAttribute('aria-pressed') === 'true', target, { timeout: 60_000 });
@@ -138,17 +138,17 @@ async function ride(spec: typeof RIDES[number]): Promise<RideResult> {
   const node = sim.run(inputs.slice(0, total));
   const nodeFinishTime = sim.rules.phase() === 'finished' ? sim.rules.runTicks() / hz : null;
   await page.evaluate(async ({ outfit, bike, trackId, seed, quality }) => {
-    const w = window as unknown as { __trials: { setBike(b: string): void; loadTrack(id: string, seed: number): Promise<boolean> | boolean; skipCountdown(): void; setQuality(t: string): void; resize(w: number, h: number): void; info(): { bike: string; seed: number } }; __render: { whenReady(): Promise<void>; setRiderOutfit(o: string): Promise<boolean> } };
+    const w = window as unknown as { __rockhop: { setBike(b: string): void; loadTrack(id: string, seed: number): Promise<boolean> | boolean; skipCountdown(): void; setQuality(t: string): void; resize(w: number, h: number): void; info(): { bike: string; seed: number } }; __render: { whenReady(): Promise<void>; setRiderOutfit(o: string): Promise<boolean> } };
     await w.__render.whenReady();
     if (!await w.__render.setRiderOutfit(outfit)) throw new Error(`outfit ${outfit} did not load`);
-    w.__trials.setBike(bike);
+    w.__rockhop.setBike(bike);
     await w.__render.whenReady();
-    if (!await w.__trials.loadTrack(trackId, seed)) throw new Error('track did not load');
+    if (!await w.__rockhop.loadTrack(trackId, seed)) throw new Error('track did not load');
     await w.__render.whenReady();
-    w.__trials.setQuality(quality);
+    w.__rockhop.setQuality(quality);
     await w.__render.whenReady();
-    w.__trials.skipCountdown();
-    if (w.__trials.info().bike !== bike || w.__trials.info().seed !== seed) throw new Error('class/seed mismatch');
+    w.__rockhop.skipCountdown();
+    if (w.__rockhop.info().bike !== bike || w.__rockhop.info().seed !== seed) throw new Error('class/seed mismatch');
   }, { outfit: spec.outfit, bike: spec.bike, trackId: rec.header.trackId, seed: rec.header.seed, quality });
   const started = now();
   const samples: RideSample[] = [];
@@ -157,13 +157,13 @@ async function ride(spec: typeof RIDES[number]): Promise<RideResult> {
   const poseFrames: PoseFrame[] = [];
   for (let tick = 0; tick < total; tick += ticksPerFrame) {
     const s = await page.evaluate(({ batch, sample }) => {
-      const w = window as unknown as { __trials: { setInput(f: unknown): void; step(n: number): void; render(sync: boolean): void; getState(): { tick: number; bike: { pos: { x: number } } }; phase(): string; hashState(): string }; __render: { debugInfo(): { heroDoc: string; calls: number; tris: number; profile: string; tier: string } } };
-      for (const f of batch) { w.__trials.setInput(f); w.__trials.step(1); }
-      w.__trials.render(true);
-      const st = w.__trials.getState(), d = w.__render.debugInfo();
+      const w = window as unknown as { __rockhop: { setInput(f: unknown): void; step(n: number): void; render(sync: boolean): void; getState(): { tick: number; bike: { pos: { x: number } } }; phase(): string; hashState(): string }; __render: { debugInfo(): { heroDoc: string; calls: number; tris: number; profile: string; tier: string } } };
+      for (const f of batch) { w.__rockhop.setInput(f); w.__rockhop.step(1); }
+      w.__rockhop.render(true);
+      const st = w.__rockhop.getState(), d = w.__render.debugInfo();
       const rd = (w.__render as unknown as { debug?: { rider?: { debug?: { stance?: { on: boolean; pose: string; blend: number }; wristErr: number[]; stageClip: string | null } } } }).debug?.rider?.debug;
       const pose = rd ? { stanceOn: !!rd.stance?.on, pose: rd.stance?.pose ?? '-', blend: rd.stance?.blend ?? 0, wristErr: [rd.wristErr[0] ?? 0, rd.wristErr[1] ?? 0] as [number, number], stageClip: rd.stageClip ?? null } : null;
-      return { tick: st.tick, x: Math.round(st.bike.pos.x * 100) / 100, phase: w.__trials.phase(), heroDoc: d.heroDoc, calls: d.calls, tris: d.tris, hash: sample || st.tick === 1200 ? w.__trials.hashState() : null, profile: d.profile, tier: d.tier, pose };
+      return { tick: st.tick, x: Math.round(st.bike.pos.x * 100) / 100, phase: w.__rockhop.phase(), heroDoc: d.heroDoc, calls: d.calls, tris: d.tris, hash: sample || st.tick === 1200 ? w.__rockhop.hashState() : null, profile: d.profile, tier: d.tier, pose };
     }, { batch: inputs.slice(tick, tick + ticksPerFrame), sample: frames % 60 === 0 });
     frames++;
     heroDocs.add(s.heroDoc);
@@ -174,7 +174,7 @@ async function ride(spec: typeof RIDES[number]): Promise<RideResult> {
     if (s.hash !== null || s.tick === 1200) samples.push({ tick: s.tick, x: s.x, phase: s.phase, heroDoc: s.heroDoc, calls: s.calls, tris: s.tris, ms: now() - started });
     if (samples.length === 1) log[`profile.${spec.bike}`] = `${s.profile}/${s.tier}`;
   }
-  const end = await page.evaluate(() => { const t = (window as unknown as { __trials: { hashState(): string; finishTime(): number | null; phase(): string; getState(): { tick: number } } }).__trials; return { hash: t.hashState(), finishTime: t.finishTime(), phase: t.phase(), tick: t.getState().tick }; });
+  const end = await page.evaluate(() => { const t = (window as unknown as { __rockhop: { hashState(): string; finishTime(): number | null; phase(): string; getState(): { tick: number } } }).__rockhop; return { hash: t.hashState(), finishTime: t.finishTime(), phase: t.phase(), tick: t.getState().tick }; });
   // The gate's golden pin (finish hash) when the whole golden was ridden and a pin exists for this class.
   const pin = total === inputs.length && expected[spec.pinKey]?.['golden']?.file === spec.golden ? expected[spec.pinKey]!['golden']!.hash : null;
   const pinMatch = pin ? end.hash === pin : null;
@@ -198,7 +198,7 @@ try {
   await page.waitForSelector('.garage-screen.live', { timeout: 30_000 });
   await page.evaluate(async () => { await (window as unknown as { __render: { whenReady(): Promise<void> } }).__render.whenReady(); });
   mark('garageLive');
-  if (garageQuality) await page.evaluate(async (q) => { (window as unknown as { __trials: { setQuality(t: string): void } }).__trials.setQuality(q); await (window as unknown as { __render: { whenReady(): Promise<void> } }).__render.whenReady(); }, garageQuality);
+  if (garageQuality) await page.evaluate(async (q) => { (window as unknown as { __rockhop: { setQuality(t: string): void } }).__rockhop.setQuality(q); await (window as unknown as { __render: { whenReady(): Promise<void> } }).__render.whenReady(); }, garageQuality);
   log['garageBoot'] = await page.evaluate(() => { const d = (window as unknown as { __render: { debugInfo(): Record<string, unknown> } }).__render.debugInfo(); return { heroDoc: d['heroDoc'], outfit: d['riderOutfit'], calls: d['calls'], tris: d['tris'], heroTris: d['heroTris'], garage: d['garage'], tier: d['tier'], profile: d['profile'], dpr: d['dpr'], canvas: `${String(d['canvasW'])}x${String(d['canvasH'])}` }; });
   await page.waitForTimeout(1000);
   // Every outfit; on each, Pro then Rookie so both liveries are seen under every outfit (15 swaps).
@@ -215,7 +215,7 @@ try {
   await page.waitForTimeout(600);
   // The rides: the same page in harness mode (the harness owns the clock; every tick from the golden).
   await page.goto(`${server.url}?harness=1&sw=0&rider=gltf&bike=gltf&hz=120&physics=v2&outfit=${RIDES[0]!.outfit}`, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => (window as unknown as { __trials?: { ready?: boolean } }).__trials?.ready === true, null, { timeout: 120_000 });
+  await page.waitForFunction(() => (window as unknown as { __rockhop?: { ready?: boolean } }).__rockhop?.ready === true, null, { timeout: 120_000 });
   mark('harnessReady');
   const rides: RideResult[] = [];
   for (const spec of RIDES) {

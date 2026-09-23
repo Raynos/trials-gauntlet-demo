@@ -288,7 +288,7 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
     for (let t = 0; t < startTick; t += hz * 5) {
       const slice: InputFrame[] = frames.slice(t, Math.min(startTick, t + hz * 5));
       await page.evaluate((inputs) => {
-        const tr = window.__trials!;
+        const tr = window.__rockhop!;
         for (const f of inputs) {
           tr.setInput(f);
           tr.step(1);
@@ -314,7 +314,7 @@ export async function captureClip(o: CaptureOptions): Promise<CaptureResult> {
       // Step this frame's ticks and render in one round trip.
       const res = await page.evaluate(
         ([inputs, n, grab, cam, rp]) => {
-          const t = window.__trials!;
+          const t = window.__rockhop!;
           for (const f of inputs) {
             t.setInput(f);
             t.step(1);

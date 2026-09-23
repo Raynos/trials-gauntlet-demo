@@ -106,7 +106,7 @@ interface RunResult {
 /** Runs in the page once per tick batch: steps the inputs, renders, measures. */
 function probeInPage([inputs, MASK_PX]: [unknown[], number]): Row {
   const w = window as any;
-  const tr = w.__trials;
+  const tr = w.__rockhop;
   for (const f of inputs) {
     tr.setInput(f);
     tr.step(1);
@@ -303,7 +303,7 @@ async function openPage(b: { context: BrowserContext }, baseUrl: string, mode: M
   const page = await b.context.newPage();
   await page.addInitScript('window.__name = function (f) { return f; };'); // tsx keepNames helper inside evaluated functions
   // A fresh context is a first launch: the onboarding card would pause the run behind it (the bench skips it, the live leg must too).
-  await page.addInitScript('try { localStorage.setItem("trials.onboarded", "1"); } catch {}');
+  await page.addInitScript('try { localStorage.setItem("rockhop.onboarded", "1"); } catch {}');
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   const url = new URL(baseUrl);
@@ -314,7 +314,7 @@ async function openPage(b: { context: BrowserContext }, baseUrl: string, mode: M
   url.searchParams.set('rider', 'gltf');
   url.searchParams.set('bike', 'gltf');
   await page.goto(url.toString(), { waitUntil: 'commit' });
-  await page.waitForFunction(() => (window as any).__trials?.ready === true, undefined, { timeout: 60_000 });
+  await page.waitForFunction(() => (window as any).__rockhop?.ready === true, undefined, { timeout: 60_000 });
   return { page, errors };
 }
 
@@ -344,13 +344,13 @@ async function runHarness(engine: string, tier: string, baseUrl: string): Promis
     await page.evaluate(
       async ([track, seed, tier, lod]) => {
         const w = window as any;
-        w.__trials.setQuality(tier);
+        w.__rockhop.setQuality(tier);
         if (lod) w.__render.setRiderLod(true);
-        w.__trials.loadTrack(track, seed);
+        w.__rockhop.loadTrack(track, seed);
         await w.__render.whenReady();
-        w.__trials.render(true);
-        w.__trials.render(true);
-        w.__trials.skipCountdown?.();
+        w.__rockhop.render(true);
+        w.__rockhop.render(true);
+        w.__rockhop.skipCountdown?.();
       },
       [track, rec.header.seed, tier, riderLod] as const,
     );
@@ -366,7 +366,7 @@ async function runHarness(engine: string, tier: string, baseUrl: string): Promis
       rows.push(row);
       if (!shot && at >= shotTick) {
         shot = path.join(outDir, `${engine}-${tier}${riderLod ? '-lod' : ''}-t${at}.png`);
-        await page.evaluate(() => (window as any).__trials.render(true));
+        await page.evaluate(() => (window as any).__rockhop.render(true));
         await page.screenshot({ path: shot });
       }
     }
@@ -385,14 +385,14 @@ async function runApp(engine: string, tier: string, baseUrl: string): Promise<Ru
   const b = await launch(engine);
   try {
     const { page, errors } = await openPage(b, baseUrl, 'app');
-    await page.waitForFunction(() => (window as any).__trials.app?.screen() === 'run', undefined, { timeout: 60_000 });
+    await page.waitForFunction(() => (window as any).__rockhop.app?.screen() === 'run', undefined, { timeout: 60_000 });
     await page.evaluate(
       async ([tier, lod]) => {
         const w = window as any;
-        w.__trials.setQuality(tier);
+        w.__rockhop.setQuality(tier);
         if (lod) w.__render.setRiderLod(true);
         await w.__render.whenReady();
-        w.__trials.skipCountdown?.();
+        w.__rockhop.skipCountdown?.();
       },
       [tier, riderLod] as const,
     );
@@ -428,7 +428,7 @@ async function runBench(engine: string, baseUrl: string): Promise<RunResult> {
   const b = await launch(engine);
   try {
     const { page, errors } = await openPage(b, baseUrl, 'bench');
-    await page.evaluate(() => (window as any).__trials.bench.start());
+    await page.evaluate(() => (window as any).__rockhop.bench.start());
     const rows: Row[] = [];
     const shots: string[] = [];
     let env: Record<string, unknown> | null = null;
@@ -436,9 +436,9 @@ async function runBench(engine: string, baseUrl: string): Promise<RunResult> {
     const t0 = Date.now();
     while (Date.now() - t0 < 240_000) {
       await page.waitForTimeout(3000);
-      const st = await page.evaluate(() => (window as any).__trials.bench.state());
+      const st = await page.evaluate(() => (window as any).__rockhop.bench.state());
       if (st.done) break;
-      const screen = await page.evaluate(() => (window as any).__trials.app.screen());
+      const screen = await page.evaluate(() => (window as any).__rockhop.app.screen());
       if (screen !== 'run') continue;
       if (!env) env = await page.evaluate(envInPage);
       const row = await page.evaluate(probeInPage, [[] as unknown[], MASK_PX] as [unknown[], number]);

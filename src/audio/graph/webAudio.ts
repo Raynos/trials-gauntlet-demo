@@ -25,7 +25,7 @@ import { MusicPlayer, type MusicPlayerOptions } from '../music/player';
 import { zoneOf, type MusicZone } from '../music/zone';
 import { SCENE_MENU, SCENE_RESULTS } from '../model/mapParams';
 
-const WORKLET_NAME = 'trials-synth';
+const WORKLET_NAME = 'rockhop-synth';
 
 export interface WebAudioOptions {
   /** Inject a context (tests / OfflineAudioContext). Default: new AudioContext in unlock(). */

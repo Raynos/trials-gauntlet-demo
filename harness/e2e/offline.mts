@@ -240,7 +240,7 @@ async function dumpCache(page: Page): Promise<CacheDump> {
 async function replayGolden(page: Page, json: string): Promise<{ hash: string; finishTime: number | null; faults: number } | null> {
   return page
     .evaluate((j) => {
-      const t = (window as unknown as { __trials?: { runRecording(j: string): { finishTime: number | null }; hashState(): string; faults(): number; drainEvents(): unknown } }).__trials;
+      const t = (window as unknown as { __rockhop?: { runRecording(j: string): { finishTime: number | null }; hashState(): string; faults(): number; drainEvents(): unknown } }).__rockhop;
       if (!t) return null;
       t.drainEvents();
       const state = t.runRecording(j);
@@ -334,7 +334,7 @@ export async function offlineSuite(opts: { verbose?: boolean; stillsDir?: string
       // The world map, offline: PLAY → the plates the boot already pulled.
       const wm = await page
         .evaluate(async () => {
-          const t = (window as unknown as { __trials?: { app?: { goto(s: string): void; screen(): string; frame(): void } } }).__trials;
+          const t = (window as unknown as { __rockhop?: { app?: { goto(s: string): void; screen(): string; frame(): void } } }).__rockhop;
           if (!t?.app) return null;
           t.app.goto('tracks');
           await new Promise((r) => setTimeout(r, 1500));
@@ -353,7 +353,7 @@ export async function offlineSuite(opts: { verbose?: boolean; stillsDir?: string
       // The review inbox, offline: the note queues in localStorage and says so.
       const inbox = await page
         .evaluate(async () => {
-          const t = (window as unknown as { __trials?: { app?: { goto(s: string): void; play(id: string): void; screen(): string } } }).__trials;
+          const t = (window as unknown as { __rockhop?: { app?: { goto(s: string): void; play(id: string): void; screen(): string } } }).__rockhop;
           if (!t?.app) return null;
           const before = Object.keys(localStorage).filter((k) => /inbox|note/i.test(k));
           let err = '';
@@ -410,7 +410,7 @@ export async function offlineSuite(opts: { verbose?: boolean; stillsDir?: string
         // every screen and takes the pointers, so a tap on the outfit rail lands on nothing at all.
         await page.setViewportSize({ width: 932, height: 430 });
         await page.waitForTimeout(500);
-        await page.evaluate(() => (window as unknown as { __trials: { app: { goto(s: string): void } } }).__trials.app.goto('garage'));
+        await page.evaluate(() => (window as unknown as { __rockhop: { app: { goto(s: string): void } } }).__rockhop.app.goto('garage'));
         await page.waitForSelector('.garage-screen.live', { timeout: 30_000 });
         // The screen reveals on an opacity ramp and `src/ui/live.ts` ignores pointers under .5 opacity
         // (the R6 touch invariant): tapping the instant the class lands is a tap on nothing.

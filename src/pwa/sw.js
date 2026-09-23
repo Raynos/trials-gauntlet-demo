@@ -1,17 +1,17 @@
-/* Trials Gauntlet service worker (docs/design/game.md §14, docs/plans/PWA_OFFLINE.md).
+/* ROCKHOP service worker (docs/design/game.md §14, docs/plans/PWA_OFFLINE.md).
  *
- * Emitted by the `trials:pwa` Vite plugin with `__BUILD_ID__` / `__ASSET_ID__` replaced per build.
+ * Emitted by the `rockhop:pwa` Vite plugin with `__BUILD_ID__` / `__ASSET_ID__` replaced per build.
  * `__BUILD_ID__` is `<git sha>-<content hash of every emitted + public file>`: a deploy that changes
  * bytes is a byte-different worker (the browser installs it); a rebuild of the same tree is the SAME
  * worker, so a rebuild no longer throws the player's 31 MB away.
  *
  * THREE caches, because they expire on three different clocks (plan §2.3):
- *   trials-immutable          content-addressed, therefore forever: /assets/*-<8>.{js,css} and
+ *   rockhop-immutable          content-addressed, therefore forever: /assets/*-<8>.{js,css} and
  *                             /models/<16hex>/<name>-<16hex>.glb. `activate` PRUNES it to the URLs
  *                             the new build's load-manifest names — it never deletes it wholesale.
- *   trials-static-<assets>    unhashed but rarely edited: /fonts/**, /art/**. Keyed by a hash of
+ *   rockhop-static-<assets>   unhashed but rarely edited: /fonts/**, /art/**. Keyed by a hash of
  *                             public/ alone, so a JS-only deploy does NOT re-download 7 MB of art.
- *   trials-shell-<build>      the ~25 KB that changes every build: index.html, offline.html,
+ *   rockhop-shell-<build>     the ~25 KB that changes every build: index.html, offline.html,
  *                             manifest.webmanifest, load-manifest.json.
  *   rockhop-audio             the recorded music (/audio/<cue>-<8 hex>.m4a, src/audio/music/cues.ts):
  *                             content-addressed, cache-first from the FIRST play, never precached (6.5 MB
@@ -22,7 +22,7 @@
  *   install   precache the critical shell (strict — a failed shell fails install, so the old worker
  *             keeps serving) plus the icons (tolerant: the `art=absent` harness config has none).
  *   activate  drop stale shell/static caches, prune (never wipe) the immutable cache, claim.
- *   fetch     hashed assets / models: cache-first into trials-immutable;
+ *   fetch     hashed assets / models: cache-first into rockhop-immutable;
  *             fonts / art / flat models: cache-first into the static cache;
  *             the document: cache-first with a background revalidate (a flapping link must never
  *             hold the first paint — the plan's B-SLOW), offline.html as the last resort;
@@ -38,11 +38,13 @@
  */
 const BUILD = '__BUILD_ID__';
 const ASSETS = '__ASSET_ID__';
-const SHELL = `trials-shell-${BUILD}`;
-const STATIC = `trials-static-${ASSETS}`;
-const IMMUTABLE_CACHE = 'trials-immutable';
+const SHELL = `rockhop-shell-${BUILD}`;
+const STATIC = `rockhop-static-${ASSETS}`;
+const IMMUTABLE_CACHE = 'rockhop-immutable';
 const AUDIO_CACHE = 'rockhop-audio';
 const KEEP = [SHELL, STATIC, IMMUTABLE_CACHE, AUDIO_CACHE];
+/** The pre-rebrand name of the immutable cache: carried over once so the rename costs a returning player no re-download. */
+const LEGACY_IMMUTABLE = 'trials-immutable';
 
 /** Install fails without these: an incomplete shell must not pretend to be installed. */
 const SHELL_CRITICAL = ['./index.html', './offline.html', './manifest.webmanifest'];
@@ -92,12 +94,26 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
+      await adoptLegacyImmutable();
       for (const k of await caches.keys()) if (!KEEP.includes(k)) await caches.delete(k);
       await pruneImmutable();
       await self.clients.claim();
     })(),
   );
 });
+
+/** Copy the old-named immutable cache into the new one (content-addressed: same URL, same bytes), then drop it. */
+async function adoptLegacyImmutable() {
+  if (!(await caches.has(LEGACY_IMMUTABLE))) return;
+  const from = await caches.open(LEGACY_IMMUTABLE);
+  const to = await caches.open(IMMUTABLE_CACHE);
+  for (const req of await from.keys()) {
+    if (await to.match(req, MATCH_OPTS)) continue;
+    const res = await from.match(req, MATCH_OPTS);
+    if (res) await to.put(req, res);
+  }
+  await caches.delete(LEGACY_IMMUTABLE);
+}
 
 /** Drop only the content-addressed entries this build no longer names. No manifest → no prune (never a wipe). */
 async function pruneImmutable() {

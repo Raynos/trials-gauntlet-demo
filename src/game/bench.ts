@@ -18,7 +18,7 @@
  *
  * Report: on screen at the end (one row per scenario), **Copy report** (clipboard, in the tap's own handler so
  * iOS allows it; textarea fallback) and **Share** (`navigator.share`) — markdown table + JSON in one string;
- * also appended to the local telemetry (`trials.benchlog`, in the run-log export). `window.__trials.bench`
+ * also appended to the local telemetry (`rockhop.benchlog`, in the run-log export). `window.__rockhop.bench`
  * drives it headlessly (`start()`, `state()`, `report()`, `text()`).
  */
 import type { QualityTier } from '../core/types';
@@ -135,7 +135,7 @@ export interface BenchScenarioResult {
 }
 
 export interface BenchReport {
-  kind: 'trials-bench';
+  kind: 'rockhop-bench';
   v: 1;
   build: string;
   at: string;
@@ -302,7 +302,7 @@ export class Bench {
     }
   }
 
-  /** The START tap (or `window.__trials.bench.start()`): fetch the golden, then scenario 0. */
+  /** The START tap (or `window.__rockhop.bench.start()`): fetch the golden, then scenario 0. */
   start(): void {
     if (this.phase !== 'idle') return;
     this.phase = 'loading';
@@ -541,7 +541,7 @@ export class Bench {
     const nav = navigator as Navigator & { deviceMemory?: number; standalone?: boolean };
     const mm = (q: string): boolean => typeof matchMedia === 'function' && matchMedia(q).matches;
     return {
-      kind: 'trials-bench',
+      kind: 'rockhop-bench',
       v: 1,
       build: this.host.build,
       at: new Date().toISOString(),

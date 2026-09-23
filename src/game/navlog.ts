@@ -7,7 +7,7 @@
  * in `targetLive` is a navigation from a control the player could not see: the report's bug.
  *
  * Surfaces: the `?touchdebug=1` overlay (last lines), the run telemetry (`RunTelemetry.nav`), and
- * `window.__trials.navLog()` for the harness. A 200-entry ring; nothing leaves the device.
+ * `window.__rockhop.navLog()` for the harness. A 200-entry ring; nothing leaves the device.
  */
 import type { NavEvent } from '../core/types';
 import { effectiveOpacity, isLiveTarget } from '../ui/live';

@@ -57,19 +57,19 @@ async function tapSel(page: Page, selector: string, expect: Expect, touch: boole
   return true;
 }
 
-const VIEW = `window.__trials.review.view()`;
+const VIEW = `window.__rockhop.review.view()`;
 type View = { trackId: string; seg: number; x: number; dist: number; flying: boolean; riding: boolean; segments: { i: number; from: number; to: number; label: string; kinds: Record<string, number> }[] };
 const view = (page: Page): Promise<View> => page.evaluate(VIEW) as Promise<View>;
-const camX = (page: Page): Promise<number> => page.evaluate(`window.__trials.camera().pos.x`) as Promise<number>;
+const camX = (page: Page): Promise<number> => page.evaluate(`window.__rockhop.camera().pos.x`) as Promise<number>;
 /** The camera moves only when a frame renders: wait for one rendered frame (SwiftShader next to 15 other pages starves rAF for seconds), then read it. */
 async function camXRendered(page: Page, timeout = 10000): Promise<number> {
-  const n0 = (await page.evaluate(`window.__trials.renderedFrames()`)) as number;
-  await page.waitForFunction((n) => (window as unknown as { __trials: { renderedFrames(): number } }).__trials.renderedFrames() > n, n0, { timeout, polling: 30 }).catch(() => undefined);
+  const n0 = (await page.evaluate(`window.__rockhop.renderedFrames()`)) as number;
+  await page.waitForFunction((n) => (window as unknown as { __rockhop: { renderedFrames(): number } }).__rockhop.renderedFrames() > n, n0, { timeout, polling: 30 }).catch(() => undefined);
   return camX(page);
 }
 /** The camera x once it has followed the pan past `c0 + 0.5` (a rendered frame after the pan), else its value at the timeout — the assertion stays `> c0 + 0.5`. */
 async function camXMoved(page: Page, c0: number, timeout = 10000): Promise<number> {
-  await page.waitForFunction((c) => (window as unknown as { __trials: { camera(): { pos: { x: number } } } }).__trials.camera().pos.x > c + 0.5, c0, { timeout, polling: 30 }).catch(() => undefined);
+  await page.waitForFunction((c) => (window as unknown as { __rockhop: { camera(): { pos: { x: number } } } }).__rockhop.camera().pos.x > c + 0.5, c0, { timeout, polling: 30 }).catch(() => undefined);
   return camX(page);
 }
 
@@ -209,7 +209,7 @@ async function phoneFlow(ctx: BrowserContext, url: string, g: { name: string; wi
   await tapSel(page, '.review-ui.live .rv-copy', expect, true);
   await page.waitForTimeout(400);
   const clip = (await page.evaluate(() => navigator.clipboard.readText().catch(() => '')).catch(() => '')) as string;
-  const text = clip || ((await page.evaluate(`window.__trials.review.export().text`)) as string);
+  const text = clip || ((await page.evaluate(`window.__rockhop.review.export().text`)) as string);
   expect(clip.length > 0, 'clipboard', 'clipboard empty after Copy review (falling back to export())');
   expect(text.includes('| # | Range | Segment | Rating | Tags | Comment |'), 'md-table', 'no markdown table');
   const fenced = /```json\n(.*)\n```/.exec(text);
@@ -225,7 +225,7 @@ async function phoneFlow(ctx: BrowserContext, url: string, g: { name: string; wi
     if (g.name === 'iphone15promax') fs.writeFileSync(`${stills}/sample-review.md`, text);
   }
   // The note survives a reload of the same segment (localStorage).
-  expect((await page.evaluate(() => localStorage.getItem('trials.review.b1-first-ride')))?.includes(COMMENT), 'stored', 'note not in localStorage');
+  expect((await page.evaluate(() => localStorage.getItem('rockhop.review.b1-first-ride')))?.includes(COMMENT), 'stored', 'note not in localStorage');
 
   // Pan: a one-finger drag to the left moves the probe (and the camera) to +x.
   const x0 = (await view(page)).x;
@@ -251,7 +251,7 @@ async function phoneFlow(ctx: BrowserContext, url: string, g: { name: string; wi
   v = await view(page);
   expect(v.riding, 'riding', 'RIDE did not start a ride');
   expect(await page.evaluate(() => document.querySelector('.touch-layer')?.classList.contains('on')), 'strip-on', 'touch strip not enabled while riding');
-  const bx0 = (await page.evaluate(`window.__trials.getState().bike.pos.x`)) as number;
+  const bx0 = (await page.evaluate(`window.__rockhop.getState().bike.pos.x`)) as number;
   expect(Math.abs(bx0 - xp) < 3, 'ride-drop', `bike dropped at ${bx0.toFixed(2)}, probe was ${xp.toFixed(2)}`);
   // The strip draws for the touch device; typing the comment made the keyboard the active device (a real phone stays on
   // touch), so the first finger on the layer flips it back — then the drawn gas zone is held.
@@ -268,7 +268,7 @@ async function phoneFlow(ctx: BrowserContext, url: string, g: { name: string; wi
   expect(gas, 'gas-zone', 'gas zone not drawn after a touch');
   if (gas) {
     await holdTouch(ctx, page, gas, 1500);
-    const bx1 = (await page.evaluate(`window.__trials.getState().bike.pos.x`)) as number;
+    const bx1 = (await page.evaluate(`window.__rockhop.getState().bike.pos.x`)) as number;
     expect(bx1 > bx0 + 1, 'ride-moves', `bike x ${bx0.toFixed(2)} → ${bx1.toFixed(2)} after 1.5 s of gas`);
   }
   await still('ride');

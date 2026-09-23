@@ -15,6 +15,7 @@ import type { BestEntry, BoardEntry } from './best';
 import { formatTime } from './format';
 import { BUILD_STAMP_SHORT, escapeHtml, Screen, type FrontCallbacks, type FrontState } from './front';
 import { isLiveTarget } from './live';
+import { wordmarkSvg } from './brand';
 import { isLabTrack, medalTotals, nextTrack, shipTracks, TIER_LABEL, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
 import { wantsHiRes } from '../boot/tier';
@@ -114,7 +115,7 @@ export class WorldMapScreen extends Screen {
     this.card = el('div', 'wm-card');
     this.scene.append(this.world, this.tier, this.route, this.fog, this.names, this.markerLayer);
     this.view.append(this.scene, el('div', 'wm-haze'), el('div', 'wm-clouds'));
-    const brand = el('div', 'wm-brand', `<div class="plate"><b>Trials Gauntlet</b><span>World map</span></div><div class="stamp">${escapeHtml(BUILD_STAMP_SHORT)}</div>`);
+    const brand = el('div', 'wm-brand', `<div class="plate"><b class="wordmark">${wordmarkSvg()}</b><span>World map</span></div><div class="stamp">${escapeHtml(BUILD_STAMP_SHORT)}</div>`);
     this.progress = el('div', 'wm-progress');
     const actions = el('div', 'wm-actions');
     this.ride = el('button', 'wm-ride');
@@ -592,7 +593,7 @@ export class WorldMapScreen extends Screen {
     // Progress chip: cleared / total and the medal dots.
     const totals = medalTotals(ship, medalOf);
     const dot = (m: Medal, n: number, label: string): string => `<span class="${m}"><i></i>${n} <em>${label}</em></span>`;
-    this.progress.innerHTML = `<span class="n"><b>${totals.cleared}</b> / ${totals.total} cleared</span><span class="dots">${dot('platinum', totals.platinum, 'Platinum')}${dot('gold', totals.gold, 'Gold')}${dot('silver', totals.silver, 'Silver')}${dot('bronze', totals.bronze, 'Bronze')}</span>`;
+    this.progress.innerHTML = `<span class="n"><b>${totals.cleared}</b> / ${totals.total} cleared</span><span class="dots">${dot('platinum', totals.platinum, 'Obsidian')}${dot('gold', totals.gold, 'Gold')}${dot('silver', totals.silver, 'Silver')}${dot('bronze', totals.bronze, 'Bronze')}</span>`;
     // Opening focus: last played if still open, else the first unridden track of the highest open tier (`nextTrack`).
     const target = nextTrack(ship, medalOf, s.dev, s.lastPlayed);
     const at = locate(regions, target?.id);
@@ -666,7 +667,7 @@ export class WorldMapScreen extends Screen {
       const sec = (t - m * 60).toFixed(1);
       return m > 0 ? `${m}:${sec.padStart(4, '0')}` : sec;
     };
-    return `<div class="board" data-bike="${bike}" data-rows="${rows.length}">${rows.map((e, i) => `<span class="${e.medal}" title="#${i + 1} ${bike} · ${formatTime(e.time)} · ${e.faults} faults">${short(e.time)}</span>`).join('')}</div>`;
+    return `<div class="board" data-bike="${bike}" data-rows="${rows.length}">${rows.map((e, i) => `<span class="${e.medal}" title="#${i + 1} ${bike} · ${formatTime(e.time)} · ${e.faults} ${e.faults === 1 ? 'bail' : 'bails'}">${short(e.time)}</span>`).join('')}</div>`;
   }
 
   /** The card on the focused marker and the RIDE / GHOST pills: re-rendered on every focus. */

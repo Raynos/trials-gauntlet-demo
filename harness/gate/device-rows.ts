@@ -59,7 +59,7 @@ const num = (s: string | undefined): number | null => {
   return m ? Number(m[0]) : null;
 };
 
-/** Parse one filed device report: the scenario table + the trailing `{"kind":"trials-bench",...}` line. */
+/** Parse one filed device report: the scenario table + the trailing `{"kind":"rockhop-bench",...}` line. */
 export function parseDeviceReport(file: string): DeviceReportSummary {
   const text = fs.readFileSync(file, 'utf8');
   const rows: DeviceScenarioRow[] = [];
@@ -75,7 +75,7 @@ export function parseDeviceReport(file: string): DeviceReportSummary {
   let at: string | null = null;
   let ua: string | null = null;
   let thermal: DeviceReportSummary['thermal'] = null;
-  const json = text.split('\n').find((l) => l.startsWith('{"kind":"trials-bench"'));
+  const json = text.split('\n').find((l) => l.startsWith('{"kind":"rockhop-bench"'));
   if (json) {
     try {
       const j = JSON.parse(json) as { build?: string; at?: string; device?: { ua?: string }; thermal?: DeviceReportSummary['thermal'] };

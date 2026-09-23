@@ -5,7 +5,7 @@
  *   pnpm harness:gate [--track flat-test] [--build] [--dev] [--heap-seconds 60] [--quick] [--pin]
  *   pnpm harness:gate --only=camera[,clear,...]   one or more sections alone (a row's re-proof); PARTIAL verdict, ship-gate.partial.json
  *
- *   G1 cold boot        3 fresh contexts: nav -> __trials.ready p50; ready -> first synced frame
+ *   G1 cold boot        3 fresh contexts: nav -> __rockhop.ready p50; ready -> first synced frame
  *   G2 clear a track    golden replay (inputs/<track>/bot-oracle.json): finishTime bit-equal + hash vs expected.json
  *   G3 crash            inputs/<track>/crash.json: a non-restart fault within crash.faultWithinS
  *   G4 fault -> control after the crash: throttle until the bike moves again (ms)
@@ -188,7 +188,7 @@ async function bootSamples(launched: Awaited<ReturnType<BrowserVerifier['open']>
     const page = await ctx.newPage();
     const timing = await openGame(page, url);
     bootRuns.push(timing.bootMs);
-    firstFrameMs.push(await page.evaluate(() => window.__trials!.render(true)));
+    firstFrameMs.push(await page.evaluate(() => window.__rockhop!.render(true)));
     await ctx.close();
   }
   return { bootRuns, firstFrameMs };
@@ -367,7 +367,7 @@ async function main(): Promise<void> {
       const crashFrames = expandFrames(crash);
       const r = await page.evaluate(
         ([fr, id, seed, hz]) => {
-          const t = window.__trials!;
+          const t = window.__rockhop!;
           const res: {
             faultTick: number | null;
             faultTime: number | null;
@@ -440,7 +440,7 @@ async function main(): Promise<void> {
       await openGame(page, server.url);
       const r = await page.evaluate(
         ([id]) => {
-          const t = window.__trials!;
+          const t = window.__rockhop!;
           void t.loadTrack(id);
           t.skipCountdown();
           t.setInput({ throttle: 1 });
@@ -504,7 +504,7 @@ async function main(): Promise<void> {
       const rec = synthesizeRecording({ trackId, seed: 1, physicsHz: hz, seconds: heapSeconds, style: 'wiggle' });
       const frames = expandFrames(rec);
       await page.evaluate(([id]) => {
-        const t = window.__trials!;
+        const t = window.__rockhop!;
         void t.loadTrack(id);
         t.resize(640, 360); // heap/perf counters do not depend on the viewport; SwiftShader raster cost does
         for (let i = 0; i < 5; i++) t.render(true);
@@ -517,7 +517,7 @@ async function main(): Promise<void> {
         const slice = frames.slice(s * hz, (s + 1) * hz);
         const r = await page.evaluate(
           ([ins, n, sync]) => {
-            const t = window.__trials!;
+            const t = window.__rockhop!;
             const pm: number[] = [];
             const sm: number[] = [];
             const ym: number[] = [];
@@ -547,7 +547,7 @@ async function main(): Promise<void> {
         syncedMs.push(...r.ym);
       }
       const heapAfter = await readHeap(page, true);
-      const stats = await page.evaluate(() => window.__trials!.stats());
+      const stats = await page.evaluate(() => window.__rockhop!.stats());
       await closeIsolated(page);
       const growthMB = (heapAfter.jsHeapUsed - heapBefore.jsHeapUsed) / (1024 * 1024);
       report.heap = { beforeMB: heapBefore.jsHeapUsed / 1048576, afterMB: heapAfter.jsHeapUsed / 1048576, growthMB, seconds: heapSeconds };

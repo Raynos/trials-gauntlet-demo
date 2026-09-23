@@ -76,7 +76,7 @@ function row(id: string, over: Partial<BenchScenarioResult> = {}): BenchScenario
 
 describe('formatReport', () => {
   const r: BenchReport = {
-    kind: 'trials-bench',
+    kind: 'rockhop-bench',
     v: 1,
     build: 'abc1234',
     at: '2026-09-15T12:00:00.000Z',

@@ -1,7 +1,7 @@
 /**
- * Trials-style DOM HUD: centred run timer + fault pill, checkpoint progress
- * strip, kinetic banners (3-2-1-GO, CRASH!, CHECKPOINT, TRACK FINISHED!),
- * results panel, beginner hints. Every animation is a pure function of the
+ * DOM HUD: centred run timer + bails pill, marker progress strip, kinetic call-outs (READY · SET · ROCK, BAIL +1,
+ * MARKER n, CLEAN LINE), the results survey ticket (store release D19), beginner hints. The layout is the one the
+ * player knows (D21): only words and colours moved to the ROCKHOP brand. Every animation is a pure function of the
  * simulated clock in `RunInfo.simTime`, so a capture at any cadence shows the
  * same frames and `animations: disabled` screenshots cannot hide a banner.
  */
@@ -12,8 +12,14 @@ import { formatDelta, formatTime } from './format';
 import type { Hud, HudAction } from './index';
 import { conceal, isLive, reveal } from './live';
 import { TileRow } from './tiles';
+import { MEDAL_NAME, medalSvg, wordmarkSvg, zoneTitle, type MedalId } from './brand';
 
 type BannerKind = 'count' | 'go' | 'crash' | 'cp' | 'finish';
+
+/** The countdown's words (3 → READY, held through 2; 1 → SET; GO → ROCK). */
+export const COUNTDOWN_WORDS = { 3: 'Ready', 2: 'Ready', 1: 'Set', go: 'Rock' } as const;
+
+const MEDAL_ORDER: readonly MedalId[] = ['bronze', 'silver', 'gold', 'platinum'];
 
 interface Banner {
   el: HTMLDivElement;
@@ -34,7 +40,7 @@ const DEFAULT_HINTS: Record<InputDevice, string[]> = {
 };
 
 const RESULTS_LEGEND: Record<InputDevice, string> = {
-  keyboard: `<span><kbd>Enter</kbd>Select</span><span><kbd>R</kbd>Retry</span><span><kbd>Esc</kbd>Menu</span>`,
+  keyboard: `<span><kbd>Enter</kbd>Select</span><span><kbd>R</kbd>Retry</span><span><kbd>Esc</kbd>Map</span>`,
   gamepad: `<span><i class="pad a">A</i>Select</span><span><i class="pad b">B</i>Retry</span>`,
   touch: '',
 };
@@ -103,9 +109,9 @@ export class DomHud implements Hud {
 
   onAction: ((action: HudAction) => void) | null = null;
 
-  /** Medal icons from the art manifest for the results panel (fallback: tinted discs). */
+  /** Painted medal art from the art manifest for the ticket (until it decodes: the SVG badges, `brand.ts medalSvg`). */
   setMedalArt(src: Partial<Record<Medal, string>>): void {
-    for (const k of ['bronze', 'silver', 'gold', 'platinum'] as const) {
+    for (const k of MEDAL_ORDER) {
       const i = this.resMedals[k].querySelector<HTMLElement>('i');
       const url = src[k];
       if (!i || !url) continue;
@@ -134,7 +140,7 @@ export class DomHud implements Hud {
     const center = el('div', 'hud-center');
     this.timerEl = el('div', 'hud-timer');
     this.faultsEl = el('div', 'hud-faults');
-    this.faultsEl.innerHTML = '<span class="x">✕</span><span class="n">0</span>';
+    this.faultsEl.innerHTML = '<span class="x">Bails</span><span class="n">0</span>';
     this.faultsN = this.faultsEl.querySelector('.n') as HTMLSpanElement;
     center.append(this.timerEl, this.faultsEl);
     this.splitEl = el('div', 'hud-split');
@@ -162,26 +168,28 @@ export class DomHud implements Hud {
 
     this.hintsEl = el('div', 'hints');
 
-    // Results (SPEC.md §4.2 / §4.3): full-frame overlay in the pause frame — title block top-left,
-    // headline centred in the free band, tile row in the lower third, legend bottom-right.
+    // Results (store release D19, mockup round1/A-results): the survey ticket on the left — zone · code, track name,
+    // CLEAN LINE, TIME / BAILS boxes, the PB line, the four mountain medals — the finish scene live on the right,
+    // and MAP · RETRY · NEXT TRACK (vermilion) along the bottom. The staged reveal classes are the old ones.
     this.results = el('div', 'results');
     this.results.innerHTML = `
-      <div class="ov-head"><div class="ov-title"><div class="ov-kicker"></div><div class="ov-name"></div><div class="ov-stats"></div></div><div class="board" hidden></div></div>
-      <div class="ov-free headline">
-        <div class="row"><div class="time">0:00.000</div><div class="faults"><span>✕</span> 0 faults</div></div>
-        <div class="pb"></div>
-        <div class="medals">
-          <div class="medal bronze"><i></i><b>Bronze</b><small></small></div>
-          <div class="medal silver"><i></i><b>Silver</b><small></small></div>
-          <div class="medal gold"><i></i><b>Gold</b><small></small></div>
-          <div class="medal platinum"><i></i><b>Platinum</b><small></small></div>
+      <div class="ticket">
+        <div class="tk-head"><div class="ov-title"><div class="ov-kicker"></div><div class="ov-name"></div></div><div class="tk-mark">${wordmarkSvg({ title: '' })}</div></div>
+        <div class="tk-stamp">Clean line</div>
+        <div class="tk-body">
+          <div class="tk-box time-box"><small>Time</small><div class="time">0:00.000</div><div class="pb"></div></div>
+          <div class="tk-box faults"><small>Bails</small><b>0</b></div>
+          <div class="board" hidden></div>
+          <svg class="tk-route" viewBox="0 0 60 90" aria-hidden="true"><path d="M8 86C22 70 14 58 28 46S46 30 40 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 4"/><path d="M40 2l6 10h-12z M18 40l5 8h-10z M34 58l4 7h-8z" fill="currentColor"/></svg>
         </div>
+        <div class="medals">${MEDAL_ORDER.map((m) => `<div class="medal ${m}"><i>${medalSvg(m)}</i><b>${MEDAL_NAME[m]}</b><small></small></div>`).join('')}</div>
+        <div class="ov-stats"></div>
       </div>`;
     this.resKicker = this.results.querySelector('.ov-kicker') as HTMLDivElement;
     this.resName = this.results.querySelector('.ov-name') as HTMLDivElement;
     this.resStats = this.results.querySelector('.ov-stats') as HTMLDivElement;
     this.resTime = this.results.querySelector('.time') as HTMLDivElement;
-    this.resFaults = this.results.querySelector('.faults') as HTMLDivElement;
+    this.resFaults = this.results.querySelector('.faults b') as HTMLDivElement;
     this.resPb = this.results.querySelector('.pb') as HTMLDivElement;
     this.resBoard = this.results.querySelector('.board') as HTMLDivElement;
     this.resMedals = {
@@ -191,11 +199,12 @@ export class DomHud implements Hud {
       platinum: this.results.querySelector('.medal.platinum') as HTMLDivElement,
     };
     this.resTiles = new TileRow(this.results, null);
+    // DOM order is the pad / keyboard order: MAP · RETRY · REPLAY · NEXT TRACK (NEXT TRACK is the vermilion one).
     this.resTiles.setTiles([
+      { id: 'menu', label: 'Map', icon: 'map' },
       { id: 'retry', label: 'Retry', icon: 'restart' },
+      { id: 'replay', label: 'Replay', icon: 'play' },
       { id: 'next', label: 'Next track', icon: 'next' },
-      { id: 'replay', label: 'Watch replay', icon: 'play' },
-      { id: 'menu', label: 'Menu', icon: 'door' },
     ]);
     // A click can only reach a tile through `.results.live` (styles.ts), and live lands from stage-3; this is the same gate for anything else that calls pick().
     this.resTiles.onPick = (id) => {
@@ -331,10 +340,10 @@ export class DomHud implements Hud {
     this.animateFlash();
     this.animateResults();
 
-    // Deferred CRASH! stamp (0.2 s after the fault, so the tumble reads before the word).
+    // The BAIL +1 call-out lands with the bail itself (the next HUD frame), small, under the countdown line.
     if (this.pendingCrashAt >= 0 && this.simTime >= this.pendingCrashAt) {
       this.pendingCrashAt = -1;
-      this.crashBanner = this.spawn('crash', 'Crash!', 1.4);
+      this.crashBanner = this.spawn('crash', 'Bail +1', 1.1);
     }
     this.animateBanners();
   }
@@ -368,14 +377,17 @@ export class DomHud implements Hud {
 
   onEvent(event: GameEvent): void {
     switch (event.type) {
-      case 'countdown':
-        this.spawn('count', String(event.n), 0.9);
+      case 'countdown': {
+        // READY holds across 3 and 2 (one banner, two beats), SET on 1, ROCK on GO.
+        if (event.n === 2 && this.banners.some((b) => b.active && b.kind === 'count')) return;
+        this.spawn('count', COUNTDOWN_WORDS[event.n], event.n === 3 ? 1.9 : 0.9);
         return;
+      }
       case 'go':
-        this.spawn('go', 'Go!', 0.8);
+        this.spawn('go', `${COUNTDOWN_WORDS.go}!`, 0.8);
         return;
       case 'fault':
-        if (event.reason !== 'restart') this.pendingCrashAt = this.simTime + 0.2;
+        if (event.reason !== 'restart') this.pendingCrashAt = this.simTime;
         return;
       case 'restart':
         this.pendingCrashAt = -1;
@@ -390,12 +402,12 @@ export class DomHud implements Hud {
         }
         return;
       case 'checkpoint':
-        this.spawn('cp', `Checkpoint ${event.index + 1}`, 0.9);
+        this.spawn('cp', `Marker ${event.index + 1}`, 0.9);
         this.flashKind = 'cp';
         this.flashStart = this.simTime;
         return;
       case 'finish':
-        this.spawn('finish', 'Track finished!', 2.3);
+        this.spawn('finish', 'Clean line', 2.3);
         this.flashKind = 'finish';
         this.flashStart = this.simTime;
         return;
@@ -459,22 +471,23 @@ export class DomHud implements Hud {
   showResults(r: RunResult): void {
     this.resultsAt = this.simTime;
     this.resultsStage = -1;
-    const name = this.track?.name ?? '';
-    const tier = this.track?.tier ?? '';
-    const earned = r.medal !== 'bronze' || (r.targetTimeS === null && r.faults === 0);
-    this.resKicker.textContent = `Track cleared · ${tier}`;
-    this.resKicker.className = `ov-kicker ${earned ? 'green' : ''}`;
+    const t = this.track;
+    const name = t?.name ?? '';
+    const meta = (t?.meta ?? {}) as { zone?: string; code?: string };
+    // "DESERT QUARRY / D3" on a ROCKHOP course; the tier on anything else (dev tracks).
+    this.resKicker.textContent = meta.zone ? `${zoneTitle(meta.zone)}${meta.code ? `  /  ${meta.code}` : ''}` : (t?.tier ?? '');
+    this.resKicker.className = 'ov-kicker';
     this.resName.textContent = name;
     const T = r.targetTimeS;
     const bike = r.bike === 'pro' ? 'Pro' : 'Rookie';
-    this.resStats.innerHTML = `<span>PB <b>${r.previousBest !== null ? formatTime(Math.min(r.previousBest, r.time)) : '—'}</b></span>${T ? `<i>·</i><span>Target <b>${formatTime(T)}</b></span>` : ''}<i>·</i><span>Bike <b class="bike-${r.bike ?? 'rookie'}">${bike}</b></span>`;
+    this.resStats.innerHTML = `<span>Best <b>${r.previousBest !== null ? formatTime(Math.min(r.previousBest, r.time)) : '—'}</b></span>${T ? `<i>·</i><span>Target <b>${formatTime(T)}</b></span>` : ''}<i>·</i><span>Bike <b class="bike-${r.bike ?? 'rookie'}">${bike}</b></span>`;
     const text = formatTime(r.time);
     const dot = text.indexOf('.');
     this.resTime.innerHTML = `${text.slice(0, dot)}<span class="ms">${text.slice(dot)}</span>`;
-    this.resFaults.innerHTML = `<span>✕</span> ${r.faults} ${r.faults === 1 ? 'fault' : 'faults'}`;
+    this.resFaults.textContent = String(r.faults);
     if (r.personalBest) {
-      this.resPb.className = 'pb green';
-      this.resPb.textContent = r.previousBest === null ? 'First clear' : `${formatDelta(r.time - r.previousBest)} · New personal best`;
+      this.resPb.className = 'pb best';
+      this.resPb.textContent = r.previousBest === null ? 'First clear' : `${formatDelta(r.time - r.previousBest).replace('-', '\u2212')} · New best`;
     } else if (r.previousBest !== null) {
       this.resPb.className = 'pb behind';
       this.resPb.innerHTML = `<em>${formatDelta(r.time - r.previousBest)}</em> · Best ${formatTime(r.previousBest)}`;
@@ -482,13 +495,13 @@ export class DomHud implements Hud {
       this.resPb.className = 'pb';
       this.resPb.textContent = '';
     }
-    const thresholds = T
-      ? { platinum: `≤ ${formatTime(T * 0.85)} · 0✕`, gold: `≤ ${formatTime(T)} · ≤1✕`, silver: `≤ ${formatTime(T * 1.25)} · ≤5✕`, bronze: 'finish' }
-      : { platinum: '—', gold: '0 faults', silver: '—', bronze: 'finish' };
-    for (const k of ['bronze', 'silver', 'gold', 'platinum'] as const) {
+    const hints = medalHints(r);
+    for (const k of MEDAL_ORDER) {
       const m = this.resMedals[k];
       m.classList.toggle('earned', k === r.medal);
-      (m.querySelector('small') as HTMLElement).textContent = thresholds[k];
+      m.classList.toggle('got', MEDAL_ORDER.indexOf(k) <= MEDAL_ORDER.indexOf(r.medal));
+      m.classList.toggle('next', hints.next === k);
+      (m.querySelector('small') as HTMLElement).textContent = hints.text[k];
     }
     this.renderBoard(r);
     this.results.className = 'results show stage-0';
@@ -497,7 +510,7 @@ export class DomHud implements Hud {
     this.root.classList.add('results-on');
     this.resTiles.setDisabled('next', !this.nextEnabled);
     this.resTiles.focusId(this.nextEnabled ? 'next' : 'retry');
-    for (const b of this.banners) if (b.kind === 'finish') this.retire(b); // the panel restates it
+    for (const b of this.banners) if (b.kind === 'finish') this.retire(b); // the ticket restates it
   }
 
   /** The track's top 5 for the class ridden (`BestTimes.board`), medal dot per row, this run's row marked `you`. */
@@ -512,7 +525,7 @@ export class DomHud implements Hud {
     const rank = r.rank ?? null;
     const items = rows
       .slice(0, BOARD_SIZE)
-      .map((e, i) => `<li class="${i + 1 === rank ? 'you' : ''}"><span class="n">${i + 1}</span><i class="dot ${e.medal}" title="${e.medal}"></i><b>${formatTime(e.time)}</b><small>${e.faults}✕</small></li>`)
+      .map((e, i) => `<li class="${i + 1 === rank ? 'you' : ''}"><span class="n">${i + 1}</span><i class="dot ${e.medal}" title="${MEDAL_NAME[e.medal]}"></i><b>${formatTime(e.time)}</b><small>${e.faults}b</small></li>`)
       .join('');
     this.resBoard.innerHTML = `<div class="board-head">Top ${BOARD_SIZE} · ${bike}${rank ? ` · <em>#${rank}</em>` : ''}</div><ol>${items}</ol>`;
     this.resBoard.hidden = false;
@@ -728,6 +741,22 @@ export class DomHud implements Hud {
   }
 }
 
+/**
+ * The line under each medal on the ticket: the one above what this run earned says what it takes ("0:48.000 to earn",
+ * or "0 bails to earn" when the time was already there); the rest stay quiet. Thresholds are the tracks' own
+ * (src/tracks/rockhop/builder.ts `medalTargets`: OBSIDIAN ≤ 0.85 T · 0 bails, GOLD ≤ T · ≤ 1, SILVER ≤ 1.25 T · ≤ 5).
+ */
+export function medalHints(r: Pick<RunResult, 'medal' | 'targetTimeS' | 'time' | 'faults'>): { next: MedalId | null; text: Record<MedalId, string> } {
+  const text: Record<MedalId, string> = { bronze: '', silver: '', gold: '', platinum: '' };
+  const T = r.targetTimeS;
+  const next = MEDAL_ORDER[MEDAL_ORDER.indexOf(r.medal) + 1] ?? null;
+  if (!next || !T) return { next: T ? next : null, text };
+  const need = { silver: { t: T * 1.25, b: 5 }, gold: { t: T, b: 1 }, platinum: { t: T * 0.85, b: 0 } }[next as 'silver' | 'gold' | 'platinum'];
+  const timeOk = r.time <= need.t + 1e-9;
+  text[next] = timeOk && r.faults > need.b ? `${need.b === 0 ? 'No' : `≤ ${need.b}`} ${need.b === 1 ? 'bail' : 'bails'} to earn` : `${formatTime(need.t)} to earn`;
+  return { next, text };
+}
+
 function el<K extends 'div'>(tag: K, className: string): HTMLDivElement {
   const d = document.createElement(tag);
   d.className = className;
@@ -737,7 +766,7 @@ function el<K extends 'div'>(tag: K, className: string): HTMLDivElement {
 /** Mirrors `reviewEnabled` in src/ui/inbox.ts without importing it (that module stays a lazy chunk). */
 function reviewEnabled(): boolean {
   try {
-    return /[?&]review=1(&|$)/.test(location.search) || !!localStorage.getItem('trials.reviewPassword');
+    return /[?&]review=1(&|$)/.test(location.search) || !!localStorage.getItem('rockhop.reviewPassword');
   } catch {
     return false;
   }

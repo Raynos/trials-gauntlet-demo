@@ -108,12 +108,12 @@ export async function captureCommit(ref: string, dist: string, outdir = CAPTURES
     await page.goto(url.toString(), { waitUntil: 'commit', timeout: 30_000 });
     let booted = true;
     try {
-      await page.waitForFunction(() => (window as unknown as { __trials?: { ready?: boolean } }).__trials?.ready === true, undefined, {
+      await page.waitForFunction(() => (window as unknown as { __rockhop?: { ready?: boolean } }).__rockhop?.ready === true, undefined, {
         timeout: 45_000,
       });
     } catch (err) {
       booted = false;
-      notes.push(`boot: __trials.ready not observed (${err instanceof Error ? err.message.split('\n')[0] : String(err)})`);
+      notes.push(`boot: __rockhop.ready not observed (${err instanceof Error ? err.message.split('\n')[0] : String(err)})`);
     }
     if (!booted) {
       // Still record what the page looks like: a blank or broken boot is history too.
@@ -128,7 +128,7 @@ export async function captureCommit(ref: string, dist: string, outdir = CAPTURES
     const setup = await withTimeout(
       page.evaluate(
         ([want, fbs, w, h]) => {
-          const tr = (window as unknown as { __trials: Record<string, (...a: never[]) => unknown> }).__trials as unknown as {
+          const tr = (window as unknown as { __rockhop: Record<string, (...a: never[]) => unknown> }).__rockhop as unknown as {
             listTracks?: () => string[];
             loadTrack: (id: string, seed?: number) => boolean;
             info: () => { trackId?: string; physicsHz?: number };
@@ -187,7 +187,7 @@ export async function captureCommit(ref: string, dist: string, outdir = CAPTURES
     // Render frame 0 once so the first clip frame is not a blank canvas.
     await withTimeout(
       page.evaluate(() => {
-        const tr = (window as unknown as { __trials: { setInput: (f: unknown) => void; render: (s?: boolean) => unknown } }).__trials;
+        const tr = (window as unknown as { __rockhop: { setInput: (f: unknown) => void; render: (s?: boolean) => unknown } }).__rockhop;
         tr.setInput({ throttle: 1, brake: 0, lean: 0.5 });
         tr.render(true);
       }),
@@ -204,8 +204,8 @@ export async function captureCommit(ref: string, dist: string, outdir = CAPTURES
       try {
         await withTimeout(
           page.evaluate((n) => {
-            const tr = (window as unknown as { __trials: { setInput: (f: unknown) => void; step: (n: number) => unknown; render: (s?: boolean) => unknown } })
-              .__trials;
+            const tr = (window as unknown as { __rockhop: { setInput: (f: unknown) => void; step: (n: number) => unknown; render: (s?: boolean) => unknown } })
+              .__rockhop;
             tr.setInput({ throttle: 1, brake: 0, lean: 0.5 });
             tr.step(n);
             tr.render(true);

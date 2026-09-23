@@ -291,10 +291,10 @@ async function toMenu(page: Page, flow: string, g: Geom): Promise<void> {
  * live.ts has seen the band drawn for 150 ms it IS live and the same tap opens track select.
  */
 async function checkPlayReveal(page: Page, flow: string, g: Geom): Promise<void> {
-  await page.evaluate(`window.__trials.app.goto('credits')`);
+  await page.evaluate(`window.__rockhop.app.goto('credits')`);
   await waitFor(page, `!!document.querySelector('.credits-screen.live')`, 10000);
   const before = await page.evaluate(`(() => {
-    window.__trials.app.goto('menu');
+    window.__rockhop.app.goto('menu');
     const play = document.querySelector('.menu-screen .menu-item[data-id=play]');
     const r = play.getBoundingClientRect();
     const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
@@ -306,8 +306,8 @@ async function checkPlayReveal(page: Page, flow: string, g: Geom): Promise<void>
       hit.dispatchEvent(new PointerEvent('pointerup', init));
       hit.dispatchEvent(new MouseEvent('click', init));
     }
-    window.__trials.app.frame();
-    return { live, screen: window.__trials.app.screen(), menuLive: !!document.querySelector('.menu-screen.live'), hit: hit ? hit.tagName + '.' + hit.className : '(none)', w: r.width, h: r.height };
+    window.__rockhop.app.frame();
+    return { live, screen: window.__rockhop.app.screen(), menuLive: !!document.querySelector('.menu-screen.live'), hit: hit ? hit.tagName + '.' + hit.className : '(none)', w: r.width, h: r.height };
   })()`) as { live: boolean; screen: string; menuLive: boolean; hit: string; w: number; h: number };
   expect(!before.live && !before.menuLive, flow, 'R6-play-not-live-before-reveal', `PLAY hit-testable as live right after goto(menu): ${JSON.stringify(before)}`);
   expect(before.screen === 'menu', flow, 'R6-play-dead-tap', `a tap on PLAY before its reveal navigated to ${before.screen}`);
@@ -517,8 +517,8 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   expect(strip0.keys.length === 4 && strip0.keys.every((k) => k.w > 0 && k.h <= strip0.h && k.top >= strip0.top - 1 && k.bottom <= strip0.bottom + 1), flow, 'R7-keys', `keys ${JSON.stringify(strip0.keys)} inside strip top ${strip0.top.toFixed(0)}`);
   await still(page, g, 'idle');
   // Hold gas on the right for 1 s: the bike must move.
-  const x0 = await page.evaluate(() => (window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } } } }).__trials?.getState().bike.pos.x ?? -1);
-  const rt0 = (await page.evaluate(`window.__trials.phase() === 'riding' ? window.__trials.runTime() : 0`)) as number;
+  const x0 = await page.evaluate(() => (window as unknown as { __rockhop?: { getState(): { bike: { pos: { x: number } } } } }).__rockhop?.getState().bike.pos.x ?? -1);
+  const rt0 = (await page.evaluate(`window.__rockhop.phase() === 'riding' ? window.__rockhop.runTime() : 0`)) as number;
   const cdp = await ctx.newCDPSession(page);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: g.width * 0.9, y: g.height * 0.6, id: 1 }] });
   // Held GAS: the key lights green and its whole quarter carries the wash; the three idle keys do not.
@@ -530,8 +530,8 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   // The bike must move ≥ 1 m — judged on the sim clock, not the wall clock: a loaded SwiftShader draws the run at
   // one or two frames a second, so 15 wall seconds can be under a sim second (the countdown alone is three).
   // The wait ends when it has moved, or once 2.5 s of riding have elapsed without it (then `moved` is a real fail).
-  await page.waitForFunction(([x, rt]) => { const t = (window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } }; phase(): string; runTime(): number } }).__trials; if (!t) return false; return t.getState().bike.pos.x > x + 1 || (t.phase() === 'riding' && t.runTime() > rt + 2.5); }, [x0, rt0] as [number, number], { timeout: 60000, polling: 100 }).catch(() => undefined);
-  const moved = ((await page.evaluate(() => (window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } } } }).__trials?.getState().bike.pos.x ?? -1)) as number) > x0 + 1;
+  await page.waitForFunction(([x, rt]) => { const t = (window as unknown as { __rockhop?: { getState(): { bike: { pos: { x: number } } }; phase(): string; runTime(): number } }).__rockhop; if (!t) return false; return t.getState().bike.pos.x > x + 1 || (t.phase() === 'riding' && t.runTime() > rt + 2.5); }, [x0, rt0] as [number, number], { timeout: 60000, polling: 100 }).catch(() => undefined);
+  const moved = ((await page.evaluate(() => (window as unknown as { __rockhop?: { getState(): { bike: { pos: { x: number } } } } }).__rockhop?.getState().bike.pos.x ?? -1)) as number) > x0 + 1;
   // Second finger: LEAN BACK with GAS still down (the multi-touch P0) — both keys lit, then the still.
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: g.width * 0.9, y: g.height * 0.6, id: 1 }, { x: g.width * 0.1, y: g.height * 0.6, id: 2 }] });
   await page.waitForTimeout(150);
@@ -551,7 +551,7 @@ async function flowRun(ctx: BrowserContext, url: string, g: Geom): Promise<void>
   const released = await keyStates(page);
   expect(!released.fwd.held && !released.brake.held && !released.fwd.wash && released.fwd.scale === 1, flow, 'R7-release', `after release: ${JSON.stringify(released)}`);
   await cdp.detach();
-  const x1 = await page.evaluate(() => (window as unknown as { __trials?: { getState(): { bike: { pos: { x: number } } } } }).__trials?.getState().bike.pos.x ?? -1);
+  const x1 = await page.evaluate(() => (window as unknown as { __rockhop?: { getState(): { bike: { pos: { x: number } } } } }).__rockhop?.getState().bike.pos.x ?? -1);
   expect(moved, flow, 'gas-zone', `bike x ${x0.toFixed(1)} → ${x1.toFixed(1)} while holding the right half`);
   // Settled (3 s of riding): the strip drops to ~.3, the keys stay drawn.
   const settled = await waitFor(page, `document.querySelector('.touch-layer').classList.contains('settled')`, 20000);
@@ -596,14 +596,14 @@ async function flowEntry(ctx: BrowserContext, url: string, g: Geom): Promise<voi
   const flow = `entry@${g.name}`;
   const page = await ctx.newPage();
   page.on('pageerror', (e) => expect(false, flow, 'pageerror', e.message));
-  await page.addInitScript(() => { try { localStorage.setItem('trials.onboarded', '1'); } catch { /* none */ } });
+  await page.addInitScript(() => { try { localStorage.setItem('rockhop.onboarded', '1'); } catch { /* none */ } });
   await page.goto(`${url}/?sw=0&perf=1`);
   await page.waitForFunction(() => !document.getElementById('loader'), null, { timeout: 180000 });
   await waitFor(page, `!!document.querySelector('.menu-screen.live')`, 20000);
   // Boot prepared the industrial hall (b1); e1 is canyon — a biome change, the case the phone showed.
   const track = 'e1-uphill-weight';
   await page.evaluate(`(() => {
-    const w = window; const t = w.__trials; w.__entryLog = []; w.__perfWrites = [];
+    const w = window; const t = w.__rockhop; w.__entryLog = []; w.__perfWrites = [];
     const sample = () => {
       const i = t.info(); const r = i.render || {}; const hud = document.querySelector('.hud .entry');
       const ov = document.querySelector('.perf');
@@ -619,7 +619,7 @@ async function flowEntry(ctx: BrowserContext, url: string, g: Geom): Promise<voi
   const done = await waitFor(page, `window.__entryDone === true`, 120000);
   type Row = { t: number; ph: string; en: boolean; hold: boolean; ms: number; rt: number; label: string | null; banner: boolean; perf: string | null };
   const log = (await page.evaluate(`window.__entryLog`)) as Row[];
-  const info = (await page.evaluate(`window.__trials.info()`)) as { render?: Record<string, unknown>; entryHold?: boolean; qualityWhy?: string; quality?: string };
+  const info = (await page.evaluate(`window.__rockhop.info()`)) as { render?: Record<string, unknown>; entryHold?: boolean; qualityWhy?: string; quality?: string };
   expect(done, flow, 'entry-sampled', `sampler did not finish: ${log.length} rows, last ${JSON.stringify(log.at(-1))}`);
   const held = log.filter((r) => r.hold);
   const afterGo = log.filter((r) => r.ph === 'riding' || r.ph === 'crashed' || r.ph === 'finished');
@@ -650,7 +650,7 @@ async function flowEntry(ctx: BrowserContext, url: string, g: Geom): Promise<voi
 // docs/tasks/touch-navigation-invariant.md §4. For each transition — ride→crash, ride→finish, finish→results stage 0..5,
 // pause open, pause close, results→menu, menu→tracks — a 12×6 grid of points is tapped at 0/50/100/200/400/800 ms after
 // the transition. The screen / phase / pause state may change only when a tapped point was inside a `.live` element drawn
-// at ≥ 0.5 opacity (the invariant, src/ui/live.ts). Transitions are driven through `window.__trials` (sim stepped in one
+// at ≥ 0.5 opacity (the invariant, src/ui/live.ts). Transitions are driven through `window.__rockhop` (sim stepped in one
 // evaluate, one synchronous app frame after the taps) so nothing here waits on SwiftShader's RAF cadence.
 //
 // Each transition instance serves six slots (one per offset); a slot taps GRID_PER_SLOT points in quick succession and then
@@ -674,7 +674,7 @@ function sigKey(s: Sig): string {
   return `${s.screen}|${group}|${s.paused ? 'paused' : '-'}`;
 }
 
-const SIG_SRC = `(() => { const t = window.__trials; const r = document.querySelector('.results'); return { screen: t.app.screen(), phase: t.phase(), paused: t.app.paused(), results: r ? r.className : '' }; })()`;
+const SIG_SRC = `(() => { const t = window.__rockhop; const r = document.querySelector('.results'); return { screen: t.app.screen(), phase: t.phase(), paused: t.app.paused(), results: r ? r.className : '' }; })()`;
 
 async function sig(page: Page): Promise<Sig> {
   return page.evaluate(SIG_SRC) as Promise<Sig>;
@@ -682,7 +682,7 @@ async function sig(page: Page): Promise<Sig> {
 
 /** One synchronous app frame (input poll + live tick), then the state. */
 async function frameSig(page: Page): Promise<Sig> {
-  return page.evaluate(`(() => { window.__trials.app.frame(); return ${SIG_SRC}; })()`) as Promise<Sig>;
+  return page.evaluate(`(() => { window.__rockhop.app.frame(); return ${SIG_SRC}; })()`) as Promise<Sig>;
 }
 
 /**
@@ -707,7 +707,7 @@ const E2E_TAP_SRC = `window.__e2eTap = function (x, y) {
 
 /** One slot: tap every point in-page, run one app frame, read the state — a single round trip. */
 async function tapSlot(page: Page, pts: { x: number; y: number }[]): Promise<{ probes: Probe[]; sig: Sig }> {
-  return page.evaluate(`(() => { const probes = ${JSON.stringify(pts)}.map((p) => window.__e2eTap(p.x, p.y)); window.__trials.app.frame(); return { probes, sig: ${SIG_SRC} }; })()`) as Promise<{ probes: Probe[]; sig: Sig }>;
+  return page.evaluate(`(() => { const probes = ${JSON.stringify(pts)}.map((p) => window.__e2eTap(p.x, p.y)); window.__rockhop.app.frame(); return { probes, sig: ${SIG_SRC} }; })()`) as Promise<{ probes: Probe[]; sig: Sig }>;
 }
 
 async function waitFor(page: Page, src: string, timeout = 30000): Promise<boolean> {
@@ -715,10 +715,10 @@ async function waitFor(page: Page, src: string, timeout = 30000): Promise<boolea
 }
 
 /** Drive the run to `phase` in one evaluate (flat-test: throttle = finish in 8.4 s of sim, throttle + lean back = crash in 0.75 s). */
-const DRIVE = (crash: boolean) => `(() => { const t = window.__trials; t.restart(); t.skipCountdown(); t.setInput(${crash ? '{ throttle: 1, brake: 0, lean: -1 }' : '{ throttle: 1, brake: 0, lean: 0 }'}); let n = 0; while (t.phase() === 'riding' && n < 120 * 60) { t.step(1); n++; } t.setInput({ throttle: 0, brake: 0, lean: 0 }); t.app.frame(); return t.phase(); })()`;
+const DRIVE = (crash: boolean) => `(() => { const t = window.__rockhop; t.restart(); t.skipCountdown(); t.setInput(${crash ? '{ throttle: 1, brake: 0, lean: -1 }' : '{ throttle: 1, brake: 0, lean: 0 }'}); let n = 0; while (t.phase() === 'riding' && n < 120 * 60) { t.step(1); n++; } t.setInput({ throttle: 0, brake: 0, lean: 0 }); t.app.frame(); return t.phase(); })()`;
 /** Stage k of the results = RESULTS_DELAY (0.4 s) + the stage's age threshold, stepped in sim ticks then rendered (the HUD's stage clock is the render's sim time). */
 const STAGE_AGE_S = [0, 0.15, 0.35, 0.6, 0.9, 1.1];
-const TO_STAGE = (k: number) => `(() => { const t = window.__trials; const r = document.querySelector('.results'); let n = 0; while (!r.classList.contains('show') && n < 240) { t.step(1); n++; } t.step(${Math.ceil(STAGE_AGE_S[k]! * 120) + 1}); t.render(); t.app.frame(); return r.className; })()`;
+const TO_STAGE = (k: number) => `(() => { const t = window.__rockhop; const r = document.querySelector('.results'); let n = 0; while (!r.classList.contains('show') && n < 240) { t.step(1); n++; } t.step(${Math.ceil(STAGE_AGE_S[k]! * 120) + 1}); t.render(); t.app.frame(); return r.className; })()`;
 
 interface Transition {
   name: string;
@@ -733,8 +733,8 @@ async function toRun(page: Page): Promise<boolean> {
   let s = await sig(page);
   log(`toRun from ${sigKey(s)}`);
   if (s.screen !== 'run') {
-    await page.evaluate(`window.__trials.app.play('flat-test')`);
-    if (!(await waitFor(page, `window.__trials.app.screen() === 'run' && window.__trials.phase() !== 'menu'`))) { log('toRun: play did not reach a run'); return false; }
+    await page.evaluate(`window.__rockhop.app.play('flat-test')`);
+    if (!(await waitFor(page, `window.__rockhop.app.screen() === 'run' && window.__rockhop.phase() !== 'menu'`))) { log('toRun: play did not reach a run'); return false; }
     log('toRun: in run');
   }
   if (await page.evaluate(`!!document.querySelector('.onboard.show')`)) {
@@ -745,8 +745,8 @@ async function toRun(page: Page): Promise<boolean> {
     log('toRun: onboard dismissed');
   }
   s = await sig(page);
-  if (s.paused) await page.evaluate(`window.__trials.app.togglePause(); window.__trials.app.frame()`);
-  await page.evaluate(`(() => { const t = window.__trials; t.restart(); t.skipCountdown(); t.setInput({ throttle: 0, brake: 0, lean: 0 }); t.step(2); t.app.frame(); })()`);
+  if (s.paused) await page.evaluate(`window.__rockhop.app.togglePause(); window.__rockhop.app.frame()`);
+  await page.evaluate(`(() => { const t = window.__rockhop; t.restart(); t.skipCountdown(); t.setInput({ throttle: 0, brake: 0, lean: 0 }); t.step(2); t.app.frame(); })()`);
   s = await sig(page);
   log(`toRun done: ${sigKey(s)}`);
   return s.phase === 'riding' && !s.paused;
@@ -758,7 +758,7 @@ function transitions(page: Page, g: Geom): Transition[] {
     const c = await centre(page, '.tz-pause');
     if (!c) return false;
     await tap(page, c.x, c.y);
-    await page.evaluate(`window.__trials.app.frame()`);
+    await page.evaluate(`window.__rockhop.app.frame()`);
     return (await sig(page)).paused;
   };
   const resultsLive = async (): Promise<boolean> => {
@@ -787,7 +787,7 @@ function transitions(page: Page, g: Geom): Transition[] {
         const c = await centre(page, '.pause-overlay.live .tile[data-id=resume]');
         if (!c) return false;
         await tap(page, c.x, c.y);
-        await page.evaluate(`window.__trials.app.frame()`);
+        await page.evaluate(`window.__rockhop.app.frame()`);
         const s = await sig(page);
         return !s.paused && s.screen === 'run';
       },
@@ -800,7 +800,7 @@ function transitions(page: Page, g: Geom): Transition[] {
         const c = await centre(page, '.results.live .tile[data-id=menu]');
         if (!c) return false;
         await tap(page, c.x, c.y);
-        await page.evaluate(`window.__trials.app.frame()`);
+        await page.evaluate(`window.__rockhop.app.frame()`);
         return (await sig(page)).screen === 'menu';
       },
     },
@@ -817,8 +817,8 @@ function transitions(page: Page, g: Geom): Transition[] {
         for (let attempt = 0; attempt < 2; attempt++) {
           await page.evaluate(`new Promise((r) => setTimeout(r, 450))`);
           const s0 = await sig(page);
-          if (s0.phase !== 'menu') await page.evaluate(`window.__trials.app.quit()`);
-          else if (s0.screen !== 'menu') await page.evaluate(`window.__trials.app.goto('menu')`);
+          if (s0.phase !== 'menu') await page.evaluate(`window.__rockhop.app.quit()`);
+          else if (s0.screen !== 'menu') await page.evaluate(`window.__rockhop.app.goto('menu')`);
           if (!(await waitFor(page, `!!document.querySelector('.menu-screen.live')`))) return false;
           await page.waitForTimeout(250);
           const s1 = await sig(page);
@@ -831,7 +831,7 @@ function transitions(page: Page, g: Geom): Transition[] {
           });
           if (!c) return false;
           await tap(page, c.x, c.y);
-          await page.evaluate(`window.__trials.app.frame()`);
+          await page.evaluate(`window.__rockhop.app.frame()`);
           const s = await sig(page);
           if (s.screen === 'tracks') return true;
           log(`menu→tracks: PLAY tap landed in ${sigKey(s)}; retrying`);
@@ -851,7 +851,7 @@ async function flowGrid(ctx: BrowserContext, url: string, g: Geom, shard: { k: n
   page.on('pageerror', (e) => expect(false, flow, 'pageerror', e.message));
   await page.goto(`${url}/?sw=0&track=flat-test`);
   await page.waitForFunction(() => !document.getElementById('loader'), null, { timeout: 180000 });
-  await waitFor(page, `!!(window.__trials && window.__trials.app)`);
+  await waitFor(page, `!!(window.__rockhop && window.__rockhop.app)`);
   await page.evaluate(E2E_TAP_SRC);
   const points: { x: number; y: number }[] = [];
   for (let j = 0; j < GRID_ROWS; j++) for (let i = 0; i < GRID_COLS; i++) points.push({ x: Math.round(((i + 0.5) / GRID_COLS) * g.width), y: Math.round(((j + 0.5) / GRID_ROWS) * g.height) });
@@ -893,7 +893,7 @@ async function flowGrid(ctx: BrowserContext, url: string, g: Geom, shard: { k: n
           const reloaded = await page.evaluate(`typeof window.__e2eTap !== 'function'`).catch(() => true);
           if (!reloaded) throw e;
           await page.waitForFunction(() => !document.getElementById('loader'), null, { timeout: 180000 });
-          await waitFor(page, `!!(window.__trials && window.__trials.app)`);
+          await waitFor(page, `!!(window.__rockhop && window.__rockhop.app)`);
           await page.evaluate(E2E_TAP_SRC);
           stats.changes++;
           const armed = recent.flat().filter((p) => p.live && /ov-reload/.test(p.el));
@@ -943,7 +943,7 @@ async function flowHitRects(ctx: BrowserContext, url: string, g: Geom): Promise<
   page.on('pageerror', (e) => expect(false, flow, 'pageerror', e.message));
   await page.goto(`${url}/?sw=0&track=flat-test`);
   await page.waitForFunction(() => !document.getElementById('loader'), null, { timeout: 180000 });
-  await waitFor(page, `!!(window.__trials && window.__trials.app)`);
+  await waitFor(page, `!!(window.__rockhop && window.__rockhop.app)`);
   if (!(await toRun(page))) { expect(false, flow, 'setup', 'no run'); return page.close(); }
   expect(await waitFor(page, `document.querySelector('.touch-layer').classList.contains('live')`), flow, 'layer-live', 'touch layer never went live');
   const rect = async (sel: string) => page.evaluate((s) => { const r = document.querySelector<HTMLElement>(s)!.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom, op: getComputedStyle(document.querySelector<HTMLElement>(s)!).opacity }; }, sel);
@@ -959,25 +959,25 @@ async function flowHitRects(ctx: BrowserContext, url: string, g: Geom): Promise<
         await waitFor(page, `document.querySelector('.touch-layer').classList.contains('live')`, 5000);
         await tap(page, x, y);
         const s = await frameSig(page);
-        if (s.paused) await page.evaluate(`window.__trials.app.togglePause(); window.__trials.app.frame()`);
+        if (s.paused) await page.evaluate(`window.__rockhop.app.togglePause(); window.__rockhop.app.frame()`);
         return s.paused;
       }
       // Restart is a held input read by the frame poll: finger down, an app frame + a few ticks (a restart edge while
       // riding = one fault, checkpoint respawn), finger up. A frame never runs between a Playwright tap's down and up.
-      const f0 = (await page.evaluate(`window.__trials.faults()`)) as number;
+      const f0 = (await page.evaluate(`window.__rockhop.faults()`)) as number;
       const cdp = await ctx.newCDPSession(page);
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
-      await page.evaluate(`window.__trials.app.frame(); window.__trials.step(3); window.__trials.app.frame()`);
+      await page.evaluate(`window.__rockhop.app.frame(); window.__rockhop.step(3); window.__rockhop.app.frame()`);
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
       await cdp.detach();
-      await page.evaluate(`window.__trials.app.frame(); window.__trials.step(3)`);
-      return ((await page.evaluate(`window.__trials.faults()`)) as number) > f0;
+      await page.evaluate(`window.__rockhop.app.frame(); window.__rockhop.step(3)`);
+      return ((await page.evaluate(`window.__rockhop.faults()`)) as number) > f0;
     };
     for (const [x, y] of inner) expect(await acted(x, y), flow, `${kind}-inner`, `tap ${x.toFixed(0)},${y.toFixed(0)} inside the drawn rect did not act`);
     for (const [x, y] of outer) expect(!(await acted(x, y)), flow, `${kind}-outer`, `tap ${x.toFixed(0)},${y.toFixed(0)} outside the drawn rect acted`);
   }
   // Under the pause overlay the buttons are not drawn: the pause rect must not resume, the restart rect must not restart.
-  await page.evaluate(`window.__trials.app.togglePause(); window.__trials.app.frame()`);
+  await page.evaluate(`window.__rockhop.app.togglePause(); window.__rockhop.app.frame()`);
   expect(await page.evaluate(`!document.querySelector('.touch-layer').classList.contains('live')`), flow, 'layer-dead-under-overlay', 'touch layer still live with the pause overlay up');
   await waitFor(page, `parseFloat(getComputedStyle(document.querySelector('.tz-pause')).opacity) < 0.5`, 5000); // the .25 s fade-out
   const rp = await rect('.tz-pause');

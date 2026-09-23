@@ -57,7 +57,7 @@ async function main(): Promise<void> {
       const inputs = frames.slice(start * ticksPerFrame, end * ticksPerFrame);
       const r = await page.evaluate(
         ([ins, tpf]) => {
-          const t = window.__trials!;
+          const t = window.__rockhop!;
           const rm: number[] = [];
           const sm: number[] = [];
           const pm: number[] = [];

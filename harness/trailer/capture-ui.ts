@@ -28,13 +28,13 @@ import { startServer } from '../lib/server';
 /** Local progress seed: medals on the beginner rows so the map and the menu read like a played save. */
 const SEED = `(() => {
   const mk = (time, medal) => JSON.stringify({ time, faults: 0, medal });
-  localStorage.setItem('trials.best.b1-first-ride', mk(41.2, 'gold'));
-  localStorage.setItem('trials.best.b2-lean-back', mk(47.9, 'silver'));
-  localStorage.setItem('trials.best.b3-kicker-row', mk(58.1, 'bronze'));
-  localStorage.setItem('trials.best.e1-uphill-weight', mk(52.4, 'silver'));
-  localStorage.setItem('trials.best.e2-rear-wheel-first', mk(66.8, 'bronze'));
-  localStorage.setItem('trials.best.e3-stairway@pro', mk(61.3, 'silver'));
-  localStorage.setItem('trials.onboarded', '1');
+  localStorage.setItem('rockhop.best.b1-first-ride', mk(41.2, 'gold'));
+  localStorage.setItem('rockhop.best.b2-lean-back', mk(47.9, 'silver'));
+  localStorage.setItem('rockhop.best.b3-kicker-row', mk(58.1, 'bronze'));
+  localStorage.setItem('rockhop.best.e1-uphill-weight', mk(52.4, 'silver'));
+  localStorage.setItem('rockhop.best.e2-rear-wheel-first', mk(66.8, 'bronze'));
+  localStorage.setItem('rockhop.best.e3-stairway@pro', mk(61.3, 'silver'));
+  localStorage.setItem('rockhop.onboarded', '1');
 })()`;
 
 export type Step =
@@ -165,11 +165,11 @@ async function main(): Promise<void> {
       for (const [k, v] of Object.entries(shot.query ?? {})) url.searchParams.set(k, v);
       await page.goto(url.toString(), { waitUntil: 'commit' });
       await page.waitForFunction(() => !document.getElementById('loader'), undefined, { timeout: 240_000 });
-      await page.waitForFunction(() => window.__trials?.ready === true, undefined, { timeout: 120_000 });
+      await page.waitForFunction(() => window.__rockhop?.ready === true, undefined, { timeout: 120_000 });
       // Let the first real frames land, then freeze: from here the page only moves when we step it.
       await page.waitForTimeout(1500);
       await page.clock.pauseAt(Math.max(clock0, Date.now()) + 2000);
-      await page.evaluate(`window.__trials.setQuality(${JSON.stringify(shot.quality ?? 'high')})`);
+      await page.evaluate(`window.__rockhop.setQuality(${JSON.stringify(shot.quality ?? 'high')})`);
       // The fps meter is drawn on every screen except the menu; a trailer frame must not carry it.
       await page.addStyleTag({ content: '.fpsmeter, .perf, .trace { display: none !important; }' });
 

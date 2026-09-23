@@ -1,6 +1,6 @@
 /**
  * Live-browser driver: the same ReflexController, but its eyes are
- * `window.__trials.getState()` polled over CDP at the skill's glance rate, its
+ * `window.__rockhop.getState()` polled over CDP at the skill's glance rate, its
  * hands are `page.keyboard.down/up` on the real arrow keys, and its clock is
  * the wall clock. The page runs the *live* game (no `?harness=1`): the App
  * shell, the 3-2-1-GO countdown, `RafDriver` ticking physics from
@@ -28,7 +28,7 @@ import { faultContext, nearestObstacle, type ReflexFault } from './play';
 const KEY_CODES: Record<keyof Keys, string> = { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight', restart: 'Enter' };
 
 const IN_PAGE_HOOK = `(() => {
-  const h = window.__trials;
+  const h = window.__rockhop;
   const r = { started: false, startTick: -1, startAt: 0, frames: 0, t0: performance.now() };
   window.__reflex = r;
   const tick = () => {
@@ -46,13 +46,13 @@ const IN_PAGE_HOOK = `(() => {
 })()`;
 
 const GLANCE = `(() => {
-  const h = window.__trials;
+  const h = window.__rockhop;
   const r = window.__reflex;
   return { st: h.getState(), phase: h.phase(), runTime: h.runTime(), events: h.drainEvents(), now: performance.now(), frames: r.frames, started: r.started, startTick: r.startTick };
 })()`;
 
 const STOP = `(() => {
-  const h = window.__trials;
+  const h = window.__rockhop;
   const json = h.stopRecording();
   return { json, hash: h.hashState(), state: h.getState(), runTime: h.runTime(), faults: h.faults(), frames: window.__reflex.frames, startTick: window.__reflex.startTick };
 })()`;
@@ -143,26 +143,26 @@ export class ReflexBrowser {
       url.searchParams.set('track', trackId);
       // Round 10: `?track=` goes straight to the run, but a first launch ever shows the onboarding card with the game
       // paused (phase 'menu') until a key — a fresh Playwright context is always a first launch, which is the round-9
-      // "expected the countdown after pauseAt, got 'menu'". A returning player has `trials.onboarded` set; so does the driver.
+      // "expected the countdown after pauseAt, got 'menu'". A returning player has `rockhop.onboarded` set; so does the driver.
       await page.addInitScript(() => {
         try {
-          localStorage.setItem('trials.onboarded', '1');
+          localStorage.setItem('rockhop.onboarded', '1');
         } catch {
           /* storage unavailable */
         }
       });
       await page.goto(url.toString(), { waitUntil: 'commit' });
-      await page.waitForFunction(() => window.__trials?.ready === true, undefined, { timeout: 30_000 });
+      await page.waitForFunction(() => window.__rockhop?.ready === true, undefined, { timeout: 30_000 });
       // Round 11: `ready` is set when the hook installs (boot step `front`), BEFORE `App.start()` runs in the `track`
       // step behind `nextPaint()` (rAF + setTimeout). With the fake clock installed, `pauseAt` below freezes the clock,
       // so a boot still downloading art when it fires never gets its next paint: `start()` never runs, the screen stays
       // at its initial 'menu' and the nav log is empty — round 9's 'menu', round 10's 'title'. The clock runs in real
       // time until paused, so wait for the run itself (`?track=` -> `play()` -> countdown) before touching it.
       try {
-        await page.waitForFunction(() => window.__trials?.phase?.() === 'countdown', undefined, { timeout: 90_000 });
+        await page.waitForFunction(() => window.__rockhop?.phase?.() === 'countdown', undefined, { timeout: 90_000 });
       } catch {
         const why = (await page.evaluate(
-          `(() => { const t = window.__trials; const app = t && t.app; return JSON.stringify({ search: location.search, phase: t && t.phase ? t.phase() : null, screen: app && app.screen ? app.screen() : null, nav: t && t.navLog ? t.navLog().slice(-8) : null, boot: (document.getElementById('boot') || document.querySelector('[data-boot]') || {}).textContent || null }); })()`,
+          `(() => { const t = window.__rockhop; const app = t && t.app; return JSON.stringify({ search: location.search, phase: t && t.phase ? t.phase() : null, screen: app && app.screen ? app.screen() : null, nav: t && t.navLog ? t.navLog().slice(-8) : null, boot: (document.getElementById('boot') || document.querySelector('[data-boot]') || {}).textContent || null }); })()`,
         )) as string;
         throw new Error(`live game: \`?track=\` did not reach the countdown within 90 s (app ${why})`);
       }
@@ -170,17 +170,17 @@ export class ReflexBrowser {
         // pauseAt fast-forwards to the target (rAF fires sparsely, each frame clamped to 0.25 s of game time by the
         // App), so a target well past the slowest boot costs a little countdown, never the GO.
         await page.clock.pauseAt(Math.max(clock0, Date.now()) + 30_000);
-        const ph = (await page.evaluate('window.__trials.phase()')) as string;
+        const ph = (await page.evaluate('window.__rockhop.phase()')) as string;
         if (ph !== 'countdown') {
           // Round 10: `?track=` lands in `play()` (phase countdown) and something under the fast-forward takes it back to
           // `menu` (`quit()` / `loadBackdrop()` are the only paths) — report the App screen and the nav log with the failure.
           const why = (await page.evaluate(
-            `(() => { const t = window.__trials; const app = t && t.app; return JSON.stringify({ screen: app && app.screen ? app.screen() : null, nav: t && t.navLog ? t.navLog().slice(-8) : null }); })()`,
+            `(() => { const t = window.__rockhop; const app = t && t.app; return JSON.stringify({ screen: app && app.screen ? app.screen() : null, nav: t && t.navLog ? t.navLog().slice(-8) : null }); })()`,
           )) as string;
           throw new Error(`fake clock: expected the countdown after pauseAt, got '${ph}' (app ${why})`);
         }
       }
-      await page.evaluate(`window.__trials.setQuality(${JSON.stringify(this.opts.quality ?? 'low')})`);
+      await page.evaluate(`window.__rockhop.setQuality(${JSON.stringify(this.opts.quality ?? 'low')})`);
       await page.evaluate(IN_PAGE_HOOK);
       // Node-side model of the same track for perception (geometry only) and for the replay check.
       const sim = await createSim(trackId);

@@ -101,7 +101,7 @@ async function main(): Promise<void> {
       for (let t = 0; t < start; t += hz * 5) {
         const slice = seq.slice(t, Math.min(start, t + hz * 5));
         await page.evaluate((inputs) => {
-          const tr = window.__trials!;
+          const tr = window.__rockhop!;
           for (const f of inputs) {
             tr.setInput(f);
             tr.step(1);
@@ -117,7 +117,7 @@ async function main(): Promise<void> {
         const slice = seq.slice(t, t + tpf);
         const res = await page.evaluate(
           ([inputs, n, grab]) => {
-            const tr = window.__trials!;
+            const tr = window.__rockhop!;
             for (const f of inputs) {
               tr.setInput(f);
               tr.step(1);

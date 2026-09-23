@@ -298,94 +298,6 @@
    "tier": "extreme"
   },
   {
-   "id": "medal-bronze-512",
-   "path": "art/menu/medal-bronze-512.png",
-   "kind": "medal",
-   "w": 512,
-   "h": 512,
-   "bytes": 88055,
-   "v": "d4712401",
-   "medal": "bronze",
-   "variant": "2x"
-  },
-  {
-   "id": "medal-bronze",
-   "path": "art/menu/medal-bronze.png",
-   "kind": "medal",
-   "w": 256,
-   "h": 256,
-   "bytes": 25292,
-   "v": "1ace6c5d",
-   "medal": "bronze",
-   "variant": "1x"
-  },
-  {
-   "id": "medal-silver-512",
-   "path": "art/menu/medal-silver-512.png",
-   "kind": "medal",
-   "w": 512,
-   "h": 512,
-   "bytes": 77927,
-   "v": "e29c508c",
-   "medal": "silver",
-   "variant": "2x"
-  },
-  {
-   "id": "medal-silver",
-   "path": "art/menu/medal-silver.png",
-   "kind": "medal",
-   "w": 256,
-   "h": 256,
-   "bytes": 22967,
-   "v": "273f649c",
-   "medal": "silver",
-   "variant": "1x"
-  },
-  {
-   "id": "medal-gold-512",
-   "path": "art/menu/medal-gold-512.png",
-   "kind": "medal",
-   "w": 512,
-   "h": 512,
-   "bytes": 79364,
-   "v": "31b1ae0e",
-   "medal": "gold",
-   "variant": "2x"
-  },
-  {
-   "id": "medal-gold",
-   "path": "art/menu/medal-gold.png",
-   "kind": "medal",
-   "w": 256,
-   "h": 256,
-   "bytes": 22194,
-   "v": "2d57129b",
-   "medal": "gold",
-   "variant": "1x"
-  },
-  {
-   "id": "medal-platinum-512",
-   "path": "art/menu/medal-platinum-512.png",
-   "kind": "medal",
-   "w": 512,
-   "h": 512,
-   "bytes": 86804,
-   "v": "0e116af3",
-   "medal": "platinum",
-   "variant": "2x"
-  },
-  {
-   "id": "medal-platinum",
-   "path": "art/menu/medal-platinum.png",
-   "kind": "medal",
-   "w": 256,
-   "h": 256,
-   "bytes": 25201,
-   "v": "61338121",
-   "medal": "platinum",
-   "variant": "1x"
-  },
-  {
    "id": "results-industrial",
    "path": "art/menu/results-industrial.webp",
    "kind": "results-bg",
@@ -1336,6 +1248,178 @@
    "v": "998e3855",
    "biome": "snow",
    "tileX": true
+  },
+  {
+   "id": "keyart-harbour-1920",
+   "path": "art/menu/keyart-harbour-1920.webp",
+   "kind": "keyart",
+   "w": 1920,
+   "h": 1280,
+   "bytes": 474096,
+   "v": "bb6fa1d4",
+   "biome": "coast",
+   "variant": "2x"
+  },
+  {
+   "id": "keyart-harbour-960",
+   "path": "art/menu/keyart-harbour-960.webp",
+   "kind": "keyart",
+   "w": 960,
+   "h": 640,
+   "bytes": 163236,
+   "v": "6b652635",
+   "biome": "coast",
+   "variant": "1x"
+  },
+  {
+   "id": "keyart-quarry-1920",
+   "path": "art/menu/keyart-quarry-1920.webp",
+   "kind": "keyart",
+   "w": 1920,
+   "h": 1280,
+   "bytes": 393248,
+   "v": "7a685a90",
+   "biome": "quarry",
+   "variant": "2x"
+  },
+  {
+   "id": "keyart-quarry-960",
+   "path": "art/menu/keyart-quarry-960.webp",
+   "kind": "keyart",
+   "w": 960,
+   "h": 640,
+   "bytes": 138678,
+   "v": "4113f006",
+   "biome": "quarry",
+   "variant": "1x"
+  },
+  {
+   "id": "results-coast",
+   "path": "art/menu/results-coast.webp",
+   "kind": "results-bg",
+   "w": 1536,
+   "h": 1024,
+   "bytes": 235268,
+   "v": "fa0485c4",
+   "biome": "coast"
+  },
+  {
+   "id": "results-alpine",
+   "path": "art/menu/results-alpine.webp",
+   "kind": "results-bg",
+   "w": 1536,
+   "h": 1024,
+   "bytes": 285224,
+   "v": "bd5c64aa",
+   "biome": "alpine"
+  },
+  {
+   "id": "results-quarry",
+   "path": "art/menu/results-quarry.webp",
+   "kind": "results-bg",
+   "w": 1536,
+   "h": 1024,
+   "bytes": 225682,
+   "v": "ff390a0c",
+   "biome": "quarry"
+  },
+  {
+   "id": "results-snowline",
+   "path": "art/menu/results-snowline.webp",
+   "kind": "results-bg",
+   "w": 1536,
+   "h": 1024,
+   "bytes": 222014,
+   "v": "2b296331",
+   "biome": "snowline"
+  },
+  {
+   "id": "medal-bronze-512",
+   "path": "art/menu/medal-bronze-512.png",
+   "kind": "medal",
+   "w": 512,
+   "h": 512,
+   "bytes": 110222,
+   "v": "6079a5f5",
+   "medal": "bronze",
+   "variant": "2x"
+  },
+  {
+   "id": "medal-bronze",
+   "path": "art/menu/medal-bronze.png",
+   "kind": "medal",
+   "w": 256,
+   "h": 256,
+   "bytes": 31893,
+   "v": "505c58e2",
+   "medal": "bronze",
+   "variant": "1x"
+  },
+  {
+   "id": "medal-silver-512",
+   "path": "art/menu/medal-silver-512.png",
+   "kind": "medal",
+   "w": 512,
+   "h": 512,
+   "bytes": 99511,
+   "v": "3a22eb09",
+   "medal": "silver",
+   "variant": "2x"
+  },
+  {
+   "id": "medal-silver",
+   "path": "art/menu/medal-silver.png",
+   "kind": "medal",
+   "w": 256,
+   "h": 256,
+   "bytes": 30255,
+   "v": "77baeded",
+   "medal": "silver",
+   "variant": "1x"
+  },
+  {
+   "id": "medal-gold-512",
+   "path": "art/menu/medal-gold-512.png",
+   "kind": "medal",
+   "w": 512,
+   "h": 512,
+   "bytes": 107446,
+   "v": "baeb408f",
+   "medal": "gold",
+   "variant": "2x"
+  },
+  {
+   "id": "medal-gold",
+   "path": "art/menu/medal-gold.png",
+   "kind": "medal",
+   "w": 256,
+   "h": 256,
+   "bytes": 30780,
+   "v": "2435f6ac",
+   "medal": "gold",
+   "variant": "1x"
+  },
+  {
+   "id": "medal-obsidian-512",
+   "path": "art/menu/medal-obsidian-512.png",
+   "kind": "medal",
+   "w": 512,
+   "h": 512,
+   "bytes": 88928,
+   "v": "73ba8d62",
+   "medal": "platinum",
+   "variant": "2x"
+  },
+  {
+   "id": "medal-obsidian",
+   "path": "art/menu/medal-obsidian.png",
+   "kind": "medal",
+   "w": 256,
+   "h": 256,
+   "bytes": 28694,
+   "v": "df746cf1",
+   "medal": "platinum",
+   "variant": "1x"
   }
  ]
 }

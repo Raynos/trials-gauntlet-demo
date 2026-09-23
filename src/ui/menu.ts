@@ -5,7 +5,8 @@
  */
 import type { QualityTier } from '../core/types';
 import { formatTime } from './format';
-import { BUILD_STAMP, GAME_NAME, escapeHtml, hardReload } from './front';
+import { BUILD_STAMP, escapeHtml, hardReload } from './front';
+import { wordmarkSvg } from './brand';
 import { TileRow } from './tiles';
 import { logicalRect } from './orientation';
 import type { UiSfx } from './sfx';
@@ -172,12 +173,12 @@ export class PauseMenu {
     this.short = document.documentElement.classList.contains('short');
     if (info) {
       const crashed = info.phase === 'crashed';
-      this.kicker.textContent = `${crashed ? 'Crashed' : 'Paused'} · ${info.tier}`;
+      this.kicker.textContent = `${crashed ? 'Bailed' : 'Paused'} · ${info.tier}`;
       this.kicker.classList.toggle('red', crashed);
       this.title.textContent = info.trackName;
-      let stats = `<span>Time <b>${formatTime(info.runTime)}</b></span><i>·</i><span>Faults <b>${info.faults}</b></span>`;
+      let stats = `<span>Time <b>${formatTime(info.runTime)}</b></span><i>·</i><span>Bails <b>${info.faults}</b></span>`;
       if (crashed && typeof info.checkpointCount === 'number' && info.checkpointCount > 0) {
-        stats += `<i>·</i><span>Checkpoint <b>${Math.max(0, (info.checkpoint ?? -1) + 1)}</b> of <b>${info.checkpointCount}</b></span>`;
+        stats += `<i>·</i><span>Marker <b>${Math.max(0, (info.checkpoint ?? -1) + 1)}</b> of <b>${info.checkpointCount}</b></span>`;
       }
       this.stats.innerHTML = stats;
     }
@@ -289,7 +290,7 @@ export class PauseMenu {
 export function mountRotatePrompt(parent: HTMLElement): HTMLDivElement {
   const d = document.createElement('div');
   d.className = 'rotate armed';
-  d.innerHTML = `<div class="wordmark">${GAME_NAME.split(' ')[0]}<br>${GAME_NAME.split(' ').slice(1).join(' ')}</div>
+  d.innerHTML = `<div class="wordmark">${wordmarkSvg()}</div>
     <i></i>
     <div class="msg">Rotate to landscape</div>
     <button type="button" class="btn primary reload">⟳ Reload game</button>

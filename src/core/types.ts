@@ -544,7 +544,7 @@ export const WHEEL_RADIUS = 0.34;
 export const WHEELBASE = 1.3;
 
 // ---------------------------------------------------------------------------
-// Test hook exposed on `window.__trials`
+// Test hook exposed on `window.__rockhop`
 // ---------------------------------------------------------------------------
 
 export interface RenderStats {
@@ -594,7 +594,10 @@ export interface HookInfo {
  * Global test hook so a headless harness can drive the game without a real
  * clock. All methods are synchronous and deterministic.
  */
-export interface TrialsHook {
+/** @deprecated The pre-rebrand name of `RockhopHook` (`window.__rockhop`); kept while callers move over. */
+export type TrialsHook = RockhopHook;
+
+export interface RockhopHook {
   ready: true;
   info(): HookInfo;
   /** Advance physics by `n` ticks with the current input. Returns new tick. */
@@ -669,7 +672,7 @@ export interface TrialsHook {
     screen(): string;
     paused(): boolean;
   };
-  /** Level reviewer (docs/design/game.md §21; `window.__trials.review`): open a track under the review UI, read / drive its view, the Copy review payload. */
+  /** Level reviewer (docs/design/game.md §21; `window.__rockhop.review`): open a track under the review UI, read / drive its view, the Copy review payload. */
   review?: {
     open(trackId: string, seg?: number): boolean;
     close(): void;

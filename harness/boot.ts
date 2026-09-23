@@ -1,6 +1,6 @@
 /**
  * Cold-boot gate: serve the build, open headless Chromium with WebGL2, wait
- * for `window.__trials`, report boot ms / heap / renderer string.
+ * for `window.__rockhop`, report boot ms / heap / renderer string.
  *
  *   pnpm harness:boot [--dev] [--build] [--json] [--runs N]
  */
@@ -29,7 +29,7 @@ async function main(): Promise<void> {
       const state = await hook.getState();
       // Restart latency: drive a short run, then time restart → first synced frame.
       const restart = await page.evaluate(() => {
-        const t = window.__trials!;
+        const t = window.__rockhop!;
         t.setInput({ throttle: 1 });
         t.step(240);
         t.render(true); // warm: first synced frame pays SwiftShader pipeline setup
@@ -79,7 +79,7 @@ async function main(): Promise<void> {
       });
       printKV('game', { version: first.info.version, physicsHz: first.info.physicsHz, track: first.info.trackId, seed: first.info.seed });
       printKV('boot', {
-        'cold boot ms (nav → __trials.ready)': report.boot.bootMs,
+        'cold boot ms (nav → __rockhop.ready)': report.boot.bootMs,
         ...(runs > 1 ? { 'min/max ms': `${report.boot.bootMsMin} / ${report.boot.bootMsMax}` } : {}),
         'DOMContentLoaded ms': report.boot.domContentLoadedMs,
         'load event ms': report.boot.loadEventMs,

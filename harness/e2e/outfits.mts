@@ -41,16 +41,16 @@ try {
   });
   await page.goto(`${server.url}?sw=0&outfit=street`, { waitUntil: 'domcontentloaded' });
   // The loader removes itself after its completion crossfade; do not wait for a transient node.
-  await page.waitForFunction(() => window.__trials?.app && (!document.querySelector('#loader') || document.querySelector('#loader')?.getAttribute('data-done') === '1'), undefined, { timeout: 90_000 });
+  await page.waitForFunction(() => window.__rockhop?.app && (!document.querySelector('#loader') || document.querySelector('#loader')?.getAttribute('data-done') === '1'), undefined, { timeout: 90_000 });
   console.log('outfits: production boot ready');
-  await page.evaluate(() => window.__trials!.app!.goto('garage'));
+  await page.evaluate(() => window.__rockhop!.app!.goto('garage'));
   await page.waitForSelector('.garage-screen.live', { timeout: 30_000 });
   const race = page.locator('button[data-outfit="street-openface"]'), street = page.locator('button[data-outfit="street-mustard"]');
   await race.click();
   await page.waitForFunction(() => document.querySelector('.outfit-current')?.textContent?.includes('Select it to retry'));
   console.log('outfits: injected outage observed');
   if (await street.getAttribute('aria-pressed') !== 'true') throw new Error('Outage unselected the available street outfit');
-  const failed = await page.evaluate(() => ({ saved: localStorage.getItem('trials.riderOutfit'),
+  const failed = await page.evaluate(() => ({ saved: localStorage.getItem('rockhop.riderOutfit'),
     rendered: (window as unknown as HeroHarnessWindow).__render.debugInfo().riderOutfit, status: document.querySelector('.outfit-current')!.textContent }));
   if (failed.saved === 'street-openface' || failed.rendered !== 'street-mustard' || failedRequests < 1) throw new Error(`Failed outfit was committed (or nothing was fetched): ${JSON.stringify({ failed, failedRequests })}`);
   const failedAtOutage = failedRequests;
@@ -58,7 +58,7 @@ try {
   await race.click();
   await page.waitForFunction(() => document.querySelector('.outfit-current')?.textContent === 'Charcoal · open-face selected');
   console.log('outfits: retry selected openface');
-  const retry = await page.evaluate(() => ({ saved: localStorage.getItem('trials.riderOutfit'),
+  const retry = await page.evaluate(() => ({ saved: localStorage.getItem('rockhop.riderOutfit'),
     rendered: (window as unknown as HeroHarnessWindow).__render.debugInfo().riderOutfit, heroDoc: (window as unknown as HeroHarnessWindow).__render.debugInfo().heroDoc }));
   // The twin lands after the swap (off-track parse): wait for both files of the pair to have been served before judging.
   const pair = [basename(riderUrl('street-openface')), basename(lodUrl(riderUrl('street-openface')))];
@@ -75,7 +75,7 @@ try {
   for (const preset of AVAILABLE_RIDER_PRESETS) {
     console.log(`outfits: checking ${preset.id}`);
     await page.locator(`button[data-outfit="${preset.id}"]`).click();
-    await page.waitForFunction(id => localStorage.getItem('trials.riderOutfit') === id, preset.id);
+    await page.waitForFunction(id => localStorage.getItem('rockhop.riderOutfit') === id, preset.id);
     for (const bike of ['rookie', 'pro'] as const) {
       await page.locator(`button[data-bike="${bike}"]`).click();
       for (const lod of [false, true]) {
@@ -91,7 +91,7 @@ try {
             for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) materials.push(material.name);
           });
           const debug = r.debugInfo();
-          return { saved: localStorage.getItem('trials.riderOutfit'), rendered: debug.riderOutfit, variant: debug.riderMaterialVariant, heroDoc: debug.heroDoc, materials: [...new Set(materials)] };
+          return { saved: localStorage.getItem('rockhop.riderOutfit'), rendered: debug.riderOutfit, variant: debug.riderMaterialVariant, heroDoc: debug.heroDoc, materials: [...new Set(materials)] };
         }, { lod });
         const liveMaterial = liveMaterialOf(preset.id, observation.materials);
         const files = { rider: basename(riderUrl(preset.id)), riderLod: basename(lodUrl(riderUrl(preset.id))), bike: basename(bikeUrl(bike)), bikeLod: basename(lodUrl(bikeUrl(bike))) };

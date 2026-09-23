@@ -1,5 +1,5 @@
 /**
- * TrialsSynth — the whole soundscape as one sample-rate process.
+ * RockhopSynth — the whole soundscape as one sample-rate process.
  *
  *   engine ─┐
  *   tyres ──┤
@@ -86,7 +86,7 @@ const ROOMS: readonly { fb: number; lp: number }[] = [
   { fb: 0.7, lp: 2000 }, // foundry: big, hot, very damped
 ];
 
-export class TrialsSynth {
+export class RockhopSynth {
   readonly sampleRate: number;
   readonly engine: EngineVoice;
   readonly tyres: [TyreVoice, TyreVoice];

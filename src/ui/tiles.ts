@@ -8,7 +8,7 @@
  */
 import type { UiSfx } from './sfx';
 
-export type TileIcon = 'play' | 'restart' | 'door' | 'next' | 'grid';
+export type TileIcon = 'play' | 'restart' | 'door' | 'next' | 'grid' | 'map';
 
 export interface TileDef {
   id: string;
@@ -22,6 +22,7 @@ const ICONS: Record<TileIcon, string> = {
   restart: '<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 3.5v4h4"/>',
   door: '<path d="M4 4h9v16H4z"/><path d="M13 12h7"/><path d="M17 9l3 3-3 3"/><circle cx="10" cy="12" r=".9" fill="currentColor" stroke="none"/>',
   next: '<path d="M4 5v14l8-7z" fill="currentColor" stroke="none"/><path d="M12 5v14l8-7z" fill="currentColor" stroke="none"/>',
+  map: '<path d="M2.5 19.5l6.2-11 4.2 6.4 2.6-3.8 6 8.4z" fill="currentColor" stroke="none"/><path d="M8.7 8.5l1.6 2.5" stroke="none"/>',
   grid: '<rect x="4" y="4" width="7" height="7" rx="1.2"/><rect x="13" y="4" width="7" height="7" rx="1.2"/><rect x="4" y="13" width="7" height="7" rx="1.2"/><rect x="13" y="13" width="7" height="7" rx="1.2"/>',
 };
 

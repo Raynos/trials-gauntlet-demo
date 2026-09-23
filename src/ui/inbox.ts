@@ -6,14 +6,14 @@
  * `pause` action and never touches physics, so replays / hashes are unaffected. A note is the
  * reviewer's words plus the auto-captured context (track, tick, run time, faults, bike, rider,
  * quality / dpr / canvas, version + build, UA) and a JPEG of the canvas, POSTed to `/api/inbox`
- * with the password stored once under `trials.reviewPassword`. Offline or failed sends queue in
+ * with the password stored once under `rockhop.reviewPassword`. Offline or failed sends queue in
  * localStorage and retry on the next open / `online` event. The pull side is `scripts/inbox-pull.ts`.
  */
-import type { TrialsHook } from '../core/types';
+import type { RockhopHook } from '../core/types';
 import { conceal, reveal } from './live';
 
-export const PASSWORD_KEY = 'trials.reviewPassword';
-export const QUEUE_KEY = 'trials.reviewQueue';
+export const PASSWORD_KEY = 'rockhop.reviewPassword';
+export const QUEUE_KEY = 'rockhop.reviewQueue';
 export const INBOX_URL = '/api/inbox';
 export const SHOT_MAX_W = 1280;
 export const SHOT_MAX_BYTES = 300 * 1024;
@@ -59,7 +59,7 @@ export interface QueuedNote {
 
 /** What the HUD hands over on open (the only coupling to `hud.ts`). */
 export interface InboxHost {
-  /** The HUD's own view of the run (track name, device); everything else comes from `window.__trials`. */
+  /** The HUD's own view of the run (track name, device); everything else comes from `window.__rockhop`. */
   hud(): { trackName: string; device: string };
   /** Pause the run (the HUD's `pause` action) — a no-op when already paused or not in a run. */
   pause(): void;
@@ -108,7 +108,7 @@ export function savePassword(pw: string | null, storage = safeStorage()): void {
 }
 
 /** Everything the agent needs to reproduce, read from the hook + storage; every field is a string or number (chips + JSON). */
-export function captureContext(hook: TrialsHook | undefined, hud: { trackName: string; device: string }, storage = safeStorage(), nav: { userAgent: string } = navigator, win: { innerWidth: number; innerHeight: number; devicePixelRatio: number; location: { href: string } } = window): NoteContext {
+export function captureContext(hook: RockhopHook | undefined, hud: { trackName: string; device: string }, storage = safeStorage(), nav: { userAgent: string } = navigator, win: { innerWidth: number; innerHeight: number; devicePixelRatio: number; location: { href: string } } = window): NoteContext {
   const info = hook?.info();
   const st = hook?.getState();
   const render = (info?.render ?? {}) as Record<string, unknown>;
@@ -138,9 +138,9 @@ export function captureContext(hook: TrialsHook | undefined, hud: { trackName: s
     canvas: render['canvasW'] !== undefined ? `${s(render['canvasW'])}×${s(render['canvasH'])}` : '',
     tier: s(render['tier']),
     deviceClass: s(render['deviceClass']),
-    riderModel: get('trials.riderModel'),
-    riderOutfit: get('trials.riderOutfit'),
-    bikeModel: get('trials.bikeModel'),
+    riderModel: get('rockhop.riderModel'),
+    riderOutfit: get('rockhop.riderOutfit'),
+    bikeModel: get('rockhop.bikeModel'),
     version: s(info?.version),
     build: typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev',
     ua: nav.userAgent,
@@ -178,7 +178,7 @@ const FORCE_DRAW_TRIES = 40;
  * counter moves (its skip valve draws by the 31st call), then read back. Scaled to ≤ SHOT_MAX_W,
  * quality stepped down until ≤ SHOT_MAX_BYTES. Null when there is no canvas / no 2D context.
  */
-export function captureScreenshot(canvas: HTMLCanvasElement | null, hook?: TrialsHook, doc: Document = document): string | null {
+export function captureScreenshot(canvas: HTMLCanvasElement | null, hook?: RockhopHook, doc: Document = document): string | null {
   if (!canvas || canvas.width === 0 || canvas.height === 0) return null;
   try {
     if (hook) {
@@ -302,7 +302,7 @@ export class InboxSheet {
 
   constructor(
     private readonly host: InboxHost,
-    private readonly hook: () => TrialsHook | undefined = () => window.__trials,
+    private readonly hook: () => RockhopHook | undefined = () => window.__rockhop,
     private readonly fetchImpl: typeof fetch = (...a) => fetch(...a),
     storage: StorageLike | null = safeStorage(),
   ) {

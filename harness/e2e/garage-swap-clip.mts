@@ -41,7 +41,7 @@ const ctx = await browser.newContext({
   viewport: { width: W, height: H }, deviceScaleFactor: DPR, isMobile: true, hasTouch: true, recordVideo: { dir: out, size: { width: W, height: H } },
   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
 });
-await ctx.addInitScript(() => { localStorage.setItem('trials.onboarded', '1'); });
+await ctx.addInitScript(() => { localStorage.setItem('rockhop.onboarded', '1'); });
 const page: Page = await ctx.newPage();
 let timeOrigin = 0;
 const requests: ModelReq[] = [];
@@ -106,7 +106,7 @@ try {
   await page.waitForTimeout(800);
   await tap('.menu-screen.live .menu-item[data-id=garage]');
   const tapped = await page.waitForSelector('.garage-screen.live', { timeout: 10_000 }).then(() => true, () => false);
-  if (!tapped) { log['garageEntry'] = 'the GARAGE tile tap did not open the garage within 10 s; opened through app.goto (a finding for the menu, not this clip)'; await page.evaluate(() => (window as unknown as { __trials: { app: { goto(s: string): void } } }).__trials.app.goto('garage')); await page.waitForSelector('.garage-screen.live', { timeout: 30_000 }); }
+  if (!tapped) { log['garageEntry'] = 'the GARAGE tile tap did not open the garage within 10 s; opened through app.goto (a finding for the menu, not this clip)'; await page.evaluate(() => (window as unknown as { __rockhop: { app: { goto(s: string): void } } }).__rockhop.app.goto('garage')); await page.waitForSelector('.garage-screen.live', { timeout: 30_000 }); }
   await page.evaluate(async () => { await (window as unknown as { __render: { whenReady(): Promise<void> } }).__render.whenReady(); });
   await page.waitForTimeout(1500);
   log['garageBoot'] = await page.evaluate(() => { const r = (window as unknown as { __render: { debugInfo(): Record<string, unknown>; riderDocumentOutfit: string; bikeDocumentClass: string } }).__render; const d = r.debugInfo(); return { outfit: r.riderDocumentOutfit, cls: r.bikeDocumentClass, heroDoc: d['heroDoc'], tier: d['tier'], profile: d['profile'], dpr: d['dpr'], calls: d['calls'], tris: d['tris'], heroSwapHook: d['heroSwap'] !== undefined }; });

@@ -1,6 +1,6 @@
 /**
  * Browser-side verification of a recording: the same bytes through
- * `window.__trials.runRecording` must hash identically to the node sim
+ * `window.__rockhop.runRecording` must hash identically to the node sim
  * (`__trialsRunAs`, lib/hook.ts, routes a Pro recording onto the Pro bike).
  * Reuses one server + browser across calls.
  */
@@ -62,7 +62,7 @@ export class BrowserVerifier {
       await openGame(page, server.url, rec.header.physics === 'v1' ? { query: { physics: 'v1' } } : {});
       const json = encodeJSON(rec);
       return await page.evaluate((j) => {
-        const t = window.__trials!;
+        const t = window.__rockhop!;
         const t0 = performance.now();
         t.drainEvents();
         const state = (window.__trialsRunAs ?? t.runRecording)(j);

@@ -41,14 +41,14 @@ const ctx = await browser.newContext({
   viewport: { width: W, height: H }, deviceScaleFactor: DPR, isMobile: true, hasTouch: true, recordVideo: { dir: out, size: { width: W, height: H } },
   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
 });
-await ctx.addInitScript(() => { localStorage.setItem('trials.onboarded', '1'); });
+await ctx.addInitScript(() => { localStorage.setItem('rockhop.onboarded', '1'); });
 // The in-page probe: rAF gaps, hero document slots, phase — from the first frame of the document.
 await ctx.addInitScript(`(function () {
   var P = { t0: performance.timeOrigin, docs: [], hitches: [], last: -1, lastDocs: '', readyAt: null };
   window.__bootProbe = P;
   P.state = function () { return state(); };
   function state() {
-    var w = window, t = w.__trials, r = w.__render, g = r && r.gltf;
+    var w = window, t = w.__rockhop, r = w.__render, g = r && r.gltf;
     var phase = t && typeof t.phase === 'function' ? t.phase() : 'boot';
     var screen = t && t.app && typeof t.app.screen === 'function' ? t.app.screen() : (document.getElementById('loader') ? 'loader' : 'boot');
     var d = r && typeof r.debugInfo === 'function' ? r.debugInfo() : null;
@@ -91,8 +91,8 @@ try {
   mark('menuHeld');
   log['menuDocs'] = await page.evaluate(() => (window as unknown as { __bootProbe: { docs: unknown[] } }).__bootProbe.docs.at(-1));
   // Launch b1 through the flow (the map's pan / zoom is the level-select clip's business, not this one's).
-  await page.evaluate((id) => (window as unknown as { __trials: { app: { play(id: string): void } } }).__trials.app.play(id), track);
-  await page.waitForFunction(() => (window as unknown as { __trials: { phase(): string } }).__trials.phase() === 'riding', null, { timeout: 60_000 });
+  await page.evaluate((id) => (window as unknown as { __rockhop: { app: { play(id: string): void } } }).__rockhop.app.play(id), track);
+  await page.waitForFunction(() => (window as unknown as { __rockhop: { phase(): string } }).__rockhop.phase() === 'riding', null, { timeout: 60_000 });
   mark('riding');
   // Ride: a finger on the GAS zone; a crash plays out the game's own auto-respawn under the held finger.
   const gas = await centre('.tz-throttle');
@@ -104,23 +104,23 @@ try {
   let finished = false;
   while (Date.now() - tRide < rideS * 1000) {
     await page.waitForTimeout(500);
-    const ph = await page.evaluate(() => (window as unknown as { __trials: { phase(): string } }).__trials.phase());
+    const ph = await page.evaluate(() => (window as unknown as { __rockhop: { phase(): string } }).__rockhop.phase());
     if (ph === 'finished') { finished = true; break; }
   }
   await page.mouse.up();
   mark(finished ? 'finished' : 'rideTimeout');
-  log['ride'] = await page.evaluate(() => { const t = (window as unknown as { __trials: { runTime(): number; faults(): number; finishTime(): number | null; getState(): { bike: { pos: { x: number } } } } }).__trials; return { runTime: t.runTime(), faults: t.faults(), finishTime: t.finishTime(), x: Math.round(t.getState().bike.pos.x * 10) / 10 }; });
+  log['ride'] = await page.evaluate(() => { const t = (window as unknown as { __rockhop: { runTime(): number; faults(): number; finishTime(): number | null; getState(): { bike: { pos: { x: number } } } } }).__rockhop; return { runTime: t.runTime(), faults: t.faults(), finishTime: t.finishTime(), x: Math.round(t.getState().bike.pos.x * 10) / 10 }; });
   await page.waitForTimeout(4000);
   mark('resultsHeld');
   // Results → MENU (the results tile when it is live, else the flow), then the GARAGE tile.
   if (await page.$('.results.live .tile[data-id=menu]')) await tap('.results.live .tile[data-id=menu]');
-  else await page.evaluate(() => (window as unknown as { __trials: { app: { goto(s: string): void } } }).__trials.app.goto('menu'));
+  else await page.evaluate(() => (window as unknown as { __rockhop: { app: { goto(s: string): void } } }).__rockhop.app.goto('menu'));
   await page.waitForFunction(() => !!document.querySelector('.menu-screen.live'), null, { timeout: 30_000 });
   await page.waitForTimeout(1500);
   const reqBeforeGarage = requests.length;
   await tap('.menu-screen.live .menu-item[data-id=garage]');
   const tapped = await page.waitForSelector('.garage-screen.live', { timeout: 10_000 }).then(() => true, () => false);
-  if (!tapped) { log['garageEntry'] = 'tap on the GARAGE tile did not open the garage within 10 s; opened through app.goto'; await page.evaluate(() => (window as unknown as { __trials: { app: { goto(s: string): void } } }).__trials.app.goto('garage')); await page.waitForSelector('.garage-screen.live', { timeout: 30_000 }); }
+  if (!tapped) { log['garageEntry'] = 'tap on the GARAGE tile did not open the garage within 10 s; opened through app.goto'; await page.evaluate(() => (window as unknown as { __rockhop: { app: { goto(s: string): void } } }).__rockhop.app.goto('garage')); await page.waitForSelector('.garage-screen.live', { timeout: 30_000 }); }
   await page.evaluate(async () => { await (window as unknown as { __render: { whenReady(): Promise<void> } }).__render.whenReady(); });
   mark('garageLive');
   await page.waitForTimeout(2500);

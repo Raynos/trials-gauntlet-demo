@@ -1,0 +1,1 @@
+Zone: DESERT QUARRY - pale sandstone terraces of an open-pit quarry, a rusted conveyor gantry and headframe, a rope bridge, stacked cut blocks, warm late-afternoon light under a teal sky. Match the attached A-results and Q2 frames' look.

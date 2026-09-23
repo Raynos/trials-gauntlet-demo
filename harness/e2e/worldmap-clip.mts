@@ -22,13 +22,13 @@ fs.mkdirSync(out, { recursive: true });
 
 const SEED = `(() => {
   const mk = (time, medal) => JSON.stringify({ time, faults: 0, medal });
-  localStorage.setItem('trials.best.b1-first-ride', mk(41.2, 'gold'));
-  localStorage.setItem('trials.best.b2-lean-back', mk(47.9, 'silver'));
-  localStorage.setItem('trials.best.b3-kicker-row', mk(58.1, 'bronze'));
-  localStorage.setItem('trials.best.e1-uphill-weight', mk(52.4, 'silver'));
-  localStorage.setItem('trials.best.e2-rear-wheel-first', mk(66.8, 'bronze'));
-  localStorage.setItem('trials.best.e3-stairway@pro', mk(61.3, 'silver'));
-  localStorage.setItem('trials.onboarded', '1');
+  localStorage.setItem('rockhop.best.b1-first-ride', mk(41.2, 'gold'));
+  localStorage.setItem('rockhop.best.b2-lean-back', mk(47.9, 'silver'));
+  localStorage.setItem('rockhop.best.b3-kicker-row', mk(58.1, 'bronze'));
+  localStorage.setItem('rockhop.best.e1-uphill-weight', mk(52.4, 'silver'));
+  localStorage.setItem('rockhop.best.e2-rear-wheel-first', mk(66.8, 'bronze'));
+  localStorage.setItem('rockhop.best.e3-stairway@pro', mk(61.3, 'silver'));
+  localStorage.setItem('rockhop.onboarded', '1');
 })()`;
 
 const browser = engine === 'webkit' ? await webkit.launch({ headless: true }) : await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
@@ -115,7 +115,7 @@ try {
   // H1 is focused and locked: a tap shakes it and states the rule everywhere.
   await tap('.wm-marker[data-track=h1-wheelie-wire] .wm-hit'); taps++;
   await page.waitForTimeout(500);
-  t['lockedH1'] = JSON.stringify(await page.evaluate(() => ({ cardRule: document.querySelector('.wm-card .rule')?.textContent ?? null, plateRule: document.querySelector('.wm-marker[data-track=h1-wheelie-wire] .wm-rule')?.textContent ?? null, gate: document.querySelector('.wm-gate .wm-plate')?.textContent ?? null, ride: document.querySelector<HTMLButtonElement>('.wm-ride')?.textContent, rideDisabled: document.querySelector<HTMLButtonElement>('.wm-ride')?.disabled, screen: window.__trials?.app?.screen?.() })));
+  t['lockedH1'] = JSON.stringify(await page.evaluate(() => ({ cardRule: document.querySelector('.wm-card .rule')?.textContent ?? null, plateRule: document.querySelector('.wm-marker[data-track=h1-wheelie-wire] .wm-rule')?.textContent ?? null, gate: document.querySelector('.wm-gate .wm-plate')?.textContent ?? null, ride: document.querySelector<HTMLButtonElement>('.wm-ride')?.textContent, rideDisabled: document.querySelector<HTMLButtonElement>('.wm-ride')?.disabled, screen: window.__rockhop?.app?.screen?.() })));
   // The gate's chevrons are a tap away: they focus the next unlock (H1 again) — then the road back to B1.
   await tap('.wm-gate .wm-hit'); taps++;
   await settle();
@@ -133,20 +133,20 @@ try {
   // RIDE.
   await tap('.wm-ride'); taps++;
   mark('tapRide');
-  await page.waitForFunction(() => window.__trials?.app?.screen?.() === 'run' && ![...document.querySelectorAll('.screen')].some((el) => el.classList.contains('show')), null, { timeout: 60000 });
+  await page.waitForFunction(() => window.__rockhop?.app?.screen?.() === 'run' && ![...document.querySelectorAll('.screen')].some((el) => el.classList.contains('show')), null, { timeout: 60000 });
   mark('runScreen');
   t['tapsMenuToB1'] = taps - tapsBeforeLaunch + 1; // PLAY + RIDE (+ the B1 tap when the keys were coalesced) — the pans, pinches and Night City were the demonstration, not the path
-  await page.waitForFunction(() => window.__trials?.phase?.() === 'riding', null, { timeout: 60000 }).catch(() => undefined);
+  await page.waitForFunction(() => window.__rockhop?.phase?.() === 'riding', null, { timeout: 60000 }).catch(() => undefined);
   mark('riding');
-  t['track'] = await page.evaluate(() => window.__trials!.info().trackId);
+  t['track'] = await page.evaluate(() => window.__rockhop!.info().trackId);
   // Ride 3 s: hold the throttle zone (right half, right side).
   const gx = W * 0.88, gy = H * 0.7;
   if (cdp) await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: gx, y: gy }] });
   else await page.touchscreen.tap(gx, gy);
   await page.waitForTimeout(3000);
   if (cdp) await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  t['runTimeAfter3s'] = await page.evaluate(() => window.__trials!.runTime());
-  t['bikeX'] = await page.evaluate(() => Math.round(window.__trials!.getState().bike.pos.x * 100) / 100);
+  t['runTimeAfter3s'] = await page.evaluate(() => window.__rockhop!.runTime());
+  t['bikeX'] = await page.evaluate(() => Math.round(window.__rockhop!.getState().bike.pos.x * 100) / 100);
   mark('rideEnd');
   // Back: pause → Quit (to the menu).
   await tap('.tz-pause'); taps++;
@@ -156,7 +156,7 @@ try {
   mark('backInMenu');
   t['taps'] = taps;
   t['plateBytes'] = JSON.stringify(await page.evaluate(() => performance.getEntriesByType('resource').filter((e) => /\/art\/worldmap\//.test(e.name)).map((e) => ({ name: e.name.replace(/^.*\/art\/worldmap\//, ''), bytes: (e as PerformanceResourceTiming).encodedBodySize || (e as PerformanceResourceTiming).transferSize, ms: Math.round(e.duration) }))));
-  t['navLog'] = JSON.stringify(await page.evaluate(() => window.__trials!.navLog?.().slice(-6) ?? null));
+  t['navLog'] = JSON.stringify(await page.evaluate(() => window.__rockhop!.navLog?.().slice(-6) ?? null));
   await page.waitForTimeout(600);
 } finally {
   await page.close();

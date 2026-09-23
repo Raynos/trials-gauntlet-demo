@@ -36,7 +36,7 @@ describe('best times per bike class', () => {
     store.put('b1', result(31, 'silver', 'rookie'), { splits: [1], recording: 'r' });
     store.put('b1', result(25, 'gold', 'pro'), { splits: [2], recording: 'p' });
     expect(localStorage.getItem(bestKey('b1', 'rookie'))).toContain('"time":31');
-    expect(localStorage.getItem('trials.best.b1@pro')).toContain('"time":25');
+    expect(localStorage.getItem('rockhop.best.b1@pro')).toContain('"time":25');
     expect(store.get('b1', 'rookie')?.recording).toBe('r');
     expect(store.get('b1', 'pro')?.recording).toBe('p');
     expect(store.get('b1')?.bike).toBe('pro'); // higher medal wins
@@ -45,7 +45,7 @@ describe('best times per bike class', () => {
   });
 
   it('pre-garage entries (no bike field) read back as Rookie', () => {
-    localStorage.setItem('trials.best.b1', JSON.stringify({ time: 40, faults: 2, medal: 'bronze' }));
+    localStorage.setItem('rockhop.best.b1', JSON.stringify({ time: 40, faults: 2, medal: 'bronze' }));
     const store = new BestTimes();
     expect(store.get('b1', 'rookie')?.bike).toBe('rookie');
     expect(store.get('b1', 'pro')).toBeNull();
@@ -62,7 +62,7 @@ describe('run log', () => {
     expect(log.read().map((r) => r.track)).toEqual(['t2', 't3', 't4']);
     expect(log.summary()).toEqual({ runs: 3, tracks: 3 });
     const out = JSON.parse(log.exportJson('build x')) as { kind: string; runs: unknown[] };
-    expect(out.kind).toBe('trials-runlog');
+    expect(out.kind).toBe('rockhop-runlog');
     expect(out.runs).toHaveLength(3);
   });
 });

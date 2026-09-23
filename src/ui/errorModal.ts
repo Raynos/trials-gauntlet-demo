@@ -104,13 +104,13 @@ export function reportMeta(now = new Date()): string {
 const CSS = /* css */ `
 #crash { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
   padding: calc(12px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) calc(12px + env(safe-area-inset-left, 0px));
-  background: rgba(7,8,10,.94); color: var(--ink, #f3f5f8); font: 500 14px/1.4 var(--font, "Trials UI", "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, system-ui, sans-serif);
+  background: rgba(7,8,10,.94); color: var(--ink, #f3f5f8); font: 500 14px/1.4 var(--font, "Rockhop UI", "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, system-ui, sans-serif);
   -webkit-user-select: text; user-select: text; touch-action: auto; pointer-events: auto; }
 #crash * { box-sizing: border-box; }
 #crash .sheet { display: flex; flex-direction: column; width: min(760px, 100%); max-height: 100%; background: var(--slab-3, rgba(16,19,25,.96));
   box-shadow: inset 5px 0 0 var(--red, #ff3d3d), 0 0 0 1px rgba(255,255,255,.08), 0 24px 80px rgba(0,0,0,.6); border-radius: 0 var(--r2, 10px) var(--r2, 10px) 0; padding: 16px 18px 14px 24px; }
 #crash .tag { font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--red, #ff3d3d); }
-#crash h1 { margin: 2px 0 2px; font: italic 900 clamp(22px, 5.2vmin, 34px)/1 var(--display, "Trials Display", "Arial Narrow", Impact, system-ui, sans-serif); letter-spacing: -.01em; text-transform: uppercase; color: var(--ink, #f3f5f8); }
+#crash h1 { margin: 2px 0 2px; font: 400 clamp(22px, 5.2vmin, 34px)/1 var(--display, "Rockhop Display", "Arial Narrow", Impact, system-ui, sans-serif); letter-spacing: -.01em; text-transform: uppercase; color: var(--ink, #f3f5f8); }
 #crash .sub { margin: 0 0 10px; font-size: 13px; color: var(--ink-dim, rgba(243,245,248,.62)); }
 #crash .msg { margin: 0 0 8px; font: 700 14px/1.35 var(--mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace); color: #fff; white-space: pre-wrap; word-break: break-word; }
 #crash .scroll { flex: 1 1 auto; min-height: 48px; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; margin: 0 0 10px; padding: 8px 10px; background: rgba(0,0,0,.45); border: 1px solid var(--line-2, rgba(255,255,255,.08)); border-radius: var(--r1, 6px); }
@@ -118,7 +118,7 @@ const CSS = /* css */ `
 #crash pre.meta { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-2, rgba(255,255,255,.08)); color: var(--ink-mute, rgba(243,245,248,.38)); font-size: 10.5px; }
 #crash .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex: 0 0 auto; }
 #crash button { appearance: none; -webkit-appearance: none; min-height: 44px; min-width: 112px; padding: 0 18px; border: 0; border-radius: var(--r1, 6px); cursor: pointer;
-  font: 700 15px/1 var(--font, "Trials UI", "Barlow Condensed", "Arial Narrow", system-ui, sans-serif); letter-spacing: .1em; text-transform: uppercase; color: var(--ink, #f3f5f8); background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px var(--line, rgba(255,255,255,.18)); }
+  font: 700 15px/1 var(--font, "Rockhop UI", "Barlow Condensed", "Arial Narrow", system-ui, sans-serif); letter-spacing: .1em; text-transform: uppercase; color: var(--ink, #f3f5f8); background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px var(--line, rgba(255,255,255,.18)); }
 #crash button.primary { background: var(--amber, #ffb020); color: var(--amber-ink, #1a1206); box-shadow: none; }
 #crash button:focus-visible { outline: 2px solid var(--ink, #f3f5f8); outline-offset: 2px; }
 #crash button:active { transform: translateY(1px); }
@@ -212,7 +212,7 @@ export function crashCount(): number {
   return count;
 }
 
-type CrashWindow = Window & { __trialsCrash?: { count(): number; show(message: string, stack?: string): void } };
+type CrashWindow = Window & { __rockhopCrash?: { count(): number; show(message: string, stack?: string): void } };
 
 /**
  * Hook `error` + `unhandledrejection` on the window, capture phase (see the header: before the inline loader's
@@ -222,9 +222,9 @@ type CrashWindow = Window & { __trialsCrash?: { count(): number; show(message: s
 export function installErrorModal(): void {
   if (typeof window === 'undefined') return;
   const w = window as CrashWindow;
-  if (w.__trialsCrash) return;
+  if (w.__rockhopCrash) return;
   if (AUTOMATION_HOOK && /[?&]harness=1/.test(location.search)) return;
-  w.__trialsCrash = { count: crashCount, show: showError };
+  w.__rockhopCrash = { count: crashCount, show: showError };
   let leaving = false;
   const bye = (): void => {
     leaving = true;

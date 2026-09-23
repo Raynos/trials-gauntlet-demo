@@ -42,7 +42,7 @@ const CSS = /* css */ `
   transform: translate(-50%, -8px); display: inline-flex; align-items: center; gap: .6em; min-height: 44px; padding: 0 1.5em 0 1em; border: 0; margin: 0;
   background: var(--slab-2, rgba(9,11,15,.92)); box-shadow: inset 4px 0 0 var(--amber, #ffb020), 0 4px 14px rgba(0,0,0,.45);
   clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%); color: var(--ink, #f3f5f8);
-  font: 700 .8rem/1 var(--font, "Trials UI", "Barlow Condensed", "Arial Narrow", system-ui, sans-serif); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap;
+  font: 700 .8rem/1 var(--font, "Rockhop UI", "Barlow Condensed", "Arial Narrow", system-ui, sans-serif); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap;
   cursor: pointer; pointer-events: auto; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
   opacity: 0; visibility: hidden; transition: opacity var(--t2, 240ms) var(--ease, ease), transform var(--t2, 240ms) var(--ease, ease), visibility 0s linear var(--t2, 240ms); }
 .update-pill.on { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition: opacity var(--t2, 240ms) var(--ease, ease), transform var(--t2, 240ms) var(--ease, ease), visibility 0s; }
@@ -60,7 +60,7 @@ const CHECK_EVERY_MS = 5 * 60 * 1000;
 /** How long a tap waits for the worker to find / install the new build before falling back to a plain reload. */
 const ADOPT_CAP_MS = 6000;
 
-type UpdateWindow = Window & { __trialsUpdate?: { check(): Promise<void>; state(): { running: string; server: string | null; shown: boolean } } };
+type UpdateWindow = Window & { __rockhopUpdate?: { check(): Promise<void>; state(): { running: string; server: string | null; shown: boolean } } };
 
 /** A cache-busted reload of this page (keeps every other query parameter). */
 function bust(): void {
@@ -113,7 +113,7 @@ async function applyUpdate(): Promise<void> {
  */
 export function installUpdatePill(): void {
   const w = window as UpdateWindow;
-  if (w.__trialsUpdate) return;
+  if (w.__rockhopUpdate) return;
   const running = typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev';
   let server: string | null = null;
   let shown = false;
@@ -170,6 +170,6 @@ export function installUpdatePill(): void {
     if (!document.hidden) void check();
   });
   window.setInterval(() => void check(), CHECK_EVERY_MS);
-  w.__trialsUpdate = { check, state: () => ({ running, server, shown }) };
+  w.__rockhopUpdate = { check, state: () => ({ running, server, shown }) };
   void check();
 }

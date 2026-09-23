@@ -63,7 +63,7 @@ const FEATURES: Record<string, (string | RegExp)[]> = {
   '?-param dev modes (the page never reads its query string)': ['location.search', 'touchdebug', 'harness=1'],
   'service worker': ['./sw.js'],
   'update pill + version probe': ['version.json'],
-  'window.__trials automation hook': [/window\.__trials\s*=/],
+  'window.__rockhop automation hook': [/window\.__rockhop\s*=/],
   'level reviewer tile': [/id:\s*"review",\s*label:\s*"Review"/],
 };
 

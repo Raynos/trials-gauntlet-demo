@@ -69,7 +69,7 @@ interface HeldResult {
 }
 
 const HELD_SRC = `(function (n, w, h, dpr) {
-  var t = window.__trials; var r = window.__render; var b = window.__bench;
+  var t = window.__rockhop; var r = window.__render; var b = window.__bench;
   b.install();
   // CPU loop on a quarter canvas (submit cost is pixel-independent; SwiftShader's raster would otherwise pace it).
   r.resize(Math.round(w / 4), Math.round(h / 4), dpr);
@@ -152,17 +152,17 @@ export async function runIdle(browser: Browser, url: string, opts: IdleOptions, 
     page.on('pageerror', (e) => log(`[idle pageerror] ${e.message}`));
     await page.goto(`${url}/?sw=0`);
     await page.waitForFunction(() => !document.getElementById('loader'), null, { timeout: 180_000 });
-    await page.waitForFunction(() => !!window.__trials?.app && !!(window as unknown as { __render?: unknown }).__render, null, { timeout: 60_000 });
+    await page.waitForFunction(() => !!window.__rockhop?.app && !!(window as unknown as { __render?: unknown }).__render, null, { timeout: 60_000 });
     await page.waitForTimeout(800);
     await page.evaluate(PAGE_BENCH_SRC);
     const phone = await page.evaluate(() => ({ coarse: matchMedia('(pointer: coarse)').matches, w: innerWidth, h: innerHeight, dpr: devicePixelRatio, tier: (window as unknown as { __render: { debugInfo(): { tier: string } } }).__render.debugInfo().tier }));
     log(`idle: front page up (coarse=${phone.coarse} ${phone.w}×${phone.h} tier=${phone.tier})`);
     for (const screen of opts.screens) {
-      await page.evaluate((s) => window.__trials!.app!.goto(s), screen);
+      await page.evaluate((s) => window.__rockhop!.app!.goto(s), screen);
       await page.waitForTimeout(1500);
       for (const tier of opts.tiers) {
         const load0 = os.loadavg()[0]!;
-        await page.evaluate((q) => window.__trials!.setQuality(q), tier);
+        await page.evaluate((q) => window.__rockhop!.setQuality(q), tier);
         // The app's resize/fit path owns the canvas size; force the phone DPR through the renderer like the device would (dprCap → 3 → tier cap).
         await page.evaluate(() => (window as unknown as { __render: { resize(w: number, h: number, d: number): void } }).__render.resize(innerWidth, innerHeight, 3));
         // Render round 4: a tier change may load the tier's hero pair; the row is that pair's only once it is installed.

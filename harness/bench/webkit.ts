@@ -27,7 +27,7 @@ import { startServer } from '../lib/server';
 import { GEOMETRIES, TRACKS } from './bench';
 
 const RUN_SRC = `(function (ins, tier, w, h, dpr, device, tpf) {
-  var t = window.__trials, R = window.__render;
+  var t = window.__rockhop, R = window.__render;
   if (R.setDeviceClass) R.setDeviceClass(device);
   t.setQuality(tier); R.resize(w, h, dpr);
   var gl = R.renderer.getContext();
@@ -68,10 +68,10 @@ async function main(): Promise<void> {
     const url = new URL(server.url);
     url.searchParams.set('harness', '1');
     await page.goto(url.toString(), { waitUntil: 'commit' });
-    await page.waitForFunction(() => window.__trials?.ready === true, undefined, { timeout: 120_000 });
+    await page.waitForFunction(() => window.__rockhop?.ready === true, undefined, { timeout: 120_000 });
     await page.evaluate(PAGE_RUN_AS_SRC);
     for (const tier of tiers) {
-      await page.evaluate((id) => window.__trials!.loadTrack(id), trackId);
+      await page.evaluate((id) => window.__rockhop!.loadTrack(id), trackId);
       const r = (await page.evaluate(`(${RUN_SRC})(${JSON.stringify(inputs)}, ${JSON.stringify(tier)}, ${geom.cssW}, ${geom.cssH}, ${geom.dpr}, ${JSON.stringify(device)}, ${tpf})`)) as {
         n: number; frameP50: number; frameP95: number; frameMax: number; submitP50: number; calls: number; tris: number; rtMpx: number; passes: string; canvas: string; profile: string; renderer: string;
       };

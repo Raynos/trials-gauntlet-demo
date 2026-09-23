@@ -26,12 +26,12 @@ fs.mkdirSync(out, { recursive: true });
 
 export const SEED_JS = `(() => {
   const mk = (time, medal) => JSON.stringify({ time, faults: 0, medal });
-  localStorage.setItem('trials.best.b1-first-ride', mk(41.2, 'gold'));
-  localStorage.setItem('trials.best.b2-lean-back', mk(47.9, 'silver'));
-  localStorage.setItem('trials.best.b3-kicker-row', mk(58.1, 'bronze'));
-  localStorage.setItem('trials.best.e1-uphill-weight', mk(52.4, 'silver'));
-  localStorage.setItem('trials.best.e2-rear-wheel-first', mk(66.8, 'bronze'));
-  localStorage.setItem('trials.best.e3-stairway@pro', mk(61.3, 'silver'));
+  localStorage.setItem('rockhop.best.b1-first-ride', mk(41.2, 'gold'));
+  localStorage.setItem('rockhop.best.b2-lean-back', mk(47.9, 'silver'));
+  localStorage.setItem('rockhop.best.b3-kicker-row', mk(58.1, 'bronze'));
+  localStorage.setItem('rockhop.best.e1-uphill-weight', mk(52.4, 'silver'));
+  localStorage.setItem('rockhop.best.e2-rear-wheel-first', mk(66.8, 'bronze'));
+  localStorage.setItem('rockhop.best.e3-stairway@pro', mk(61.3, 'silver'));
 })()`;
 
 async function boot(page: Page): Promise<void> {
@@ -90,7 +90,7 @@ export const MEASURE_JS = `(() => {
   const card = document.querySelector('.wm-card');
   const ride = document.querySelector('.wm-ride');
   const plates = [...document.querySelectorAll('.wm-region.loaded')].map((p) => p.dataset.region);
-  return { page: window.__trials.app && window.__trials.app.screen(), region: scene.dataset.region, focused: scene.dataset.track, camera: { zoom: Number(scene.dataset.zoom), x: Number(scene.dataset.x), y: Number(scene.dataset.y), far: scene.dataset.far === '1' }, world: document.querySelector('.wm-world').classList.contains('loaded'), plates, tierOpacity: Number(document.querySelector('.wm-tier').style.opacity), viewBox: rect(m), axes, pageOverflow: Math.max(0, document.documentElement.scrollHeight - innerHeight) + Math.max(0, document.documentElement.scrollWidth - innerWidth), targets: targets.length, small, overlaps, focusedOn: on && on.dataset.track, markersOnScreen, gateOnScreen: !!gate && vis(gate.querySelector('.wm-hit')), gateText: gate && gate.textContent, card: rect(card.getBoundingClientRect()), cardText: card.textContent, cardRule: (card.querySelector('.rule') || {}).textContent || null, plateRule: on && on.querySelector('.wm-rule') ? on.querySelector('.wm-rule').textContent : null, ride: { text: ride.textContent, disabled: ride.disabled }, ghost: !document.querySelector('.wm-ghost').hidden, sceneNodes: scene.querySelectorAll('*').length, progress: document.querySelector('.wm-progress').textContent, names: [...document.querySelectorAll('.wm-name')].map((n) => n.textContent) };
+  return { page: window.__rockhop.app && window.__rockhop.app.screen(), region: scene.dataset.region, focused: scene.dataset.track, camera: { zoom: Number(scene.dataset.zoom), x: Number(scene.dataset.x), y: Number(scene.dataset.y), far: scene.dataset.far === '1' }, world: document.querySelector('.wm-world').classList.contains('loaded'), plates, tierOpacity: Number(document.querySelector('.wm-tier').style.opacity), viewBox: rect(m), axes, pageOverflow: Math.max(0, document.documentElement.scrollHeight - innerHeight) + Math.max(0, document.documentElement.scrollWidth - innerWidth), targets: targets.length, small, overlaps, focusedOn: on && on.dataset.track, markersOnScreen, gateOnScreen: !!gate && vis(gate.querySelector('.wm-hit')), gateText: gate && gate.textContent, card: rect(card.getBoundingClientRect()), cardText: card.textContent, cardRule: (card.querySelector('.rule') || {}).textContent || null, plateRule: on && on.querySelector('.wm-rule') ? on.querySelector('.wm-rule').textContent : null, ride: { text: ride.textContent, disabled: ride.disabled }, ghost: !document.querySelector('.wm-ghost').hidden, sceneNodes: scene.querySelectorAll('*').length, progress: document.querySelector('.wm-progress').textContent, names: [...document.querySelectorAll('.wm-name')].map((n) => n.textContent) };
 })()`;
 
 const browser = engine === 'webkit' ? await webkit.launch({ headless: true }) : await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
@@ -101,7 +101,7 @@ try {
     const ctx = await browser.newContext({ viewport: { width: g.width, height: g.height }, deviceScaleFactor: phone ? 2 : 1, isMobile: phone, hasTouch: phone,
       ...(phone ? { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' } : {}) });
     if (seed) await ctx.addInitScript(SEED_JS);
-    if (last) await ctx.addInitScript(`localStorage.setItem('trials.lastTrack', ${JSON.stringify(last)})`);
+    if (last) await ctx.addInitScript(`localStorage.setItem('rockhop.lastTrack', ${JSON.stringify(last)})`);
     const page = await ctx.newPage();
     page.on('pageerror', (e) => console.error(`[pageerror] ${e.message}`));
     await boot(page);

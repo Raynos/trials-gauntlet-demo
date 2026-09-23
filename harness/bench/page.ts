@@ -98,7 +98,7 @@ declare global {
 }
 
 export const PAGE_BENCH_SRC = `window.__bench = (function () {
-  var T = function () { return window.__trials; };
+  var T = function () { return window.__rockhop; };
   var R = function () { return window.__render; };
   var acc = { build: 0, rig: 0, hero: 0, shadow: 0, draws: 0, scene: 0, post: 0, render: 0, renderCalls: 0, drawCount: 0, inShadow: 0 };
   var FIELDS = ${JSON.stringify(FRAME_FIELDS)};

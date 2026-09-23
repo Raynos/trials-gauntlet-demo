@@ -1,5 +1,5 @@
 /**
- * Node-side wrapper around `window.__trials`. Each method is one
+ * Node-side wrapper around `window.__rockhop`. Each method is one
  * `page.evaluate` round trip; batch work in-page where it matters (replay).
  */
 import type { Page } from 'playwright';
@@ -12,7 +12,7 @@ export interface OpenGameOptions {
 }
 
 export interface BootTiming {
-  /** ms from navigation start to `window.__trials.ready` observed. */
+  /** ms from navigation start to `window.__rockhop.ready` observed. */
   bootMs: number;
   /** Navigation timing breakdown from the page. */
   domContentLoadedMs: number;
@@ -33,7 +33,7 @@ export interface BootTiming {
  * rookie path every gate). Installed by `openGame` as a plain script (no tsx `__name` helper).
  */
 export const PAGE_RUN_AS_SRC = `window.__trialsRunAs = function (json) {
-  var t = window.__trials;
+  var t = window.__rockhop;
   var rec = JSON.parse(json);
   var bike = rec && rec.header && rec.header.bike;
   if (!bike || bike === 'rookie' || typeof t.setBike !== 'function') return t.runRecording(json);
@@ -61,7 +61,7 @@ export async function openGame(page: Page, baseUrl: string, options: OpenGameOpt
   for (const [k, v] of Object.entries(options.query ?? {})) url.searchParams.set(k, v);
   const t0 = performance.now();
   await page.goto(url.toString(), { waitUntil: 'commit' });
-  await page.waitForFunction(() => window.__trials?.ready === true, undefined, {
+  await page.waitForFunction(() => window.__rockhop?.ready === true, undefined, {
     timeout: options.timeoutMs ?? 30_000,
   });
   const bootMs = performance.now() - t0;
@@ -96,61 +96,61 @@ export class HookClient {
   constructor(readonly page: Page) {}
 
   info(): Promise<HookInfo> {
-    return this.page.evaluate(() => window.__trials!.info());
+    return this.page.evaluate(() => window.__rockhop!.info());
   }
 
   loadTrack(id: string, seed?: number): Promise<boolean> {
-    return this.page.evaluate(([i, s]) => window.__trials!.loadTrack(i, s), [id, seed] as const);
+    return this.page.evaluate(([i, s]) => window.__rockhop!.loadTrack(i, s), [id, seed] as const);
   }
 
   step(n: number): Promise<number> {
-    return this.page.evaluate((k) => window.__trials!.step(k), n);
+    return this.page.evaluate((k) => window.__rockhop!.step(k), n);
   }
 
   setInput(frame: Partial<InputFrame>): Promise<void> {
-    return this.page.evaluate((f) => window.__trials!.setInput(f), frame);
+    return this.page.evaluate((f) => window.__rockhop!.setInput(f), frame);
   }
 
   getState(): Promise<PhysicsState> {
-    return this.page.evaluate(() => window.__trials!.getState());
+    return this.page.evaluate(() => window.__rockhop!.getState());
   }
 
   hashState(): Promise<string> {
-    return this.page.evaluate(() => window.__trials!.hashState());
+    return this.page.evaluate(() => window.__rockhop!.hashState());
   }
 
   finishTime(): Promise<number | null> {
-    return this.page.evaluate(() => window.__trials!.finishTime());
+    return this.page.evaluate(() => window.__rockhop!.finishTime());
   }
 
   render(sync = false): Promise<number> {
-    return this.page.evaluate((s) => window.__trials!.render(s), sync);
+    return this.page.evaluate((s) => window.__rockhop!.render(s), sync);
   }
 
   stats(): Promise<RenderStats> {
-    return this.page.evaluate(() => window.__trials!.stats());
+    return this.page.evaluate(() => window.__rockhop!.stats());
   }
 
   resize(w: number, h: number): Promise<void> {
-    return this.page.evaluate(([a, b]) => window.__trials!.resize(a, b), [w, h] as const);
+    return this.page.evaluate(([a, b]) => window.__rockhop!.resize(a, b), [w, h] as const);
   }
 
   setQuality(t: QualityTier): Promise<void> {
-    return this.page.evaluate((q) => window.__trials!.setQuality(q), t);
+    return this.page.evaluate((q) => window.__rockhop!.setQuality(q), t);
   }
 
   restart(): Promise<void> {
-    return this.page.evaluate(() => window.__trials!.restart());
+    return this.page.evaluate(() => window.__rockhop!.restart());
   }
 
   listTracks(): Promise<string[]> {
-    return this.page.evaluate(() => window.__trials!.listTracks());
+    return this.page.evaluate(() => window.__rockhop!.listTracks());
   }
 
   /** Pick the bike class for the next loadTrack (no-op on a page without `setBike`). */
   setBike(bike: BikeClass): Promise<boolean> {
     return this.page.evaluate((b) => {
-      const t = window.__trials!;
+      const t = window.__rockhop!;
       if (typeof t.setBike !== 'function') return false;
       t.setBike(b);
       return true;
@@ -161,8 +161,8 @@ export class HookClient {
   runRecording(json: string): Promise<{ state: PhysicsState; hash: string; wallMs: number }> {
     return this.page.evaluate((j) => {
       const t0 = performance.now();
-      const state = (window.__trialsRunAs ?? window.__trials!.runRecording)(j);
-      return { state, hash: window.__trials!.hashState(), wallMs: performance.now() - t0 };
+      const state = (window.__trialsRunAs ?? window.__rockhop!.runRecording)(j);
+      return { state, hash: window.__rockhop!.hashState(), wallMs: performance.now() - t0 };
     }, json);
   }
 }

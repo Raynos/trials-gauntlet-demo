@@ -89,9 +89,9 @@ try {
   });
   const bootAt = performance.now();
   await page.goto(`${url}?harness=1&physics=v2&hz=120&outfit=street&rider=gltf&bike=gltf`, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__trials?.ready);
+  await page.waitForFunction(() => window.__rockhop?.ready);
   await page.evaluate(async header => {
-    const t = window.__trials!, renderer = (window as unknown as HeroHarnessWindow).__render;
+    const t = window.__rockhop!, renderer = (window as unknown as HeroHarnessWindow).__render;
     await renderer.whenReady(); t.setBike!(header.bike ?? 'rookie'); await renderer.whenReady();
     if (!await t.loadTrack(header.trackId, header.seed)) throw new Error('Track failed to load');
     t.skipCountdown(); await (window as unknown as HeroHarnessWindow).__render.whenReady(); t.render(true);
@@ -100,13 +100,13 @@ try {
     if (!r.rider.source?.scene || !r.bike.source?.scene) throw new Error('Procedural model fallback');
   }, rec.header);
   const coldBootMs = performance.now() - bootAt;
-  const renderer = await page.evaluate(() => window.__trials!.stats().renderer);
+  const renderer = await page.evaluate(() => window.__rockhop!.stats().renderer);
   if ((backend === 'metal' && !renderer.includes('Metal')) || (backend === 'swiftshader' && !renderer.includes('SwiftShader'))) throw new Error(`Wrong backend: ${renderer}`);
   // Compare every tick, including complete Game counters. No old expected golden is repinned.
   let mismatchedTick: number | null = null;
   for (let start = 0; start < frames.length; start += 600) {
     const states = await page.evaluate(batch => {
-      const t = window.__trials!;
+      const t = window.__rockhop!;
       return batch.map((frame, i) => {
         t.setInput(frame); t.step(1);
         if (i % 2 === 1) {
@@ -120,14 +120,14 @@ try {
     for (let i = 0; i < states.length; i++) if (states[i] !== expected[start + i] && mismatchedTick === null) mismatchedTick = start + i + 1;
   }
   const clear = await page.evaluate(() => {
-    const t = window.__trials!;
+    const t = window.__rockhop!;
     t.render(true); // A finish on an odd tick still gets a presented-state render.
     if ((window as unknown as HeroHarnessWindow).__render.debug.renderer.getContext().getError() !== 0) throw new Error('GL error on finish');
     return { cleared: t.cleared(), time: t.runTime(), faults: t.faults() };
   });
   if (!clear.cleared || mismatchedTick !== null) throw new Error(`Production replay disagreement at ${mismatchedTick}, clear=${clear.cleared}`);
   const restart = await page.evaluate(async () => {
-    const t = window.__trials!, renderer = (window as unknown as HeroHarnessWindow).__render;
+    const t = window.__rockhop!, renderer = (window as unknown as HeroHarnessWindow).__render;
     t.setBike!('rookie'); await renderer.whenReady();
     if (!await t.loadTrack('flat-test', 1)) throw new Error('Crash track unavailable');
     await renderer.whenReady(); t.skipCountdown();

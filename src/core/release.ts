@@ -16,7 +16,7 @@ export const STORE: boolean = env?.VITE_STORE === '1';
 export const DEV_SURFACES: boolean = !STORE;
 
 /**
- * The `window.__trials` automation hook and the `?harness=1` route: every non-release build. A store build
+ * The `window.__rockhop` automation hook and the `?harness=1` route: every non-release build. A store build
  * keeps it only with `VITE_STORE_DEBUG=1` (the native gate's debug build), never in the release.
  */
 export const AUTOMATION_HOOK: boolean = !STORE || env?.VITE_STORE_DEBUG === '1';

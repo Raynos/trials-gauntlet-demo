@@ -12,7 +12,7 @@ import type { PhysicsFactory, PhysicsWorld } from '../physics';
 import { compileTrack, getTrack } from '../tracks';
 import type { BikeClass, CompiledTrack } from '../core/types';
 import { ModelDriver, type AudioScene } from './driver';
-import { TrialsSynth, type SynthOptions } from './dsp/synth';
+import { RockhopSynth, type SynthOptions } from './dsp/synth';
 import type { Stand } from './model/mapParams';
 
 export const OFFLINE_SAMPLE_RATE = 48000;
@@ -65,7 +65,7 @@ export function renderScript(script: StateScript, seconds: number, opts: Offline
   driver.setScene(opts.scene === undefined ? 'run' : opts.scene);
   if (opts.stands) driver.scratch.stands = opts.stands;
   driver.setBike(opts.bike);
-  const synth = new TrialsSynth(sampleRate, { seed, solo: opts.solo ?? null });
+  const synth = new RockhopSynth(sampleRate, { seed, solo: opts.solo ?? null });
   const L = new Float32Array(updates * spu);
   const R = new Float32Array(updates * spu);
   const emit = (e: GameEvent): void => driver.onEvent(e);
@@ -136,7 +136,7 @@ export function renderWorld(src: WorldSource, seconds: number, opts: OfflineOpti
   driver.setTrack(track, src.seed);
   driver.setBike(src.bike);
   driver.setScene(opts.scene === undefined ? 'run' : opts.scene);
-  const synth = new TrialsSynth(sampleRate, { seed: src.seed, solo: opts.solo ?? null });
+  const synth = new RockhopSynth(sampleRate, { seed: src.seed, solo: opts.solo ?? null });
   let current: Readonly<InputFrame> = NEUTRAL_INPUT;
   const preroll = opts.countdown ? 3 * updateHz : 0;
   const updates = Math.ceil(seconds * updateHz);
@@ -196,7 +196,7 @@ export function renderWorld(src: WorldSource, seconds: number, opts: OfflineOpti
   return { pcm: interleave(L, R), sampleRate, channels: 2, updates };
 }
 
-/** Contract-shaped closure for `window.__trials.audio.renderOffline`. */
+/** Contract-shaped closure for `window.__rockhop.audio.renderOffline`. */
 export function createOfflineRenderer(
   makePhysics: PhysicsFactory,
   opts: OfflineOptions = {},

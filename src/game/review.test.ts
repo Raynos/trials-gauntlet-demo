@@ -53,7 +53,7 @@ describe('level reviewer (docs/design/game.md §21)', () => {
     st.save('b1-first-ride', 4, { rating: 0, tags: [], comment: '  ' });
     expect(st.count('b1-first-ride')).toBe(0);
     const raw = memStorage();
-    raw.setItem('trials.review.x', JSON.stringify({ 2: { rating: 9, tags: ['fun', 'bogus'], comment: 'c' } }));
+    raw.setItem('rockhop.review.x', JSON.stringify({ 2: { rating: 9, tags: ['fun', 'bogus'], comment: 'c' } }));
     const n = new ReviewStore(raw).get('x', 2);
     expect(n.tags).toEqual(['fun']);
   });

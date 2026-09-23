@@ -283,3 +283,28 @@ command for your area) → report to the parent with the *finding* (one sentence
 path (clip/sheet/JSON). The parent commits once per round with the finding as the subject. Every
 third round the parent runs the ship gate: cold boot, clear a track by replay, crash, instant restart.
 Clips, not stills, are evidence: if you changed how something moves, capture a clip of it moving.
+
+## 5. Brand (store release D17–D23) — Brand/UI owns
+
+The product is **ROCKHOP**. The code form of this section is `src/ui/brand.ts` (wordmark, palette, medal names) and
+the `:root` tokens in `src/ui/styles.ts`; masters and recipes are in `assets/brand/` (`tools/`, `briefs/`).
+
+| token | value | use |
+|---|---|---|
+| `--cream` | `#EFE3C8` | sandstone cream: paper cards (home, results ticket), the wordmark on photographs |
+| `--teal` | `#0F5C63` | deep teal: the wordmark on paper, CLEAN LINE, MARKER plates, the splash / loader field |
+| `--vermilion` | `#E4572E` | the one accent (was amber): PLAY, NEXT TRACK, BAIL +1, the target dot. `--amber` aliases it |
+| `--coal` | `#1D2326` | ink: text on paper |
+| `--ochre` | `#C99A4B` | dust ochre: secondary warm |
+
+- **Wordmark:** outlines of Archivo Black + the hand-built survey-target O (ring as thick as the stems, crosshair
+  slits knocked through it, ticks inside, vermilion dot). Always the SVG from `wordmarkSvg()` — never set in type, never
+  an image in the UI. Cream on photographs, teal on paper.
+- **Faces:** `--display` Archivo Black (headings, buttons, call-outs); `--sans` Archivo variable (tracked labels on
+  paper); `--font` Barlow Condensed (body, HUD). All SIL OFL 1.1, self-hosted in `public/fonts/` with their licences.
+- **Words:** faults are **bails**; checkpoints are **markers**; the finish is **CLEAN LINE**; the countdown is
+  **READY · SET · ROCK**; the crash call-out is **BAIL +1**; medals are BRONZE / SILVER / GOLD / **OBSIDIAN** (the code
+  key stays `platinum`). No "Trials", "Gauntlet", "demo" or "platinum" in anything a player can read.
+- **HUD (D21):** layout and the four touch-strip keys are unchanged; only words and colours follow this section.
+- **Storage / hooks:** localStorage keys are `rockhop.*` (a one-time copy from `trials.*`, `src/ui/storageMigration.ts`);
+  the automation hook is `window.__rockhop` (§2.9 reads `__trials` historically).

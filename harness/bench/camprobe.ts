@@ -73,7 +73,7 @@ async function main(): Promise<void> {
     for (let t = 0; t < from; t += hz * 5) {
       const slice = frames.slice(t, Math.min(from, t + hz * 5));
       await page.evaluate((inputs) => {
-        const tr = window.__trials!;
+        const tr = window.__rockhop!;
         for (const f of inputs) {
           tr.setInput(f);
           tr.step(1);
@@ -84,7 +84,7 @@ async function main(): Promise<void> {
       const slice = frames.slice(k * ticksPerFrame, (k + 1) * ticksPerFrame);
       const r = await page.evaluate(
         ([inputs, n]) => {
-          const tr = window.__trials!;
+          const tr = window.__rockhop!;
           for (const f of inputs) {
             tr.setInput(f);
             tr.step(1);

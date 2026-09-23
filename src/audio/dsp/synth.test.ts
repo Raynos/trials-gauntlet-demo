@@ -75,7 +75,7 @@ function steady(fn: (s: PhysicsState, t: number, emit: (e: GameEvent) => void) =
   };
 }
 
-describe('TrialsSynth (offline, node)', () => {
+describe('RockhopSynth (offline, node)', () => {
   it('renders the gauntlet byte-identically twice, under the -1 dBTP ceiling, faster than realtime', () => {
     const t0 = performance.now();
     const a = renderScript(gauntletScript(HZ), GAUNTLET.end, {}, 1);

@@ -25,10 +25,10 @@ async function capturePass(page: Page, url: string, trackId: string, tier: Quali
   await openGame(page, url);
   const hook = new HookClient(page);
   await hook.loadTrack(trackId);
-  await page.evaluate(([t, w, h, d, dc]) => { const R = (window as unknown as { __render: { resize(w: number, h: number, d: number): void; setDeviceClass?(c: string): void } }).__render; R.setDeviceClass?.(dc as string); window.__trials!.setQuality(t as QualityTier); R.resize(w as number, h as number, d as number); }, [tier, geom.cssW, geom.cssH, geom.dpr, geom.cssW < 1000 ? 'phone' : 'desktop'] as const);
+  await page.evaluate(([t, w, h, d, dc]) => { const R = (window as unknown as { __render: { resize(w: number, h: number, d: number): void; setDeviceClass?(c: string): void } }).__render; R.setDeviceClass?.(dc as string); window.__rockhop!.setQuality(t as QualityTier); R.resize(w as number, h as number, d as number); }, [tier, geom.cssW, geom.cssH, geom.dpr, geom.cssW < 1000 ? 'phone' : 'desktop'] as const);
   const out = (await page.evaluate(
     ([ins, ts]) => {
-      const t = window.__trials!;
+      const t = window.__rockhop!;
       const R = (window as unknown as { __render: { canvas: HTMLCanvasElement } }).__render;
       const res: { tick: number; url: string }[] = [];
       let fed = 0;

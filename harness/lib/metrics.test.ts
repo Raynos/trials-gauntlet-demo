@@ -5,7 +5,7 @@ import path from 'node:path';
 import { SIM_IDENTICAL_STAMPS, fingerprintMatches, simFingerprint } from './metrics';
 
 function fixtureRoot(): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'trials-fp-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rockhop-fp-'));
   const w = (rel: string, body: string): void => {
     const p = path.join(root, rel);
     fs.mkdirSync(path.dirname(p), { recursive: true });

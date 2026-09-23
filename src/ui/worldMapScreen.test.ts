@@ -56,7 +56,7 @@ describe('world map screen — the painted continent as the level select', () =>
     expect(document.querySelectorAll('style#worldmap-css')).toHaveLength(1);
     expect(document.querySelector('.tracks-screen .backbtn')?.textContent).toContain('Menu');
     expect(document.querySelector('.wm-progress')?.textContent).toContain('0 / 15 cleared');
-    expect(document.querySelector('.wm-brand')?.textContent).toContain('Trials Gauntlet');
+    expect(document.querySelector('.wm-brand svg')?.getAttribute('aria-label')).toBe('ROCKHOP');
     expect(document.querySelectorAll('.wm-ride')).toHaveLength(1);
     // The world plate is probed (lazy art, never the boot set); the focused region's plate too.
     expect(probed.some((p) => /art\/worldmap\/world-\d+\.webp/.test(p))).toBe(true);

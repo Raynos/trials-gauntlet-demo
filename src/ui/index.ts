@@ -51,6 +51,8 @@ export {
   saveSoundEnabled,
   loadVolume,
   saveVolume,
+  loadMusicVolume,
+  saveMusicVolume,
   clearAllBest,
   bestKey,
   loadBikeChoice,

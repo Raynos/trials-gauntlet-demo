@@ -131,9 +131,9 @@ try {
     }).catch(error => { responseFailures.push(`${relative}: ${error.message}`); }));
   });
   await page.goto(`http://127.0.0.1:${addr.port}/?harness=1&rider=gltf&bike=gltf&hz=${hz}&physics=${physics}&outfit=${outfit}`, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__trials?.ready === true);
+  await page.waitForFunction(() => window.__rockhop?.ready === true);
   await page.evaluate(async header => {
-    const t = window.__trials!;
+    const t = window.__rockhop!;
     const r = (window as unknown as HeroHarnessWindow).__render;
     // Visual replay starts from a settled scene. Rapid track/tier switching is a separate
     // lifecycle test; do not overlap those warmups while preparing a deterministic clip.
@@ -148,7 +148,7 @@ try {
     if (t.info().modules?.physics !== expectedFactory) throw new Error('recording solver does not match running simulation');
   }, recording.header);
   await page.evaluate(async ({ tier, width, height, devicePixelRatio, deviceClass }) => {
-    const t = window.__trials!, r = (window as unknown as HeroHarnessWindow).__render;
+    const t = window.__rockhop!, r = (window as unknown as HeroHarnessWindow).__render;
     if (!r) throw new Error('missing renderer inspection handle');
     t.resize(width, height);
     r.setDeviceClass(deviceClass as 'phone' | 'desktop');
@@ -186,7 +186,7 @@ try {
   // EVERY preceding rendered frame is evaluated: no cold camera/rig at the clip start.
   for (let tick = 0; tick < to; tick += ticksPerFrame) {
     const sample = await page.evaluate(batch => {
-      const t = window.__trials!, r = (window as unknown as HeroHarnessWindow).__render;
+      const t = window.__rockhop!, r = (window as unknown as HeroHarnessWindow).__render;
       for (const input of batch) { t.setInput(input); t.step(1); }
       const renderStart = performance.now();
       t.render(true);

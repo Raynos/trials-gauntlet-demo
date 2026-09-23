@@ -25,7 +25,7 @@ export const FLY_MPS = 8;
 /** Camera distance range the pinch / wheel walks (m from the bike; the rig clamps to the hall on interiors). */
 export const ZOOM_RANGE: [number, number] = [5, 34];
 export const ZOOM_DEFAULT = 12;
-const STORE_PREFIX = 'trials.review.';
+const STORE_PREFIX = 'rockhop.review.';
 
 export interface SegmentNote {
   /** 0 = unrated. */
@@ -88,7 +88,7 @@ export function segmentAt(segments: readonly ReviewSegment[], x: number): number
   return Math.max(0, segments.length - 1);
 }
 
-/** Notes per track / segment in localStorage (`trials.review.<track>` → { [i]: SegmentNote }). Storage failures are silent. */
+/** Notes per track / segment in localStorage (`rockhop.review.<track>` → { [i]: SegmentNote }). Storage failures are silent. */
 export class ReviewStore {
   constructor(private readonly storage: Pick<Storage, 'getItem' | 'setItem'> | null = typeof localStorage === 'undefined' ? null : localStorage) {}
 

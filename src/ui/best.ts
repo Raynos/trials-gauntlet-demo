@@ -1,9 +1,10 @@
 /**
- * Best time per track in localStorage (`trials.best.<trackId>`), plus the
- * quality override (`trials.quality`). Every access is try/catch'd: private
+ * Best time per track in localStorage (`rockhop.best.<trackId>`), plus the
+ * quality override (`rockhop.quality`). Every access is try/catch'd: private
  * mode, blocked storage and the headless harness must all just work.
  */
 import type { BikeClass, Medal, QualityTier, RunResult } from '../core/types';
+import { persistentStorage } from '../platform/storage';
 
 export interface BestEntry {
   time: number;
@@ -29,10 +30,10 @@ export interface BoardEntry {
 /** Rows kept per track per class. */
 export const BOARD_SIZE = 5;
 
-const PREFIX = 'trials.best.';
-const QUALITY_KEY = 'trials.quality';
-const FPS_KEY = 'trials.fps';
-const HELD_KEY = 'trials.heldTier';
+const PREFIX = 'rockhop.best.';
+const QUALITY_KEY = 'rockhop.quality';
+const FPS_KEY = 'rockhop.fps';
+const HELD_KEY = 'rockhop.heldTier';
 const MEDAL_RANK: Record<Medal, number> = { bronze: 1, silver: 2, gold: 3, platinum: 4 };
 
 /** Storage key per track and bike class: rookie keeps the legacy key so pre-garage PBs survive; pro gets a suffix. */
@@ -40,7 +41,7 @@ export function bestKey(trackId: string, bike: BikeClass): string {
   return bike === 'pro' ? `${PREFIX}${trackId}@pro` : PREFIX + trackId;
 }
 
-/** `trials.best.<trackId>[@pro]#board`: under the best-times prefix so Reset progress clears it with the PBs. */
+/** `rockhop.best.<trackId>[@pro]#board`: under the best-times prefix so Reset progress clears it with the PBs. */
 export function boardKey(trackId: string, bike: BikeClass): string {
   return `${bestKey(trackId, bike)}#board`;
 }
@@ -50,9 +51,10 @@ export function boardOrder(a: BoardEntry, b: BoardEntry): number {
   return a.time - b.time || a.faults - b.faults;
 }
 
+/** localStorage on the web, the Preferences-backed mirror in the native shells (src/platform/storage.ts). */
 function store(): Storage | null {
   try {
-    return typeof localStorage === 'undefined' ? null : localStorage;
+    return persistentStorage();
   } catch {
     return null;
   }
@@ -180,9 +182,9 @@ export class BestTimes {
   }
 }
 
-const BIKE_KEY = 'trials.bikeClass';
-const TELEMETRY_KEY = 'trials.telemetry';
-const ONBOARDED_KEY = 'trials.onboarded';
+const BIKE_KEY = 'rockhop.bikeClass';
+const TELEMETRY_KEY = 'rockhop.telemetry';
+const ONBOARDED_KEY = 'rockhop.onboarded';
 
 /** The Garage choice, or null when the player has never picked (then the per-tier default applies, rules.ts). */
 export function loadBikeChoice(): BikeClass | null {
@@ -235,8 +237,8 @@ export function saveOnboarded(): void {
   }
 }
 
-const GHOST_KEY = 'trials.ghost';
-const MODEL_KEYS = { rider: 'trials.riderModel', bike: 'trials.bikeModel' } as const;
+const GHOST_KEY = 'rockhop.ghost';
+const MODEL_KEYS = { rider: 'rockhop.riderModel', bike: 'rockhop.bikeModel' } as const;
 
 export type ModelChoice = 'proc' | 'gltf';
 
@@ -279,8 +281,8 @@ export function saveGhostEnabled(on: boolean): void {
   }
 }
 
-const SOUND_KEY = 'trials.sound';
-const VOLUME_KEY = 'trials.volume';
+const SOUND_KEY = 'rockhop.sound';
+const VOLUME_KEY = 'rockhop.volume';
 
 export function loadSoundEnabled(): boolean {
   try {
@@ -315,7 +317,28 @@ export function saveVolume(v: number): void {
   }
 }
 
-/** Reset progress: every `trials.best.*` entry (medals, PBs, ghosts). Settings stay. */
+const MUSIC_KEY = 'rockhop.musicVolume';
+
+/** The music-only level (Settings · Music), 0..1; default 1 (the master still scales it). */
+export function loadMusicVolume(): number {
+  try {
+    const raw = store()?.getItem(MUSIC_KEY);
+    const v = Number(raw);
+    return raw !== null && raw !== undefined && Number.isFinite(v) && v >= 0 && v <= 1 ? v : 1;
+  } catch {
+    return 1;
+  }
+}
+
+export function saveMusicVolume(v: number): void {
+  try {
+    store()?.setItem(MUSIC_KEY, String(Math.max(0, Math.min(1, v))));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** Reset progress: every `rockhop.best.*` entry (medals, PBs, ghosts). Settings stay. */
 export function clearAllBest(): number {
   const s = store();
   if (!s) return 0;
@@ -400,7 +423,7 @@ export function saveQualityOverride(v: QualityTier | 'auto'): void {
 // Last run per track (replay viewer, docs/design/game.md §16)
 // ---------------------------------------------------------------------------
 
-const LAST_RUN_PREFIX = 'trials.lastrun.';
+const LAST_RUN_PREFIX = 'rockhop.lastrun.';
 
 export interface LastRunEntry {
   time: number;
@@ -413,7 +436,7 @@ export interface LastRunEntry {
 }
 
 /**
- * `trials.lastrun.<trackId>`: the most recent *finished* run on a track, any bike class, whatever
+ * `rockhop.lastrun.<trackId>`: the most recent *finished* run on a track, any bike class, whatever
  * its time — "Watch replay" after a run that was not a PB, and the track card's second watch option.
  * Reset progress leaves these alone (they are not progress); a full storage clear drops them.
  */

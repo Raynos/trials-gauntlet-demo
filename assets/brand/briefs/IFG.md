@@ -1,0 +1,2 @@
+## THIS IMAGE: APP ICON FOREGROUND LAYER on chroma green
+Size: 1024 x 1024 square. From the attached I1 app icon keep ONLY the rider-on-bike and the big vermilion survey triangle with its cream inner triangle, at the same positions, sizes and flat vector style - on a perfectly flat uniform pure chroma green #00FF00 background. NO teal field, NO contour lines, NO sun, NO shadow, NO glow, hard clean edges.

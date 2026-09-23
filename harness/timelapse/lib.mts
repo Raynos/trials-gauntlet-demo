@@ -28,7 +28,7 @@ export const FFPROBE = process.env.FFPROBE_PATH ?? path.join(path.dirname(FFMPEG
 export const PYTHON = process.env.TIMELAPSE_PYTHON ?? 'python3';
 
 /** Scratch root for exports: TIMELAPSE_SCRATCH, else the OS tmp dir. */
-export const SCRATCH_DIR = process.env.TIMELAPSE_SCRATCH ?? path.join(os.tmpdir(), 'trials-timelapse');
+export const SCRATCH_DIR = process.env.TIMELAPSE_SCRATCH ?? path.join(os.tmpdir(), 'rockhop-timelapse');
 
 export interface CommitInfo {
   sha: string;
