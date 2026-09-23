@@ -1,0 +1,57 @@
+
+> rockhop@0.3.2 harness:bot /Users/raynos/projects/game-demos/trials-gauntlet-demo
+> tsx harness/bot/bot.ts --refresh-goldens --tracks b1-first-ride,b2-lean-back,b3-kicker-row,e1-uphill-weight,e2-rear-wheel-first,e3-stairway,flat-test,gap-test,h1-wheelie-wire,h2-gap-chain,h3-fire-line,lab-box-climb,lab-flat-200,lab-physics-test,lab-ramp-jump,m1-hop-up,m2-drum-roll,m3-see-saw,p1-container-yard,p2-canyon-run,p3-snow-line,p4-night-circuit,p5-foundry-floor,x1-vertical-limit,x2-pipe-dream,x3-gauntlet --build --jobs 3
+
+refresh-goldens: src=2249b7bb tracks=26 jobs=3 loadavg 6.1 5.5 6.5 / 18 cores
+  50 golden(s) to re-prove in the browser, 3 at a time
+  RESTAMPED b1-first-ride        bot-3.json     finish 40.083 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED b1-first-ride        bot-3-pro.json finish 38.825 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED b2-lean-back         bot-3.json     finish 38.567 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED b3-kicker-row        bot-3.json     finish 45.158 s, 2 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED b3-kicker-row        bot-3-pro.json finish 32.067 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED b2-lean-back         bot-3-pro.json finish 60.475 s, 4 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED e2-rear-wheel-first  bot-3.json     finish 45.867 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED e1-uphill-weight     bot-3.json     finish 44.867 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED e1-uphill-weight     bot-3-pro.json finish 42.892 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED e2-rear-wheel-first  bot-3-pro.json finish 41.642 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED e3-stairway          bot-3.json     finish 38.500 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED e3-stairway          bot-3-pro.json finish 37.083 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED flat-test            bot-3.json     finish 8.592 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED flat-test            bot-3-pro.json finish 8.950 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED gap-test             bot-3.json     finish 5.533 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED h1-wheelie-wire      bot-3.json     finish 45.867 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED gap-test             bot-3-pro.json finish 5.992 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED h1-wheelie-wire      bot-3-pro.json finish 43.500 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED h2-gap-chain         bot-3.json     finish 46.242 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED h2-gap-chain         bot-3-pro.json finish 43.633 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED h3-fire-line         bot-3.json     finish 55.433 s, 2 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED h3-fire-line         bot-3-pro.json finish 52.108 s, 2 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED lab-box-climb        bot-3.json     finish 4.550 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED lab-flat-200         bot-3.json     finish 12.617 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED lab-flat-200         bot-3-pro.json finish 12.817 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED lab-physics-test     bot-3.json     finish 7.992 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED lab-physics-test     bot-3-pro.json finish 8.517 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED lab-ramp-jump        bot-3.json     finish 5.117 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED m1-hop-up            bot-3.json     finish 32.908 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED m2-drum-roll         bot-3.json     finish 44.808 s, 2 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED m1-hop-up            bot-3-pro.json finish 33.117 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED m2-drum-roll         bot-3-pro.json finish 37.733 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED m3-see-saw           bot-3-pro.json finish 38.392 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED m3-see-saw           bot-3.json     finish 39.750 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p1-container-yard    bot-3.json     finish 35.442 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p2-canyon-run        bot-3.json     finish 33.792 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p1-container-yard    bot-3-pro.json finish 34.383 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p2-canyon-run        bot-3-pro.json finish 32.892 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p3-snow-line         bot-3.json     finish 33.992 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p3-snow-line         bot-3-pro.json finish 33.392 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p4-night-circuit     bot-3.json     finish 39.042 s, 2 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p4-night-circuit     bot-3-pro.json finish 33.208 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p5-foundry-floor     bot-3.json     finish 30.983 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED x1-vertical-limit    bot-3.json     finish 54.850 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED p5-foundry-floor     bot-3-pro.json finish 30.950 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED x1-vertical-limit    bot-3-pro.json finish 59.867 s, 2 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED x2-pipe-dream        bot-3-pro.json finish 42.750 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED x2-pipe-dream        bot-3.json     finish 43.058 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED x3-gauntlet          bot-3.json     finish 44.725 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+  RESTAMPED x3-gauntlet          bot-3-pro.json finish 42.733 s, 1 attempt(s), node == browser; 207404d3 -> 2249b7bb
+refresh-goldens: fresh 0, restamped 50, stale 0; tracks with a proven golden 26/26

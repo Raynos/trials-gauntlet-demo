@@ -1,0 +1,106 @@
+
+> rockhop@0.3.2 harness:gate /Users/raynos/projects/game-demos/trials-gauntlet-demo
+> tsx harness/gate/ship-gate.ts --build --quiet-timing --jobs 3
+
+gate flat-test: physics=bikePhysicsFactory-v2 thresholds=harness/gate/thresholds.json
+renderer: ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version) -> ship limits
+      golden: bot-3.json (rookie; src=2249b7bb matches the working tree; 1 candidate(s))
+sections: pool of 3 (clear, clearPro, crash, determinism, camera, bundle) then timing chain (boot, restart, heap), then offline; loadavg 8.5 7.7 7.3 / 18 cores
+PASS  clear.golden                 true  (limit true)  bot-3.json finish=8.591666666666667 run=8.592 faults=0
+PASS  clear.finishTimeBitEqual     true  (limit true)  expected 8.591666666666667
+PASS  clear.hashOk                 true  (limit true)  622bb2554e0f9a26 vs pinned 622bb2554e0f9a26
+      section clear: 0.6 s, loadavg 8.5 7.7 7.3 / 18 cores
+      PASS  D1   cross-load         622bb2554e0f9a26 622bb2554e0f9a26  (2 loads, finish=8.591666666666667)
+      PASS  D2   cross-encoding     622bb2554e0f9a26 622bb2554e0f9a26
+      PASS  D3   node-vs-browser    622bb2554e0f9a26 622bb2554e0f9a26  (physics=bikePhysicsFactory-v2)
+      PASS  D4   snapshot-node      4549156034b28e1f 6bf00b3c91f5c72a 6adaf6f9074f64a4
+      PASS  D4c  foreign-snapshot   4549156034b28e1f 6bf00b3c91f5c72a 6adaf6f9074f64a4
+PASS  clear.pro.flat               true  (limit true)  bot-3-pro.json (src matches) finish=8.95 faults=0 hash d32110eb8eb945c1 vs pinned d32110eb8eb945c1 (expected finish 8.95)
+PASS  clear.pro.b1                 true  (limit true)  bot-3-pro.json (src matches) finish=38.825 faults=0 hash 5f78ab40a954f176 vs pinned 5f78ab40a954f176 (expected finish 38.825)
+      section clearPro: 0.9 s, loadavg 8.5 7.7 7.3 / 18 cores
+PASS  crash.faultWithinS           0.86s  (limit 8s)  reason=crash
+PASS  fault.toControlMs            25ms  (limit 500ms)  crash tick -> restart mash on the next tick -> bike moving; auto-respawn path 1017 ms (CONTRACT §2.8: 1.0 s)
+      section crash: 0.7 s, loadavg 8.5 7.7 7.3 / 18 cores
+FAIL  bundle.jsGzipKB              652.04KB  (limit 640KB)  dist 47664 KB raw
+      section bundle: 0.0 s, loadavg 8.5 7.7 7.3 / 18 cores
+      PASS  D4b  snapshot-browser   4549156034b28e1f 6bf00b3c91f5c72a 6adaf6f9074f64a4
+      PASS  D5   chunking           622bb2554e0f9a26 622bb2554e0f9a26 622bb2554e0f9a26  (chunks 1,7,15,120 + runRecording)
+      PASS  D7   no-state-leak      622bb2554e0f9a26 622bb2554e0f9a26
+      PASS  D8   pinned-hash        56e0d38f820a3435 56e0d38f820a3435  (pinned physics=bikePhysicsFactory-v2)
+PASS  determinism.pass             true  (limit true)  9/9 checks
+      section determinism: 3.8 s, loadavg 8.5 7.7 7.3 / 18 cores
+PASS  camera.box                   0frames out of box while riding  (limit 0frames out of box while riding)  bot-3.json; clamped 14.4 % (reported); 117 s; camera: PASS out-of-box 0/924 (riding 0), clamped 133 (14.4%), max|roll| 2.8e-17
+      section camera: 117.2 s, loadavg 6.4 7.1 7.1 / 18 cores
+PASS  boot.readyP50Ms              91.88ms  (limit 300ms)  runs 91/92/197/93/92 min 91 loadavg 6.57/18
+PASS  boot.firstFrameMs            424.10ms  (limit 900ms)  ready -> first synced frame
+      section boot: 4.1 s, loadavg 6.6 7.1 7.1 / 18 cores
+PASS  restart.ticks                1  (limit 1)  tick==0 && faulted==null after exactly one tick, 20 reps
+PASS  restart.wallMsP95            0.09ms  (limit 5ms)
+PASS  restart.frameMsP95           5.44ms  (limit 33ms)  restart -> synced frame
+PASS  restart.noCountdown          1 ticks  (limit 12 ticks)  worst of 20 reps: held throttle after the restart tick until the bike rolls (a countdown would be 360+); first-tick roll yes; game faults=20
+      section restart: 1.1 s, loadavg 6.6 7.1 7.1 / 18 cores
+FAIL  heap.growthMBPer60s          5.10MB  (limit 5MB)  retained heap after GC at both endpoints over 60s of play
+PASS  perf.drawCallsMax            184  (limit 300)
+PASS  perf.trianglesMax            267138  (limit 500000)
+PASS  perf.texturesMBMax           80.59MB  (limit 96MB)
+PASS  perf.physicsUsPerTickP95     20.00us  (limit 60us)
+PASS  perf.renderSubmitMsP95       0.65ms  (limit 4ms)
+PASS  perf.renderSyncedMsP95       9.68ms  (limit 16ms)  render + readPixels sync
+      section heap: 3.4 s, loadavg 6.8 7.2 7.1 / 18 cores
+  PASS offline.cacheAfterFirstLoad    133 entries · 14 models · 40.59 MB  need ≥ 14 models, ≥ 5 assets+fonts, ≥ 27 MB; wire 37.31 MB
+  PASS offline.coldStartPlayable      100/100 done=true in 14128 ms  0 origin requests, transferSize 0, workerStart 0.51 ms, crossOriginIsolated true
+  PASS offline.firstFrame             canvas / context
+  FAIL offline.worldMapDraws          tracks: world loaded, 4 region plates, 16 markers  need the world plate + at least 5 region plates, drawn with the origin unreachable
+  PASS offline.inboxQueues            POST /api/inbox → TypeError: Failed to fetch  the worker bypasses /api/; the queue itself is src/ui/inbox.ts NoteQueue (unit-tested)
+  PASS offline.garageSwapsOffline     10/10 combinations  0 failed /models/ requests
+  PASS offline.rideFinishes           40.0833 s · 368f1ca5bd9e  online 40.0833 · 368f1ca5bd9e
+  PASS offline.noPageErrors           0
+  PASS offline.slowStart              12774 ms at 50 kbps / 400 ms RTT  offline was 14128 ms; limit ×1.6 = 22605 ms; 501618 B over the wire
+  PASS offline.updateSurvives         14 models kept · 40.5 KB re-fetched  0 B of models off the wire (must be 0); loader 100/100
+PASS  offline.coldStartPlayable    100/100 done=true in 14128 ms  (limit true)  9/10 offline e2e checks pass; also failing: offline.worldMapDraws
+      section offline: 81.5 s, loadavg 7.5 7.2 7.1 / 18 cores
+PASS  stranger.medianAttempts      no armed track  (limit 1.5)  median attempts / (1.5 x band top), every counted session cleared, on src 2249b7bb and the tier's default bike; armed 0/15 tracks (>= 2 completed); informational (unarmed): b1 0 fresh+2 censored, b2 0 fresh+2 censored, b3 0 fresh+2 censored, e1 0 fresh+2 censored, e2 0 fresh+2 censored, e3 0 fresh+2 censored, m1 0 fresh, m2 0 fresh, m3 0 fresh, h1 0 fresh, h2 0 fresh, h3 0 fresh, x1 0 fresh+1 censored, x2 no report, x3 0 fresh+2 censored
+PASS  reflex.medianAttempts        b1 -/1.5 (0 fresh) · b2 -/3 (0 fresh) · b3 -/3 (0 fresh) · e1 -/6 (0 fresh)  (limit 1.5)  reflex bot (average) median attempts / (1.5 x band top) on src 2249b7bb; informational until every track has >= 3 seeds on this src (pnpm harness:reflex --all-tracks --seeds 3)
+PASS  reflex.medianAttempts.pro    b1 -/1.5 (0 fresh) (not all cleared) · b2 -/3 (0 fresh) (not all cleared) · b3 -/3 (0 fresh) (not all cleared) · e1 -/6 (0 fresh) (not all cleared)  (limit 1.5)  reflex bot (average) on the Pro bike, same tracks and band; informational (the band is Rookie's): fewer than 3 fresh seeds on some track (pnpm harness:reflex --all-tracks --bike pro --seeds 3)
+PASS  device.fpsLow60              59.50  (limit 55)  b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md); informational until 3 reports exist (1 filed)
+PASS  device.thermalDropPct        null  (limit 10)  no thermal proxy in the latest report
+PASS  device.worstMsHigh           81  (limit 50)  b1 ride · high · cap 30: 30 fps, worst 81 ms — informational (the governor steps down from high on a phone; the perf plan's target is phone-high at 60)
+PASS  hero.webkit.driftMaxMm       0  (limit 5)  rider bone-position drift over the bench flow in WebKit (ANGLE-on-Metal), worst of 4 runs at 2026-09-17T23:16:40Z: 0 mm (the arms bug 2b48370 read 2 600 mm); reach 0 cm, overhang 0.5 px (harness/out/hero-webkit/hero-webkit-2026-09-17T23-16-40.json)
+      section stranger: 0.0 s, loadavg 7.5 7.2 7.1 / 18 cores
+
+== checks in report order (sections wall 207 s: boot 4s, clear 1s, clearPro 1s, crash 1s, restart 1s, heap 3s, bundle 0s, determinism 4s, offline 82s, camera 117s, stranger 0s)
+PASS  boot.readyP50Ms              91.88ms  (limit 300ms)  runs 91/92/197/93/92 min 91 loadavg 6.57/18
+PASS  boot.firstFrameMs            424.10ms  (limit 900ms)  ready -> first synced frame
+PASS  clear.golden                 true  (limit true)  bot-3.json finish=8.591666666666667 run=8.592 faults=0
+PASS  clear.finishTimeBitEqual     true  (limit true)  expected 8.591666666666667
+PASS  clear.hashOk                 true  (limit true)  622bb2554e0f9a26 vs pinned 622bb2554e0f9a26
+PASS  clear.pro.flat               true  (limit true)  bot-3-pro.json (src matches) finish=8.95 faults=0 hash d32110eb8eb945c1 vs pinned d32110eb8eb945c1 (expected finish 8.95)
+PASS  clear.pro.b1                 true  (limit true)  bot-3-pro.json (src matches) finish=38.825 faults=0 hash 5f78ab40a954f176 vs pinned 5f78ab40a954f176 (expected finish 38.825)
+PASS  crash.faultWithinS           0.86s  (limit 8s)  reason=crash
+PASS  fault.toControlMs            25ms  (limit 500ms)  crash tick -> restart mash on the next tick -> bike moving; auto-respawn path 1017 ms (CONTRACT §2.8: 1.0 s)
+PASS  restart.ticks                1  (limit 1)  tick==0 && faulted==null after exactly one tick, 20 reps
+PASS  restart.wallMsP95            0.09ms  (limit 5ms)
+PASS  restart.frameMsP95           5.44ms  (limit 33ms)  restart -> synced frame
+PASS  restart.noCountdown          1 ticks  (limit 12 ticks)  worst of 20 reps: held throttle after the restart tick until the bike rolls (a countdown would be 360+); first-tick roll yes; game faults=20
+FAIL  heap.growthMBPer60s          5.10MB  (limit 5MB)  retained heap after GC at both endpoints over 60s of play
+PASS  perf.drawCallsMax            184  (limit 300)
+PASS  perf.trianglesMax            267138  (limit 500000)
+PASS  perf.texturesMBMax           80.59MB  (limit 96MB)
+PASS  perf.physicsUsPerTickP95     20.00us  (limit 60us)
+PASS  perf.renderSubmitMsP95       0.65ms  (limit 4ms)
+PASS  perf.renderSyncedMsP95       9.68ms  (limit 16ms)  render + readPixels sync
+FAIL  bundle.jsGzipKB              652.04KB  (limit 640KB)  dist 47664 KB raw
+PASS  determinism.pass             true  (limit true)  9/9 checks
+PASS  offline.coldStartPlayable    100/100 done=true in 14128 ms  (limit true)  9/10 offline e2e checks pass; also failing: offline.worldMapDraws
+PASS  camera.box                   0frames out of box while riding  (limit 0frames out of box while riding)  bot-3.json; clamped 14.4 % (reported); 117 s; camera: PASS out-of-box 0/924 (riding 0), clamped 133 (14.4%), max|roll| 2.8e-17
+PASS  stranger.medianAttempts      no armed track  (limit 1.5)  median attempts / (1.5 x band top), every counted session cleared, on src 2249b7bb and the tier's default bike; armed 0/15 tracks (>= 2 completed); informational (unarmed): b1 0 fresh+2 censored, b2 0 fresh+2 censored, b3 0 fresh+2 censored, e1 0 fresh+2 censored, e2 0 fresh+2 censored, e3 0 fresh+2 censored, m1 0 fresh, m2 0 fresh, m3 0 fresh, h1 0 fresh, h2 0 fresh, h3 0 fresh, x1 0 fresh+1 censored, x2 no report, x3 0 fresh+2 censored
+PASS  reflex.medianAttempts        b1 -/1.5 (0 fresh) · b2 -/3 (0 fresh) · b3 -/3 (0 fresh) · e1 -/6 (0 fresh)  (limit 1.5)  reflex bot (average) median attempts / (1.5 x band top) on src 2249b7bb; informational until every track has >= 3 seeds on this src (pnpm harness:reflex --all-tracks --seeds 3)
+PASS  reflex.medianAttempts.pro    b1 -/1.5 (0 fresh) (not all cleared) · b2 -/3 (0 fresh) (not all cleared) · b3 -/3 (0 fresh) (not all cleared) · e1 -/6 (0 fresh) (not all cleared)  (limit 1.5)  reflex bot (average) on the Pro bike, same tracks and band; informational (the band is Rookie's): fewer than 3 fresh seeds on some track (pnpm harness:reflex --all-tracks --bike pro --seeds 3)
+PASS  device.fpsLow60              59.50  (limit 55)  b1 ride · low · cap 60 on the user's phone: 59.5 fps, 6 dropped / 20 s, worst 46 ms (docs/device/2026-09-15-5649aa6.md); informational until 3 reports exist (1 filed)
+PASS  device.thermalDropPct        null  (limit 10)  no thermal proxy in the latest report
+PASS  device.worstMsHigh           81  (limit 50)  b1 ride · high · cap 30: 30 fps, worst 81 ms — informational (the governor steps down from high on a phone; the perf plan's target is phone-high at 60)
+PASS  hero.webkit.driftMaxMm       0  (limit 5)  rider bone-position drift over the bench flow in WebKit (ANGLE-on-Metal), worst of 4 runs at 2026-09-17T23:16:40Z: 0 mm (the arms bug 2b48370 read 2 600 mm); reach 0 cm, overhang 0.5 px (harness/out/hero-webkit/hero-webkit-2026-09-17T23-16-40.json)
+
+NO-SHIP: 29/31 checks pass, track=flat-test, physics=bikePhysicsFactory-v2, wall=210s
+report: /Users/raynos/projects/game-demos/trials-gauntlet-demo/harness/out/metrics/ship-gate.json
+ ELIFECYCLE  Command failed with exit code 2.
