@@ -10,3 +10,7 @@ waiting on. IDs never reused. Ported from the FF15 demo's `HUMAN_REVIEW.md`.
 - **HR-16 — Open the two store accounts (ask 86, [STORE_RELEASE.md](../../docs/plans/STORE_RELEASE.md)).** Waiting on: you — enrol at
   developer.apple.com/programs (individual, $99/yr; your legal name shows as seller) and play.google.com/console (personal,
   $25; identity verification can take days). Start now: Google's 12-tester × 14-day closed test can't begin until the account exists.
+
+- **HR-18 — Back up the Android upload key (ask 104).** Waiting on: you — copy `~/.config/rockhop/` (upload-keystore.jks + keystore.properties, alias `rockhop-upload`, SHA-256 `C3:61:7C:2E:…:1F:57`) to your password manager / an offline backup. It is not in git by design;
+  losing it means a Play support upload-key reset. Also noted: the Android emulator gate is off at your request (machine load) — your own Android phone is the Android check once the
+  internal-testing track exists (after HR-16).
