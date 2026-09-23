@@ -503,9 +503,11 @@ async function main(): Promise<void> {
       const tpf = hz / fps;
       const rec = synthesizeRecording({ trackId, seed: 1, physicsHz: hz, seconds: heapSeconds, style: 'wiggle' });
       const frames = expandFrames(rec);
-      await page.evaluate(([id]) => {
+      // The load is awaited: `heapBefore` is the loaded track. Sampled mid-load (the old `void loadTrack`), the load's
+      // own tail (~3 MB on c1 and b1: props, zone kit, geometry) counted as 60 s of "growth".
+      await page.evaluate(async ([id]) => {
         const t = window.__rockhop!;
-        void t.loadTrack(id);
+        await t.loadTrack(id);
         t.resize(640, 360); // heap/perf counters do not depend on the viewport; SwiftShader raster cost does
         for (let i = 0; i < 5; i++) t.render(true);
       }, [trackId] as const);
