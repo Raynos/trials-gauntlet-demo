@@ -115,9 +115,10 @@ let cachedGit: string | null = null;
 export function gitHead(): string {
   if (cachedGit) return cachedGit;
   try {
-    cachedGit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).trim();
+    cachedGit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
   } catch {
-    cachedGit = 'unknown';
+    // A `git archive` export (the clean tree gates are measured on) has no .git: the build's own stamp names the commit.
+    cachedGit = (process.env['VERCEL_GIT_COMMIT_SHA'] ?? '').slice(0, 8) || 'unknown';
   }
   return cachedGit;
 }
