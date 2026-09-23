@@ -45,7 +45,8 @@ export interface OfflineReport {
   measured: Record<string, unknown>;
 }
 
-const GOLDEN_TRACK = 'b1-first-ride';
+/** The shipped game's first course: the retired curriculum (b1…) is a lazy `?`-URL dev chunk no offline player has. */
+const GOLDEN_TRACK = 'c1-low-tide';
 const ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
 const GEOM = { viewport: { width: 430, height: 932 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true } as const;
 /** SwiftShader boots the whole 27 MB in ~15 s; a throttled row needs a lot more rope than that. */
@@ -342,13 +343,15 @@ export async function offlineSuite(opts: { verbose?: boolean; stillsDir?: string
             screen: t.app.screen(),
             world: !!document.querySelector('.wm-world.loaded'),
             regions: document.querySelectorAll('.wm-region.loaded').length,
+            regionsDrawn: document.querySelectorAll('.wm-region').length,
             markers: document.querySelectorAll('.wm-marker').length,
           };
         })
         .catch(() => null);
       // Round 3 put both world-map tiers in the first boot, so offline the plates are not a "degrades
       // gracefully" case any more: they are there, or the offline set is incomplete.
-      check('offline.worldMapDraws', !!wm && wm.screen === 'tracks' && wm.markers > 0 && wm.world && wm.regions >= 5, wm ? `${wm.screen}: world ${wm.world ? 'loaded' : 'MISSING'}, ${wm.regions} region plates, ${wm.markers} markers` : 'no world map', 'need the world plate + at least 5 region plates, drawn with the origin unreachable');
+      // ROCKHOP's map is four zones (90b641a2): every region plate the map draws must decode offline, and there are >= 4.
+      check('offline.worldMapDraws', !!wm && wm.screen === 'tracks' && wm.markers > 0 && wm.world && wm.regions >= 4 && wm.regions === wm.regionsDrawn, wm ? `${wm.screen}: world ${wm.world ? 'loaded' : 'MISSING'}, ${wm.regions}/${wm.regionsDrawn} region plates, ${wm.markers} markers` : 'no world map', 'need the world plate + every drawn region plate (>= 4 zones) loaded, with the origin unreachable');
 
       // The review inbox, offline: the note queues in localStorage and says so.
       const inbox = await page
