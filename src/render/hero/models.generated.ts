@@ -2,73 +2,73 @@
 // URLs identify the snapshotted full/LOD pair and each file's actual bytes.
 export const MODEL_ASSETS = {
   "models/bike-pro-lod.glb": {
-    "url": "models/5349f8ef86958d91/bike-pro-lod-3ae6a8d20fccb027.glb",
-    "bytes": 864848,
-    "sha256": "3ae6a8d20fccb0273d2ee00fb2ced3d92fd5ae4c80aa925a293975b42aaa2c6b"
+    "url": "models/bb3ec209a0dcc809/bike-pro-lod-37455064bf7b6012.glb",
+    "bytes": 864844,
+    "sha256": "37455064bf7b6012d67e99454cefced5a1aceac3747796f11cdcfe839436a2b7"
   },
   "models/bike-pro.glb": {
-    "url": "models/5349f8ef86958d91/bike-pro-8299dbf0e8482ecd.glb",
-    "bytes": 2270544,
-    "sha256": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b"
+    "url": "models/bb3ec209a0dcc809/bike-pro-0acc9ac86eeca76c.glb",
+    "bytes": 2270540,
+    "sha256": "0acc9ac86eeca76cc1812f8870eab36e2e25ca76d6a5cbe86d4a46a36cc12a86"
   },
   "models/bike-rookie-lod.glb": {
-    "url": "models/dea46269446cfc82/bike-rookie-lod-cdb09ff4e7cafa79.glb",
-    "bytes": 870440,
-    "sha256": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e"
+    "url": "models/98214c3b3099a465/bike-rookie-lod-4ec26ad0a0c08f7e.glb",
+    "bytes": 870436,
+    "sha256": "4ec26ad0a0c08f7ec7e466523b77b4dd5f6378e9b389fade140eb7d08418d36b"
   },
   "models/bike-rookie.glb": {
-    "url": "models/dea46269446cfc82/bike-rookie-51f26d6c05b91a68.glb",
-    "bytes": 2283040,
-    "sha256": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666"
+    "url": "models/98214c3b3099a465/bike-rookie-e55919d602678493.glb",
+    "bytes": 2283036,
+    "sha256": "e55919d60267849358ef5e97f4731f42fac6eb2835b9998e1d146d056c0f10f7"
   },
   "models/rider-race-bluewhite-lod.glb": {
-    "url": "models/22dcaff208be3efe/rider-race-bluewhite-lod-8c3da63b305bdfe8.glb",
+    "url": "models/c49fd28578f306a9/rider-race-bluewhite-lod-2bbe14c984d760e5.glb",
     "bytes": 946824,
-    "sha256": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515"
+    "sha256": "2bbe14c984d760e593e1a6042185ef0cba1f100d59f0074c8b1ce5ccc2032b42"
   },
   "models/rider-race-bluewhite.glb": {
-    "url": "models/22dcaff208be3efe/rider-race-bluewhite-ad1907131d0de127.glb",
+    "url": "models/c49fd28578f306a9/rider-race-bluewhite-28a1e706cf13337a.glb",
     "bytes": 2448152,
-    "sha256": "ad1907131d0de127ec7900f0543ac413dd5d81c0f562a9d9dded7bf7747634e0"
+    "sha256": "28a1e706cf13337ab0309dc76fb9f18191edf23eb71f216f3b43109057585321"
   },
   "models/rider-race-charcoalyellow-lod.glb": {
-    "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-lod-fc77e5624851c3c7.glb",
+    "url": "models/f7e7252c644c5eee/rider-race-charcoalyellow-lod-31229d98fde8964c.glb",
     "bytes": 912696,
-    "sha256": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a"
+    "sha256": "31229d98fde8964c0d0e42ba109f3bc1f392be9e9cd766b73dde71bbfc1e19bc"
   },
   "models/rider-race-charcoalyellow.glb": {
-    "url": "models/e5f02c0fc8125f6c/rider-race-charcoalyellow-a535485d70b6ecd4.glb",
+    "url": "models/f7e7252c644c5eee/rider-race-charcoalyellow-4a9801c2a4148f45.glb",
     "bytes": 2355380,
-    "sha256": "a535485d70b6ecd4874f204162e338d9ac3ae9d67f335b041170b556793f4ff5"
+    "sha256": "4a9801c2a4148f450874b87f65e604a29967924ace1d52341ab5176b7804c6b4"
   },
   "models/rider-street-charcoal-lod.glb": {
-    "url": "models/5464fc559d28ab47/rider-street-charcoal-lod-fb3780c48f5c5083.glb",
-    "bytes": 1706124,
-    "sha256": "fb3780c48f5c5083ac0410fe17f9245f64830a7b42577f666915f16857e09910"
+    "url": "models/8e7b1bc154e23855/rider-street-charcoal-lod-2769317a38c360d6.glb",
+    "bytes": 1706116,
+    "sha256": "2769317a38c360d6b48503462c6ace8ff04bdfe2e492a53101a6444bbdea406c"
   },
   "models/rider-street-charcoal.glb": {
-    "url": "models/5464fc559d28ab47/rider-street-charcoal-95acaf16925f55ab.glb",
-    "bytes": 3486940,
-    "sha256": "95acaf16925f55abd0ce4446c3c8418f385079d7e2b60db697d53a9fd01e8aa0"
+    "url": "models/8e7b1bc154e23855/rider-street-charcoal-0e7f2231e7f15dd5.glb",
+    "bytes": 3486936,
+    "sha256": "0e7f2231e7f15dd542b90f614e73cdda9aea937b656fcd72d61b6742b04223c0"
   },
   "models/rider-street-mustard-lod.glb": {
-    "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-lod-8cb79bdfc20c4ddb.glb",
-    "bytes": 1753256,
-    "sha256": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82"
+    "url": "models/72619c57c200c5c9/rider-street-mustard-lod-5d8cdbd9a2d3035f.glb",
+    "bytes": 1753248,
+    "sha256": "5d8cdbd9a2d3035f928f1800d25f5c26ed1c39afca27b7ac7f1643f31b1ae5d8"
   },
   "models/rider-street-mustard.glb": {
-    "url": "models/0ccc75ca6b98d7b3/rider-street-mustard-ad74ba7acbb10eef.glb",
-    "bytes": 3616252,
-    "sha256": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca"
+    "url": "models/72619c57c200c5c9/rider-street-mustard-c08dabf79dc45d2f.glb",
+    "bytes": 3616248,
+    "sha256": "c08dabf79dc45d2f3d36d8caa5971ff85008b63ea84431d23730c86afd0caa52"
   },
   "models/rider-street-openface-lod.glb": {
-    "url": "models/0261fc3c3f0b5c86/rider-street-openface-lod-fbbae43691569760.glb",
-    "bytes": 1480204,
-    "sha256": "fbbae43691569760a6ee0b4385533536b986dd5e7697bf48f4c32cbb4810cf5d"
+    "url": "models/055a33c00bdb65ab/rider-street-openface-lod-d86ca40f97b7a06c.glb",
+    "bytes": 1480200,
+    "sha256": "d86ca40f97b7a06c0ea77b04d32d85053e5fbe3a338fb033e31ed53c957863f7"
   },
   "models/rider-street-openface.glb": {
-    "url": "models/0261fc3c3f0b5c86/rider-street-openface-dfa54ff6efe7dec9.glb",
-    "bytes": 3015120,
-    "sha256": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59"
+    "url": "models/055a33c00bdb65ab/rider-street-openface-438e972824940b55.glb",
+    "bytes": 3015116,
+    "sha256": "438e972824940b5537716c7e22657b15ccc9dc1a0d394a685088d10f08073db8"
   }
 } as const;
