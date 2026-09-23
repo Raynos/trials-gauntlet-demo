@@ -40,7 +40,27 @@
   },
   "b1-first-ride": {
     "canonical1200": {
-      "hash": "080a20348893ed02",
+      "hash": "78f44e9bf8d3b2e3",
+      "physics": "bikePhysicsFactory-v2"
+    },
+    "golden": {
+      "file": "bot-3.json",
+      "finishTime": 40.083333333333336,
+      "hash": "368f1ca5bd9e830a",
+      "ticks": 4810,
+      "physics": "bikePhysicsFactory-v2"
+    }
+  },
+  "c1-low-tide": {
+    "golden": {
+      "file": "bot-3.json",
+      "finishTime": 29.716666666666665,
+      "hash": "cde355087a245c52",
+      "ticks": 3566,
+      "physics": "bikePhysicsFactory-v2"
+    },
+    "canonical1200": {
+      "hash": "f31ce3e0c1e91f83",
       "physics": "bikePhysicsFactory-v2"
     }
   }
