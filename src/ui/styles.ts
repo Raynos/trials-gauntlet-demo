@@ -654,8 +654,8 @@ export const HUD_CSS = /* css */ `
 .results .medal.bronze { --md: #B8693A; } .results .medal.silver { --md: #AEB6C0; } .results .medal.gold { --md: #E0AE36; } .results .medal.platinum { --md: #1E2A2E; }
 .results .medal i:not(.img) { background: radial-gradient(circle at 36% 30%, rgba(255,255,255,.55), transparent 42%), var(--md); box-shadow: inset 0 0 0 .3em rgba(0,0,0,.18); }
 .results .medal.got i { filter: none; opacity: 1; }
-.results .medal b { font-weight: 800; color: var(--coal); }
-.results .medal small { display: block; min-height: 1em; font: 700 .9em/1.1 var(--sans); letter-spacing: 0; text-transform: none; color: rgba(29,35,38,.75); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.results .medal b { position: relative; z-index: 1; font-weight: 800; color: var(--coal); }
+.results .medal small { position: relative; z-index: 1; display: block; min-height: 1em; font: 700 .9em/1.1 var(--sans); letter-spacing: 0; text-transform: none; color: rgba(29,35,38,.75); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .results .medal.next small { color: var(--teal); }
 .results .medal.earned::before { content: ""; position: absolute; left: 50%; top: -.95em; width: 7.1em; height: 7.1em; margin-left: -3.55em; background: var(--laurel) center / contain no-repeat; pointer-events: none; opacity: 0; transform: scale(.8); transition: opacity var(--t3) var(--ease), transform var(--t3) var(--ease); }
 .results.stage-4 .medal.earned::before, .results.stage-5 .medal.earned::before { opacity: 1; transform: none; }
