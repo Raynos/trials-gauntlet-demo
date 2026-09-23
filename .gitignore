@@ -49,3 +49,5 @@ docs/research/frames/
 
 # Production source maps, moved out of the deploy by vite.config.ts `sourcemapsOut` (store release P0.2).
 dist-maps/
+# raw Codex originals for the ROCKHOP zone plates (~20 MB), kept local
+assets/design/store-release/world/gen/

@@ -18,3 +18,7 @@ waiting on. IDs never reused. Ported from the FF15 demo's `HUMAN_REVIEW.md`.
 - **HR-19 — Support email for the Rockhop store pages (ask 104).** Waiting on: you — both stores require a public privacy +
   support URL; `store/site` (rockhop.vercel.app) prints a contact email and refuses to build without one. Reply with the address
   to publish (a new alias like rockhop.support@… keeps your personal inbox off a public page). Then the parent deploys the site.
+
+- **HR-20 — Recruit 12 Android closed testers (ask 104, D15).** Waiting on: you — Google opens Play production only after a closed test with ≥ 12 testers
+  opted in for 14 continuous days. You said you need to recruit; gather 12 Google-account emails (friends, or a tester-exchange community) so the test
+  can start the day the first build is on the internal track (after HR-16).
