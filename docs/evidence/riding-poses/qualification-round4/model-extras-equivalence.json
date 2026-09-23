@@ -1,0 +1,134 @@
+{
+  "beforeCommit": "044464a8",
+  "afterCommit": "1141b81d",
+  "models": [
+    {
+      "file": "public/models/bike-pro-lod.glb",
+      "before": "3ae6a8d20fccb0273d2ee00fb2ced3d92fd5ae4c80aa925a293975b42aaa2c6b",
+      "after": "37455064bf7b6012d67e99454cefced5a1aceac3747796f11cdcfe839436a2b7",
+      "binBefore": "962e84eedecbd528abdca8d7e447ba2506b3a8b2aab6246958f0ca49b08d41e3",
+      "binAfter": "962e84eedecbd528abdca8d7e447ba2506b3a8b2aab6246958f0ca49b08d41e3",
+      "nonExtrasJsonBefore": "c681b418a3819427177147e1d9fc0c7981db92ef593bd036557a717c5ed20576",
+      "nonExtrasJsonAfter": "c681b418a3819427177147e1d9fc0c7981db92ef593bd036557a717c5ed20576"
+    },
+    {
+      "file": "public/models/bike-pro.glb",
+      "before": "8299dbf0e8482ecdb24bb874fceb305227e88a4ec056faff12ddcfa766370e7b",
+      "after": "0acc9ac86eeca76cc1812f8870eab36e2e25ca76d6a5cbe86d4a46a36cc12a86",
+      "binBefore": "0510ccf03de9891efeeae26577f925e92a8c643d098578f3e5d8ebebb99fe9f4",
+      "binAfter": "0510ccf03de9891efeeae26577f925e92a8c643d098578f3e5d8ebebb99fe9f4",
+      "nonExtrasJsonBefore": "a94214e503b35e33cc3b3ed56a819bf9aa78dc9fea3febfcd0907350590c2c90",
+      "nonExtrasJsonAfter": "a94214e503b35e33cc3b3ed56a819bf9aa78dc9fea3febfcd0907350590c2c90"
+    },
+    {
+      "file": "public/models/bike-rookie-lod.glb",
+      "before": "cdb09ff4e7cafa7941c93752c4bc2d6f78e386585133f0d85adcf41d52942b3e",
+      "after": "4ec26ad0a0c08f7ec7e466523b77b4dd5f6378e9b389fade140eb7d08418d36b",
+      "binBefore": "7c456798d52652a68799714a475caaf6cef30fd649c3dcc1fbdfcb18acf32d56",
+      "binAfter": "7c456798d52652a68799714a475caaf6cef30fd649c3dcc1fbdfcb18acf32d56",
+      "nonExtrasJsonBefore": "47b077616e7181c72914910104a8c968f11e1ccf9002dd0941f7d4436ae206dd",
+      "nonExtrasJsonAfter": "47b077616e7181c72914910104a8c968f11e1ccf9002dd0941f7d4436ae206dd"
+    },
+    {
+      "file": "public/models/bike-rookie.glb",
+      "before": "51f26d6c05b91a686868f2e8a488d93fbf04dff8e969464e6d52955a7409b666",
+      "after": "e55919d60267849358ef5e97f4731f42fac6eb2835b9998e1d146d056c0f10f7",
+      "binBefore": "23e581dd44c377f14a95f1258bc5800c5a6213271c097c29b01f99ef5c1f518b",
+      "binAfter": "23e581dd44c377f14a95f1258bc5800c5a6213271c097c29b01f99ef5c1f518b",
+      "nonExtrasJsonBefore": "737affce7d3aa90db762f5d7542efad73d3979a13d2b42e64f713aa708fd7bd3",
+      "nonExtrasJsonAfter": "737affce7d3aa90db762f5d7542efad73d3979a13d2b42e64f713aa708fd7bd3"
+    },
+    {
+      "file": "public/models/rider-race-bluewhite-lod.glb",
+      "before": "8c3da63b305bdfe8262980fe2f551f96349b4eeef46f77137dd9a2bdb2b09515",
+      "after": "2bbe14c984d760e593e1a6042185ef0cba1f100d59f0074c8b1ce5ccc2032b42",
+      "binBefore": "6fddf3d1461a7b84b28b98de3cc5b0c0bf900f07dc396203b9f039b31fb7b75d",
+      "binAfter": "6fddf3d1461a7b84b28b98de3cc5b0c0bf900f07dc396203b9f039b31fb7b75d",
+      "nonExtrasJsonBefore": "02f14067eab97a0888a5cef8a52d20c6fc25a2e6a7b2be4993d10bb4de768ebb",
+      "nonExtrasJsonAfter": "02f14067eab97a0888a5cef8a52d20c6fc25a2e6a7b2be4993d10bb4de768ebb"
+    },
+    {
+      "file": "public/models/rider-race-bluewhite.glb",
+      "before": "ad1907131d0de127ec7900f0543ac413dd5d81c0f562a9d9dded7bf7747634e0",
+      "after": "28a1e706cf13337ab0309dc76fb9f18191edf23eb71f216f3b43109057585321",
+      "binBefore": "e50175331a2636254b13ce0f6a66ccd3b7abc9d50ce73decba6e823c8bc400a2",
+      "binAfter": "e50175331a2636254b13ce0f6a66ccd3b7abc9d50ce73decba6e823c8bc400a2",
+      "nonExtrasJsonBefore": "be35b2312fddf2a619c564c6ae771719a3f2c22bf619e0db1b45b0b712badd72",
+      "nonExtrasJsonAfter": "be35b2312fddf2a619c564c6ae771719a3f2c22bf619e0db1b45b0b712badd72"
+    },
+    {
+      "file": "public/models/rider-race-charcoalyellow-lod.glb",
+      "before": "fc77e5624851c3c7213b62252dc377837e7117b91fbf9962631efe2288094a4a",
+      "after": "31229d98fde8964c0d0e42ba109f3bc1f392be9e9cd766b73dde71bbfc1e19bc",
+      "binBefore": "61c7c630c0be8265a9a09963bd041e6e7025840f84aec894d7392dc5a83d58e8",
+      "binAfter": "61c7c630c0be8265a9a09963bd041e6e7025840f84aec894d7392dc5a83d58e8",
+      "nonExtrasJsonBefore": "da089ee8f70a395f9e8273e215c3113f8a69043e38414c2606c9c63402f7cf8c",
+      "nonExtrasJsonAfter": "da089ee8f70a395f9e8273e215c3113f8a69043e38414c2606c9c63402f7cf8c"
+    },
+    {
+      "file": "public/models/rider-race-charcoalyellow.glb",
+      "before": "a535485d70b6ecd4874f204162e338d9ac3ae9d67f335b041170b556793f4ff5",
+      "after": "4a9801c2a4148f450874b87f65e604a29967924ace1d52341ab5176b7804c6b4",
+      "binBefore": "f13b3a73b6c8e59f05e6e43e482d8432f0048c5c7cc0b02ac64734e918cc5f01",
+      "binAfter": "f13b3a73b6c8e59f05e6e43e482d8432f0048c5c7cc0b02ac64734e918cc5f01",
+      "nonExtrasJsonBefore": "b3cecf1c847408b3e3e30c29386fab422fb627c4a444b7bc1b1274eb6d403682",
+      "nonExtrasJsonAfter": "b3cecf1c847408b3e3e30c29386fab422fb627c4a444b7bc1b1274eb6d403682"
+    },
+    {
+      "file": "public/models/rider-street-charcoal-lod.glb",
+      "before": "fb3780c48f5c5083ac0410fe17f9245f64830a7b42577f666915f16857e09910",
+      "after": "2769317a38c360d6b48503462c6ace8ff04bdfe2e492a53101a6444bbdea406c",
+      "binBefore": "bef31fcd10259d768fb33e0d4e787df4fe88090d1976bc965f6d8099cc58eec9",
+      "binAfter": "bef31fcd10259d768fb33e0d4e787df4fe88090d1976bc965f6d8099cc58eec9",
+      "nonExtrasJsonBefore": "9ded2854cd7199f9480e9889128521aeea070cb5d904c71047160a6cde0d784e",
+      "nonExtrasJsonAfter": "9ded2854cd7199f9480e9889128521aeea070cb5d904c71047160a6cde0d784e"
+    },
+    {
+      "file": "public/models/rider-street-charcoal.glb",
+      "before": "95acaf16925f55abd0ce4446c3c8418f385079d7e2b60db697d53a9fd01e8aa0",
+      "after": "0e7f2231e7f15dd542b90f614e73cdda9aea937b656fcd72d61b6742b04223c0",
+      "binBefore": "133f237f786b96aa13b4f0039861e86e1cc17131f550ee0c12667cca3799da32",
+      "binAfter": "133f237f786b96aa13b4f0039861e86e1cc17131f550ee0c12667cca3799da32",
+      "nonExtrasJsonBefore": "dfb441eef8d15efa7b61e2c06ab132c09516eb1f6c6e40ddf41b57322dc8a2ca",
+      "nonExtrasJsonAfter": "dfb441eef8d15efa7b61e2c06ab132c09516eb1f6c6e40ddf41b57322dc8a2ca"
+    },
+    {
+      "file": "public/models/rider-street-mustard-lod.glb",
+      "before": "8cb79bdfc20c4ddb85e14a23176a545f6db6c0b7b8566a314d7395a605d7ce82",
+      "after": "5d8cdbd9a2d3035f928f1800d25f5c26ed1c39afca27b7ac7f1643f31b1ae5d8",
+      "binBefore": "edaa8fd3b173e59d25bc5d0a7f7293de6fa63a8ea3b5ae08333de988053fa633",
+      "binAfter": "edaa8fd3b173e59d25bc5d0a7f7293de6fa63a8ea3b5ae08333de988053fa633",
+      "nonExtrasJsonBefore": "458ad0848e192df936d6b697223b39cb06e7cbc3d30f26e2c7a7f1fb52c7fb80",
+      "nonExtrasJsonAfter": "458ad0848e192df936d6b697223b39cb06e7cbc3d30f26e2c7a7f1fb52c7fb80"
+    },
+    {
+      "file": "public/models/rider-street-mustard.glb",
+      "before": "ad74ba7acbb10eef9f30c166b34e92b967c201c60a9b81b1f941ad887420c4ca",
+      "after": "c08dabf79dc45d2f3d36d8caa5971ff85008b63ea84431d23730c86afd0caa52",
+      "binBefore": "1ccfc92d9cd0a8cb26c2f8a6474b5aa045d2643feeb6679b138606499a0599a2",
+      "binAfter": "1ccfc92d9cd0a8cb26c2f8a6474b5aa045d2643feeb6679b138606499a0599a2",
+      "nonExtrasJsonBefore": "e365a8ec7335d322ba3ba418e3e259b3fc1a318b721df296c3d0ba3a025148d2",
+      "nonExtrasJsonAfter": "e365a8ec7335d322ba3ba418e3e259b3fc1a318b721df296c3d0ba3a025148d2"
+    },
+    {
+      "file": "public/models/rider-street-openface-lod.glb",
+      "before": "fbbae43691569760a6ee0b4385533536b986dd5e7697bf48f4c32cbb4810cf5d",
+      "after": "d86ca40f97b7a06c0ea77b04d32d85053e5fbe3a338fb033e31ed53c957863f7",
+      "binBefore": "018adbc853a3e9660ecc1a6704d74e8cd14a18551d232e34efe5ac268231bd90",
+      "binAfter": "018adbc853a3e9660ecc1a6704d74e8cd14a18551d232e34efe5ac268231bd90",
+      "nonExtrasJsonBefore": "f750d396bb3cbf421e92f36701f7f3249d8364a94ef21858fb10d3d01ce9c410",
+      "nonExtrasJsonAfter": "f750d396bb3cbf421e92f36701f7f3249d8364a94ef21858fb10d3d01ce9c410"
+    },
+    {
+      "file": "public/models/rider-street-openface.glb",
+      "before": "dfa54ff6efe7dec910de63aa1d49dcc3d8095a44f3c41a4b32c2df96f262ac59",
+      "after": "438e972824940b5537716c7e22657b15ccc9dc1a0d394a685088d10f08073db8",
+      "binBefore": "f940d36920a188c0f95684bb125be1536ba7d9cf017c0a5a82a39c08c40b6404",
+      "binAfter": "f940d36920a188c0f95684bb125be1536ba7d9cf017c0a5a82a39c08c40b6404",
+      "nonExtrasJsonBefore": "2a5c489aebddaf16d5f6a00516fa78d0bc48b02e6c7c76525ad2d64d59dbbe17",
+      "nonExtrasJsonAfter": "2a5c489aebddaf16d5f6a00516fa78d0bc48b02e6c7c76525ad2d64d59dbbe17"
+    }
+  ],
+  "allBinEqual": true,
+  "allNonExtrasJsonEqual": true
+}
