@@ -70,15 +70,20 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      # Store release bar 1 (docs/plans/STORE_RELEASE.md P0.4): the store bundle's denylist hits, reported,
-      # never blocking until Phase 6 turns on --strict. Rebuilds dist/ as the store build — the deploy below
-      # uploads the source and Vercel builds the web bundle itself, so this dist/ is never shipped.
-      - name: IP audit (store build, report only)
-        continue-on-error: true
+      # Store release bar 1 (docs/plans/STORE_RELEASE.md P0.4): the store bundle's denylist hits = 0, blocking
+      # (--strict; the rules are scripts/ip-audit-rules.mjs). Rebuilds dist/ as the store build — the deploy below
+      # uploads the source and Vercel builds the web bundle itself, so this dist/ is never shipped. The report
+      # reaches the summary before the exit status does (no `| tee`: without pipefail it would swallow the failure).
+      - name: IP audit (store build, strict)
         run: |
           pnpm run build:store
-          node scripts/ip-audit.mjs | tee ip-audit.txt
+          set +e
+          node scripts/ip-audit.mjs --strict > ip-audit.txt
+          status=$?
+          set -e
+          cat ip-audit.txt
           { echo '### IP audit (store build)'; echo '```'; head -40 ip-audit.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $status
 
       # ---- deploy (main only) ------------------------------------------------------------------
       - name: No token, no deploy
@@ -148,12 +153,16 @@ jobs:
       - name: Store listing (lengths, denied terms)
         run: node scripts/store-metadata.mjs
 
-      # Bar 1: report only until Phase 6 turns on --strict. Scans the store bundle and the shells' copies of it.
-      - name: IP audit (store bundle + shells, report only)
-        continue-on-error: true
+      # Bar 1, blocking (--strict): the store bundle and the shells' copies of it hold no denylist hit.
+      - name: IP audit (store bundle + shells, strict)
         run: |
-          node scripts/ip-audit.mjs store/build/web ios android store/metadata | tee ip-audit.txt
+          set +e
+          node scripts/ip-audit.mjs --strict store/build/web ios android store/metadata > ip-audit.txt
+          status=$?
+          set -e
+          cat ip-audit.txt
           { echo '### IP audit (store bundle + shells)'; echo '```'; head -30 ip-audit.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $status
 
       - uses: actions/setup-java@v4
         with:

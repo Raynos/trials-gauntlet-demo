@@ -17,7 +17,16 @@ export const FULL_MANIFEST = join(here, 'manifest.json');
 export const RUNTIME_MANIFEST = resolve(here, '../../public/art/manifest.json');
 
 /** Retired from the shipped world (store release P0.2): Trials-coded or a real brand. build.mjs never emits them. */
-export const RETIRED = new Set(['graffiti-nofear', 'graffiti-rise', 'poster-trials-night', 'banner-ironworks-series']);
+export const RETIRED = new Set([
+  'graffiti-nofear',
+  'graffiti-rise',
+  'poster-trials-night',
+  'banner-ironworks-series',
+  // Store release Phase 3: the real-render thumbs of the retired curriculum (assets/art/thumbs.mts THUMB_X). Those
+  // tracks are dev-only now (src/tracks `RETIRED_TRACKS`), so their cards never show; the ids and file names carried
+  // retired level names ("x3-gauntlet", "see-saw", "stairway") into both manifests.
+  ...['b1-first-ride', 'b2-lean-back', 'b3-kicker-row', 'e1-uphill-weight', 'e2-rear-wheel-first', 'e3-stairway', 'm1-hop-up', 'm2-drum-roll', 'm3-see-saw', 'h1-wheelie-wire', 'h2-gap-chain', 'h3-fire-line', 'x1-vertical-limit', 'x2-pipe-dream', 'x3-gauntlet'].map((id) => `thumb-${id}`),
+]);
 
 /** Per-asset fields the runtime reads. Anything else (prompt, src, note, shot, recording, …) stays in the full manifest. */
 const RUNTIME_FIELDS = ['id', 'path', 'kind', 'w', 'h', 'bytes', 'v', 'biome', 'track', 'tier', 'medal', 'variant', 'bike', 'tileX', 'alpha', 'alphaFadeBottom', 'time', 'figures'];

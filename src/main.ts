@@ -34,7 +34,7 @@ import type { GameRenderer } from './render';
 import { App, Game, MockPhysics, installHook, isPhone, type HookExtras } from './game';
 import { parseBenchParams, type BenchOptions } from './game/bench';
 import { BACKDROP_TRACK, resolveBoot } from './game/flow';
-import { getTrack } from './tracks';
+import { getTrack, loadRetiredTracks } from './tracks';
 import { ArtManifest, BestTimes, DomHud, injectStyles, loadBikeChoice, loadHeldTier, loadModelChoice, loadQualityOverride, menuPlate, type ModelChoice } from './ui';
 import { nextPaint } from './ui/loader';
 import { takeBootPlan } from './boot/handoff';
@@ -450,6 +450,12 @@ if (STORE) {
   void import('./platform')
     .then((p) => p.startPlatform())
     .catch((e: unknown) => console.warn('[rockhop] platform start failed', e))
+    .finally(boot);
+} else if (DEV_SURFACES && location.search.length > 1) {
+  // A `?` dev URL (`?track=`, `?bench=1`, `?harness=1`, `?review=`…) may name a retired track: register them first
+  // (src/tracks `loadRetiredTracks`, the lazy dev chunk). A player's plain URL never fetches it.
+  void loadRetiredTracks()
+    .catch((e: unknown) => console.warn('[rockhop] retired tracks failed to load', e))
     .finally(boot);
 } else {
   boot();

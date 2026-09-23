@@ -58,7 +58,7 @@ export const P_COAST = playground('coast', 'PC', 'Harbour Yard', 'the whole scra
   b.ramp({ length: 4, height: 0.3, surface: 'wood', prop: 'pallet' }).ledge({ height: 0.3, length: 6, surface: 'wood', prop: 'pallet' }).ramp({ length: 4, height: 0.3, direction: 'down', surface: 'wood', prop: 'pallet' }).flat(10);
   b.bumpDrum(0.6, 0.2, { surface: 'metal', prop: 'buoy' }).flat(10).checkpoint();
   seg('The container stack');
-  b.flat(8).setPiece('balance', 'The Stack').ramp({ length: 12, height: 1.0, surface: 'wood', prop: 'pallet' }).box({ width: 8, height: 1.0, prop: 'container' });
+  b.flat(8).setPiece('balance', 'The Sea Stack').ramp({ length: 12, height: 1.0, surface: 'wood', prop: 'pallet' }).box({ width: 8, height: 1.0, prop: 'container' });
   // C1's fix: the bare 0.3 m step between the containers bucked a held-gas bike off container 2 (crash x 288) and
   // stopped a coasting one dead; a 4 m pallet wedge up it rolls at every speed.
   b.ramp({ length: 4, height: 0.3, surface: 'wood', prop: 'pallet' }, { base: 1.0 }).box({ width: 8, height: 1.3, prop: 'container', variant: 1 });

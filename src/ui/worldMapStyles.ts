@@ -76,7 +76,7 @@ export const WORLD_MAP_CSS = `
 .wm-marker .wm-plate .tag.ghost { background: rgba(90,169,255,.25); color: #cfe6ff; }
 .wm-marker .wm-rule { position: absolute; left: 22px; top: -10px; height: 14px; padding: 0 5px; border-radius: 2px; background: rgba(20,31,34,.86); box-shadow: 0 0 0 1px rgba(201,154,75,.5); font: 700 8px/14px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ochre); white-space: nowrap; pointer-events: none; display: none; }
 .wm-marker.locked .wm-rule { display: block; }
-/* The focused marker: the bike at its foot, an amber beacon rising into the sky, its plate hidden under the card. */
+/* The focused marker: the bike at its foot, an amber beacon climbing into the sky, its plate hidden under the card. */
 .wm-marker.on { z-index: 3; --mk: #6FA8FF; --mk2: #1D4FB8; }
 .wm-marker.on .wm-diamond { box-shadow: 0 0 0 2px #fff, 0 0 12px 3px rgba(111,168,255,.8), 0 3px 6px rgba(0,0,0,.6); }
 .wm-marker.on .wm-plate, .wm-marker.on .wm-lead, .wm-marker.on .wm-rule { display: none; }

@@ -21,7 +21,7 @@ const rawKeep = join(here, 'raw');
 const sel = JSON.parse(readFileSync(join(here, 'selection.json'), 'utf8'));
 const jobByName = Object.fromEntries(jobs.map(j => [j.name, j]));
 const primary = jobs.filter(j => !/-v\d+$/.test(j.name));   // v2/v3 are alternate sources, selected via selection.json
-const tmp = join(process.env.TMPDIR || '/tmp', 'trials-art-build');
+const tmp = join(process.env.TMPDIR || '/tmp', 'rockhop-art-build');
 mkdirSync(tmp, { recursive: true });
 for (const d of ['menu', 'world', 'plates', 'icons', 'thumbs']) mkdirSync(join(pub, d), { recursive: true });
 mkdirSync(rawKeep, { recursive: true });

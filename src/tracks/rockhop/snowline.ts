@@ -205,7 +205,7 @@ export const S2 = rockhop('S2', 's2-cornice', 'Cornice', 'snowline', 'extreme', 
 export const S3 = (() => {
   const b = rockhop('S3', 's3-whiteout', 'Whiteout', 'snowline', 'extreme', {
     technique: 'everything, closer together',
-    demands: 'the summit: a rising ice-shelf chain to 2.2 m, four summit tower caps at 2.55 m over the crevasse, off the station and down',
+    demands: 'the summit: a climbing ice-shelf chain to 2.2 m, four summit tower caps at 2.55 m over the crevasse, off the station and down',
     idea: 'the summit in a storm: slots, rollers, the shelves up and the summit towers',
     hero: 'The Summit Towers',
     attemptsBand: [8, 16],
