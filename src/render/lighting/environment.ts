@@ -65,7 +65,7 @@ export function installFogChunks(): void {
     uniform float fogNear;
     uniform float fogFar;
   #endif
-  float trialsFogFactor() {
+  float zoneFogFactor() {
     #ifdef FOG_EXP2
       return 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
     #else
@@ -86,12 +86,12 @@ export function installFogChunks(): void {
   // the fog is folded in *before* the tone map (below) so the two paths see the same linear mix.
   THREE.ShaderChunk.fog_fragment = /* glsl */ `
 #if defined( USE_FOG ) && !defined( TONE_MAPPING )
-  gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, trialsFogFactor() );
+  gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, zoneFogFactor() );
 #endif`;
   THREE.ShaderChunk.tonemapping_fragment = /* glsl */ `
 #if defined( TONE_MAPPING )
   #ifdef USE_FOG
-    gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, trialsFogFactor() );
+    gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, zoneFogFactor() );
   #endif
   gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );
 #endif`;
@@ -102,12 +102,12 @@ export function installFogChunks(): void {
 uniform vec4 uGradeA;
 uniform vec4 uGradeB;
 uniform vec4 uGradeC;
-vec3 trialsAces( vec3 x ) {
+vec3 rhAces( vec3 x ) {
   const float a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14;
   return clamp( ( x * ( a * x + b ) ) / ( x * ( c * x + d ) + e ), 0.0, 1.0 );
 }
 vec3 CustomToneMapping( vec3 color ) {
-  vec3 col = trialsAces( color * toneMappingExposure );
+  vec3 col = rhAces( color * toneMappingExposure );
   col = 0.18 * pow( max( col, vec3( 0.0 ) ) / 0.18, vec3( 1.0 + uGradeB.w ) );
   col = col * ( 1.0 + uGradeB.rgb ) + uGradeA.rgb * ( 1.0 - col );
   float l = dot( col, vec3( 0.2126, 0.7152, 0.0722 ) );
@@ -231,7 +231,14 @@ export function buildSkyTexture(b: Biome, width = 256, height = 128): THREE.Data
       data[k + 3] = 1;
     }
   }
-  const tex = new THREE.DataTexture(data, width, height, THREE.RGBAFormat, THREE.FloatType);
+  // Half float, not float: WebGL2 filters half-float textures linearly as core, while linear filtering of a
+  // 32-bit float texture needs OES_texture_float_linear — which iOS WKWebView does not expose. There the
+  // float sky was an incomplete texture that sampled black, so the PMREM environment (and the procedural
+  // background) came out black and every metallic / env-lit surface went near-black (store release, ask:
+  // Release owner's iOS 26.5 Simulator screens). Half precision holds the sky's range (sun disc ≤ 40).
+  const half = new Uint16Array(data.length);
+  for (let i = 0; i < data.length; i++) half[i] = THREE.DataUtils.toHalfFloat(Math.min(65000, data[i]!));
+  const tex = new THREE.DataTexture(half, width, height, THREE.RGBAFormat, THREE.HalfFloatType);
   tex.mapping = THREE.EquirectangularReflectionMapping;
   tex.colorSpace = THREE.LinearSRGBColorSpace;
   tex.minFilter = THREE.LinearFilter;
@@ -395,7 +402,7 @@ export class LightingRig {
 
   /** Estimated bytes of the env textures (for stats). */
   get textureBytes(): number {
-    return 256 * 128 * 16 + (this.envRT ? this.envRT.width * this.envRT.height * 8 : 0);
+    return 256 * 128 * 8 + (this.envRT ? this.envRT.width * this.envRT.height * 8 : 0);
   }
 
   /**
