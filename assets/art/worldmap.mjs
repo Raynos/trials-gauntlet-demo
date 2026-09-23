@@ -37,10 +37,23 @@ function capped(inFile, outFile, { w, q, maxBytes, minQ = 48, fallbackW = [] }) 
 }
 
 const REGIONS = ['industrial', 'canyon', 'snow', 'nightCity', 'foundry'];
+
 const TIERS = [
   { variant: '2x', w: 1536 },
   { variant: '1x', w: 1024 },
 ];
+// Store release (ROCKHOP): `--store` re-encodes only the world plate from assets/design/store-release/world/
+// world-plate.png (W-worldmap repaint; round 2 outpainted its top / bottom 158 rows, brief world/briefs/map3.md)
+// into world-{1536,1024}.webp under the same caps, and leaves worldmap.json and the region plates alone.
+if (process.argv.includes('--store')) {
+  const f = join(repo, 'assets/design/store-release/world/world-plate.png');
+  for (const t of TIERS) {
+    const dst = join(out, `world-${t.w}.webp`);
+    const enc = capped(f, dst, { w: t.w, q: 82, maxBytes: 350 * 1024 });
+    console.log(`world-${t.w}`, (statSync(dst).size / 1024).toFixed(0) + ' KB', 'q' + enc.q, enc.over ? 'OVER CAP' : '');
+  }
+  process.exit(0);
+}
 const plates = [];
 const rec = (id, file, kind, tags) => {
   const [w, h] = dims(file);

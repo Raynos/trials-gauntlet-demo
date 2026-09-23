@@ -8,6 +8,7 @@ LOGS=${LOGS:-/tmp/world-gen-logs}; mkdir -p "$LOGS" "$W/gen"
 case "$B" in
   map) REFS=(-i $R1/W-worldmap.png);;
   map2) REFS=(-i /tmp/wst/wmap-ref.png);;
+  map3) REFS=(-i /tmp/wst/outpaint-ref.png);;
   *-coast) REFS=(-i $R1/C-ride.png);;
   *-alpine) REFS=(-i $R1/B-ride.png);;
   *-quarry) REFS=(-i $R2/Q2.png -i $R2/Q1.png);;
