@@ -463,8 +463,8 @@ export class SettingsScreen extends Screen {
   ) {
     super(parent, 'settings-screen');
     const wrap = h('div', 'settings-wrap');
-    wrap.innerHTML = `<h1>Settings</h1>`;
-    const list = h('div', 'settings-list rise');
+    wrap.innerHTML = `<h1 class="rh-head"><small><i class="rh-pin"></i>Rockhop / Field kit</small>Settings</h1>`;
+    const list = h('div', 'settings-list rh-card rise');
     const foot = h('div', 'settings-foot');
     foot.innerHTML = `<div class="controls-line">${controlsLineHtml()}</div><div class="build">${escapeHtml(GAME_NAME)} · ${escapeHtml(BUILD_STAMP)}</div><div class="build offline-line"></div>`;
     // What the worker actually holds, and the one thing we cannot engineer around: Safari clears an

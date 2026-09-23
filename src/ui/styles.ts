@@ -181,40 +181,52 @@ html.short #ui .menu-item[data-id="play"] { font-size: clamp(1.5rem, calc(8.8 * 
 .menu-screen.show .menu-item { animation: rise var(--t2) var(--ease) both; }
 .menu-screen .menu-item:nth-child(3) { animation-delay: 40ms; } .menu-screen .menu-item:nth-child(4) { animation-delay: 80ms; } .menu-screen .menu-item:nth-child(5) { animation-delay: 120ms; }
 
-/* ---- settings ---------------------------------------------------------- */
-.settings-screen { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.86) 55%, rgba(6,7,9,.6) 100%); }
-.settings-wrap { position: absolute; inset: 0; padding: calc(var(--s5) + var(--sat)) calc(calc(5 * var(--vw)) + var(--sar)) calc(var(--s6) + var(--sab)) calc(calc(7 * var(--vw)) + var(--sal)); display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: minmax(18rem, 34rem); gap: var(--s4); }
-.settings-foot { display: flex; flex-direction: column; gap: var(--s1); font-size: .78rem; color: var(--ink-mute); line-height: 1.5; max-width: 40rem; }
-.settings-foot b { color: var(--ink-dim); font-weight: 700; }
+/* ---- settings: the field-kit card (store release polish; the home screen's cards, the results ticket's paper) -------
+   A kicker with the survey marker and the SETTINGS headline in cream display over the dimmed scene; every row on one
+   cream contour card (teal words, hairline rules between rows), the focused row flagged by the vermilion marker;
+   choices are teal segments, levels vermilion bars, RESET a vermilion outline that fills when armed. */
+.settings-screen { background: radial-gradient(130% 110% at 0% 0%, rgba(9,38,42,.92), rgba(8,20,22,.8) 55%, rgba(8,20,22,.5)); }
+.settings-wrap { position: absolute; inset: 0; padding: calc(var(--s4) + var(--sat)) calc(calc(5 * var(--vw)) + var(--sar)) calc(var(--s3) + var(--sab)) calc(calc(5 * var(--vw)) + var(--sal)); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; grid-template-columns: minmax(18rem, 38rem); gap: var(--s3); }
+.settings-foot { display: flex; flex-direction: column; gap: 2px; font: 600 .72rem/1.45 var(--sans); color: rgba(239,227,200,.62); max-width: 40rem; }
+.settings-foot b { color: var(--cream); font-weight: 800; }
 .settings-foot .sep { margin: 0 .5em; }
-.settings-foot .build { opacity: .7; letter-spacing: .08em; text-transform: uppercase; font-size: .7rem; }
-.settings-wrap h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 2.2rem; line-height: .9; text-transform: uppercase; align-self: start; letter-spacing: .01em; }
-.settings-wrap h1 small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .72rem; letter-spacing: .34em; color: var(--amber); margin-bottom: .35em; }
-.settings-list { display: flex; flex-direction: column; gap: var(--s1); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: none; padding-right: var(--s2); }
+.settings-foot .build { letter-spacing: .1em; text-transform: uppercase; font-size: .62rem; }
+.rh-head { margin: 0; font: 400 2.2rem/.9 var(--display); text-transform: uppercase; letter-spacing: .01em; color: var(--cream); align-self: start; text-shadow: 0 2px 0 rgba(6,14,16,.35), 0 6px 16px rgba(4,10,12,.45); }
+.rh-head small { display: flex; align-items: center; gap: .55em; margin-bottom: .5em; font: 800 .66rem/1 var(--sans); letter-spacing: .3em; color: rgba(239,227,200,.82); text-shadow: none; }
+/* The survey marker (A-brand § 06): a vermilion triangle over its dot. */
+.rh-pin { position: relative; flex: none; width: .95em; height: 1.25em; }
+.rh-pin::before { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: .85em; background: var(--vermilion); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.rh-pin::after { content: ""; position: absolute; left: 50%; bottom: 0; width: .3em; height: .3em; margin-left: -.15em; border-radius: 50%; background: currentColor; }
+.rh-card { color: var(--coal); border-radius: 10px; background: var(--contour) 0 0 / 240px 160px, linear-gradient(180deg, #F7EEDA, var(--cream) 55%, var(--cream-2)); box-shadow: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -3px 0 rgba(15,92,99,.12), 0 16px 36px rgba(4,10,12,.5); }
+.settings-list { display: flex; flex-direction: column; gap: 0; padding: var(--s1) var(--s2); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: none; }
 .settings-list::-webkit-scrollbar { display: none; }
-.setting { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--s3); min-height: 52px; padding: var(--s2) var(--s4); border-radius: var(--r2); border: 1px solid transparent; transition: background var(--t1) var(--ease), border-color var(--t1); }
-.setting.on { background: rgba(255,255,255,.06); border-color: var(--line-2); }
-.setting.on .lab { color: var(--amber); }
-.setting .lab { font-family: var(--display); font-weight: 400; font-size: 1.3rem; text-transform: uppercase; letter-spacing: .01em; }
-.setting .lab { min-width: 0; }
-.setting .lab small { display: block; font-family: var(--font); font-style: normal; font-weight: 500; font-size: .78rem; text-transform: none; letter-spacing: .02em; color: var(--ink-mute); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--r1); overflow: hidden; background: rgba(0,0,0,.35); }
-.seg button { min-height: 44px; min-width: 44px; padding: 0 var(--s3); background: transparent; border: 0; border-right: 1px solid var(--line-2); cursor: pointer; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: .82rem; color: var(--ink-dim); transition: background var(--t1), color var(--t1); }
+.setting { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--s3); min-height: 52px; padding: 6px var(--s3) 6px calc(var(--s4) + 10px); border-radius: 6px; transition: background var(--t1) var(--ease); }
+.setting + .setting { box-shadow: 0 -1px 0 rgba(15,92,99,.16); }
+.setting.on { background: rgba(15,92,99,.09); box-shadow: none; }
+.setting.on + .setting { box-shadow: none; }
+.setting.on::before { content: ""; position: absolute; left: 8px; top: 50%; width: 11px; height: 10px; margin-top: -6px; background: var(--vermilion); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.setting .lab { min-width: 0; font: 400 1.2rem/1 var(--display); text-transform: uppercase; letter-spacing: .01em; color: var(--teal); }
+.setting .lab small { display: block; margin-top: 3px; font: 600 .74rem/1.2 var(--sans); letter-spacing: 0; text-transform: none; color: rgba(29,35,38,.62); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg { display: inline-flex; border-radius: 8px; overflow: hidden; background: rgba(15,92,99,.07); box-shadow: inset 0 0 0 1.5px rgba(15,92,99,.34); }
+.seg button { min-height: 44px; min-width: 44px; padding: 0 var(--s3); background: transparent; border: 0; border-right: 1px solid rgba(15,92,99,.2); cursor: pointer; font: 800 .76rem/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--teal); transition: background var(--t1), color var(--t1); }
+#ui .seg button { color: var(--teal); }
 .seg button:last-child { border-right: 0; }
-.seg button.on { background: var(--amber); color: var(--amber-ink); }
-.seg button:focus-visible, .seg button.focus { box-shadow: inset 0 0 0 2px var(--ink); }
+#ui .seg button.on { background: var(--teal); color: var(--cream); }
+.seg button:focus-visible, .seg button.focus { box-shadow: inset 0 0 0 2px var(--vermilion); }
 .slider { display: inline-flex; align-items: center; gap: var(--s2); }
-.slider button { min-width: 44px; min-height: 44px; border-radius: var(--r1); border: 1px solid var(--line); background: rgba(0,0,0,.35); cursor: pointer; font-weight: 700; font-size: 1.1rem; }
-.slider button:focus-visible, .slider button.focus { box-shadow: inset 0 0 0 2px var(--ink); }
-.slider .bar { position: relative; width: clamp(5rem, calc(9 * var(--vw)), 9rem); height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; }
-.slider .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 70%; background: linear-gradient(90deg, var(--amber-2), var(--amber)); transition: width var(--t1) var(--ease); }
-.slider .val { min-width: 2.6em; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; font-size: .9rem; }
-.btn { min-height: 44px; min-width: 44px; padding: var(--s2) var(--s5); border-radius: var(--r1); border: 1px solid var(--line); background: rgba(255,255,255,.08); color: var(--ink); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; font-size: .9rem; transition: background var(--t1), transform var(--t1) var(--ease), box-shadow var(--t1); }
+#ui .slider button { min-width: 44px; min-height: 44px; border-radius: 8px; border: 0; background: rgba(15,92,99,.07); box-shadow: inset 0 0 0 1.5px rgba(15,92,99,.34); cursor: pointer; font: 800 1.15rem/1 var(--sans); color: var(--teal); }
+.slider button:focus-visible, .slider button.focus { box-shadow: inset 0 0 0 2px var(--vermilion); }
+.slider .bar { position: relative; width: clamp(5rem, calc(9 * var(--vw)), 9rem); height: 8px; border-radius: 4px; background: rgba(15,92,99,.16); overflow: hidden; }
+.slider .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 70%; border-radius: 4px; background: linear-gradient(90deg, var(--vermilion-2), var(--vermilion)); transition: width var(--t1) var(--ease); }
+.slider .val { min-width: 2.8em; text-align: right; font: 800 .82rem/1 var(--sans); font-variant-numeric: tabular-nums; color: var(--coal); }
+.btn { min-height: 44px; min-width: 44px; padding: var(--s2) var(--s5); border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,.08); color: var(--ink); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; font-size: .9rem; transition: background var(--t1), transform var(--t1) var(--ease), box-shadow var(--t1); }
 .btn:hover, .btn:focus-visible, .btn.focus { background: rgba(255,255,255,.16); box-shadow: inset 0 0 0 2px var(--ink); }
-.btn.primary { background: var(--amber); color: var(--amber-ink); border-color: transparent; }
-.btn.primary:hover, .btn.primary:focus-visible, .btn.primary.focus { background: #ffc24d; box-shadow: inset 0 0 0 2px var(--amber-ink); }
-.btn.danger { color: var(--red); border-color: rgba(255,61,61,.4); }
-.btn.danger.armed { background: var(--red); color: #fff; }
+.btn.primary { background: var(--vermilion); color: var(--amber-ink); border-color: transparent; box-shadow: inset 0 -3px 0 rgba(100,24,6,.3); }
+.btn.primary:hover, .btn.primary:focus-visible, .btn.primary.focus { background: #EE6A40; box-shadow: inset 0 0 0 2px var(--amber-ink); }
+#ui .settings-screen .btn { border: 0; background: rgba(15,92,99,.07); box-shadow: inset 0 0 0 1.5px rgba(15,92,99,.34); color: var(--teal); font: 800 .78rem/1 var(--sans); letter-spacing: .08em; padding: 0 var(--s4); }
+#ui .settings-screen .btn.danger { color: var(--vermilion-2); background: transparent; box-shadow: inset 0 0 0 1.5px rgba(196,68,31,.6); }
+#ui .settings-screen .btn.danger.armed, .btn.danger.armed { background: var(--vermilion); color: var(--amber-ink); box-shadow: inset 0 -3px 0 rgba(100,24,6,.3); }
+.btn.danger { color: var(--vermilion); border-color: rgba(228,87,46,.5); }
 
 /* ---- credits ---------------------------------------------------------- */
 .credits-screen { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.7) 60%, rgba(6,7,9,.45) 100%); }
@@ -729,8 +741,8 @@ export const HUD_CSS = /* css */ `
 /* Short landscape phones (844×390): tighter type, single-row menus above the fold. html.short = logical height ≤ 500 px (orientation.ts). */
 html.short .settings-wrap { padding-top: calc(var(--s3) + var(--sat)); padding-bottom: calc(var(--s4) + var(--sab)); gap: var(--s2); grid-template-columns: minmax(16rem, 30rem); }
 html.short .settings-foot .controls-line { display: none; }
-html.short .settings-wrap h1 { font-size: 1.8rem; }
-html.short .setting { min-height: 46px; padding: var(--s1) var(--s3); }
+html.short .settings-wrap .rh-head { font-size: 1.8rem; }
+html.short .setting { min-height: 46px; padding: var(--s1) var(--s3) var(--s1) calc(var(--s4) + 8px); }
 html.short .setting .lab { font-size: 1.05rem; }
 html.short .setting .lab small { display: none; }
 html.short .legend { bottom: calc(var(--s2) + var(--sab)); font-size: .72rem; }
