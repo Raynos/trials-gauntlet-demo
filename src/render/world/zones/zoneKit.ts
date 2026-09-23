@@ -123,7 +123,10 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
   painted.name = 'zone-painted';
   lib.complete(foliage);
   lib.complete(painted);
-  const rust = lib.get('rustSteel');
+  // Round 2: weathered rust, not polished — the library's 0.6 metalness read near black on every zone prop.
+  const rust = lib.derive('rustSteel');
+  rust.metalness = 0.22;
+  rust.color.setHex(0xb8aca0); // the rust hue is baked per vertex; the library's dark base under it read black
   const wood = lib.get('pallet');
   // Stone: the fine neutral concrete grain tinted per zone (the library rock albedo is baked orange); the quarry's
   // stone and ground take its own painted pale dust instead (round 2: the concrete grain read dark brown there).
@@ -299,9 +302,7 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
     const bollards = PB('bollard', G.bollardGeometry(), painted);
     const ropes = PB('rope', G.ropeCoilGeometry(), foliage);
     const nets = PB('net', G.netPileGeometry(track.def.seed ^ 3), foliage);
-    const rustDull = lib.derive('rustSteel'); // scrap: weathered, not polished — the library's 0.6 metalness read black
-    rustDull.metalness = 0.2;
-    const scrap = [0, 1].map((i) => PB(`scrap${i}`, G.scrapHeapGeometry((track.def.seed ^ (i * 977 + 5)) >>> 0), rustDull));
+    const scrap = [0, 1].map((i) => PB(`scrap${i}`, G.scrapHeapGeometry((track.def.seed ^ (i * 977 + 5)) >>> 0), rust));
     const quay = PB('quay', G.quayGeometry(), lib.get('concrete'));
     const piles = PB('pile', G.pileGeometry(), wood);
     const deckPlanks = PB('pierdeck', G.paint(new THREE.BoxGeometry(1, 0.3, 1).translate(0, -0.15, 0), G.rgb(0x7a6246)), wood);

@@ -730,17 +730,25 @@ export function hutGeometry(): THREE.BufferGeometry {
   return ao(merge([box(4, 2.6, 3, 0, 1.3, 0, rgb(0xb8a07a)), box(4.4, 0.16, 3.4, 0, 2.7, 0, rgb(0x8a4a2e), 0.06), box(0.9, 1.9, 0.06, -0.9, 0.95, 1.53, rgb(0x3a2a22)), box(1.0, 0.7, 0.06, 1, 1.6, 1.53, rgb(0x2a3438))]), 1.2, 0.35);
 }
 
-/** Haul truck (Q1), mustard; 9 × 5 × 5, origin bottom centre. */
+/** Haul truck (Q1): dust-caked ochre, a rubble heap in the bed; 9 × 5 × 5, origin bottom centre. */
 export function haulTruckGeometry(): THREE.BufferGeometry {
-  const y = rgb(0xd6a030);
+  const y = rgb(0xa8843e);
   const dark = rgb(0x262626);
   const parts: THREE.BufferGeometry[] = [];
-  for (const x of [-3, 2.8]) for (const z of [-1.9, 1.9]) parts.push(cyl(1.25, 1.25, 1.1, 14, x, 1.25, z, dark, 'z'));
+  // Dust caked up the lower half, the paint sun-faded above.
+  const dust = (_x: number, yy: number): number => 0.62 + 0.38 * Math.min(1, Math.max(0, (yy - 2.2) / 2.4));
+  for (const x of [-3, 2.8]) for (const z of [-1.9, 1.9]) {
+    parts.push(cyl(1.25, 1.25, 1.1, 14, x, 1.25, z, dark, 'z'));
+    parts.push(cyl(0.6, 0.6, 1.14, 10, x, 1.25, z, rgb(0x6a5a40), 'z'));
+  }
   parts.push(box(8, 0.8, 3.4, 0, 2.0, 0, dark));
-  const bed = new THREE.BoxGeometry(6, 2.2, 4.6).translate(-1.2, 3.6, 0);
-  parts.push(paint(bed, y));
-  parts.push(box(2.2, 2.2, 3.2, 3.6, 3.5, 0, y));
+  parts.push(paint(new THREE.BoxGeometry(6, 2.2, 4.6).translate(-1.2, 3.6, 0), y, dust));
+  for (let i = 0; i < 5; i++) parts.push(paint(new THREE.BoxGeometry(0.12, 2.0, 4.7).translate(-3.9 + i * 1.35, 3.6, 0), y, (a, b) => dust(a, b) * 0.8));
+  parts.push(paint(new THREE.BoxGeometry(2.2, 2.2, 3.2).translate(3.6, 3.5, 0), y, dust));
   parts.push(box(1.0, 1.0, 3.3, 3.9, 4.0, 0, rgb(0x2a3440)));
+  parts.push(box(0.9, 0.12, 4.9, 1.9, 2.55, 0, rgb(0x3a3430)));
+  const rnd = lcg(53);
+  for (let i = 0; i < 14; i++) parts.push(paint(new THREE.IcosahedronGeometry(0.45 + rnd() * 0.4, 0).scale(1.2, 0.7, 1).translate(-1.2 + (rnd() - 0.5) * 4.6, 4.7 + rnd() * 0.4, (rnd() - 0.5) * 3.4), STONE[i % STONE.length]!, () => 0.85));
   return ao(merge(parts), 2.5, 0.3);
 }
 
