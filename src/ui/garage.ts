@@ -18,6 +18,7 @@ import { RIDER_PRESETS } from '../core/riderPresets';
 import type { ArtManifest } from './art';
 import { BUILD_STAMP_SHORT, escapeHtml } from './front';
 import { wordmarkSvg } from './brand';
+import { DEV_SURFACES } from '../core/release';
 import type { UiSfx } from './sfx';
 import { conceal, isLiveTarget, reveal } from './live';
 import { DEFAULT_RIDER_OUTFIT, OUTFIT_DETAIL, OUTFIT_LABEL } from './outfit';
@@ -50,7 +51,7 @@ export const BIKE_SPECS: Record<BikeClass, BikeSpec> = {
     weight: 0.72,
     weightFeel: 'Planted',
     note: 'Loops only leaning back · standard medal targets',
-    tint: '#ffb020',
+    tint: '#E4572E',
   },
   pro: {
     id: 'pro',
@@ -63,7 +64,7 @@ export const BIKE_SPECS: Record<BikeClass, BikeSpec> = {
     weight: 0.42,
     weightFeel: 'Flickable',
     note: 'Raw · medal targets 10 % tighter',
-    tint: '#5aa9ff',
+    tint: '#2a5da8',
   },
 };
 
@@ -179,7 +180,7 @@ export class GarageScreen {
     this.stage = h('div', 'garage-stage');
     this.stage.setAttribute('aria-label', 'Model explorer: drag to rotate, pinch or scroll to zoom');
     this.bindExplorer();
-    const badge = h('div', 'garage-badge', `<div class="garage-plate"><span class="wordmark">${wordmarkSvg()}</span><span class="garage-title">Garage</span></div><div class="garage-build">${escapeHtml(BUILD_STAMP_SHORT)}</div>`);
+    const badge = h('div', 'garage-badge', `<div class="garage-plate"><span class="wordmark">${wordmarkSvg()}</span><span class="garage-title">Garage</span></div>${DEV_SURFACES ? `<div class="garage-build">${escapeHtml(BUILD_STAMP_SHORT)}</div>` : ''}`);
     this.hint = h('div', 'garage-hint', '<i></i>Drag to rotate · pinch to zoom');
     // --- The rail (left edge): outfit, bike class — bike lowest (SPEC §5: under the thumb). Pointer + Esc only
     // (ask 32): a chip previews under the pointer and commits on click; no key rows, no Tab-follow.
@@ -241,7 +242,7 @@ export class GarageScreen {
       }
     }
     // --- The panel (right edge, under ‹ MENU): the chosen bike's sheet + the outfit / rider lines + the load status.
-    const panel = h('div', 'garage-panel');
+    const panel = h('div', 'garage-panel rh-card');
     this.detail = h('div', 'gp-sheet');
     this.outfitStatus = h('span', 'outfit-current');
     this.outfitStatus.setAttribute('role', 'status');

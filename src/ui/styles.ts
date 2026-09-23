@@ -114,9 +114,9 @@ export const FRONT_CSS = /* css */ `
 .wordmark { display: block; line-height: 0; color: var(--cream); filter: drop-shadow(0 2px 6px rgba(0,0,0,.45)); }
 .wordmark .rh-wordmark { width: 100%; }
 .kicker { font-size: .78rem; letter-spacing: .34em; text-transform: uppercase; color: var(--amber); font-weight: 700; }
-.backbtn { position: absolute; right: calc(var(--s5) + var(--sar)); top: calc(var(--s4) + var(--sat)); z-index: 4; display: inline-flex; align-items: center; gap: .35em; min-height: 44px; padding: 0 1.1rem 0 .8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--slab); color: var(--ink); font: 700 .82rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; pointer-events: auto; cursor: pointer; }
+.backbtn { position: absolute; right: calc(var(--s5) + var(--sar)); top: calc(var(--s4) + var(--sat)); z-index: 4; display: inline-flex; align-items: center; gap: .35em; min-height: 44px; padding: 0 1.1rem 0 .8rem; border: 1px solid rgba(239,227,200,.34); border-radius: 999px; background: rgba(10,58,63,.9); color: var(--cream); font: 800 .76rem/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; pointer-events: auto; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
 .backbtn span { font-size: 1.3em; line-height: 1; margin-top: -.1em; }
-.backbtn:active { background: rgba(255,255,255,.18); }
+.backbtn:active { background: var(--teal); }
 .legend { position: absolute; right: calc(var(--s5) + var(--sar)); bottom: calc(var(--s4) + var(--sab)); display: flex; gap: var(--s4); font-size: .82rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); white-space: nowrap; }
 .legend kbd { font-family: var(--font); font-weight: 700; color: var(--ink); background: rgba(255,255,255,.1); border: 1px solid var(--line); border-bottom-width: 2px; padding: .05em .45em; border-radius: var(--r1); margin-right: .4em; font-size: .9em; min-width: 1.6em; display: inline-block; text-align: center; }
 .legend .pad { display: inline-flex; align-items: center; justify-content: center; width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid var(--ink-dim); color: var(--ink); font-weight: 700; margin-right: .4em; font-size: .85em; }
@@ -374,38 +374,40 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 /* ---- garage: the model explorer (garage round) — layout B "tool wall" on set E "shutter door" (assets/design/garage/SPEC.md) ---- */
 /* The screen itself is clear: the renderer's garage set is the backdrop. Framing is the renderer's orbit camera, never a CSS transform on the canvas.
    Rail of tags down the left edge (rider · outfit · bike, bike lowest), the metadata panel on the right, badge top-left, ‹ MENU top-right, the hero between. */
-.garage-screen { --rail-w: 244px; --panel-w: 178px; background: none; }
+.garage-screen { --rail-w: 244px; --panel-w: max(178px, 12.5rem); background: none; }
 .garage-stage { position: absolute; inset: 0; cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; }
 .garage-stage.grabbing { cursor: grabbing; }
-/* Badge plate top-left: wordmark + GARAGE on the slanted plate, the build stamp under it (menu B's badge, one line). */
+/* Header top-left: the cream ROCKHOP wordmark and GARAGE in cream display beside it (the home screen's head), the build stamp under it on dev builds. */
 .garage-badge { position: absolute; left: calc(var(--s4) + var(--sal)); top: calc(var(--s3) + var(--sat)); display: flex; flex-direction: column; align-items: flex-start; gap: 3px; pointer-events: none; }
-.garage-plate { display: flex; align-items: center; gap: .6em; background: rgba(9,11,15,.92); box-shadow: inset 4px 0 0 var(--amber), 0 6px 20px rgba(0,0,0,.45); clip-path: polygon(0 0, 100% 0, calc(100% - .6em) 100%, 0 100%); padding: .28em 1.3em .22em .9em; font-size: 1.15rem; }
-.garage-plate .wordmark { width: 6.4em; filter: none; }
-.garage-title { font-family: var(--display); font-weight: 400; font-size: 1.1em; line-height: .9; text-transform: uppercase; color: var(--ink); letter-spacing: .01em; }
-.garage-build { font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ink); opacity: .55; text-shadow: var(--outline); padding-left: .3rem; font-variant-numeric: tabular-nums; }
+.garage-plate { display: flex; align-items: center; gap: .55em; font-size: 1.15rem; filter: drop-shadow(0 2px 0 rgba(6,14,16,.35)) drop-shadow(0 4px 12px rgba(4,10,12,.5)); }
+.garage-plate .wordmark { width: 6.4em; filter: none; color: var(--cream); }
+.garage-title { padding-left: .55em; border-left: 2px solid rgba(239,227,200,.55); font: 400 1.1em/.9 var(--display); text-transform: uppercase; color: var(--cream); letter-spacing: .01em; }
+.garage-build { font: 600 .56rem/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--cream); opacity: .6; text-shadow: 0 1px 2px #000; padding-left: .1rem; font-variant-numeric: tabular-nums; }
 /* Gesture hint under the hero (fades after the first drag). */
-.garage-hint { position: absolute; left: calc(var(--rail-w) + var(--sal) + (100% - var(--rail-w) - var(--panel-w) - var(--sal) - var(--sar)) / 2); bottom: calc(var(--s3) + var(--sab)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: .5em; padding: 6px 12px; font-size: .66rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-dim); background: rgba(9,11,15,.66); clip-path: polygon(.5em 0, 100% 0, calc(100% - .5em) 100%, 0 100%); pointer-events: none; white-space: nowrap; transition: opacity var(--t3) var(--ease); }
+.garage-hint { position: absolute; left: calc(var(--rail-w) + var(--sal) + (100% - var(--rail-w) - var(--panel-w) - var(--sal) - var(--sar)) / 2); bottom: calc(var(--s3) + var(--sab)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: .5em; padding: 6px 14px; border-radius: 999px; font: 700 .62rem/1 var(--font); letter-spacing: .2em; text-transform: uppercase; color: var(--cream); background: rgba(10,40,44,.72); box-shadow: inset 0 0 0 1px rgba(239,227,200,.22); pointer-events: none; white-space: nowrap; transition: opacity var(--t3) var(--ease); }
 .garage-hint i { width: 1.1em; height: 1.1em; border: 2px solid currentColor; border-radius: 50%; border-right-color: transparent; opacity: .8; }
 .garage-hint.used { opacity: 0; }
 /* The rail: groups stacked from the bottom edge, a stencilled spine label beside each 2-column grid of tags. */
 .garage-rail { position: absolute; left: calc(var(--s4) + var(--sal)); top: calc(var(--s3) + var(--sat) + 64px); bottom: calc(var(--s2) + var(--sab)); width: var(--rail-w); display: flex; flex-direction: column; justify-content: flex-end; gap: var(--s2); }
 .rail-group { display: grid; grid-template-columns: 14px 1fr; gap: var(--s1); align-items: end; }
-.rail-head { writing-mode: vertical-rl; transform: rotate(180deg); align-self: end; max-height: 100%; overflow: hidden; font-size: .6rem; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--amber); text-shadow: var(--outline); line-height: 14px; }
+.rail-head { writing-mode: vertical-rl; transform: rotate(180deg); align-self: end; max-height: 100%; overflow: hidden; font: 700 .58rem/14px var(--font); letter-spacing: .28em; text-transform: uppercase; color: var(--cream); text-shadow: 0 1px 3px rgba(0,0,0,.8); }
 .rail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s1); }
-#ui .chip { position: relative; display: flex; align-items: center; gap: .45em; min-height: 44px; min-width: 44px; padding: 0 .8em 0 .7em; border: 1px solid var(--line-2); background: rgba(12,14,18,.9); color: var(--ink-dim); font: 700 .8rem/1 var(--font); letter-spacing: .08em; text-transform: uppercase; text-align: left; white-space: nowrap; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.45); clip-path: polygon(0 0, 100% 0, 100% calc(100% - .5em), calc(100% - .5em) 100%, 0 100%); transition: background var(--t1), color var(--t1); }
+#ui .chip { position: relative; display: flex; align-items: center; gap: .45em; min-height: 44px; min-width: 44px; padding: 0 .8em 0 .7em; border: 0; border-radius: 7px; background: var(--contour) 0 0 / 240px 160px, linear-gradient(180deg, #F7EEDA, var(--cream) 60%, var(--cream-2)); color: var(--teal); font: 700 .84rem/1 var(--font); letter-spacing: .06em; text-transform: uppercase; text-align: left; white-space: nowrap; cursor: pointer; box-shadow: inset 0 -2px 0 rgba(15,92,99,.14), 0 4px 12px rgba(0,0,0,.42); transition: background var(--t1), color var(--t1), box-shadow var(--t1); }
 #ui .chip > b, #ui .chip > em { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 #ui .chip .txt { display: contents; }
 #ui .chip b { font-weight: 700; }
-#ui .chip em { font-style: normal; font-size: .6rem; letter-spacing: .16em; color: var(--ink-mute); }
+#ui .chip em { font-style: normal; font-size: .6rem; letter-spacing: .12em; color: rgba(29,35,38,.6); }
 /* Outfit tags read in mixed case (mockup B): the five labels fit two per row without truncation. */
 #ui .chip.outfit-button { text-transform: none; letter-spacing: .01em; font-size: .8rem; padding-top: 4px; padding-bottom: 4px; }
 #ui .chip.outfit-button > b { white-space: normal; line-height: 1.02; }
 #ui .chip.outfit-button em { text-transform: none; letter-spacing: .02em; font-size: .68rem; }
 #ui .chip b + em { margin-left: 0; }
-#ui .chip.selected { background: var(--amber); color: var(--amber-ink); border-color: var(--amber); }
-#ui .chip.selected em { color: rgba(26,18,6,.72); }
-#ui .chip.on:not(.selected) { color: var(--ink); background: rgba(255,255,255,.12); }
-#ui .chip.on, .garage-screen button:focus-visible, .garage-screen .backbtn.on { outline: 2px solid var(--ink); outline-offset: 2px; }
+#ui .chip.selected { background: var(--contour-light) 0 0 / 240px 160px, linear-gradient(180deg, #17737B, var(--teal) 60%, var(--teal-2)); color: var(--cream); box-shadow: inset 0 0 0 1.5px rgba(239,227,200,.45), 0 4px 12px rgba(0,0,0,.42); }
+/* The chosen tag carries the survey target: a vermilion dot in a cream ring, top-right. */
+#ui .chip.selected::after { content: ""; position: absolute; right: 5px; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--vermilion); box-shadow: 0 0 0 1.5px var(--cream); }
+#ui .chip.selected em { color: rgba(239,227,200,.78); }
+#ui .chip.on:not(.selected) { color: var(--teal-2); background: var(--contour) 0 0 / 240px 160px, linear-gradient(180deg, #FFF8E8, #F6ECD6); }
+#ui .chip.on, .garage-screen button:focus-visible, .garage-screen .backbtn.on { outline: 2px solid var(--cream); outline-offset: 2px; }
 #ui .chip[aria-busy="true"] { opacity: .6; }
 #ui .chip:disabled { opacity: .55; cursor: not-allowed; }
 /* Two-line tags: the label stacks over its detail. */
@@ -415,29 +417,30 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 #ui .chip > .swatch, #ui .chip > .chip-tint, #ui .chip > .chip-art { flex: 0 0 auto; }
 #ui .chip > .swatch + b, #ui .chip > .chip-art + b { flex: 1 1 calc(100% - 2.2em); }
 #ui .chip > .swatch ~ em, #ui .chip > .chip-art ~ em { margin-left: 2.2em; }
-.swatch { width: 1.6em; height: 1.6em; border: 1px solid rgba(0,0,0,.5); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
-.bike-chip { --tint: var(--amber); }
-.bike-chip .chip-tint { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--tint); opacity: .9; }
-.bike-chip.selected .chip-tint { background: var(--amber-ink); opacity: .35; }
+.swatch { width: 1.6em; height: 1.6em; border-radius: 4px; border: 1px solid rgba(29,35,38,.45); box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+.bike-chip { --tint: var(--vermilion); }
+.bike-chip .chip-tint { position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 0 2px 2px 0; background: var(--tint); }
+.bike-chip.selected .chip-tint { background: var(--cream); opacity: .6; }
 .bike-chip .chip-art { width: 2.1em; height: 1.4em; margin-left: 2px; background-size: cover; background-position: 50% 45%; opacity: 0; transition: opacity var(--t3); border-radius: 2px; }
 .bike-chip .chip-art.loaded { opacity: 1; }
 .bike-chip .chip-art:not(.loaded) { display: none; }
 /* The panel: the chosen bike's sheet — class, bars, character, note — then the outfit / rider lines and the load status. */
-.garage-panel { position: absolute; right: calc(var(--s4) + var(--sar)); top: calc(var(--s4) + var(--sat) + 52px); width: var(--panel-w); display: flex; flex-direction: column; gap: var(--s2); padding: var(--s3) var(--s3) var(--s2); background: rgba(9,11,15,.88); border: 1px solid var(--line-2); border-top: 2px solid var(--amber); box-shadow: 0 8px 24px rgba(0,0,0,.5); pointer-events: none; }
+.garage-panel { position: absolute; right: calc(var(--s4) + var(--sar)); top: calc(var(--s4) + var(--sat) + 52px); width: var(--panel-w); display: flex; flex-direction: column; gap: var(--s2); padding: var(--s3) var(--s3) var(--s2); pointer-events: none; }
 .gp-sheet { display: flex; flex-direction: column; gap: 6px; }
 .gp-name { display: flex; align-items: baseline; gap: .5em; }
-.gp-name b { font-family: var(--display); font-weight: 400; font-size: 1.5rem; line-height: .9; text-transform: uppercase; color: var(--tint, var(--amber)); text-shadow: 0 2px 10px rgba(0,0,0,.6); }
-.gp-name small { font-size: .62rem; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--ink-dim); }
+.gp-name::before { content: ""; align-self: center; flex: none; width: 10px; height: 9px; background: var(--vermilion); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.gp-name b { font: 400 1.5rem/.9 var(--display); text-transform: uppercase; color: var(--teal); }
+.gp-name small { font: 700 .66rem/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: rgba(29,35,38,.6); }
 .gp-stats { display: flex; flex-direction: column; gap: 4px; }
-.gp-stats .stat { display: grid; grid-template-columns: 3.6em 1fr 3.9em; align-items: center; gap: 6px; font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); font-weight: 700; }
-.gp-stats .stat i { display: block; height: 5px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; }
-.gp-stats .stat b { display: block; height: 100%; width: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--amber) 70%, #000), var(--amber)); transition: width var(--t3) var(--ease); }
-.gp-stats .stat em { font-style: normal; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
-.gp-line { font-size: .72rem; line-height: 1.3; color: var(--ink-dim); }
-.gp-note { font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); padding-top: 4px; border-top: 1px solid var(--line-2); }
-.gp-kv { display: flex; justify-content: space-between; gap: var(--s2); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); }
-.gp-kv b { color: var(--ink); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.outfit-current { color: var(--amber); font-size: .66rem; letter-spacing: .04em; line-height: 1.3; }
+.gp-stats .stat { display: grid; grid-template-columns: 3.9em 1fr 4.2em; align-items: center; gap: 6px; font: 700 .66rem/1 var(--font); letter-spacing: .14em; text-transform: uppercase; color: rgba(29,35,38,.66); }
+.gp-stats .stat i { display: block; height: 6px; border-radius: 3px; background: rgba(15,92,99,.16); overflow: hidden; }
+.gp-stats .stat b { display: block; height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg, var(--vermilion-2), var(--vermilion)); transition: width var(--t3) var(--ease); }
+.gp-stats .stat em { font-style: normal; text-align: right; color: var(--coal); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.gp-line { font: 500 .76rem/1.3 var(--font); color: rgba(29,35,38,.78); }
+.gp-note { font: 700 .64rem/1.35 var(--font); letter-spacing: .1em; text-transform: uppercase; color: rgba(29,35,38,.6); padding-top: 5px; border-top: 1.5px dashed rgba(15,92,99,.3); }
+.gp-kv { display: flex; justify-content: space-between; gap: var(--s2); font: 700 .68rem/1.2 var(--font); letter-spacing: .1em; text-transform: uppercase; color: rgba(29,35,38,.6); }
+.gp-kv b { color: var(--coal); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.outfit-current { color: var(--teal); font: 700 .7rem/1.3 var(--font); letter-spacing: .02em; }
 .garage-screen .legend { top: calc(var(--s4) + var(--sat) + 56px); right: calc(var(--s4) + var(--sar) + var(--panel-w) + var(--s3)); bottom: auto; font-size: .66rem; gap: var(--s3); }
 .garage-screen .legend.hide { display: none; }
 .ov-stats b.bike-pro { color: var(--blue); }
