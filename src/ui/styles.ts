@@ -108,14 +108,11 @@ export const FRONT_CSS = /* css */ `
 .overlay:not(.show), .onboard:not(.show), .results:not(.show), .replay:not(.show) { visibility: hidden; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
 .screen.show .rise { animation: rise var(--t2) var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-.scrim { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 35%, rgba(6,7,9,.92)); }
-.scrim.side { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.82) 34%, rgba(6,7,9,.35) 62%, rgba(6,7,9,.2) 100%), linear-gradient(180deg, rgba(6,7,9,.35), transparent 30%, transparent 70%, rgba(6,7,9,.9)); }
 /* Key art is mirrored so its hero (authored left of centre) lands right of the wordmark; the mask (local coords, pre-flip) clears the wordmark side. */
 .grain { position: absolute; inset: 0; pointer-events: none; opacity: .05; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
 /* A wordmark holder: the SVG (src/ui/brand.ts) in cream, sized by the holder's width. */
 .wordmark { display: block; line-height: 0; color: var(--cream); filter: drop-shadow(0 2px 6px rgba(0,0,0,.45)); }
 .wordmark .rh-wordmark { width: 100%; }
-.wordmark small { display: block; font-size: .28em; letter-spacing: .48em; line-height: 1; margin: 0 0 .28em .08em; color: var(--ink); background: none; -webkit-text-fill-color: var(--ink); text-shadow: var(--outline); font-weight: 900; }
 .kicker { font-size: .78rem; letter-spacing: .34em; text-transform: uppercase; color: var(--amber); font-weight: 700; }
 .backbtn { position: absolute; right: calc(var(--s5) + var(--sar)); top: calc(var(--s4) + var(--sat)); z-index: 4; display: inline-flex; align-items: center; gap: .35em; min-height: 44px; padding: 0 1.1rem 0 .8rem; border: 1px solid var(--line); border-radius: 999px; background: var(--slab); color: var(--ink); font: 700 .82rem/1 var(--font); letter-spacing: .12em; text-transform: uppercase; pointer-events: auto; cursor: pointer; }
 .backbtn span { font-size: 1.3em; line-height: 1; margin-top: -.1em; }
@@ -124,8 +121,6 @@ export const FRONT_CSS = /* css */ `
 .legend kbd { font-family: var(--font); font-weight: 700; color: var(--ink); background: rgba(255,255,255,.1); border: 1px solid var(--line); border-bottom-width: 2px; padding: .05em .45em; border-radius: var(--r1); margin-right: .4em; font-size: .9em; min-width: 1.6em; display: inline-block; text-align: center; }
 .legend .pad { display: inline-flex; align-items: center; justify-content: center; width: 1.5em; height: 1.5em; border-radius: 50%; border: 2px solid var(--ink-dim); color: var(--ink); font-weight: 700; margin-right: .4em; font-size: .85em; }
 .legend .pad.a { border-color: var(--green); } .legend .pad.b { border-color: var(--red); }
-.corner-brand { position: absolute; left: calc(var(--s5) + var(--sal)); bottom: calc(var(--s4) + var(--sab)); font-family: var(--display); font-weight: 400; font-size: 1.1rem; letter-spacing: .02em; text-transform: uppercase; color: var(--ink-dim); }
-.corner-brand b { color: var(--amber); }
 
 @keyframes pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
 
@@ -220,17 +215,6 @@ html.short #ui .menu-item[data-id="play"] { font-size: clamp(1.5rem, calc(8.8 * 
 .btn.primary:hover, .btn.primary:focus-visible, .btn.primary.focus { background: #ffc24d; box-shadow: inset 0 0 0 2px var(--amber-ink); }
 .btn.danger { color: var(--red); border-color: rgba(255,61,61,.4); }
 .btn.danger.armed { background: var(--red); color: #fff; }
-.controls-ref { display: flex; flex-direction: column; gap: var(--s4); overflow-y: auto; scrollbar-width: none; touch-action: pan-y; min-width: 0; }
-.controls-ref::-webkit-scrollbar { display: none; }
-.controls-ref h3 { margin: 0; font-size: .72rem; letter-spacing: .3em; text-transform: uppercase; color: var(--amber); font-weight: 700; }
-.devices { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: var(--s3); }
-.device { padding: var(--s3) var(--s4); background: var(--slab); border: 1px solid var(--line-2); border-radius: var(--r2); display: flex; flex-direction: column; gap: var(--s2); }
-.device h4 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 1.1rem; text-transform: uppercase; }
-.device svg { width: 100%; height: auto; display: block; }
-.device dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px var(--s3); font-size: .8rem; }
-.device dt { color: var(--ink-dim); } .device dd { margin: 0; font-weight: 700; }
-.about { font-size: .85rem; color: var(--ink-dim); line-height: 1.4; max-width: 34rem; }
-.about b { color: var(--ink); }
 
 /* ---- credits ---------------------------------------------------------- */
 .credits-screen { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.7) 60%, rgba(6,7,9,.45) 100%); }
@@ -357,10 +341,6 @@ html.short .labhud .lab-trace { width: 300px; height: 84px; }
 html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 
 /* ---- track card: the PB ghost tag doubles as "Watch PB" ---- */
-.card .top em.watch { cursor: pointer; pointer-events: auto; }
-.tier-row.lab-row .tier-head b { color: #7fd1ff; }
-.card.lab-card { --tint: #1e3a4a; }
-.card .top em.watch:hover { color: var(--amber-ink); background: var(--amber); }
 
 /* ---- art plates behind a screen (credits): cover, masked clear where the live scene should show ---- */
 .plate-bg { position: absolute; inset: 0; pointer-events: none; background-size: cover; background-position: 50% 50%; opacity: 0; transition: opacity var(--t3) var(--ease); }
@@ -435,10 +415,6 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 .outfit-current { color: var(--amber); font-size: .66rem; letter-spacing: .04em; line-height: 1.3; }
 .garage-screen .legend { top: calc(var(--s4) + var(--sat) + 56px); right: calc(var(--s4) + var(--sar) + var(--panel-w) + var(--s3)); bottom: auto; font-size: .66rem; gap: var(--s3); }
 .garage-screen .legend.hide { display: none; }
-.card .top em.bike { font-style: normal; color: #0b1a2e; background: var(--blue); border-radius: 3px; padding: 1px 6px; margin-right: 2.1rem; letter-spacing: .1em; font-weight: 700; white-space: nowrap; }
-.card .top em.ghost + em.bike { margin-left: -1.9rem; }
-.card .lockline { position: absolute; left: var(--s3); right: var(--s3); top: 36%; transform: translateY(-50%); font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); font-weight: 700; text-shadow: var(--outline); display: flex; align-items: center; gap: .45em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card .lockline::before { content: ""; flex: 0 0 auto; width: 1em; height: 1em; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10V7a5 5 0 0 1 10 0v3h1.5A1.5 1.5 0 0 1 20 11.5v8A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5v-8A1.5 1.5 0 0 1 5.5 10H7zm2 0h6V7a3 3 0 0 0-6 0v3z'/%3E%3C/svg%3E") center / contain no-repeat; }
 .ov-stats b.bike-pro { color: var(--blue); }
 .tile span small { display: block; font-family: var(--font); font-style: normal; font-weight: 700; font-size: .68rem; letter-spacing: .14em; margin-top: 4px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
 .setting .btns { display: inline-flex; gap: var(--s2); }
@@ -624,16 +600,13 @@ export const HUD_CSS = /* css */ `
 .results .board .dot { display: block; width: .72em; height: .72em; border-radius: 50%; background: currentColor; box-shadow: inset 0 -1px 0 rgba(0,0,0,.3); }
 .results .board .dot.platinum { color: #1E2A2E; box-shadow: inset 0 0 0 1.5px var(--plat); } .results .board .dot.gold { color: #D9A531; } .results .board .dot.silver { color: #9AA3AD; } .results .board .dot.bronze { color: #B8693A; }
 /* Track card: the class in effect's top 5 as medal-coloured chips. */
-.card .board { display: flex; gap: 3px; flex-wrap: nowrap; overflow: hidden; margin-top: 2px; font-variant-numeric: tabular-nums; }
-.card .board span { font-size: .58rem; font-weight: 700; line-height: 1; padding: 2px 3px; border-radius: 3px; background: rgba(0,0,0,.45); color: var(--ink); border-left: 3px solid currentColor; white-space: nowrap; }
-.card .board span.platinum { color: var(--plat); } .card .board span.gold { color: var(--gold); } .card .board span.silver { color: var(--silver); } .card .board span.bronze { color: var(--bronze); }
-.card .board span b { color: var(--ink); font-weight: 700; }
 /* The four mountain medals, split by hairlines; the one earned lifts with a glint ring, the next one says what it takes. */
 .results .medals { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: .7em; }
 .results .medal { position: relative; display: flex; flex-direction: column; align-items: center; gap: .3em; padding: 0 .4em; text-align: center; font: 800 .74em/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--coal); }
 .results .medal + .medal { border-left: 1.5px solid rgba(29,35,38,.2); }
 .results .medal i { position: relative; display: block; width: 4.6em; height: 4.6em; border-radius: 50%; background-size: cover; background-position: center; filter: saturate(.25) brightness(1.02); opacity: .55; transition: transform var(--t3) var(--ease), filter var(--t3), opacity var(--t3); }
-.results .medal i.img svg { visibility: hidden; }
+.results .medal.bronze { --md: #B8693A; } .results .medal.silver { --md: #AEB6C0; } .results .medal.gold { --md: #E0AE36; } .results .medal.platinum { --md: #1E2A2E; }
+.results .medal i:not(.img) { background: radial-gradient(circle at 36% 30%, rgba(255,255,255,.55), transparent 42%), var(--md); box-shadow: inset 0 0 0 .3em rgba(0,0,0,.18); }
 .results .medal.got i { filter: none; opacity: 1; }
 .results .medal b { font-weight: 800; color: var(--coal); }
 .results .medal small { display: block; min-height: 1em; font: 700 .9em/1.1 var(--sans); letter-spacing: 0; text-transform: none; color: rgba(29,35,38,.75); white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -741,12 +714,6 @@ export const HUD_CSS = /* css */ `
 @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) { .rotate.armed { display: flex; } }
 
 /* Short landscape phones (844×390): tighter type, single-row menus above the fold. html.short = logical height ≤ 500 px (orientation.ts). */
-html.short .tracks-head { top: calc(var(--s3) + var(--sat)); }
-html.short .tracks-head h1 { font-size: 1.8rem; }
-html.short .tiers { top: calc(var(--s3) + var(--sat) + 3.2rem); bottom: calc(var(--s5) + var(--sab)); }
-html.short .tier-row { padding: var(--s1) 0 var(--s1); }
-html.short .card { width: clamp(10.5rem, calc(19 * var(--vw)), 13rem); }
-html.short .card .name { font-size: 1.15rem; }
 html.short .settings-wrap { padding-top: calc(var(--s3) + var(--sat)); padding-bottom: calc(var(--s4) + var(--sab)); gap: var(--s2); grid-template-columns: minmax(16rem, 30rem); }
 html.short .settings-foot .controls-line { display: none; }
 html.short .settings-wrap h1 { font-size: 1.8rem; }
@@ -754,7 +721,6 @@ html.short .setting { min-height: 46px; padding: var(--s1) var(--s3); }
 html.short .setting .lab { font-size: 1.05rem; }
 html.short .setting .lab small { display: none; }
 html.short .legend { bottom: calc(var(--s2) + var(--sab)); font-size: .72rem; }
-html.short .corner-brand { bottom: calc(var(--s2) + var(--sab)); }
 html.short .overlay { padding: calc(var(--s4) + var(--sat)) calc(var(--s5) + var(--sar)) calc(var(--s3) + var(--sab)) calc(var(--s5) + var(--sal)); row-gap: var(--s2); }
 html.short .ov-name { font-size: 2.2rem; }
 html.short .tile { width: 160px; height: 92px; gap: 8px; font-size: 1.05rem; }

@@ -15,8 +15,8 @@ import type { BestEntry, BoardEntry } from './best';
 import { formatTime } from './format';
 import { BUILD_STAMP_SHORT, escapeHtml, Screen, type FrontCallbacks, type FrontState } from './front';
 import { isLiveTarget } from './live';
-import { wordmarkSvg } from './brand';
-import { isLabTrack, medalTotals, nextTrack, shipTracks, TIER_LABEL, type MedalOf } from './progress';
+import { wordmarkSvg, zoneTitle } from './brand';
+import { isLabTrack, medalTotals, nextTrack, shipTracks, stageLabel, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
 import { wantsHiRes } from '../boot/tier';
 import { allMarkers, buildRegions, fitZoom, FLY_MS, fogPatches, frameFor, locate, MAP, nextGate, regionPlateSrc, routePath, TAP_SLOP, tierBlend, worldPlateSrc, ZOOM, type FogPatch, type Gate, type Marker, type Region, type RegionId } from './worldMap';
@@ -585,7 +585,7 @@ export class WorldMapScreen extends Screen {
       ge.style.left = `${g.x}px`;
       ge.style.top = `${g.y}px`;
       const deg = (Math.atan2(g.dy, g.dx) * 180) / Math.PI;
-      ge.innerHTML = `<button type="button" class="wm-hit" aria-label="${escapeHtml(TIER_LABEL[g.tier])} tier locked: ${escapeHtml(g.rule)}"></button><span class="chev" style="transform: rotate(${deg.toFixed(1)}deg)">›››</span><span class="wm-plate">${escapeHtml(TIER_LABEL[g.tier])} · ${escapeHtml(g.rule)}<small>Next unlock · ${escapeHtml(g.track.name)}</small></span>`;
+      ge.innerHTML = `<button type="button" class="wm-hit" aria-label="${escapeHtml(zoneTitle(g.stage))} locked: ${escapeHtml(g.rule)}"></button><span class="chev" style="transform: rotate(${deg.toFixed(1)}deg)">›››</span><span class="wm-plate">${escapeHtml(zoneTitle(g.stage))} · ${escapeHtml(g.rule)}<small>Next unlock · ${escapeHtml(g.track.name)}</small></span>`;
       this.markerLayer.appendChild(ge);
       this.gateEl = ge;
     }
@@ -677,8 +677,7 @@ export class WorldMapScreen extends Screen {
     const best = this.bestOf(t.id);
     const target = t.meta?.targetTimeS;
     const ahead = best && target ? best.time <= target : false;
-    const region = this.regions.find((r) => r.id === marker.region);
-    const kind = marker.proving ? (isLabTrack(t) ? 'Lab · proving ground' : `Playground · ${region?.label ?? ''}`) : `${TIER_LABEL[t.tier]} · ${region?.label ?? ''}`;
+    const kind = marker.proving ? (isLabTrack(t) ? 'Lab · proving ground' : `Free ride · ${stageLabel(marker.region)}`) : stageLabel(marker.region);
     const times = marker.proving
       ? `<div class="times"><b class="none">No medals</b></div>`
       : marker.locked

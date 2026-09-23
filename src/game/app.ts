@@ -12,7 +12,7 @@
  */
 import type { BikeClass, CameraOverride, InputDevice, PhysicsVersion, QualityTier, ReplayCameraMode, RiderOutfit, RunResult, TrackDef, RockhopHook } from '../core/types';
 import type { AudioScene, AudioSystem } from '../audio';
-import { getTrack, listTrackIds } from '../tracks';
+import { getTrack, listTrackIds, ROCKHOP_ALL } from '../tracks';
 import {
   ArtManifest,
   BUILD_STAMP,
@@ -56,7 +56,7 @@ import {
   saveTelemetryEnabled,
   saveVolume,
   shipTracks,
-  tierUnlocked,
+  trackUnlocked,
   type BestEntry,
   type BestTimes,
   type DomHud,
@@ -254,9 +254,10 @@ export class App {
     this.hud = o.hud;
     this.audio = o.audio;
     this.bestTimes = o.bestTimes;
-    this.tracks = listTrackIds()
-      .map((id) => getTrack(id))
-      .filter((t): t is TrackDef => t !== undefined);
+    // The shipped set (store release Phase 3 cutover): the twelve ROCKHOP courses in zone order and the four zone
+    // playgrounds. The retired curriculum, its playgrounds and the Labs stay reachable by `?track=` and the level
+    // reviewer (dev builds) but are never on the map, never in progression.
+    this.tracks = [...ROCKHOP_ALL];
     try {
       this.lastTrackId = persistentStorage()?.getItem(LAST_TRACK_KEY) ?? null;
     } catch {
@@ -273,6 +274,7 @@ export class App {
     this.fpsChoice = loadFpsChoice();
     this.fpsEl = document.createElement('div');
     this.fpsEl.className = 'fpsmeter';
+    this.fpsEl.hidden = !DEV_SURFACES;
     this.fpsEl.textContent = '-- fps';
     o.uiRoot.appendChild(this.fpsEl);
     this.soundOn = loadSoundEnabled();
@@ -550,7 +552,7 @@ export class App {
     this.hud.onAction = (a) => {
       if (a === 'retry') this.fullRestart('results:retry');
       else if (a === 'next') this.play(this.nextTrackId());
-      else if (a === 'menu') this.quit('results:menu');
+      else if (a === 'menu') this.quit('results:map', 'tracks');
       else if (a === 'pause') this.togglePause('hud:pause');
       else if (a === 'replay') this.watchLastRun();
     };
@@ -890,7 +892,7 @@ export class App {
     scene?.classList.toggle('covered', screen === 'menu');
     this.game.renderEnabled = screen !== 'menu';
     // Ask 45: the meter never draws over the title strip — the menu renders no frames anyway; every other screen keeps it.
-    this.fpsEl.hidden = screen === 'menu';
+    this.fpsEl.hidden = !DEV_SURFACES || screen === 'menu'; // a store build shows no dev meter
     scene?.classList.toggle('dim', screen !== 'menu' && screen !== 'garage');
     scene?.classList.toggle('garage', screen === 'garage');
     const dev = this.mux.activeDevice();
@@ -909,7 +911,7 @@ export class App {
       this.settings.setDevice(dev);
       this.settings.show();
     } else if (screen === 'review') {
-      this.reviewPick.build(listTrackIds().map((id) => getTrack(id)!).filter((t) => !!t));
+      this.reviewPick.build([...ROCKHOP_ALL, ...listTrackIds().map((id) => getTrack(id)!).filter((t) => !!t)]);
       this.reviewPick.setDevice(dev);
       this.reviewPick.show();
     } else this.credits.show();
@@ -1041,7 +1043,8 @@ export class App {
    * then the menu fades in over it. Re-arming the finished track in place left
    * its frozen finish state under the menu (user screenshot, round 3).
    */
-  private quit(via: string): void {
+  /** Leave the run for the front end: the menu (pause · Quit), or the world map (the results ticket's MAP). */
+  private quit(via: string, to: FrontScreen = 'menu'): void {
     this.navLog.record('quit', this.navContext(), via);
     this.game.setPaused(false);
     this.pause.hide();
@@ -1049,7 +1052,7 @@ export class App {
     this.hud.hideResults();
     this.touch.setEnabled(false);
     this.loadBackdrop(BACKDROP_TRACK, true);
-    this.goto('menu');
+    this.goto(to);
   }
 
   /** Resume: the game unpauses on this frame; the overlay fades over --t1 while the HUD fades back over --t2 (SPEC §6). */
@@ -1120,7 +1123,7 @@ export class App {
     const i = ship.findIndex((t) => t.id === this.lastTrackId);
     const next = ship[i + 1];
     if (!next) return false;
-    return tierUnlocked(this.tracks, next.tier, (id) => this.bestTimes.get(id)?.medal ?? null, this.o.dev ?? false);
+    return trackUnlocked(this.tracks, next, (id) => this.bestTimes.get(id)?.medal ?? null, this.o.dev ?? false);
   }
 
   private nextTrackId(): string {

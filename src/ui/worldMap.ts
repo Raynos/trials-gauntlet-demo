@@ -1,18 +1,20 @@
 /**
  * World map — the painted continent as the level select (project/archive/WORLD_MAP.md, ask 54). Pure data and
  * layout for `WorldMapScreen` (worldMapScreen.ts), unit-tested in worldMap.test.ts: the map's coordinate
- * space (the world plate's pixel grid), one anchor per track on the terrain, the five regions in campaign
- * order with their plate crops and fog, the route through every campaign track, the tier gate on the road
- * into the next locked tier, and the camera's zoom tiers. No DOM here.
+ * space (the world plate's pixel grid), one anchor per track on the terrain, the four ROCKHOP zones in campaign
+ * order with their plate crops and fog, the route through every campaign track, the zone gate on the road into
+ * the next locked zone, and the camera's zoom tiers. No DOM here.
  *
  * Coordinates: "map units" are pixels of the world plate (`MAP.w × MAP.h`); the screen draws the scene at
- * `k` screen px per map unit (`k` is the zoom). Every anchor was read off the A mockup
- * (assets/design/worldmap/A-painted-world.png) and re-sat on the generated plate (build/world/).
+ * `k` screen px per map unit (`k` is the zoom). Every anchor was read off the W-worldmap mockup
+ * (assets/design/store-release/round1/W-worldmap.png, the map band at y 158..866) and the World owner painted the
+ * plate's trail through them (044464a8).
  */
-import type { BiomeId, Medal, TrackDef, TrackTier } from '../core/types';
-import { isLabTrack, isPlaygroundTrack, nextTrack, shipTracks, TIER_LABEL, TIER_ORDER, tierUnlocked, type MedalOf } from './progress';
+import type { Medal, TrackDef } from '../core/types';
+import { isLabTrack, isPlaygroundTrack, nextTrack, shipTracks, stageOf, stagesOf, trackUnlocked, unlockRuleFor, zoneOf, type MedalOf } from './progress';
 
-export type RegionId = BiomeId;
+/** A zone of the map: `coast | alpine | quarry | snowline` (the ROCKHOP zones, src/tracks/rockhop/zones.ts). */
+export type RegionId = string;
 
 export interface Box {
   x: number;
@@ -43,125 +45,91 @@ export interface RegionDef {
   lamp: string;
 }
 
-/** The world plate: 1536 × 1024 map units, the continent inside `CONTINENT` (the sea and sky around it are air). */
+/** The world plate: 1536 × 1024 map units; the land the fit zoom covers is `CONTINENT` (the sea and sky around it are air). */
 export const MAP = { w: 1536, h: 1024 } as const;
-/** The box the fit zoom covers: the land from the Industrial pier to the Foundry shore, not the sea and sky around it. */
-export const CONTINENT: Box = { x: 0, y: 110, w: 1536, h: 720 };
+/** The box the fit zoom covers: the harbour to the snowline, not the open sea and sky around them. */
+export const CONTINENT: Box = { x: 0, y: 150, w: 1536, h: 760 };
 
-/** Campaign order: the route runs through them south-west to north-east. */
+/** Campaign order: the trail runs from the harbour (south-west) through the forest and the quarry up to the snowline. */
 export const REGIONS: readonly RegionDef[] = [
   {
-    id: 'industrial',
-    label: 'Industrial',
-    name: { x: 300, y: 560 },
-    crop: { x: 0, y: 460, w: 640, h: 427 },
-    // Up to the mesa tops (y 175), not just to the Canyon's markers: the opening camera slides down until B1 —
-    // the lowest marker on the plate — sits at the bottom of its 15–68 % band, which eats the frame's top third.
-    // The extra headroom is what the phone sees as the Canyon above the docks (ask 59; the A region mockup).
-    frame: { x: 0, y: 175, w: 1030, h: 570 },
-    fog: [{ x: 300, y: 660, rx: 330, ry: 190 }],
-    lamp: '#ffb020',
+    id: 'coast',
+    label: 'Coastal Scrapyard',
+    name: { x: 190, y: 530 },
+    crop: { x: 0, y: 330, w: 700, h: 467 },
+    // The harbour with the forest beyond it: the opening frame of a new player (W-worldmap's left half).
+    frame: { x: 0, y: 330, w: 1000, h: 520 },
+    fog: [{ x: 250, y: 600, rx: 300, ry: 170 }],
+    lamp: '#2FB8C4',
   },
   {
-    id: 'canyon',
-    label: 'Canyon',
-    name: { x: 340, y: 190 },
-    crop: { x: 80, y: 150, w: 600, h: 400 },
-    frame: { x: 40, y: 120, w: 960, h: 460 },
-    fog: [{ x: 380, y: 320, rx: 300, ry: 170 }],
-    lamp: '#ff7a3d',
+    id: 'alpine',
+    label: 'Alpine Forest Trail',
+    name: { x: 730, y: 380 },
+    crop: { x: 430, y: 300, w: 720, h: 480 },
+    frame: { x: 380, y: 300, w: 1000, h: 480 },
+    fog: [{ x: 800, y: 560, rx: 330, ry: 170 }, { x: 640, y: 440, rx: 200, ry: 120 }],
+    lamp: '#7FBF6A',
   },
   {
-    id: 'snow',
-    label: 'Snow',
-    name: { x: 770, y: 62 },
-    crop: { x: 560, y: 50, w: 480, h: 320 },
-    frame: { x: 480, y: 30, w: 900, h: 440 },
-    fog: [{ x: 790, y: 240, rx: 240, ry: 170 }],
-    lamp: '#8fd3ff',
+    id: 'quarry',
+    label: 'Desert Quarry',
+    name: { x: 1080, y: 300 },
+    crop: { x: 900, y: 190, w: 636, h: 424 },
+    frame: { x: 860, y: 180, w: 676, h: 470 },
+    fog: [{ x: 1250, y: 430, rx: 290, ry: 160 }, { x: 1100, y: 330, rx: 180, ry: 110 }],
+    lamp: '#E0A55A',
   },
   {
-    id: 'nightCity',
-    label: 'Night City',
-    name: { x: 1080, y: 612 },
-    crop: { x: 800, y: 350, w: 540, h: 360 },
-    frame: { x: 700, y: 250, w: 836, h: 470 },
-    fog: [
-      { x: 1050, y: 500, rx: 280, ry: 160 },
-      { x: 1190, y: 560, rx: 220, ry: 110 },
-    ],
-    lamp: '#e05cff',
-  },
-  {
-    id: 'foundry',
-    label: 'Foundry',
-    name: { x: 1330, y: 112 },
-    crop: { x: 1120, y: 130, w: 416, h: 277 },
-    frame: { x: 880, y: 90, w: 656, h: 430 },
-    fog: [
-      { x: 1340, y: 290, rx: 250, ry: 170 },
-      { x: 1210, y: 240, rx: 150, ry: 110 },
-    ],
-    lamp: '#ff6a1a',
+    id: 'snowline',
+    label: 'Snowline',
+    name: { x: 1440, y: 215 },
+    crop: { x: 1080, y: 140, w: 456, h: 304 },
+    frame: { x: 1000, y: 120, w: 536, h: 380 },
+    fog: [{ x: 1370, y: 270, rx: 210, ry: 120 }],
+    lamp: '#9FD8FF',
   },
 ];
 
 /**
- * Where each track stands on the terrain (map units): the Lab hangar and P1 on the Industrial pier, B1–B3 along
- * the docks, M1 at the road out to the Canyon, E1–E3 on the mesas, M2 / P3 / X1 up the Snow range, H1 / H2 / P4
- * in Night City, M3 / P5 / H3 / X2 / X3 around the Foundry.
+ * Where each course stands on the terrain (map units): C1–C3 along the harbour trail, A1–A3 through the forest, D1–D3
+ * up the quarry benches, S1–S3 under the lifts; the four FREE RIDE flags at each zone's edge (W-worldmap).
  */
 export const ANCHOR: Readonly<Record<string, { x: number; y: number }>> = {
-  // Industrial: the hangar on its apron, the yard, the pier's east end, the coast road, the hill road to the bridge.
-  'lab-physics-test': { x: 85, y: 585 },
-  'lab-flat-200': { x: 170, y: 640 },
-  'lab-box-climb': { x: 75, y: 710 },
-  'lab-ramp-jump': { x: 235, y: 555 },
-  'p1-container-yard': { x: 270, y: 700 },
-  'b1-first-ride': { x: 445, y: 732 },
-  'b2-lean-back': { x: 532, y: 672 },
-  'b3-kicker-row': { x: 538, y: 596 },
-  // Canyon: the highway north of the river bridge, the mesa foot, the mesa tops, the west mesas.
-  'm1-hop-up': { x: 600, y: 470 },
-  'e1-uphill-weight': { x: 330, y: 395 },
-  'e2-rear-wheel-first': { x: 260, y: 290 },
-  'e3-stairway': { x: 470, y: 300 },
-  'p2-canyon-run': { x: 150, y: 250 },
-  // Snow: the ski slope under the lifts, the lodge, the summit.
-  'm2-drum-roll': { x: 790, y: 250 },
-  'p3-snow-line': { x: 760, y: 355 },
-  'x1-vertical-limit': { x: 705, y: 122 },
-  // Night City: the towers, the far waterfront, the elevated loop at the city's west edge.
-  'h1-wheelie-wire': { x: 1000, y: 430 },
-  'h2-gap-chain': { x: 1150, y: 455 },
-  'p4-night-circuit': { x: 830, y: 470 },
-  // Foundry: the lit works, the shore, the slag river, the big mill, the stacks.
-  'm3-see-saw': { x: 1295, y: 335 },
-  'p5-foundry-floor': { x: 1400, y: 400 },
-  'h3-fire-line': { x: 1450, y: 330 },
-  'x2-pipe-dream': { x: 1370, y: 290 },
-  'x3-gauntlet': { x: 1240, y: 205 },
+  'c1-low-tide': { x: 120, y: 668 },
+  'c2-crane-hop': { x: 265, y: 605 },
+  'c3-hull-breach': { x: 390, y: 563 },
+  'a1-sawdust': { x: 632, y: 578 },
+  'a2-log-jam': { x: 803, y: 611 },
+  'a3-timberline': { x: 997, y: 585 },
+  'd1-dust-devil': { x: 1200, y: 470 },
+  'd2-conveyor': { x: 1350, y: 447 },
+  'd3-rope-walk': { x: 1418, y: 410 },
+  's1-lift-line': { x: 1310, y: 262 },
+  's2-cornice': { x: 1380, y: 290 },
+  's3-whiteout': { x: 1452, y: 318 },
+  'p-coast': { x: 68, y: 614 },
+  'p-alpine': { x: 562, y: 406 },
+  'p-quarry': { x: 1490, y: 378 },
+  'p-snowline': { x: 1255, y: 205 },
 };
 
 /**
- * The road between two markers, traced off the painted plate (map units, in travel order) so the route hugs the
- * roads and valleys and never cuts across water: the pier and the coast road, the hill road to the river bridge,
- * the canyon's north-bank road and the mesa tops, the snow-foot road up to the lifts, the pass into Night City,
- * the streets to the waterfront, the climb to the Foundry and its shore road. Keyed `<from id>>' + '<to id>`;
- * a leg with no entry is a straight run.
+ * The trail between two markers (map units, in travel order) so the route follows the painted track rather than
+ * cutting across water or rock. Keyed `<from id>>` + `<to id>`; a leg with no entry is a straight run.
  */
 export const ROAD: Readonly<Record<string, { x: number; y: number }[]>> = {
-  'b1-first-ride>b2-lean-back': [{ x: 478, y: 726 }, { x: 508, y: 700 }],
-  'b2-lean-back>b3-kicker-row': [{ x: 522, y: 642 }, { x: 528, y: 616 }],
-  'b3-kicker-row>m1-hop-up': [{ x: 520, y: 578 }, { x: 490, y: 556 }, { x: 475, y: 532 }, { x: 500, y: 512 }, { x: 545, y: 505 }, { x: 566, y: 488 }],
-  'm1-hop-up>e1-uphill-weight': [{ x: 540, y: 446 }, { x: 450, y: 432 }, { x: 380, y: 420 }],
-  'e1-uphill-weight>e2-rear-wheel-first': [{ x: 300, y: 362 }, { x: 270, y: 322 }],
-  'e2-rear-wheel-first>e3-stairway': [{ x: 330, y: 270 }, { x: 400, y: 265 }, { x: 440, y: 285 }],
-  'e3-stairway>m2-drum-roll': [{ x: 540, y: 330 }, { x: 620, y: 332 }, { x: 700, y: 330 }, { x: 760, y: 300 }],
-  'm2-drum-roll>h1-wheelie-wire': [{ x: 836, y: 340 }, { x: 906, y: 400 }, { x: 936, y: 440 }, { x: 970, y: 442 }],
-  'h1-wheelie-wire>h2-gap-chain': [{ x: 1070, y: 466 }, { x: 1110, y: 462 }],
-  'h2-gap-chain>m3-see-saw': [{ x: 1200, y: 432 }, { x: 1240, y: 386 }, { x: 1270, y: 356 }],
-  'm3-see-saw>h3-fire-line': [{ x: 1336, y: 322 }, { x: 1396, y: 340 }],
+  'c1-low-tide>c2-crane-hop': [{ x: 180, y: 640 }],
+  'c2-crane-hop>c3-hull-breach': [{ x: 330, y: 582 }],
+  'c3-hull-breach>a1-sawdust': [{ x: 450, y: 585 }, { x: 540, y: 590 }],
+  'a1-sawdust>a2-log-jam': [{ x: 715, y: 600 }],
+  'a2-log-jam>a3-timberline': [{ x: 900, y: 600 }],
+  'a3-timberline>d1-dust-devil': [{ x: 1080, y: 560 }, { x: 1140, y: 510 }],
+  'd1-dust-devil>d2-conveyor': [{ x: 1280, y: 455 }],
+  'd2-conveyor>d3-rope-walk': [{ x: 1390, y: 432 }],
+  'd3-rope-walk>s1-lift-line': [{ x: 1400, y: 360 }, { x: 1350, y: 310 }],
+  's1-lift-line>s2-cornice': [{ x: 1345, y: 272 }],
+  's2-cornice>s3-whiteout': [{ x: 1416, y: 300 }],
 };
 
 /** The points of the leg from `a` to `b`: the road's waypoints between them, else straight. */
@@ -182,18 +150,21 @@ export const FLY_MS = 380;
 /** A pointer that travels more than this (px) is a drag, not a tap. */
 export const TAP_SLOP = 8;
 
+/** The zone a track stands in (`meta.zone`); a track the map does not know sits with the first zone. */
 export function regionOf(t: TrackDef): RegionId {
-  return t.meta?.biome ?? 'industrial';
+  return zoneOf(t) ?? REGIONS[0]!.id;
 }
 
+/** `C1`, `A2`, … from the course's own metadata; a zone playground reads `FREE RIDE`. */
 export function codeOf(t: TrackDef): string {
   if (isLabTrack(t)) return 'LAB';
-  return t.id.split('-')[0]!.toUpperCase();
+  if (isPlaygroundTrack(t)) return 'Free ride';
+  return (t.meta as { code?: string } | undefined)?.code ?? t.id.split('-')[0]!.toUpperCase();
 }
 
-export function unlockRule(tier: TrackTier): string {
-  const prev = TIER_ORDER[TIER_ORDER.indexOf(tier) - 1];
-  return prev ? `Medal every ${TIER_LABEL[prev]} track` : '';
+/** The rule on a locked stage: `Medal every Coast track`. */
+export function unlockRule(stage: string, tracks: readonly TrackDef[] = []): string {
+  return unlockRuleFor(tracks.length ? tracks : [{ meta: { zone: stage } } as unknown as TrackDef], stage);
 }
 
 export interface Marker {
@@ -205,9 +176,9 @@ export interface Marker {
   locked: boolean;
   /** Lab / playground: outside medals and progression (blue diamond). */
   proving: boolean;
-  /** The first unridden track of the highest open tier (`lastPlayed` never moves the flag). */
+  /** The first unridden track of the highest open zone (`lastPlayed` never moves the flag). */
   upNext: boolean;
-  /** Unlock rule when locked: `Medal every Medium track`. */
+  /** Unlock rule when locked: `Medal every Coast track`. */
   rule: string | null;
   /** Map units. */
   x: number;
@@ -227,7 +198,8 @@ export interface Region extends RegionDef {
 }
 
 export interface Gate {
-  tier: TrackTier;
+  /** The locked stage (a zone) the gate opens onto. */
+  stage: string;
   track: TrackDef;
   rule: string;
   region: RegionId;
@@ -271,7 +243,7 @@ export function buildRegions(tracks: readonly TrackDef[], medalOf: MedalOf, dev 
   let unknown = 0;
   const mk = (t: TrackDef): Marker => {
     const isProving = isLabTrack(t) || isPlaygroundTrack(t);
-    const locked = !isProving && !tierUnlocked(ship, t.tier, medalOf, dev);
+    const locked = !trackUnlocked(ship.length ? [...ship, t] : [t], t, medalOf, dev);
     const at = anchorOf(t, ANCHOR[t.id] ? 0 : unknown++);
     return {
       track: t,
@@ -281,7 +253,7 @@ export function buildRegions(tracks: readonly TrackDef[], medalOf: MedalOf, dev 
       locked,
       proving: isProving,
       upNext: !isProving && next?.id === t.id && medalOf(t.id) === null,
-      rule: locked ? unlockRule(t.tier) : null,
+      rule: locked ? unlockRuleFor(ship, stageOf(t)) : null,
       x: at.x,
       y: at.y,
       routeIndex: isProving ? -1 : route.indexOf(t),
@@ -321,12 +293,13 @@ export function allMarkers(regions: readonly Region[]): Marker[] {
  */
 export function routeSplit(regions: readonly Region[]): { main: Marker[]; spurs: { from: Marker; to: Marker }[] } {
   const ms = routeMarkers(regions);
-  const gateTier = TIER_ORDER.find((tier) => ms.some((m) => m.track.tier === tier && m.locked));
-  const beyond = gateTier ? TIER_ORDER.slice(TIER_ORDER.indexOf(gateTier) + 1) : [];
+  const order = stagesOf(ms.map((m) => m.track));
+  const gateStage = order.find((stage) => ms.some((m) => stageOf(m.track) === stage && m.locked));
+  const beyond = gateStage ? order.slice(order.indexOf(gateStage) + 1) : [];
   const main: Marker[] = [];
   const spurs: { from: Marker; to: Marker }[] = [];
   for (const m of ms) {
-    if (beyond.includes(m.track.tier) && main.length > 0) spurs.push({ from: main[main.length - 1]!, to: m });
+    if (beyond.includes(stageOf(m.track)) && main.length > 0) spurs.push({ from: main[main.length - 1]!, to: m });
     else main.push(m);
   }
   return { main, spurs };
@@ -395,7 +368,7 @@ export function nextGate(regions: readonly Region[]): Gate | null {
   const x = Math.round(from.x + (gate.x - from.x) * 0.62);
   const y = Math.round(from.y + (gate.y - from.y) * 0.62);
   const len = Math.hypot(gate.x - from.x, gate.y - from.y) || 1;
-  return { tier: gate.track.tier, track: gate.track, rule: unlockRule(gate.track.tier), region: gate.region, x, y, dx: (gate.x - from.x) / len, dy: (gate.y - from.y) / len };
+  return { stage: stageOf(gate.track), track: gate.track, rule: gate.rule ?? '', region: gate.region, x, y, dx: (gate.x - from.x) / len, dy: (gate.y - from.y) / len };
 }
 
 export interface FogPatch {
@@ -407,7 +380,7 @@ export interface FogPatch {
   ry: number;
 }
 
-/** Fog of war: every locked region's ellipses, plus a patch on each locked marker standing in open land (the Snow summit's X1 before Extreme opens). */
+/** Fog of war: every locked zone's ellipses, plus a patch on each locked marker standing in open land. */
 export function fogPatches(regions: readonly Region[]): FogPatch[] {
   const out: FogPatch[] = [];
   for (const r of regions) {
@@ -471,8 +444,8 @@ export function regionDots(region: Region): ('platinum' | 'gold' | 'silver' | 'b
 }
 
 /**
- * Art-pack paths (`public/art/worldmap/`, cut by assets/art/worldmap.mjs): the world plate and the five
- * region plates, 2x (1536 wide) for dense screens, 1x (1024) otherwise.
+ * Art-pack paths (`public/art/worldmap/`, cut by assets/art/worldmap.mjs): the world plate and the four
+ * zone plates, 2x (1536 wide) for dense screens, 1x (1024) otherwise.
  *
  * `?v=` is the build's hash of `public/art/worldmap/` (ask 58). These 13 files are not in the art
  * manifest and are not content-addressed by name, so the version travels in the query — which is what

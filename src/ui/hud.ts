@@ -12,7 +12,7 @@ import { formatDelta, formatTime } from './format';
 import type { Hud, HudAction } from './index';
 import { conceal, isLive, reveal } from './live';
 import { TileRow } from './tiles';
-import { MEDAL_NAME, medalSvg, wordmarkSvg, zoneTitle, type MedalId } from './brand';
+import { MEDAL_NAME, wordmarkSvg, zoneTitle, type MedalId } from './brand';
 
 type BannerKind = 'count' | 'go' | 'crash' | 'cp' | 'finish';
 
@@ -109,7 +109,7 @@ export class DomHud implements Hud {
 
   onAction: ((action: HudAction) => void) | null = null;
 
-  /** Painted medal art from the art manifest for the ticket (until it decodes: the SVG badges, `brand.ts medalSvg`). */
+  /** Painted medal art from the art manifest for the ticket (until it decodes: a disc in the medal colour). */
   setMedalArt(src: Partial<Record<Medal, string>>): void {
     for (const k of MEDAL_ORDER) {
       const i = this.resMedals[k].querySelector<HTMLElement>('i');
@@ -182,7 +182,7 @@ export class DomHud implements Hud {
           <div class="board" hidden></div>
           <svg class="tk-route" viewBox="0 0 60 90" aria-hidden="true"><path d="M8 86C22 70 14 58 28 46S46 30 40 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 4"/><path d="M40 2l6 10h-12z M18 40l5 8h-10z M34 58l4 7h-8z" fill="currentColor"/></svg>
         </div>
-        <div class="medals">${MEDAL_ORDER.map((m) => `<div class="medal ${m}"><i>${medalSvg(m)}</i><b>${MEDAL_NAME[m]}</b><small></small></div>`).join('')}</div>
+        <div class="medals">${MEDAL_ORDER.map((m) => `<div class="medal ${m}"><i></i><b>${MEDAL_NAME[m]}</b><small></small></div>`).join('')}</div>
         <div class="ov-stats"></div>
       </div>`;
     this.resKicker = this.results.querySelector('.ov-kicker') as HTMLDivElement;

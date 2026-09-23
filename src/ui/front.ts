@@ -716,42 +716,6 @@ export function controlsLineHtml(): string {
   ].join('<span class="sep">·</span>');
 }
 
-/** Device diagrams: keycaps, pad glyphs, touch zone map. Inline SVG, tokens via currentColor. (Kept for the credits/help route; not on the settings panel.) */
-export function controlsReferenceHtml(): string {
-  const key = (x: number, y: number, w: number, label: string, hot = false): string =>
-    `<g transform="translate(${x} ${y})"><rect width="${w}" height="22" rx="4" fill="${hot ? 'var(--amber)' : 'rgba(255,255,255,.1)'}" stroke="rgba(255,255,255,.25)"/><text x="${w / 2}" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="${hot ? 'var(--amber-ink)' : 'currentColor'}" font-family="inherit">${label}</text></g>`;
-  const keyboard = `<svg viewBox="0 0 220 84" aria-hidden="true">
-    ${key(4, 4, 24, 'W', true)}${key(4, 30, 24, 'A', true)}${key(30, 30, 24, 'S', true)}${key(56, 30, 24, 'D', true)}
-    ${key(150, 4, 24, '↑', true)}${key(124, 30, 24, '←', true)}${key(150, 30, 24, '↓', true)}${key(176, 30, 24, '→', true)}
-    ${key(4, 58, 46, 'Enter')}${key(54, 58, 26, 'R')}${key(84, 58, 30, 'Esc')}
-  </svg>`;
-  const pad = `<svg viewBox="0 0 220 96" aria-hidden="true">
-    <path d="M30 30 h160 a26 26 0 0 1 26 26 v10 a20 20 0 0 1 -34 14 l-18 -14 h-108 l-18 14 a20 20 0 0 1 -34 -14 v-10 a26 26 0 0 1 26 -26z" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.25)"/>
-    <rect x="26" y="8" width="44" height="14" rx="5" fill="var(--amber)"/><text x="48" y="18.5" text-anchor="middle" font-size="9" font-weight="700" fill="var(--amber-ink)" font-family="inherit">LT</text>
-    <rect x="150" y="8" width="44" height="14" rx="5" fill="var(--amber)"/><text x="172" y="18.5" text-anchor="middle" font-size="9" font-weight="700" fill="var(--amber-ink)" font-family="inherit">RT</text>
-    <circle cx="62" cy="58" r="14" fill="var(--amber)"/><path d="M50 58 h24 M56 52 l-6 6 6 6 M68 52 l6 6 -6 6" stroke="var(--amber-ink)" stroke-width="2" fill="none"/>
-    <circle cx="170" cy="46" r="7" fill="none" stroke="rgba(255,255,255,.35)"/><circle cx="184" cy="58" r="7" fill="var(--red)"/><text x="184" y="61.5" text-anchor="middle" font-size="9" font-weight="700" fill="#fff" font-family="inherit">B</text>
-    <circle cx="170" cy="70" r="7" fill="var(--green)"/><text x="170" y="73.5" text-anchor="middle" font-size="9" font-weight="700" fill="#0b0d10" font-family="inherit">A</text><circle cx="156" cy="58" r="7" fill="none" stroke="rgba(255,255,255,.35)"/>
-    <rect x="104" y="50" width="12" height="6" rx="2" fill="rgba(255,255,255,.5)"/>
-  </svg>`;
-  const touch = `<svg viewBox="0 0 220 100" aria-hidden="true">
-    <rect x="2" y="2" width="216" height="96" rx="10" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.25)"/>
-    <line x1="56" y1="2" x2="56" y2="98" stroke="rgba(255,255,255,.2)"/><line x1="110" y1="2" x2="110" y2="98" stroke="rgba(255,255,255,.35)"/><line x1="164" y1="2" x2="164" y2="98" stroke="rgba(255,255,255,.2)"/>
-    <text x="29" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="currentColor" font-family="inherit">LEAN ◀</text>
-    <text x="83" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="currentColor" font-family="inherit">▶ LEAN</text>
-    <text x="137" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="var(--red)" font-family="inherit">BRAKE</text>
-    <text x="191" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="var(--green)" font-family="inherit">GAS</text>
-    <rect x="8" y="8" width="26" height="16" rx="4" fill="rgba(255,255,255,.15)"/><text x="21" y="19" text-anchor="middle" font-size="8" fill="currentColor" font-family="inherit">❚❚</text>
-    <rect x="186" y="8" width="26" height="16" rx="4" fill="rgba(255,255,255,.15)"/><text x="199" y="19.5" text-anchor="middle" font-size="9" fill="currentColor" font-family="inherit">↺</text>
-  </svg>`;
-  return `<h3>Controls</h3><div class="devices">
-    <div class="device"><h4>Keyboard</h4>${keyboard}<dl><dt>Gas · Brake</dt><dd>↑ / W · ↓ / S</dd><dt>Lean</dt><dd>← → / A D</dd><dt>Restart</dt><dd>Enter · R (hold: track)</dd><dt>Pause</dt><dd>Esc</dd></dl></div>
-    <div class="device"><h4>Gamepad</h4>${pad}<dl><dt>Gas · Brake</dt><dd>RT · LT</dd><dt>Lean</dt><dd>Left stick</dd><dt>Restart</dt><dd>B (hold: track)</dd><dt>Pause</dt><dd>Start</dd></dl></div>
-    <div class="device"><h4>Touch</h4>${touch}<dl><dt>Left half</dt><dd>Lean back · forward</dd><dt>Right half</dt><dd>Brake · Gas</dd><dt>Corners</dt><dd>Pause · Restart</dd></dl></div>
-  </div>
-  <div class="about">There is no hop button: preload by leaning back on the gas, then snap forward. The clock runs through every crash — tap restart for the last checkpoint, <b>hold it 0.6 s</b> to restart the track.</div>`;
-}
-
 // ---------------------------------------------------------------------------
 // Credits
 // ---------------------------------------------------------------------------

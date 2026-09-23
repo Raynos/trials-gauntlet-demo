@@ -29,7 +29,7 @@ export interface Hud {
 export { formatTime, formatDelta } from './format';
 export { DomHud } from './hud';
 export { PauseMenu, mountRotatePrompt, spatialMove, type PauseCallbacks, type QualityChoice } from './menu';
-export { MainMenuScreen, menuPlate, SettingsScreen, CreditsScreen, FocusList, GAME_NAME, BIKE_NAME, BUILD_STAMP, BUILD_STAMP_SHORT, hardReload, controlsReferenceHtml, type FrontCallbacks, type FrontScreen, type FrontState } from './front';
+export { MainMenuScreen, menuPlate, SettingsScreen, CreditsScreen, FocusList, GAME_NAME, BIKE_NAME, BUILD_STAMP, BUILD_STAMP_SHORT, hardReload, type FrontCallbacks, type FrontScreen, type FrontState } from './front';
 export { GarageScreen, BIKE_SPECS, BIKE_LABEL, type BikeSpec, type GarageCallbacks } from './garage';
 export { PerfOverlay, type PerfSample } from './perf';
 export { ReplayBar, type ReplayBarState, type ReplayBarCallbacks } from './replay';
@@ -38,7 +38,7 @@ export { TraceBars } from './trace';
 export { OnboardingCard } from './cards';
 export { ArtManifest, BIOME_TINT, type ArtEntry } from './art';
 export { UiSfx } from './sfx';
-export { TIER_ORDER, TIER_LABEL, shipTracks, tierUnlocked, tierComplete, nextTrack, medalTotals, labTracks, isLabTrack } from './progress';
+export { TIER_ORDER, TIER_LABEL, shipTracks, tierUnlocked, tierComplete, trackUnlocked, stageUnlocked, stageOf, zoneOf, nextTrack, medalTotals, labTracks, isLabTrack } from './progress';
 export {
   BestTimes,
   loadQualityOverride,

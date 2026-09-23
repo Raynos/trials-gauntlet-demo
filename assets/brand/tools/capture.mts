@@ -59,7 +59,8 @@ async function shots(page: Page, tag: string, url: string): Promise<void> {
   await page.waitForSelector('.results.show', { timeout: 60_000 }).catch(() => console.log('  (no results panel)'));
   await sleep(2600);
   await shot('results');
-  await page.evaluate(() => (window as unknown as { __rockhop: { app: { goto(s: string): void } } }).__rockhop.app.goto('tracks'));
+  // The ticket's MAP: out of the run, onto the world map with this clear on it.
+  await page.click('.results.live .tile[data-id="menu"]').catch(async () => page.evaluate(() => (window as unknown as { __rockhop: { app: { quit(): void; goto(s: string): void } } }).__rockhop.app.goto('tracks')));
   await sleep(3000);
   await shot('worldmap');
 }

@@ -60,8 +60,8 @@ describe('the offline pack (ask 59: one tier, no link-preview card)', () => {
   it('takes one variant of every pair and leaves og.jpg on the server', () => {
     const picked = urls.map(([u]) => u);
     expect(picked.some((u) => u.includes('og.jpg'))).toBe(false); // ask 59 item 5: link previews only
-    expect(picked.some((u) => u.includes('keyart-nalati-960'))).toBe(true);
-    expect(picked.some((u) => u.includes('keyart-nalati-1920'))).toBe(false);
+    expect(picked.some((u) => u.includes('keyart-harbour-960'))).toBe(true);
+    expect(picked.some((u) => u.includes('keyart-harbour-1920'))).toBe(false);
     expect(picked.some((u) => u.includes('medal-gold.png'))).toBe(true);
     expect(picked.some((u) => u.includes('medal-gold-512'))).toBe(false);
     expect(picked.some((u) => u.includes('bike-rookie-768'))).toBe(true);

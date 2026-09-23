@@ -16,9 +16,9 @@ describe('boot routing', () => {
     expect(resolveBoot(new URLSearchParams('track=nope'), has).mode).toBe('front');
   });
 
-  it('a plain visit opens the main menu with the beginner backdrop', () => {
+  it('a plain visit opens the main menu with the harbour backdrop', () => {
     const r = resolveBoot(new URLSearchParams(''), has);
-    expect(r).toMatchObject({ mode: 'front', track: null, dev: false, backdrop: 'b1-first-ride' });
+    expect(r).toMatchObject({ mode: 'front', track: null, dev: false, backdrop: 'c1-low-tide' });
   });
 
   it('?dev=1 is carried for the unlock-all rule', () => {

@@ -15,7 +15,8 @@ export interface BootRoute {
   backdrop: string;
 }
 
-export const BACKDROP_TRACK = 'b1-first-ride';
+/** The menu / garage / map backdrop: the first ROCKHOP course (the harbour the home art shows). */
+export const BACKDROP_TRACK = 'c1-low-tide';
 
 export function resolveBoot(params: URLSearchParams, hasTrack: (id: string) => boolean = () => true): BootRoute {
   const dev = params.get('dev') === '1';

@@ -112,7 +112,7 @@ describe('store build (VITE_STORE=1) compiles out every dev surface', () => {
     for (const b of [web, store]) {
       expect(b.text).not.toMatch(/Trials Evolution|Trials Rising/);
       const art = JSON.parse(fs.readFileSync(path.join(b.dir, 'art', 'manifest.json'), 'utf8')) as { assets: Record<string, unknown>[] };
-      expect(art.assets.length).toBeGreaterThan(100);
+      expect(art.assets.length).toBeGreaterThan(50); // the pack, not an empty file (99 once the retired menu cards left)
       expect(art.assets.filter((a) => 'prompt' in a || 'src' in a)).toEqual([]);
       expect(art.assets.map((a) => a['id'])).not.toContain('graffiti-nofear');
     }

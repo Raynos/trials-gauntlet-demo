@@ -33,7 +33,7 @@ import type { PhysicsWorld } from './physics';
 import type { GameRenderer } from './render';
 import { App, Game, MockPhysics, installHook, isPhone, type HookExtras } from './game';
 import { parseBenchParams, type BenchOptions } from './game/bench';
-import { resolveBoot } from './game/flow';
+import { BACKDROP_TRACK, resolveBoot } from './game/flow';
 import { getTrack } from './tracks';
 import { ArtManifest, BestTimes, DomHud, injectStyles, loadBikeChoice, loadHeldTier, loadModelChoice, loadQualityOverride, menuPlate, type ModelChoice } from './ui';
 import { nextPaint } from './ui/loader';
@@ -410,7 +410,7 @@ function boot(): void {
           .catch(() => undefined);
       });
       const sTrack = await sPack.step('track', async (p) => {
-        p.detail(getTrack(initialTrack ?? 'b1-first-ride')?.name ?? 'track');
+        p.detail(getTrack(initialTrack ?? BACKDROP_TRACK)?.name ?? 'track');
         await nextPaint();
         shell.start(); // loads the track (compile + physics + renderer world) and shows the menu
         console.info(`[rockhop] loadTrack ${game.currentTrack?.id ?? '?'} ${game.lastLoadMs.toFixed(0)} ms`);
