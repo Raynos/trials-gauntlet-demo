@@ -629,8 +629,8 @@ export interface RockhopHook {
    */
   render(sync?: boolean): number;
   stats(): RenderStats;
-  /** Set viewport size in CSS pixels; harness uses this for stable capture. */
-  resize(width: number, height: number): void;
+  /** Set viewport size in CSS pixels; harness uses this for stable capture. `pixelRatio` defaults to 1 (the store screenshots pass the device's; the quality tier still caps it). */
+  resize(width: number, height: number, pixelRatio?: number): void;
   /** Feed a whole recording and run it to the end; returns the final state. */
   runRecording(recordingJson: string): PhysicsState;
   /** Start / stop recording inputs; stop returns the JSON recording. */

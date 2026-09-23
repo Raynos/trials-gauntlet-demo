@@ -62,7 +62,7 @@ export function installHook(source: Game | (() => Game), harness: boolean, extra
     renderedFrames: () => g().framesRendered,
     render: (sync = false) => g().renderOnce(sync),
     stats: () => g().stats(),
-    resize: (w: number, h: number) => g().resize(w, h, 1),
+    resize: (w: number, h: number, pixelRatio = 1) => g().resize(w, h, pixelRatio),
     runRecording: (json: string) => g().runRecording(json),
     startRecording: () => g().startRecording(),
     stopRecording: () => g().stopRecording(),

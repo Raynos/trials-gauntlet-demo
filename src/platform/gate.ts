@@ -32,8 +32,27 @@ export interface GateConfig {
    * `shot-<n>`, while the harness grabs the screen. Nothing is posed — the frame is the replayed ride at that tick.
    * With `shots` the run skips the boot stage and the checks.
    */
-  shots?: { recording: string; at: number[] }[];
+  shots?: ShotSpec[];
   holdMs?: number;
+  /**
+   * Play every shot recording out past its finish (after its last mark, unrendered) so the run publishes its result
+   * and the save holds its best, as a player's would: the world map shot then shows played progress.
+   */
+  playOut?: boolean;
+  /**
+   * After the rides, the front end the player's way (the app, not the harness route): `results` — this recording
+   * ridden over the line in the app (its inputs fed tick for tick from GO, synchronously, so no wall-clock frame can
+   * interleave) and the results ticket shot once its reveal lands, then its MAP tile; `map` — the world map shot.
+   */
+  front?: { results?: string; map?: boolean };
+}
+
+export interface ShotSpec {
+  recording: string;
+  /** Fractions of the run (≤ 1) or ticks (> 1). */
+  at: number[];
+  /** Shoot at the mark's tick itself, not the next airborne frame after a clean second. */
+  exact?: boolean;
 }
 
 interface GateMsg {
@@ -44,6 +63,8 @@ interface GateMsg {
 type GateWindow = Window & {
   __rockhopGate?: Partial<GateConfig>;
   __rockhopGatePost?: (m: GateMsg) => void;
+  /** The web harness's grab of `shot-<n>` is done (Playwright's screenshot is async; the ride must not move under it). */
+  __rockhopGateAck?: number;
   __rockhopAudioContexts?: () => number;
   __trials?: TrialsHook;
   __rockhop?: TrialsHook;
@@ -274,12 +295,37 @@ async function restartCheck(h: TrialsHook, track: string, reps: number): Promise
   return { track, reps, ticksOk, wallMsP95: p95(wallMs), frameMsP95: p95(frameMs), movesAfterTicks, wallMs: wallMs.map((x) => Math.round(x * 100) / 100), frameMs: frameMs.map((x) => Math.round(x * 10) / 10) };
 }
 
+/**
+ * Hold still while the harness grabs `shot-<n>`: on the web until the harness acks that exact shot (a screenshot
+ * can take longer than any fixed hold, and a late grab would catch a later tick); in the shells the snapshot is
+ * taken on the message itself, so the fixed hold is only the file write's margin.
+ */
+async function holdShot(cfg: GateConfig, n: number): Promise<void> {
+  if (cfg.platform === 'web') {
+    await waitFor(`the harness ack of shot ${n}`, () => (w.__rockhopGateAck ?? -1) >= n, 60_000);
+    return;
+  }
+  await sleep(cfg.holdMs ?? 2500);
+}
+
 async function shotsStage(cfg: GateConfig): Promise<void> {
   const h = await waitFor('the hook (harness)', () => hook()?.ready && hook());
+  // The harness route renders at pixel ratio 1; a store screenshot is taken at the device's own (the quality tier's
+  // cap still applies, as in play).
+  h.resize(innerWidth, innerHeight, devicePixelRatio);
   let n = 0;
-  for (const { recording, at } of cfg.shots ?? []) {
+  const shoot = async (recording: string, trackId: string, extra: Record<string, unknown> = {}): Promise<void> => {
+    h.render(true);
+    await frame();
+    await frame();
+    post({ name: `shot-${n}`, recording, trackId, tick: h.getState().tick, index: n, ...extra });
+    n += 1;
+    await holdShot(cfg, n - 1);
+  };
+  for (const { recording, at, exact } of cfg.shots ?? []) {
     const rec = decodeAny(await fetchText(recording));
     const frames = expandFrames(rec);
+    const hz = rec.header.physicsHz;
     const marks = at.map((a) => (a > 1 ? Math.round(a) : Math.round(a * frames.length))).sort((x, y) => x - y);
     h.setBike?.(rec.header.bike ?? 'rookie');
     await loadTrack(h, rec.header.trackId, rec.header.seed);
@@ -290,13 +336,15 @@ async function shotsStage(cfg: GateConfig): Promise<void> {
       return !(h.info().render as { entering?: boolean } | null | undefined)?.entering;
     }, 60_000).catch(() => undefined);
     h.skipCountdown();
-    const per = Math.max(1, Math.round(rec.header.physicsHz / 60));
+    const per = Math.max(1, Math.round(hz / 60));
     let next = 0;
     // A mark waits for the ride to look like riding: ≥ 1 s of clean riding since the last bail or restart (a bot
-    // golden keeps its in-band retries), then the first airborne frame within 2 s, else the frame at 2 s.
+    // golden keeps its in-band retries), then the first airborne frame within 2 s, else the frame at 2 s. An `exact`
+    // mark is shot at its own tick.
     let clean = 0;
     let waited = 0;
-    for (let i = 0; i < frames.length && next < marks.length; ) {
+    let i = 0;
+    for (; i < frames.length && next < marks.length; ) {
       for (let k = 0; k < per && i < frames.length; k++, i++) {
         h.setInput(frames[i]!);
         h.step(1);
@@ -309,18 +357,88 @@ async function shotsStage(cfg: GateConfig): Promise<void> {
       const st = h.getState();
       const airborne = st.contacts.rear === null && st.contacts.front === null;
       waited += per;
-      const ready = clean >= rec.header.physicsHz && (airborne || waited >= 2 * rec.header.physicsHz);
+      const ready = exact || (clean >= hz && (airborne || waited >= 2 * hz));
       if (ready) {
         waited = 0;
-        h.render(true);
-        await frame();
-        await frame();
-        post({ name: `shot-${n}`, recording, trackId: rec.header.trackId, tick: h.getState().tick, index: n });
-        n += 1;
+        await shoot(recording, rec.header.trackId, { faults: h.faults(), airborne });
         next += 1;
-        await sleep(cfg.holdMs ?? 2500);
       }
     }
+    if (cfg.playOut) {
+      for (; i < frames.length; i++) {
+        h.setInput(frames[i]!);
+        h.step(1);
+      }
+      h.setInput({ throttle: 0, brake: 0, lean: 0, restart: false });
+      h.step(3 * hz); // the results delay: the result publishes and the best is stored
+    }
+  }
+  if (cfg.front?.results || cfg.front?.map) {
+    await sleep(400);
+    location.replace(`./?gatefront=${n}`);
+    return;
+  }
+  post({ name: 'done', shots: n });
+}
+
+/** The front end, reached the player's way: boot, menu, a run ridden to the results ticket, its MAP tile — or the map. */
+async function frontStage(cfg: GateConfig, first: number): Promise<void> {
+  let n = first;
+  const h = await waitFor('the hook (front end)', () => hook()?.app && hook());
+  await waitFor('the loader to leave', () => !document.getElementById('loader'));
+  await waitFor('the menu', () => h.app!.screen() === 'menu', 60_000).catch(() => undefined);
+  await sleep(1500);
+  const shot = async (trackId: string, extra: Record<string, unknown>): Promise<void> => {
+    await frame();
+    await frame();
+    post({ name: `shot-${n}`, recording: extra['recording'] ?? trackId, trackId, tick: h.getState().tick, index: n, screen: h.app!.screen(), ...extra });
+    n += 1;
+    await holdShot(cfg, n - 1);
+  };
+  const results = cfg.front?.results;
+  if (results) {
+    const rec = decodeAny(await fetchText(results));
+    const frames = expandFrames(rec);
+    h.app!.play(rec.header.trackId);
+    // A fresh install shows the first-ride card before the countdown (src/ui/cards.ts): the player taps its button.
+    await waitFor('the countdown', () => {
+      document.querySelector<HTMLButtonElement>('.ob-card button')?.click();
+      return h.phase() === 'countdown';
+    }, 60_000);
+    // The recording's bike, as the Garage pick would give it (hard / extreme courses default to the Pro): during the
+    // countdown this reloads the course on that bike, back to its countdown.
+    h.setBike?.(rec.header.bike ?? 'rookie');
+    await waitFor('the countdown on the recording bike', () => h.phase() === 'countdown', 30_000);
+    // One task from GO to past the line: the recording is the player, tick for tick; no frame runs in between.
+    h.skipCountdown();
+    for (const f of frames) {
+      h.setInput(f);
+      h.step(1);
+    }
+    h.setInput({ throttle: 0, brake: 0, lean: 0, restart: false });
+    const faults = h.faults();
+    const cleared = h.cleared();
+    const finishTime = h.finishTime();
+    post({ name: 'front-ride', recording: results, trackId: rec.header.trackId, ticks: frames.length, faults, cleared, finishTime, phase: h.phase(), tick: h.getState().tick, bikeX: h.getState().bike.pos.x });
+    await waitFor('the results ticket', () => document.querySelector('.results.show.stage-5'), 30_000);
+    await sleep(1800); // the ticket's CSS settles on wall time
+    await shot(rec.header.trackId, { recording: results, results: true, faults, cleared, finishTime, finishTimeHex: f64hex(finishTime), ticks: frames.length });
+    if (cfg.front?.map) {
+      // The ticket's own MAP tile.
+      const tile = await waitFor('the MAP tile', () => document.querySelector<HTMLElement>('.results.live .tile[data-id="menu"], .results.live [data-id="menu"]'), 10_000).catch(() => null);
+      tile?.click();
+      const byTile = await waitFor('the map from the tile', () => h.app!.screen() === 'tracks', 4000).then(() => true, () => false);
+      if (!byTile) {
+        h.app!.quit();
+        await sleep(600);
+        h.app!.goto('tracks');
+      }
+    }
+  } else if (cfg.front?.map) h.app!.goto('tracks');
+  if (cfg.front?.map) {
+    await waitFor('the world map', () => h.app!.screen() === 'tracks', 20_000);
+    await sleep(4000); // the map's own open: plate, trail, markers, the focused card
+    await shot('world-map', { recording: 'map' });
   }
   post({ name: 'done', shots: n });
 }
@@ -384,6 +502,15 @@ async function harnessStage(cfg: GateConfig): Promise<void> {
 export function startGate(): void {
   const cfg: GateConfig = { platform: 'web', ...w.__rockhopGate };
   const harness = /[?&]harness=1(&|$)/.test(location.search);
+  const frontAt = /[?&]gatefront=(\d+)/.exec(location.search);
+  if (frontAt && !harness) {
+    frontStage(cfg, Number(frontAt[1])).catch((e: unknown) => post({ name: 'error', stage: 'front', error: String(e), stack: e instanceof Error ? (e.stack ?? null) : null }));
+    return;
+  }
+  if (!cfg.shots?.length && (cfg.front?.results || cfg.front?.map) && !harness) {
+    frontStage(cfg, 0).catch((e: unknown) => post({ name: 'error', stage: 'front', error: String(e), stack: e instanceof Error ? (e.stack ?? null) : null }));
+    return;
+  }
   if (cfg.shots?.length && !harness) {
     location.replace('./?harness=1');
     return;
