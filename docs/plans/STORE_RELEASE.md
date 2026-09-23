@@ -1,8 +1,6 @@
 # Store release — same game, our own identity, on the App Store and Google Play
 
-**Status: planned, decisions taken 2026-09-22 (ask 86); implementation not started. Top priority.** In-flight work
-(poses release asks 81/82, continuous deploy ask 84, oxlint ask 85) finishes as it is; the physics-library proposal
-is parked until this ships. Parent owns this plan and its row in [README.md](README.md).
+**Status: in build (asks 95/98/104), 2026-09-23. Top priority.** Live on the web as ROCKHOP (CI deploys every green push). Done: P0 clean room (`6ede7b1d` `d26f3447` `68b70e3a`), name + identity (D17–D23), 12 tracks + 4 playgrounds with a strictly rising reflex curve and stranger passes on C1–A3, re-proven on the riding-poses physics (`a7ed0716`), four zones + gates + world map (`c94cd93a` `423bf473` `044464a8`), ROCKHOP UI/results/words + zone progression (`ab8c7af4` `90b641a2`), music 6 loops + procedural sting (`5258c89b` `52f65bfa`), iOS/Android shells + store kit + legal site (`2fdef7a9` `4ede56f5` `0d46e860`), iOS near-black fix (`baef4b0c`). Open: ip-audit strict 0, UI polish, zone props, final screenshots, legal site deploy (HR-19), store accounts (HR-16), Android emulator gate (off by the user — phone is the check). Parent owns this plan and its row in [README.md](README.md).
 
 ## Goal
 
