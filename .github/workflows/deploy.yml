@@ -111,3 +111,59 @@ jobs:
           done
           echo "::error::$PROD_URL/version.json does not report $sha after 5 min: $live"
           exit 1
+
+  # Store release (docs/plans/STORE_RELEASE.md Phase 5-6): the App Store / Google Play bundle and both native shells.
+  # Its own job, in parallel: the web deploy above never waits for it, and a red store job never blocks a deploy.
+  store:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            /*
+            !/harness/out/
+            !/assets/blender/
+            !/assets/design/
+            !/docs/evidence/
+            !/project/releases/
+          sparse-checkout-cone-mode: false
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # VITE_STORE=1 into store/build/web (refused if the automation hook survived), then `cap sync` into ios/ and
+      # android/. On Linux the iOS half is the web copy + Package.swift; the Xcode build is the Mac's (RELEASE-RECIPE).
+      - name: Store bundle + cap sync
+        run: node scripts/store-build.mjs release
+
+      - name: Store listing (lengths, denied terms)
+        run: node scripts/store-metadata.mjs
+
+      # Bar 1: report only until Phase 6 turns on --strict. Scans the store bundle and the shells' copies of it.
+      - name: IP audit (store bundle + shells, report only)
+        continue-on-error: true
+        run: |
+          node scripts/ip-audit.mjs store/build/web ios android store/metadata | tee ip-audit.txt
+          { echo '### IP audit (store bundle + shells)'; echo '```'; head -30 ip-audit.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # A debug APK proves the Android project compiles against targetSdk 36 with the synced plugins. Unsigned: the
+      # upload key never leaves the maintainer's machine (~/.config/rockhop).
+      - name: Android debug build
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon -q

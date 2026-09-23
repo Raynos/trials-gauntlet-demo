@@ -1,0 +1,21 @@
+Rockhop is a side-on dirt bike game where the physics is the whole game. You control the throttle and brake, and you lean your weight back and forward. Every rock step, log pile, ramp and gap is something you ride with your balance. None of it is scripted.
+
+TWELVE HAND-BUILT LINES
+Ride through four zones: a coastal scrapyard, an alpine forest trail, a desert quarry and the snowline. The early lines teach one move at a time: leaning back up a climb, landing on the back wheel, hopping a step with lean and throttle. The later ones chain everything together.
+
+ONE TAP TO TRY AGAIN
+Tap once and you are back at the last checkpoint on the next frame. Hold to restart the whole line. There is no countdown and no loading screen between attempts, so you keep trying until you get it.
+
+RIDE IT CLEAN
+Every bail is counted. Finish with none and you earn a clean line. Beat the clock for bronze, silver, gold and the obsidian medal. Your best run rides next to you as a ghost.
+
+TWO BIKES, FOUR PLAYGROUNDS
+Start on the forgiving Rookie bike and move up to the Pro when you're ready. Each zone also has a free-ride playground with no clock.
+
+MADE FOR PLAYING ANYWHERE
+- Landscape touch controls with a thumb on each side
+- Plays completely offline; everything is on your phone
+- No ads, no in-app purchases, no account
+- No data collected
+
+The physics runs at a fixed step, so the same inputs always give exactly the same ride. When you land it, you earned it.

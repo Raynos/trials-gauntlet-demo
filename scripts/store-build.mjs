@@ -52,18 +52,24 @@ if (mode === 'release' && hookIn.length) throw new Error(`store-build: release b
 if (mode === 'debug' && !hookIn.length) throw new Error('store-build: debug bundle has no automation hook (VITE_STORE_DEBUG did not reach the build)');
 if (texts.some(([p]) => p.endsWith('.map'))) throw new Error('store-build: a source map landed in the webDir');
 
-// 3. Debug: the gate's recordings, served from the app bundle itself (no network in the app).
+// 3. Debug: the gate's recordings, served from the app bundle itself (no network in the app). Every golden
+//    (`bot-3*.json`) and crash recording under harness/inputs goes in (~0.5 MB, debug builds only), so the
+//    screenshot pipeline (harness/native/screens.ts) can ride any track; `clear`/`crash` name the gate's own set.
 if (mode === 'debug') {
   const clear = (opt('gate') ?? 'harness/inputs/flat-test/bot-3.json,harness/inputs/b1-first-ride/bot-3.json').split(',').filter(Boolean);
   const crash = opt('crash') ?? 'harness/inputs/flat-test/crash.json';
   const gateDir = join(WEB_DIR, 'gate');
   mkdirSync(gateDir, { recursive: true });
   const name = (f) => `${basename(dirname(f))}.${basename(f)}`;
-  for (const f of [...clear, crash]) {
+  const inputs = join(repo, 'harness', 'inputs');
+  const all = readdirSync(inputs, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .flatMap((d) => readdirSync(join(inputs, d.name)).filter((f) => /^(bot-3(-pro)?|crash)\.json$/.test(f)).map((f) => `harness/inputs/${d.name}/${f}`));
+  for (const f of new Set([...all, ...clear, crash])) {
     if (!existsSync(join(repo, f))) throw new Error(`store-build: gate recording ${f} missing`);
     cpSync(join(repo, f), join(gateDir, name(f)));
   }
-  writeFileSync(join(gateDir, 'manifest.json'), `${JSON.stringify({ clear: clear.map((f) => `gate/${name(f)}`), crash: `gate/${name(crash)}`, sources: [...clear, crash] }, null, 1)}\n`);
+  writeFileSync(join(gateDir, 'manifest.json'), `${JSON.stringify({ clear: clear.map((f) => `gate/${name(f)}`), crash: `gate/${name(crash)}`, sources: [...clear, crash], all: all.map((f) => `gate/${name(f)}`) }, null, 1)}\n`);
 }
 writeFileSync(join(repo, 'store', 'build', 'MODE'), `${mode}\n`);
 

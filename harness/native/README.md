@@ -10,11 +10,11 @@ It checks the same things each time: cold boot, start a track, replay goldens to
 
 ```
 node scripts/store-build.mjs debug --ios --android    # VITE_STORE=1 VITE_STORE_DEBUG=1 → store/build/web, cap sync, .app + .apk
-TRIALS_BROWSER_BACKEND=metal npx tsx harness/native/gate.ts web,ios --evidence
+npx tsx harness/native/gate.ts web,ios --evidence          # the web leg renders on Metal by default on macOS
 npx tsx harness/native/gate.ts web,ios --from-out --evidence   # re-report the last runs without launching anything
 ```
 
-**Load rule (user, 2026-09-22):** do not start the Android emulator unless the user asks for it. With software GL it held about 490 % CPU and pushed the shared host to a load average of 50, so the Android leg is BLOCKED. The user's own Android phone is the Android check. Run the iOS Simulator leg only when `uptime` shows a load average under 12, and run one gate at a time. Web runs use `TRIALS_BROWSER_BACKEND=metal`.
+**Load rule (user, 2026-09-22):** do not start the Android emulator unless the user asks for it. With software GL it held about 490 % CPU and pushed the shared host to a load average of 50, so the Android leg is BLOCKED. The user's own Android phone is the Android check. Run the iOS Simulator leg only when `uptime` shows a load average under 12, and run one gate at a time. Web legs render on Metal by default on macOS.
 
 ## How a run works
 
@@ -53,4 +53,5 @@ npx tsx harness/native/gate.ts web,ios --from-out --evidence   # re-report the l
 | `ios.ts` | own simulator `rockhop-gate` (iPhone 17 Pro Max, created on first use; other sessions' devices untouched) |
 | `android.ts` | own AVD `rockhop_api36` on console port 5584, `-no-window -no-audio` (BLOCKED, see the load rule) |
 | `web.ts` | headless Chromium over `store/build/web` with a plain static server |
+| `screens.ts` | store screenshots from played runs: iOS 6.9" 2868×1320 from the simulator, Play 1920×1080 from Chromium as a phone; `--final` → `store/screenshots/` |
 | `lib.ts` | manifest, commands, result shapes, bar-3 comparison |

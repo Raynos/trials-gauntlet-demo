@@ -45,7 +45,7 @@ class RockhopViewController: CAPBridgeViewController {
         })();
         """
         controller.addUserScript(WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: true))
-        controller.add(GateSink(), name: "rockhopGate")
+        controller.add(GateSink(webView: webView), name: "rockhopGate")
         print("[rockhop-gate] armed \(config)")
     }
     #endif
@@ -53,16 +53,42 @@ class RockhopViewController: CAPBridgeViewController {
 
 #if DEBUG
 /// Writes each gate message to `Documents/gate/<name>.json` (read back with `simctl get_app_container … data`)
-/// and echoes a one-line summary to stdout (`simctl launch --console-pty`).
+/// and echoes a one-line summary to stdout (`simctl launch --console-pty`). A `shot-<n>` message (the store
+/// screenshot pipeline, harness/native/screens.ts) first snapshots the web view itself to `shot-<n>.png` at the
+/// screen's native pixels: the app's own frame, without the simulator's Dynamic Island overlay that a panel grab has.
 private final class GateSink: NSObject, WKScriptMessageHandler {
+    private weak var webView: WKWebView?
+
+    init(webView: WKWebView?) {
+        self.webView = webView
+    }
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let text = message.body as? String,
               let obj = try? JSONSerialization.jsonObject(with: Data(text.utf8)) as? [String: Any] else { return }
         let name = (obj["name"] as? String) ?? "message"
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("gate", isDirectory: true)
         try? FileManager.default.createDirectory(at: docs, withIntermediateDirectories: true)
-        try? Data(text.utf8).write(to: docs.appendingPathComponent("\(name).json"), options: .atomic)
-        print("[rockhop-gate] \(name) \(text.prefix(400))")
+        let writeJSON = {
+            try? Data(text.utf8).write(to: docs.appendingPathComponent("\(name).json"), options: .atomic)
+            print("[rockhop-gate] \(name) \(text.prefix(400))")
+        }
+        guard name.hasPrefix("shot-"), let webView = webView else {
+            writeJSON()
+            return
+        }
+        let config = WKSnapshotConfiguration()
+        config.afterScreenUpdates = true
+        webView.takeSnapshot(with: config) { image, _ in
+            if let image = image {
+                let format = UIGraphicsImageRendererFormat()
+                format.scale = webView.window?.screen.scale ?? UIScreen.main.scale
+                format.opaque = true
+                let png = UIGraphicsImageRenderer(size: image.size, format: format).pngData { _ in image.draw(at: .zero) }
+                try? png.write(to: docs.appendingPathComponent("\(name).png"), options: .atomic)
+            }
+            writeJSON()
+        }
     }
 }
 #endif

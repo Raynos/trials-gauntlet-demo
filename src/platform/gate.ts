@@ -26,6 +26,14 @@ export interface GateConfig {
   /** Track for the player-path start and the restart reps; default: the first clear recording's track. */
   track?: string;
   restartReps?: number;
+  /**
+   * Store screenshots from played runs (harness/native/screens.ts): each recording replayed paced and rendered; at
+   * each mark (a fraction of the run, or a tick when > 1) the ride holds still for `holdMs` after posting
+   * `shot-<n>`, while the harness grabs the screen. Nothing is posed — the frame is the replayed ride at that tick.
+   * With `shots` the run skips the boot stage and the checks.
+   */
+  shots?: { recording: string; at: number[] }[];
+  holdMs?: number;
 }
 
 interface GateMsg {
@@ -266,6 +274,57 @@ async function restartCheck(h: TrialsHook, track: string, reps: number): Promise
   return { track, reps, ticksOk, wallMsP95: p95(wallMs), frameMsP95: p95(frameMs), movesAfterTicks, wallMs: wallMs.map((x) => Math.round(x * 100) / 100), frameMs: frameMs.map((x) => Math.round(x * 10) / 10) };
 }
 
+async function shotsStage(cfg: GateConfig): Promise<void> {
+  const h = await waitFor('the hook (harness)', () => hook()?.ready && hook());
+  let n = 0;
+  for (const { recording, at } of cfg.shots ?? []) {
+    const rec = decodeAny(await fetchText(recording));
+    const frames = expandFrames(rec);
+    const marks = at.map((a) => (a > 1 ? Math.round(a) : Math.round(a * frames.length))).sort((x, y) => x - y);
+    h.setBike?.(rec.header.bike ?? 'rookie');
+    await loadTrack(h, rec.header.trackId, rec.header.seed);
+    // The harness route skips the countdown, so nothing else waits for the renderer to finish compiling the zone
+    // behind its fog placeholder (`debugInfo().entering`): a shot must never catch the placeholder.
+    await waitFor('the zone compiled', () => {
+      h.render(false);
+      return !(h.info().render as { entering?: boolean } | null | undefined)?.entering;
+    }, 60_000).catch(() => undefined);
+    h.skipCountdown();
+    const per = Math.max(1, Math.round(rec.header.physicsHz / 60));
+    let next = 0;
+    // A mark waits for the ride to look like riding: ≥ 1 s of clean riding since the last bail or restart (a bot
+    // golden keeps its in-band retries), then the first airborne frame within 2 s, else the frame at 2 s.
+    let clean = 0;
+    let waited = 0;
+    for (let i = 0; i < frames.length && next < marks.length; ) {
+      for (let k = 0; k < per && i < frames.length; k++, i++) {
+        h.setInput(frames[i]!);
+        h.step(1);
+        const st = h.getState();
+        clean = h.phase() === 'riding' && st.faulted === null && st.ragdoll === null ? clean + 1 : 0;
+      }
+      h.render(false);
+      await frame();
+      if (i < marks[next]!) continue;
+      const st = h.getState();
+      const airborne = st.contacts.rear === null && st.contacts.front === null;
+      waited += per;
+      const ready = clean >= rec.header.physicsHz && (airborne || waited >= 2 * rec.header.physicsHz);
+      if (ready) {
+        waited = 0;
+        h.render(true);
+        await frame();
+        await frame();
+        post({ name: `shot-${n}`, recording, trackId: rec.header.trackId, tick: h.getState().tick, index: n });
+        n += 1;
+        next += 1;
+        await sleep(cfg.holdMs ?? 2500);
+      }
+    }
+  }
+  post({ name: 'done', shots: n });
+}
+
 async function harnessStage(cfg: GateConfig): Promise<void> {
   const h = await waitFor('the hook (harness)', () => hook()?.ready && hook());
   const readyMs = now();
@@ -325,6 +384,10 @@ async function harnessStage(cfg: GateConfig): Promise<void> {
 export function startGate(): void {
   const cfg: GateConfig = { platform: 'web', ...w.__rockhopGate };
   const harness = /[?&]harness=1(&|$)/.test(location.search);
-  const run = harness ? harnessStage(cfg) : bootStage(cfg);
+  if (cfg.shots?.length && !harness) {
+    location.replace('./?harness=1');
+    return;
+  }
+  const run = harness ? (cfg.shots?.length ? shotsStage(cfg) : harnessStage(cfg)) : bootStage(cfg);
   run.catch((e: unknown) => post({ name: 'error', stage: harness ? 'harness' : 'boot', error: String(e), stack: e instanceof Error ? (e.stack ?? null) : null }));
 }

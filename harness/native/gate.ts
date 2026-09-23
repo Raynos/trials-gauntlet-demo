@@ -20,7 +20,10 @@ import { buildMode, compareBar3, EVIDENCE_DIR, messagesFromOut, OUT, stamp, type
 import { runWeb } from './web';
 
 const args = process.argv.slice(2);
-const which = (args.find((a) => !a.startsWith('--')) ?? 'web,ios,android').split(',');
+// Web legs render on the Mac's GPU (the user's load rule, harness/native/README.md): SwiftShader only when asked.
+if (process.platform === 'darwin') process.env['TRIALS_BROWSER_BACKEND'] ??= 'metal';
+// Android only when named: the emulator is off by the user's rule on this host (harness/native/README.md).
+const which = (args.find((a) => !a.startsWith('--')) ?? 'web,ios').split(',');
 const record = !args.includes('--no-clip');
 const evidence = args.includes('--evidence');
 /** Re-report the last runs from harness/out/native/<platform>/ without launching anything. */

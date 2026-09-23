@@ -84,7 +84,7 @@ export async function runIos(opts: { arm?: Partial<GateArm>; record?: boolean; t
   let rec: ReturnType<typeof spawn> | null = null;
   if (opts.record !== false) {
     fs.rmSync(raw, { force: true });
-    rec = spawn('xcrun', ['simctl', 'io', udid, 'recordVideo', '--codec=h264', '--force', raw], { stdio: 'ignore' });
+    rec = spawn('xcrun', ['simctl', 'io', udid, 'recordVideo', '--codec=h264', '--mask=ignored', '--force', raw], { stdio: 'ignore' });
     await sleep(1500);
   }
   const launched = spawn('xcrun', ['simctl', 'launch', '--console-pty', '--terminate-running-process', udid, APP_ID, '-rockhopGate', JSON.stringify(arm)], { stdio: ['ignore', 'pipe', 'pipe'] });
