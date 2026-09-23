@@ -29,7 +29,8 @@ import { MaterialLibrary } from './materials/library';
 import { Emitters } from './particles/emitters';
 import { PostChain, tierPixelRatio, type PassWrite } from './post/chain';
 import { RiderModel } from './rider/riderModel';
-import { buildBiomeKit } from './world/biomeKit';
+import { SKY_ID, buildBiomeKit } from './world/biomeKit';
+import { ZONE_TIME } from './world/zones/zoneKit';
 import { PropBatch, tierCasts, tierHides, tierManaged } from './world/props';
 import { shrinkSkinArrays } from './world/skinArray';
 import { buildGates, type Gates } from './world/gates';
@@ -1174,7 +1175,7 @@ export class ThreeRenderer implements GameRenderer {
     this.artBackground?.dispose();
     this.artBackground = null;
     if (art && !this.biome.interior) {
-      const skyId = { canyon: 'sky-canyon', snow: 'sky-snow', nightCity: 'sky-nightcity' }[this.biome.id as 'canyon' | 'snow' | 'nightCity'];
+      const skyId = SKY_ID[this.biome.id];
       const sky = skyId ? art.texture(skyId, true, true) : null;
       if (sky) {
         const bg = sky.clone();
@@ -1188,6 +1189,8 @@ export class ThreeRenderer implements GameRenderer {
     this.lighting.setFloor(groundFloorY(track.def.profile, this.biome.interior));
     this.post.applyBiome(this.biome);
     this.rig.setKeys(track.def.meta?.camera);
+    this.rig.pitchScale = this.biome.camPitchScale ?? 1;
+    this.rig.yawScale = this.biome.camYawScale ?? 1;
     // Camera bounds (round 8): inside the hall for interiors (floor + 1.5 … roof − 1, between the
     // back wall and the front), a generous sky box for exteriors. Hard clamp every frame.
     {
@@ -1876,6 +1879,7 @@ export class ThreeRenderer implements GameRenderer {
       // Crowd: cheer for 3.5 s after GO and through the finish; sway otherwise.
       const cheer = this.phase === 'finished' || f.finished || (this.phase === 'riding' && this.runTime < 3.5) ? 1 : 0;
       w.gates.anim.uTime.value = f.tSim;
+      ZONE_TIME.value = f.tSim;
       w.gates.anim.uCheer.value = cheer;
     }
     this.post.setTime(f.tSim);

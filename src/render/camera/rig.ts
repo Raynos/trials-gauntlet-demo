@@ -197,6 +197,10 @@ export class CameraRig {
     this.camera = new THREE.PerspectiveCamera(34, 16 / 9, 0.2, 900);
   }
 
+  /** Biome framing scales (`Biome.camPitchScale` / `camYawScale`), set by the renderer per track. */
+  pitchScale = 1;
+  yawScale = 1;
+
   setKeys(keys: CameraKey[] | undefined): void {
     this.keys = keys ?? [];
     this.keyWeights.length = 0;
@@ -324,6 +328,11 @@ export class CameraRig {
         p.heightFrac = lerp(p.heightFrac, hf, wt);
       }
     }
+
+    // --- Store release (D20): the ROCKHOP zones are framed near side-on (B-ride / C-ride / Q2 hold the horizon
+    // in the upper third), so the biome scales the riding pitch and yaw after the keys (`Biome.camPitchScale`).
+    p.pitch *= this.pitchScale;
+    p.yaw *= this.yawScale;
 
     // --- Crash / finish beats.
     let followTarget = { x: f.bikeX, y: f.bikeY };

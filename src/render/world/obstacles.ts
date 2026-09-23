@@ -11,6 +11,7 @@ import type { Collider, ColliderCircle, ColliderPolyline, CompiledTrack, PlacedO
 import type { MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
 import { profileY } from './track';
+import * as G from './zones/geo';
 
 export interface ObstacleMeshes {
   group: THREE.Group;
@@ -143,6 +144,9 @@ export function buildObstacles(track: CompiledTrack, lib: MaterialLibrary): Obst
     const surface = typeof p.surface === 'string' ? p.surface : 'wood';
     const cols = po.colliderIds.map((id) => byId.get(id)).filter((c): c is Collider => !!c);
     for (const c of cols) handled.add(c.id);
+    // Store release: a ROCKHOP zone prop (`params.prop`, src/tracks/kinds.ts PROPS) draws its own body over the
+    // same colliders; an unknown prop falls through to the base kind.
+    if (typeof p.prop === 'string' && zoneProp(p.prop, po, cols, { buckets, group, drums, profile, lib, depth: DEPTH })) continue;
     switch (po.kind) {
       case 'ramp':
       case 'stair':
@@ -406,9 +410,18 @@ export function buildObstacles(track: CompiledTrack, lib: MaterialLibrary): Obst
   let triangles = 0;
   let drawCalls = drums.size + seesaws.size;
   for (const [matName, geos] of buckets) {
+    // Zone props bake a tint per vertex: when any body in the bucket carries one, every body gets a colour
+    // attribute (white = untinted) and the bucket draws with a vertex-coloured derivative of the material.
+    const tinted = geos.some((g) => !!g.getAttribute('color'));
+    if (tinted) for (const g of geos) if (!g.getAttribute('color')) G.paint(g, [1, 1, 1]);
     const merged = geos.length === 1 ? geos[0]! : mergeGeometries(geos, false);
     if (!merged) throw new Error(`Obstacle material batch could not merge: ${matName}`);
-    const mesh = new THREE.Mesh(merged, fogify(lib.get(matName)));
+    let mat = lib.get(matName);
+    if (tinted && !mat.vertexColors) {
+      mat = lib.derive(matName);
+      mat.vertexColors = true;
+    }
+    const mesh = new THREE.Mesh(merged, fogify(mat));
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.name = `obstacles:${matName}`;
@@ -417,4 +430,231 @@ export function buildObstacles(track: CompiledTrack, lib: MaterialLibrary): Obst
     drawCalls++;
   }
   return { group, seesaws, drums, triangles, drawCalls };
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------
+// ROCKHOP zone props (store release Phase 2): the kit meshes for `params.prop`. Every body follows the collider
+// outline exactly (skirt / board / circle), so the visual bounds are the physics bounds; dressing sits outside the
+// ridden surface or below it. Colours are baked per vertex into the shared library materials' buckets.
+// ---------------------------------------------------------------------------------------------------------------
+
+interface PropCtx {
+  buckets: Bucket;
+  group: THREE.Group;
+  drums: Map<number, THREE.Object3D>;
+  profile: readonly Vec2[];
+  lib: MaterialLibrary;
+  depth: number;
+}
+
+const LIVERY = [0x2f8a8a, 0xa8482e, 0x2e5f8e, 0xb86a2a, 0x8a2e24, 0x3a7a58];
+
+/** Tint every vertex — the bucket materials read vertex colours. */
+function tintGeo(g: THREE.BufferGeometry, hex: number, f?: (x: number, y: number, z: number) => number): THREE.BufferGeometry {
+  return G.paint(g, G.rgb(hex), f);
+}
+
+/** Height of polyline `c` at x (null outside it). */
+function yOn(c: ColliderPolyline, x: number): number | null {
+  const q = c.points;
+  for (let i = 1; i < q.length; i++) {
+    const a = q[i - 1]!;
+    const b = q[i]!;
+    const lo = Math.min(a.x, b.x);
+    const hi = Math.max(a.x, b.x);
+    if (x >= lo && x <= hi && hi - lo > 1e-6) return a.y + ((x - a.x) / (b.x - a.x)) * (b.y - a.y);
+  }
+  return null;
+}
+
+function zoneProp(prop: string, po: PlacedObstacle, cols: Collider[], ctx: PropCtx): boolean {
+  const { buckets, profile, depth } = ctx;
+  const p = po.params;
+  const variant = typeof p.variant === 'number' ? p.variant : 0;
+  const polys = cols.filter((c): c is ColliderPolyline => c.kind === 'polyline');
+  const circles = cols.filter((c): c is ColliderCircle => c.kind === 'circle');
+  const boxes = cols.filter((c) => c.kind === 'box') as Extract<Collider, { kind: 'box' }>[];
+  if (!polys.length && !circles.length && !boxes.length) return false;
+  let x0 = Infinity;
+  let x1 = -Infinity;
+  let y0 = Infinity;
+  let y1 = -Infinity;
+  for (const c of polys) for (const q of c.points) {
+    x0 = Math.min(x0, q.x);
+    x1 = Math.max(x1, q.x);
+    y1 = Math.max(y1, q.y);
+    y0 = Math.min(y0, profileY(profile, q.x), q.y);
+  }
+  for (const c of boxes) {
+    x0 = Math.min(x0, c.center.x - c.halfW);
+    x1 = Math.max(x1, c.center.x + c.halfW);
+    y0 = Math.min(y0, c.center.y - c.halfH);
+    y1 = Math.max(y1, c.center.y + c.halfH);
+  }
+  const topAt = (x: number): number => Math.max(-Infinity, ...polys.map((c) => yOn(c, x) ?? -Infinity), ...boxes.filter((c) => Math.abs(x - c.center.x) <= c.halfW).map((c) => c.center.y + c.halfH));
+  /** The solid under every polyline / box in `mat`, vertex-tinted. */
+  const solid = (mat: string, hex: number, shade?: (x: number, y: number, z: number) => number): void => {
+    for (const c of polys) {
+      const g = skirt(c, profile, depth);
+      if (g) push(buckets, mat, tintGeo(g, hex, shade));
+    }
+    for (const c of boxes) push(buckets, mat, tintGeo(new THREE.BoxGeometry(c.halfW * 2, c.halfH * 2, depth), hex, shade), at(c.center.x, c.center.y, 0, c.angle));
+  };
+  const plankBoard = (mat: string, hex: number, t: number): void => {
+    for (const c of polys) {
+      const g = board(c, t, depth);
+      if (g) push(buckets, mat, tintGeo(g, hex));
+    }
+  };
+  /** A spinning (registered in `drums`) or static body for a circle collider. */
+  const roller = (c: ColliderCircle, geo: THREE.BufferGeometry, mat: string): void => {
+    if (c.rolls) {
+      const dm = ctx.lib.derive(mat);
+      dm.vertexColors = true;
+      const m = new THREE.Mesh(geo, fogify(dm));
+      m.position.set(c.center.x, c.center.y, 0);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      ctx.group.add(m);
+      ctx.drums.set(c.id, m);
+    } else push(buckets, mat, geo, at(c.center.x, c.center.y, 0));
+  };
+  const face = depth / 2;
+  switch (prop) {
+    case 'container': {
+      solid('container', LIVERY[variant % LIVERY.length]!, (_x, y) => 0.8 + 0.2 * Math.min(1, (y - y0) / 2.6));
+      for (const x of [x0 + 0.09, x1 - 0.09]) push(buckets, 'darkSteel', tintGeo(new THREE.BoxGeometry(0.18, y1 - y0, 0.18), 0x707070), at(x, (y0 + y1) / 2, face - 0.05));
+      push(buckets, 'darkSteel', tintGeo(new THREE.BoxGeometry(x1 - x0, 0.12, 0.16), 0x707070), at((x0 + x1) / 2, y1 - 0.06, face - 0.05));
+      return true;
+    }
+    case 'pallet':
+    case 'timber-deck':
+    case 'pier': {
+      solid('pallet', prop === 'pier' ? 0x9a7a58 : 0xd8b888, (x) => 0.85 + 0.15 * Math.abs(Math.sin(x * 9)));
+      // Stringer blocks on the camera face every 0.6 m (stacked pallets / cribbing).
+      for (let x = x0 + 0.1; x < x1 - 0.05; x += 0.6) {
+        const gy = profileY(profile, x);
+        const h = topAt(x) - gy;
+        if (h > 0.12 && Number.isFinite(h)) push(buckets, 'pallet', tintGeo(new THREE.BoxGeometry(0.12, h - 0.02, 0.06), 0x6a5036), at(x, gy + h / 2, face + 0.02));
+      }
+      if (prop === 'pier') for (let x = x0 + 0.5; x < x1; x += 2) push(buckets, 'darkSteel', tintGeo(new THREE.CylinderGeometry(0.16, 0.2, 0.5, 10), 0x404446), at(x, topAt(x) + 0.25, face - 0.25));
+      return true;
+    }
+    case 'gangway':
+    case 'hull': {
+      solid('rustSteel', prop === 'hull' ? 0xc07040 : 0x9a9a94, (x, y) => 0.75 + 0.25 * Math.sin(x * 1.7 + y));
+      if (prop === 'hull') for (let x = x0 + 0.5; x < x1; x += 1.1) {
+        const gy = profileY(profile, x);
+        const h = topAt(x) - gy;
+        if (h > 0.2 && Number.isFinite(h)) push(buckets, 'rustSteel', tintGeo(new THREE.BoxGeometry(0.12, h, 0.1), 0x6a3a22), at(x, gy + h / 2, face + 0.03));
+      }
+      if (prop === 'gangway') for (const c of polys) {
+        for (const z of [-1.4, 1.4]) {
+          for (let i = 0; i < c.points.length; i++) {
+            const q = c.points[i]!;
+            push(buckets, 'darkSteel', tintGeo(new THREE.BoxGeometry(0.05, 0.95, 0.05), 0xd8d2c4), at(q.x, q.y + 0.47, z));
+            const n = c.points[i + 1];
+            if (n) push(buckets, 'darkSteel', tintGeo(new THREE.BoxGeometry(Math.hypot(n.x - q.x, n.y - q.y), 0.05, 0.05), 0xd8d2c4), at((q.x + n.x) / 2, (q.y + n.y) / 2 + 0.95, z, Math.atan2(n.y - q.y, n.x - q.x)));
+          }
+        }
+      }
+      return true;
+    }
+    case 'hung-container': {
+      plankBoard('container', LIVERY[variant % LIVERY.length]!, 2.4);
+      push(buckets, 'darkSteel', tintGeo(new THREE.BoxGeometry(x1 - x0 + 0.4, 0.3, 2.6), 0xd8a030), at((x0 + x1) / 2, y1 + 3.2, 0));
+      for (const x of [x0 + 0.2, x1 - 0.2]) for (const z of [-1.1, 1.1]) push(buckets, 'darkSteel', tintGeo(new THREE.CylinderGeometry(0.025, 0.025, 3.2, 5), 0x303030), at(x, y1 + 1.6, z));
+      return true;
+    }
+    case 'log-stack': {
+      solid('pallet', 0x6a4c34);
+      for (let x = x0 + 0.28; x < x1 - 0.2; x += 0.52) for (let y = profileY(profile, x) + 0.26; y < topAt(x) - 0.2; y += 0.48) push(buckets, 'pallet', tintGeo(new THREE.CylinderGeometry(0.25, 0.25, 0.08, 10).rotateX(Math.PI / 2), 0xd8b484), at(x, y, face + 0.04));
+      return true;
+    }
+    case 'block':
+      solid('concrete', 0xfff0d0, (x, y) => (Math.abs(((y - y0) % 1.1) - 1.05) < 0.05 || Math.abs(((x - x0) % 1.6) - 1.55) < 0.05 ? 0.7 : 0.9 + 0.1 * Math.sin(x * 13 + y * 7)));
+      return true;
+    case 'ice-ledge':
+      solid('snow', 0x8cc8e4, (_x, y) => 0.6 + 0.4 * Math.min(1, (y - y0) / Math.max(0.3, y1 - y0)));
+      plankBoard('snow', 0xf4f8ff, 0.18);
+      return true;
+    case 'cornice':
+      solid('snow', 0xf2f6fc);
+      return true;
+    case 'truck-bed':
+    case 'ore-cart': {
+      if (!polys.length && !boxes.length) return false;
+      solid('rustSteel', prop === 'ore-cart' ? 0x9a5430 : 0x4a4c50);
+      for (const x of [x0 + 0.5, x1 - 0.5]) for (const z of [-1.3, 1.3]) push(buckets, 'tyre', tintGeo(new THREE.CylinderGeometry(0.35, 0.35, 0.3, 12).rotateX(Math.PI / 2), 0x333333), at(x, profileY(profile, x) + 0.35, z));
+      return true;
+    }
+    case 'conveyor': {
+      plankBoard('tyre', 0x4a4844, 0.12);
+      for (const c of polys) {
+        const q0 = c.points[0]!;
+        const q1 = c.points[c.points.length - 1]!;
+        for (let i = 0; i <= 8; i++) {
+          const t = i / 8;
+          const x = q0.x + (q1.x - q0.x) * t;
+          const y = q0.y + (q1.y - q0.y) * t - 0.12;
+          const gy = profileY(profile, x);
+          if (y - gy > 0.2) for (const z of [-1.3, 1.3]) push(buckets, 'rustSteel', tintGeo(new THREE.BoxGeometry(0.1, y - gy, 0.1), 0x9a5a34), at(x, gy + (y - gy) / 2, z));
+        }
+      }
+      if (!polys.length) solid('rustSteel', 0x9a5a34);
+      return true;
+    }
+    case 'flume':
+    case 'fence':
+    case 'rope-bridge': {
+      if (polys.length && prop !== 'flume') plankBoard('pallet', prop === 'fence' ? 0x6a5638 : 0xa88a60, 0.08);
+      else solid('pallet', 0x8a6a48);
+      if (boxes.length && prop !== 'flume') solid('pallet', 0x8a6a48);
+      return true;
+    }
+    default:
+      break;
+  }
+  // Circle props.
+  if (!circles.length) return false;
+  for (const c of circles) {
+    const r = c.radius;
+    const w = Math.min(3, Number(p.width ?? 2.2));
+    const gy = profileY(profile, c.center.x);
+    if (prop === 'stump' || prop === 'lift-tower') {
+      const h = Math.max(0.1, c.center.y - gy) + r;
+      push(buckets, prop === 'stump' ? 'pallet' : 'darkSteel', tintGeo(new THREE.CylinderGeometry(r, r * 1.15, h, 10), prop === 'stump' ? 0x6a4c34 : 0x8a9098), at(c.center.x, gy + h / 2 - 0.02, 0));
+      continue;
+    }
+    if (prop === 'buoy' && !c.rolls && c.center.y - gy > r * 1.5) {
+      // Upright buoy under a pole cap.
+      push(buckets, 'container', G.buoyGeometry(c.center.y - gy + r * 0.5).translate(0, gy - c.center.y, 0), at(c.center.x, c.center.y, 0));
+      continue;
+    }
+    let geo: THREE.BufferGeometry;
+    let mat = 'tyre';
+    if (prop === 'tyre') geo = tintGeo(new THREE.TorusGeometry(r * 0.72, r * 0.28, 8, 20).scale(1, 1, 3.2), 0x3a3a3a);
+    else if (prop === 'buoy') {
+      mat = 'container';
+      geo = tintGeo(new THREE.CylinderGeometry(r, r, w, 16).rotateX(Math.PI / 2), 0x1f7c80, (_x, _y, z) => (Math.abs(z) % 0.8 < 0.22 ? 2.6 : 1));
+    } else if (prop === 'log') {
+      mat = 'pallet';
+      geo = tintGeo(new THREE.CylinderGeometry(r, r * 0.97, w + 0.6, 14).rotateX(Math.PI / 2), 0x6a4c34);
+    } else if (prop === 'pulley') {
+      mat = 'rustSteel';
+      geo = G.merge([
+        tintGeo(new THREE.CylinderGeometry(r, r, w, 20).rotateX(Math.PI / 2), 0x3a3836),
+        tintGeo(new THREE.CylinderGeometry(r * 1.12, r * 1.12, 0.1, 20).rotateX(Math.PI / 2).translate(0, 0, w / 2), 0x9a5a34),
+        tintGeo(new THREE.CylinderGeometry(r * 1.12, r * 1.12, 0.1, 20).rotateX(Math.PI / 2).translate(0, 0, -w / 2), 0x9a5a34),
+        tintGeo(new THREE.BoxGeometry(r * 1.8, 0.08, 0.04).translate(0, 0, w / 2 + 0.06), 0xe8e2d0),
+      ]);
+    } else if (prop === 'rubble') {
+      mat = 'concrete';
+      geo = tintGeo(new THREE.IcosahedronGeometry(r, 1).scale(1.2, 1, 1.1), 0xf0dcc0);
+    } else geo = tintGeo(new THREE.CylinderGeometry(r, r, w, 16).rotateX(Math.PI / 2), prop === 'snowcat' ? 0x2a2a2a : 0x555555);
+    roller(c, geo, mat);
+  }
+  if (polys.length || boxes.length) solid(prop === 'snowcat' ? 'container' : 'pallet', prop === 'snowcat' ? 0xc4321e : 0x8a6a48);
+  return true;
 }

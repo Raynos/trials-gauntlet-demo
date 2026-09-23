@@ -34,23 +34,12 @@ import {
   // round 11 exterior kit (canyon / snow)
   brazierFireGeometry,
   brazierGeometry,
-  cabinBodyGeometry,
-  coniferGeometry2,
   contactShadowBatch,
-  gableGeometry,
-  gableSnowGeometry,
-  iceCurtainGeometry,
-  lanternGeometry,
-  lanternGlassGeometry,
-  liftChairGeometry,
-  liftPylonGeometry,
   lightTowerGeometry,
   lightTowerHeadsGeometry,
-  logPileGeometry,
   minePortalGeometry,
   pickupGeometry,
   radialDiscTexture,
-  sledGeometry,
   snagGeometry,
   splitRailGeometry,
   spoolGeometry,
@@ -60,6 +49,11 @@ import {
   windmillGeometry,
 } from './props';
 import type { WorldDetail } from './props';
+import { buildZoneKit, isZone } from './zones/zoneKit';
+
+/** Art-pack far plate / sky panorama per exterior biome (the ROCKHOP zones' are `plate-<zone>` / `sky-<zone>`). */
+export const PLATE_ID: Partial<Record<string, string>> = { canyon: 'plate-canyon', nightCity: 'plate-nightcity', coast: 'plate-coast', alpine: 'plate-alpine', quarry: 'plate-quarry', snow: 'plate-snowline' };
+export const SKY_ID: Partial<Record<string, string>> = { canyon: 'sky-canyon', nightCity: 'sky-nightcity', coast: 'sky-coast', alpine: 'sky-alpine', quarry: 'sky-quarry', snow: 'sky-snowline' };
 
 export interface BiomeKit {
   group: THREE.Group;
@@ -199,7 +193,7 @@ function neonSigns(rng: Rng): { map: THREE.CanvasTexture; emissive: THREE.Canvas
   g.fillRect(0, 0, 1024, 256);
   ge.fillStyle = '#000';
   ge.fillRect(0, 0, 1024, 256);
-  const words = [['MOTO', '#ff40c0'], ['TRIALS', '#40e0ff'], ['GARAGE', '#ffd040'], ['24H', '#ff6040']] as const;
+  const words = [['MOTO', '#ff40c0'], ['ROCKHOP', '#40e0ff'], ['GARAGE', '#ffd040'], ['24H', '#ff6040']] as const;
   for (let i = 0; i < 2; i++) {
     const [w, col] = words[rng.int(0, 3)]!;
     for (const [ctx, colour] of [[g, col], [ge, col]] as const) {
@@ -362,27 +356,6 @@ function scrubGeometry(seed: number): THREE.BufferGeometry {
 
 // Round 11: the round-7 cone-stack `conifer()` is retired; `coniferGeometry2` (props.ts) has real branch tiers.
 
-/** Snow bank: half-ellipsoid with a lumpy top, white on top, blue-grey shadow toward the base. */
-function snowBankGeometry(seed: number): THREE.BufferGeometry {
-  const rnd = lcg(seed);
-  const g = new THREE.SphereGeometry(1, 14, 7, 0, Math.PI * 2, 0, Math.PI / 2);
-  const p = g.getAttribute('position') as THREE.BufferAttribute;
-  const bumps: number[] = [];
-  for (let i = 0; i < 6; i++) bumps.push(rnd() * 6.28, 0.8 + rnd() * 0.4);
-  for (let i = 0; i < p.count; i++) {
-    const x = p.getX(i);
-    const z = p.getZ(i);
-    const a = Math.atan2(z, x);
-    let k = 1;
-    for (let j = 0; j < 6; j++) k += 0.08 * Math.cos(a * 3 - bumps[j * 2]!) * bumps[j * 2 + 1]!;
-    p.setXYZ(i, x * k, p.getY(i) * 0.55, z * k);
-  }
-  g.computeVertexNormals();
-  return setColors(g, (_x, y) => {
-    const t = Math.min(1, y / 0.5);
-    return [0.78 + 0.22 * t, 0.82 + 0.18 * t, 0.9 + 0.1 * t];
-  });
-}
 
 /** Rooftop kit over a unit footprint (scale x/z to the building): parapet, water tank, AC boxes, a stair head. */
 function rooftopGeometry(): THREE.BufferGeometry {
@@ -791,8 +764,9 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
   };
 
   // Ground beyond the apron (all biomes): a wide strip following the profile
-  // at apron depth, so the ribbon sits on terrain instead of floating.
-  {
+  // at apron depth, so the ribbon sits on terrain instead of floating. The ROCKHOP zones shape their own
+  // (sea beach, lake meadow, pit rim, ice gorge: `zones/zoneKit.ts`).
+  if (!isZone(biome.id)) {
     const cols: number[] = [];
     for (let x = x0; x <= x1; x += 4) cols.push(x);
     const zRows = biome.interior ? [-30, -3.0, 3.0, 12, 30] : [-45, -12, -3.0, 3.0, 9, 45];
@@ -866,8 +840,8 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
     // (2048×512, tiles in x, alpha-faded bottom) at z −140 and the sky panorama at z −330
     // (plus `scene.background`, set by the renderer); the near/mid geometry stays. Without
     // the pack: the three parallax silhouette tiers.
-    const plateId = { canyon: 'plate-canyon', snow: 'plate-snow', nightCity: 'plate-nightcity' }[biome.id as 'canyon' | 'snow' | 'nightCity'];
-    const skyId = { canyon: 'sky-canyon', snow: 'sky-snow', nightCity: 'sky-nightcity' }[biome.id as 'canyon' | 'snow' | 'nightCity'];
+    const plateId = PLATE_ID[biome.id];
+    const skyId = SKY_ID[biome.id];
     const plateTex = plateId ? (art?.texture(plateId, true, true) ?? null) : null;
     const skyTex = skyId ? (art?.texture(skyId, true, true) ?? null) : null;
     if (plateTex && skyTex) {
@@ -931,7 +905,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
           m.receiveShadow = false;
         }
       }
-    } else {
+    } else if (!isZone(biome.id)) {
     const tiers: { z: number; h: number; kind: 'mesa' | 'pine' | 'city' | 'girder' | 'hills'; color: number; yOff: number }[] =
       biome.id === 'canyon'
         ? [
@@ -939,13 +913,7 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
             { z: -130, h: 60, kind: 'mesa', color: 0x7a4c3a, yOff: -6 },
             { z: -340, h: 80, kind: 'mesa', color: 0x9a6a54, yOff: -18 },
           ]
-        : biome.id === 'snow'
-          ? [
-              { z: -40, h: 18, kind: 'pine', color: 0x2c3a34, yOff: -2 },
-              { z: -110, h: 45, kind: 'pine', color: 0x50606a, yOff: -4 },
-              { z: -300, h: 130, kind: 'hills', color: 0x9aa8bc, yOff: -10 },
-            ]
-          : [
+        : [
               { z: -45, h: 30, kind: 'city', color: 0x14161c, yOff: -3 },
               { z: -130, h: 80, kind: 'city', color: 0x1e222c, yOff: -5 },
               { z: -340, h: 200, kind: 'city', color: 0x2a3040, yOff: -10 },
@@ -976,7 +944,13 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
     // canyon frame: the deck's edge rocks). `vc` fills white where nothing is baked.
     const vc = (g: THREE.BufferGeometry): THREE.BufferGeometry => (g.getAttribute('color') ? g : setColors(g, () => [1, 1, 1]));
     const PB = (name: string, geo: THREE.BufferGeometry, mat: THREE.Material, shadows = true): PropBatch => new PropBatch(name, vc(geo), mat, shadows);
-    if (biome.id === 'canyon') {
+    if (isZone(biome.id)) {
+      const zk = buildZoneKit({ track, biome, lib, rng, detail, keepOut, plan, x0, x1 });
+      meshes.push(...zk.meshes);
+      batches.push(...zk.batches);
+      scroll.push(...zk.scroll);
+      textureBytes += zk.textureBytes;
+    } else if (biome.id === 'canyon') {
       // Round 11 ("industrial to the bar" propagated): a low warm key from the camera side, three
       // fog tiers each carrying content — near = boulders / snags / fence / tyre walls / drums at
       // deck level either side of the ribbon, mid = mesa shoulders with strata 12–40 m back, far =
@@ -1257,403 +1231,6 @@ export function buildBiomeKit(track: CompiledTrack, biome: Biome, lib: MaterialL
         shadowAt(x, gy, z, 0.6);
       }
       batches.push(...mesaBatches, ...mesaFar, ...boulders, rubble, scrub, snags, fence, tyreWalls, bales, tyres, drums, spools, sand, ruts, towers, towerHeads, generator, braziers, fires, bleachers, shadows);
-    } else if (biome.id === 'snow') {
-      // Round 11: pale low key from the camera side, blue-white fog in three tiers with detail in
-      // every tier — near = fence posts with snow caps, lanterns (real follow spots), firewood,
-      // sleds, barrels, braziers; mid = cabins with glowing windows (the reference's depth cue), a
-      // lift station / lodge / ice curtain per track, conifers with real branch tiers; far = ridge
-      // tree lines. Contact shadows, drift lines against every prop, ice patches, ruts, gravel edges.
-      const pineMat = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, vertexColors: true }));
-      const capMat = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8, vertexColors: true }));
-      const trees = [0, 1, 2].map((i) => coniferGeometry2((track.def.seed ^ (0x2f6b * (i + 1))) >>> 0));
-      const pines = trees.map((t, i) => PB(`pine${i}`, t.tree, pineMat));
-      const caps = trees.map((t, i) => PB(`pinecap${i}`, t.snow, capMat, false));
-      const pinesFar = trees.map((t, i) => PB(`pinefar${i}`, t.tree, pineMat, false));
-      const capsFar = trees.map((t, i) => PB(`pinecapfar${i}`, t.snow, capMat, false));
-      const treeAt = (x: number, y: number, z: number, sc: number, near: boolean): void => {
-        const i = rng.int(0, 2);
-        const ry = rng.range(0, 6);
-        (near ? pines : pinesFar)[i]!.add(x, y, z, ry, sc);
-        (near ? caps : capsFar)[i]!.add(x, y, z, ry, sc);
-      };
-      const bankMat = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, vertexColors: true }));
-      const banks = PB('snowbank', snowBankGeometry(track.def.seed ^ 0x55), bankMat, false);
-      const shadows = contactShadowBatch('contactshadow', 0.32, (m) => lib.complete(m));
-      textureBytes += 128 * 128 * 4;
-      const shadowAt = (x: number, y: number, z: number, r: number, sz = r): void => shadows.add(x, y + 0.01, z, rng.range(0, 6), r, null, 0, 1, sz);
-      /** Drift line: a low bank against the windward side of a prop. */
-      const driftAt = (x: number, y: number, z: number, r: number): void => banks.add(x + rng.range(-0.2, 0.2), y - 0.05, z - r * 0.5, rng.range(0, 6), r * 1.3, null, 0, r * 0.35, r * 0.7);
-      const crates = PB('crate', bakeAO(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), 1, 0.3), lib.get('plywood'));
-      const crateSnow = PB('cratesnow', new THREE.BoxGeometry(1.06, 0.14, 1.06).translate(0, 1.05, 0), capMat, false);
-      const posts = PB('post', new THREE.CylinderGeometry(0.06, 0.08, 1, 8).translate(0, 0.5, 0), lib.get('darkSteel'));
-      const woodPosts = PB('woodpost', bakeAO(new THREE.BoxGeometry(0.14, 1, 0.14).translate(0, 0.5, 0), 1, 0.3), lib.get('pallet'));
-      const postCaps = PB('postcap', new THREE.BoxGeometry(0.2, 0.1, 0.2).translate(0, 0.04, 0), capMat, false);
-      const fence = PB('fence', new THREE.BoxGeometry(2.4, 0.06, 0.04).translate(0, 0.9, 0), lib.get('plywood'));
-      const fenceSnow = PB('fencesnow', new THREE.BoxGeometry(2.4, 0.05, 0.08).translate(0, 0.955, 0), capMat, false);
-      const lanterns = PB('lantern', lanternGeometry(), lib.get('darkSteel'), false);
-      const glassMat = fogify(new THREE.MeshStandardMaterial({ color: 0x3a2a14, emissive: 0xffb648, emissiveIntensity: 1.5, roughness: 0.4 }));
-      const glass = PB('lanternglass', lanternGlassGeometry(), glassMat, false);
-      const logs = PB('logpile', logPileGeometry(), lib.get('pallet'));
-      const sleds = PB('sled', sledGeometry(), lib.get('pallet'));
-      const drums = PB('drum', drumGeometry(), lib.get('barrelBlue'));
-      const gravel = PB('gravel', rockGeometry(track.def.seed ^ 0x71, 1), lib.get('darkSteel'), false);
-      const iceMat = new THREE.MeshStandardMaterial({ color: 0xc4dcec, roughness: 0.14, metalness: 0.05, map: radialDiscTexture(0.7), transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
-      lib.complete(iceMat);
-      fogify(iceMat);
-      const ice = PB('icepatch', new THREE.CircleGeometry(1, 12).rotateX(-Math.PI / 2), iceMat, false);
-      const rutMat = new THREE.MeshStandardMaterial({ color: 0x506070, roughness: 1, map: radialDiscTexture(1.0), transparent: true, opacity: 0.28, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
-      lib.complete(rutMat);
-      fogify(rutMat);
-      const ruts = PB('rut', new THREE.CircleGeometry(1, 8).rotateX(-Math.PI / 2), rutMat, false);
-      // Cabins: timber body, dark gable, snow load, warm windows (emissive; they are the depth cue in the fog).
-      const timber = lib.derive('plank');
-      timber.color.setHex(0x4e3c2c);
-      const cabins = PB('cabin', cabinBodyGeometry(), timber);
-      const roofMat = lib.derive('darkSteel');
-      roofMat.color.setHex(0x2c2624);
-      roofMat.metalness = 0.2;
-      const roofs = PB('cabinroof', gableGeometry(), roofMat);
-      const roofSnow = PB('cabinsnow', gableSnowGeometry(), capMat, false);
-      const windowMat = fogify(new THREE.MeshStandardMaterial({ color: 0x3a2a18, emissive: 0xffc070, emissiveIntensity: 1.9, roughness: 0.3 }));
-      const windows = PB('window', new THREE.PlaneGeometry(0.8, 1.0).translate(0, 0.5, 0), windowMat, false);
-      const doors = PB('door', new THREE.PlaneGeometry(1.0, 2.0).translate(0, 1.0, 0), lib.get('darkSteel'), false);
-      const chimneys = PB('chimney', new THREE.BoxGeometry(0.6, 1, 0.6).translate(0, 0.5, 0), lib.get('brick'), false);
-      const cabinAt = (x: number, z: number, w: number, h: number, d: number, ry: number, big = false): void => {
-        const gy = gyAt(x, z) - 0.15;
-        cabins.add(x, gy, z, ry, w, null, 0, h, d);
-        roofs.add(x, gy + h, z, ry, w, null, 0, d * 0.55, d);
-        roofSnow.add(x, gy + h, z, ry, w, null, 0, d * 0.55, d);
-        chimneys.add(x + w * 0.25, gy + h + d * 0.2, z, ry, 1, null, 0, d * 0.45, 1);
-        const cs = Math.cos(ry);
-        const sn = Math.sin(ry);
-        // Front face (+z local) toward the camera: windows either side of a door, more on a lodge.
-        const n = big ? Math.floor(w / 2.2) : Math.floor(w / 2.6);
-        for (let i = 0; i < n; i++) {
-          const lx = (i - (n - 1) / 2) * (w / n);
-          const lz = d / 2 + 0.02;
-          const lit = rng.next() < 0.8;
-          if (!lit) continue;
-          const isDoor = !big && i === Math.floor(n / 2) && n >= 3;
-          (isDoor ? doors : windows).add(x + lx * cs + lz * sn, gy + (isDoor ? 0 : 1.1), z - lx * sn + lz * cs, ry);
-          if (big && h > 4.5) windows.add(x + lx * cs + lz * sn, gy + 3.3, z - lx * sn + lz * cs, ry);
-        }
-        // One window on each gable end.
-        for (const s of [-1, 1]) {
-          const lx = s * (w / 2 + 0.02);
-          windows.add(x + lx * cs, gy + 1.1, z - lx * sn, ry + s * Math.PI / 2);
-        }
-        driftAt(x - w * 0.3, gy + 0.15, z + d / 2 + 0.2, 1.4);
-        driftAt(x + w * 0.3, gy + 0.15, z + d / 2 + 0.2, 1.1);
-        shadowAt(x, gy + 0.15, z + d / 2 + 0.3, w * 0.6, 0.8);
-      };
-      // Set piece per track: m2 = lift station (pylons, cable, chairs over the course), x1 = lodge + ice curtain.
-      const isX1 = track.def.id.startsWith('x1');
-      const isM2 = track.def.id.startsWith('m2');
-      const setX = track.bounds.minX + (track.bounds.maxX - track.bounds.minX) * 0.5;
-      // The two snow models (round 15: a playground places both — the lift line over its
-      // `balance` beat, the lodge at a free segment slot; every other course keeps its seeded pick).
-      const liftLine = (xa: number, xb: number, stationX: number): void => {
-        const pylons = PB('liftpylon', liftPylonGeometry(), lib.get('darkSteel'));
-        const chairs = PB('liftchair', liftChairGeometry(), lib.get('darkSteel'), false);
-        const cableGeos: THREE.BufferGeometry[] = [];
-        const pz = -8.5;
-        let prev: [number, number] | null = null;
-        for (let x = xa; x < xb; x += 42) {
-          const gy = gyAt(x, pz);
-          pylons.add(x, gy - 0.2, pz, 0);
-          shadowAt(x, gy, pz, 1.4);
-          driftAt(x, gy, pz + 0.8, 1.5);
-          if (prev) {
-            for (const cz of [pz - 1.4, pz + 1.4]) {
-              const L = Math.hypot(x - prev[0], gy - prev[1]);
-              const c = new THREE.BoxGeometry(L, 0.05, 0.05).translate(L / 2, 0, 0).rotateZ(Math.atan2(gy - prev[1], x - prev[0])).translate(prev[0], prev[1] + 8.4, cz);
-              cableGeos.push(c);
-            }
-            for (let t = 0.12; t < 0.95; t += 0.2) {
-              const cx = prev[0] + (x - prev[0]) * t;
-              const cy = prev[1] + (gy - prev[1]) * t + 8.4 - 0.5 * Math.sin(t * Math.PI);
-              chairs.add(cx, cy, pz + 1.4, 0);
-            }
-          }
-          prev = [x, gy - 0.2];
-        }
-        if (cableGeos.length) {
-          const m = new THREE.Mesh(vc(mergeGeometries(cableGeos, false)!), lib.get('darkSteel'));
-          m.name = 'lift:cable';
-          m.frustumCulled = false;
-          meshes.push(m);
-        }
-        // Lift station: a wide low shed at the bottom pylon with a lit interior.
-        cabinAt(stationX, -14, 12, 3.6, 7, 0.05, true);
-        batches.push(pylons, chairs);
-      };
-      const iceSolid = fogify(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.18, metalness: 0.02, vertexColors: true }));
-      lib.complete(iceSolid);
-      const curtain = PB('icecurtain', iceCurtainGeometry(track.def.seed ^ 0x1ce), iceSolid);
-      const lodge = (lx: number, cx: number): void => {
-        // Lodge with two rows of windows and a frozen waterfall further on.
-        cabinAt(lx, -17, 18, 6.2, 9, 0.06, true);
-        curtain.add(cx, gyAt(cx, -11) - 0.6, -11, 0, 9, null, 0, 10, 9);
-        curtain.add(cx + 7, gyAt(cx + 7, -12) - 0.6, -12, 0.3, 5, null, 0, 6, 5);
-        pinesFar[0]!.add(cx - 8, gyAt(cx - 8, -14) - 0.6, -14, 0, 1.4);
-        capsFar[0]!.add(cx - 8, gyAt(cx - 8, -14) - 0.6, -14, 0, 1.4);
-      };
-      /** x-stretches the cabins skip (the set pieces' own ground). */
-      const cabinSkip: number[] = [];
-      if (plan.playground && plan.slots.length) {
-        // p3-snow-line: the lift line runs over the see-saw ("The Lift Line", the `balance` beat)
-        // with its station beside it; the lodge takes the middle free slot, its waterfall 22 m on.
-        const bal = plan.balances[0]?.x ?? track.bounds.minX + (track.bounds.maxX - track.bounds.minX) * 0.5;
-        liftLine(bal - 84, bal + 85, bal + 8);
-        cabinSkip.push(bal + 8);
-        const [lx] = assignSlots(plan.slots, [null]) as [number];
-        lodge(lx, lx + 22);
-        cabinSkip.push(lx, lx + 22);
-        // The ice tunnel ("The Ice Cave", 438–458, tracks.md §7.3 item 1): a covered stretch open
-        // on the camera side (+z) — the ice curtain scaled up makes the far wall (z −depth/2 − 1)
-        // and single icicle columns the near posts (z +depth/2 + 0.6, every 5 m), a snow-capped
-        // ice slab is the roof at deck + `height`, and lanterns hang under it (`lit`).
-        for (const t of plan.tunnels.filter((t) => t.style === 'ice')) {
-          const len = t.x1 - t.x0;
-          const cx = (t.x0 + t.x1) / 2;
-          const deck = Math.max(profileY(profile, t.x0), profileY(profile, cx), profileY(profile, t.x1));
-          const roof = deck + t.height;
-          const hz = t.depth / 2 + 0.6;
-          for (let x = t.x0 + 2; x < t.x1; x += 4) {
-            const gy = gyAt(x, -hz - 0.4);
-            curtain.add(x, gy - 0.4, -hz - 0.4, rng.range(-0.2, 0.2), 4.6, null, 0, (roof + 0.6 - gy) / 1.0, 3.2);
-          }
-          // Near posts: slim icicle columns (≈ 0.45 m) every 6 m — the camera looks in between them.
-          const nPost = Math.max(2, Math.round(len / 6));
-          for (let i = 0; i <= nPost; i++) {
-            const x = t.x0 + (len * i) / nPost;
-            const gy = gyAt(x, hz);
-            curtain.add(x, gy - 0.3, hz, rng.range(-0.3, 0.3), 0.5, null, 0, (roof + 0.5 - gy) / 1.0, 0.5);
-          }
-          const slab = new THREE.Mesh(bakeAO(new THREE.BoxGeometry(1, 0.6, 1).translate(0, 0.3, 0), 0.6, 0.25), iceSolid);
-          slab.position.set(cx, roof, 0);
-          slab.scale.set(len + 3, 1, hz * 2 + 1.6);
-          slab.castShadow = true;
-          slab.receiveShadow = true;
-          meshes.push(slab);
-          const cap = new THREE.Mesh(vc(snowBankGeometry(track.def.seed ^ 0x1ce)), bankMat);
-          cap.position.set(cx, roof + 0.55, -1.0);
-          cap.scale.set(len + 3, 1.6, hz * 1.4);
-          meshes.push(cap);
-          if (t.lit) {
-            for (let x = t.x0 + 3; x < t.x1 - 1; x += 6) {
-              lanterns.add(x, roof - 0.9, -1.8, 0);
-              glass.add(x, roof - 0.9, -1.8, 0);
-              lamps.push({ x, y: roof - 1.2, z: -1.8 }); // the follow spot parks 0.2 m under this: below the cage, like the lantern posts
-            }
-          }
-        }
-        batches.push(curtain);
-      } else if (isM2 || (!isX1 && track.def.seed % 2 === 0)) {
-        liftLine(track.bounds.minX + 12, track.bounds.maxX + 10, track.bounds.minX + 18);
-      } else {
-        lodge(setX, track.bounds.minX + (track.bounds.maxX - track.bounds.minX) * 0.72);
-        batches.push(curtain);
-      }
-      // Cabins every 24–40 m in the mid tier (skipping the set piece's stretch).
-      for (let x = x0 + 18; x < x1 - 10; x += rng.range(24, 40)) {
-        if (Math.abs(x - setX) < 16 || cabinSkip.some((sx) => Math.abs(x - sx) < 16)) continue;
-        const z = rng.range(-13, -27);
-        cabinAt(x, z, rng.range(5, 8.5), rng.range(2.8, 3.5), rng.range(4, 6), rng.range(-0.25, 0.25));
-      }
-      // Snow banks hugging the trail on both sides (the ploughed edge), gravel showing through at the edge.
-      for (let x = x0 + 2; x < x1; x += rng.range(2.2, 4.5)) {
-        if (rng.next() > 0.25) banks.add(x, profileY(profile, x) - 0.55, rng.range(-4.2, -3.0), rng.range(0, 6), rng.range(1.4, 2.8), null, 0, rng.range(0.45, 0.9), rng.range(0.7, 1.1));
-        if (rng.next() > 0.55 && !keepOut(x, 1.5)) banks.add(x, profileY(profile, x) - 0.6, rng.range(3.6, 4.6), rng.range(0, 6), rng.range(1.0, 2.0), null, 0, rng.range(0.3, 0.6), rng.range(0.5, 0.8));
-        for (let k = 0; k < 3; k++) {
-          const side = rng.next() < 0.6 ? -1 : 1;
-          const gz = side * rng.range(2.7, 3.3);
-          if (side > 0 && keepOut(x, 0.5)) continue;
-          gravel.add(x + rng.range(-1, 1), gyAt(x, gz) + 0.02, gz, rng.range(0, 6), rng.range(0.06, 0.16), 0x5a5e66, 0, rng.range(0.04, 0.1), rng.range(0.06, 0.16));
-        }
-      }
-      // Ice patches and ruts on the apron beside the deck where it is flat.
-      for (let x = x0 + 8; x < x1; x += rng.range(6, 13)) {
-        const slope = Math.abs(profileY(profile, x + 1.5) - profileY(profile, x - 1.5));
-        if (slope > 0.2) continue;
-        const z = rng.next() < 0.55 ? rng.range(-2.4, -3.2) : rng.range(2.4, 3.2);
-        if (z > 0 && keepOut(x, 2)) continue;
-        if (rng.next() < 0.5) ice.add(x, gyAt(x, z) + 0.014, z, rng.range(0, 6), rng.range(0.8, 1.8), null, 0, 1, rng.range(0.5, 1.0));
-        else ruts.add(x, gyAt(x, z) + 0.014, z, rng.range(-0.08, 0.08), 0.22, null, 0, 1, rng.range(2.0, 4.5));
-      }
-      // Far tier: ridge tree lines at z −60…−85 (big, unshadowed) and the mid conifer row at z −24…−40.
-      for (let x = x0 - 60; x < x1 + 60; x += rng.range(5, 9)) {
-        treeAt(x, gyAt(x, -33) - 4 + rng.range(-1, 1), rng.range(-85, -60), rng.range(2.0, 3.2), false);
-      }
-      for (let x = x0 - 40; x < x1 + 40; x += rng.range(7, 13)) {
-        const z = rng.range(-40, -24);
-        treeAt(x, gyAt(x, Math.max(z, -28)) - 0.6, z, rng.range(1.1, 1.7), false);
-      }
-      // Near shelf (z −3.7…−6.5): 2.4 m slots, a cluster on ~65 %.
-      for (let x = x0 + 6; x < x1; x += 2.4) {
-        const r = rng.next();
-        if (r < 0.35) continue;
-        const z = rng.range(-3.7, -6.5);
-        const gy = gyAt(x, z);
-        if (r < 0.5) {
-          const sc = rng.range(0.55, 0.95);
-          treeAt(x, gy - 0.3, z - 1.5, sc, true);
-          shadowAt(x, gy, z - 1.5, 1.3 * sc);
-          driftAt(x, gy, z - 1.5, 1.2);
-        } else if (r < 0.6) {
-          logs.add(x, gy, z, rng.range(-0.2, 0.2));
-          shadowAt(x, gy, z, 0.9, 0.7);
-          driftAt(x, gy, z, 0.9);
-        } else if (r < 0.68) {
-          sleds.add(x, gy, z, rng.range(-0.5, 0.5));
-          shadowAt(x, gy, z, 0.7, 0.4);
-        } else if (r < 0.76) {
-          drums.add(x, gy, z, rng.range(0, 6), 1, rng.next() < 0.5 ? 0xd8d2c4 : null);
-          crateSnow.add(x, gy - 0.15, z, 0, 0.62);
-          shadowAt(x, gy, z, 0.55);
-          driftAt(x, gy, z, 0.6);
-        } else if (r < 0.86) {
-          const sc = rng.range(0.8, 1.3);
-          const ry = rng.range(-0.3, 0.3);
-          crates.add(x, gy, z, ry, sc);
-          crateSnow.add(x, gy, z, ry, sc);
-          shadowAt(x, gy, z, 0.8 * sc);
-          driftAt(x, gy, z, 0.9 * sc);
-        } else {
-          // Lantern post: a real follow-spot pool (kit.lamps) and a warm bulb.
-          woodPosts.add(x, gy, z, 0, 1, null, 0, 2.7, 1);
-          postCaps.add(x, gy + 2.7, z, 0, 1.4);
-          lanterns.add(x, gy + 2.55, z + 0.3, 0);
-          glass.add(x, gy + 2.55, z + 0.3, 0);
-          lamps.push({ x, y: gy + 2.05, z: z + 0.3 }); // the follow spot parks 0.2 m under this: below the cage, not inside it
-          shadowAt(x, gy, z, 0.35);
-        }
-      }
-      // Fence runs with snow caps along the far edge (z −4.3) and near edge (z +4.2).
-      for (let x = x0 + 10; x < x1; x += rng.range(16, 34)) {
-        const n = rng.int(3, 7);
-        const far = rng.next() < 0.6;
-        const z = far ? -4.3 : 4.2;
-        for (let i = 0; i <= n; i++) {
-          const fx = x + i * 2.4;
-          if (!far && keepOut(fx, 1.3)) continue;
-          const gy = gyAt(fx, z);
-          woodPosts.add(fx - 1.2, gy, z, 0, 1, null, 0, 1.05, 1);
-          postCaps.add(fx - 1.2, gy + 1.05, z, 0);
-          if (i < n) {
-            fence.add(fx, gy, z, 0);
-            fenceSnow.add(fx, gy, z, 0);
-          }
-          shadowAt(fx - 1.2, gy, z, 0.3);
-        }
-      }
-      // Near ledge in front (z +3.6…+5.2): low things only, outside keep-outs.
-      for (let x = x0 + 6; x < x1; x += rng.range(2.5, 5)) {
-        if (keepOut(x, 1)) continue;
-        const z = rng.range(3.6, 5.2);
-        const gy = gyAt(x, z);
-        const r = rng.next();
-        if (r < 0.4) banks.add(x, gy - 0.3, z, rng.range(0, 6), rng.range(1.0, 1.8), null, 0, rng.range(0.3, 0.5), rng.range(0.6, 1.0));
-        else if (r < 0.65) {
-          sleds.add(x, gy - 0.05, z, rng.range(-0.6, 0.6));
-          shadowAt(x, gy, z, 0.7, 0.4);
-        } else if (r < 0.85) {
-          logs.add(x, gy - 0.1, z, rng.range(-0.3, 0.3), 0.8, null, 0, 0.6, 0.8);
-          shadowAt(x, gy, z, 0.8, 0.6);
-        } else {
-          woodPosts.add(x, gy - 0.1, z, 0, 1, null, 0, 0.9, 1);
-          postCaps.add(x, gy + 0.8, z, 0);
-          shadowAt(x, gy, z, 0.3);
-        }
-      }
-      // Mid band (z −7…−16): conifers, crates, the odd tall lamp post.
-      for (let x = x0 + 4; x < x1; x += rng.range(3.5, 7)) {
-        const z = rng.range(-7, -16);
-        const gy = gyAt(x, z);
-        const r = rng.next();
-        if (r < 0.7) {
-          const sc = rng.range(0.7, 1.4);
-          treeAt(x, gy - 0.4, z, sc, true);
-          shadowAt(x, gy, z, 1.4 * sc);
-          if (rng.next() < 0.5) banks.add(x + rng.range(-1, 1), gy - 0.3, z + rng.range(-1, 1), rng.range(0, 6), rng.range(1.5, 3), null, 0, rng.range(0.4, 0.8), rng.range(1.5, 3));
-        } else if (r < 0.85) {
-          const sc = rng.range(0.8, 1.3);
-          const ry = rng.range(-0.3, 0.3);
-          crates.add(x, gy, z, ry, sc);
-          crateSnow.add(x, gy, z, ry, sc);
-          shadowAt(x, gy, z, 0.8 * sc);
-        } else {
-          posts.add(x, gy, z, 0, 1, null, 0, 3.4, 1);
-          lanterns.add(x, gy + 3.4, z + 0.3, 0);
-          glass.add(x, gy + 3.4, z + 0.3, 0);
-          shadowAt(x, gy, z, 0.3);
-        }
-        if (rng.next() < 0.1 && !keepOut(x + 2, 2)) {
-          const fz = rng.range(6.5, 8.5);
-          treeAt(x + 2, gyAt(x + 2, fz) - 1.0, fz, rng.range(0.9, 1.4), true);
-        }
-      }
-      // Event start / finish: string lights over the gate and along the barrier, braziers
-      // (`kit.fountains` + `meltLights`), firewood stacks, flags come from the gates kit.
-      const bulbMat = fogify(new THREE.MeshStandardMaterial({ color: 0x402a10, emissive: 0xffd080, emissiveIntensity: 1.8, roughness: 0.4 }));
-      const bulbs = PB('stringbulb', new THREE.SphereGeometry(0.07, 6, 5), bulbMat, false);
-      const cables = PB('stringcable', new THREE.BoxGeometry(1, 0.02, 0.02).translate(0.5, 0, 0), lib.get('darkSteel'), false);
-      const braziers = PB('brazier', brazierGeometry(), lib.get('rustSteel'));
-      const fireMat = fogify(new THREE.MeshStandardMaterial({ color: 0x1a0a04, emissive: 0xff7a1a, emissiveIntensity: 1.7, roughness: 0.6 }));
-      flicker.push(fireMat);
-      const fires = PB('brazierfire', brazierFireGeometry(), fireMat, false);
-      for (const ex of [track.def.start.pos.x, track.def.finishX]) {
-        const gy0 = profileY(profile, ex);
-        // Over the gate: a sagging string across the deck at gate height.
-        for (let i = 0; i <= 10; i++) {
-          const t = i / 10;
-          const z = -2.3 + 4.6 * t;
-          const y = gy0 + 5.1 - 0.35 * Math.sin(t * Math.PI);
-          bulbs.add(ex - 1.0, y - 0.08, z);
-          if (i < 10) {
-            const zn = -2.3 + 4.6 * ((i + 1) / 10);
-            const yn = gy0 + 5.1 - 0.35 * Math.sin(((i + 1) / 10) * Math.PI);
-            const L = Math.hypot(zn - z, yn - y);
-            cables.add(ex - 1.0, y, z, Math.PI / 2, L, null, Math.atan2(yn - y, zn - z), 1, 1);
-          }
-        }
-        // Along the crowd barrier on posts at 2.2 m.
-        const xa = ex - 9;
-        const xb = ex + 7;
-        for (let x = xa; x <= xb + 0.01; x += 4) {
-          const gy = gyAt(x, -4.15);
-          woodPosts.add(x, gy, -4.15, 0, 1, null, 0, 2.3, 1);
-          postCaps.add(x, gy + 2.3, -4.15, 0, 1.2);
-          if (x + 4 <= xb + 0.01) {
-            const gyn = gyAt(x + 4, -4.15);
-            for (let k = 0; k <= 5; k++) {
-              const t = k / 5;
-              bulbs.add(x + 4 * t, gy + (gyn - gy) * t + 2.2 - 0.25 * Math.sin(t * Math.PI) - 0.07, -4.15);
-            }
-            cables.add(x, gy + 2.2, -4.15, 0, Math.hypot(4, gyn - gy), null, Math.atan2(gyn - gy, 4), 1, 1);
-          }
-        }
-        for (const dx of [-10.5, 9.5]) {
-          const bx = ex + dx;
-          const gy = gyAt(bx, -6.4);
-          braziers.add(bx, gy, -6.4, 0);
-          fires.add(bx, gy, -6.4, 0);
-          fountains.push({ x: bx, y: gy + 1.0, z: -6.4 });
-          shadowAt(bx, gy, -6.4, 0.6);
-          driftAt(bx, gy, -6.4, 0.7);
-          logs.add(bx + 1.6, gyAt(bx + 1.6, -6.6), -6.6, 0.1);
-        }
-      }
-      // Braziers at the checkpoints too (the pools mark the spawns in the fog).
-      for (const cp of track.def.checkpoints) {
-        const bx = cp.x + 8;
-        const gy = gyAt(bx, -5.8);
-        braziers.add(bx, gy, -5.8, 0);
-        fires.add(bx, gy, -5.8, 0);
-        fountains.push({ x: bx, y: gy + 1.0, z: -5.8 });
-        shadowAt(bx, gy, -5.8, 0.6);
-      }
-      batches.push(banks, ...pines, ...caps, ...pinesFar, ...capsFar, crates, crateSnow, posts, woodPosts, postCaps, fence, fenceSnow, lanterns, glass, logs, sleds, drums, gravel, ice, ruts, cabins, roofs, roofSnow, windows, doors, chimneys, bulbs, cables, braziers, fires, shadows);
     } else {
       // nightCity (round 11, "industrial to the bar" recipe): the street is built at deck level —
       // near facades with lit shops at z −12, parked cars / dumpsters / bollards / hydrants /

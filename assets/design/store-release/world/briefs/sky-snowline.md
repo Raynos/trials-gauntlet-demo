@@ -1,0 +1,7 @@
+You are generating ONE image with the built-in image_gen tool. Generate exactly one image at the size stated below. Then copy the generated PNG to the exact output path given at the end of this prompt (mkdir -p the folder). Do not edit any other file. Report the saved path.
+
+Context: ROCKHOP is an original 2.5D side-on motorbike physics game shipping to the App Store and Google Play. Its world has four zones: COAST (a coastal scrapyard harbour, teal/rust daylight), ALPINE (pine forest trail with a sawmill, warm afternoon), QUARRY (desert open-pit sandstone quarry, cream/ochre/rose stone under a teal sky, late-afternoon light) and SNOWLINE (glacier and ski lifts, cold blue/white, low sun). The attached reference images are the approved look: painterly, richly detailed, sunlit, saturated but natural, the rendering quality of a premium mobile game key art.
+Hard rules: absolutely NO text, NO letters, NO numbers, NO logos, NO signs with writing, NO UI, NO labels, NO map markers, NO pins, NO icons, NO frames, NO letterbox bars, NO people, NO riders. No real brands.
+
+## THIS IMAGE: SNOWLINE sky panorama, 1536 x 1024 landscape
+Sky only, a seamless wide panorama for a game's sky dome: cold pale-blue winter sky, thin cirrus, a warm low-sun glow near the horizon on one side. The bottom 20 percent is a soft pale horizon haze (no land, no sea, no objects at all). Evenly distributed clouds left to right so it tiles horizontally; no sun disc in frame.

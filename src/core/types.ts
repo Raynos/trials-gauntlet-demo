@@ -100,7 +100,7 @@ export interface TrackDef {
 // ---------------------------------------------------------------------------
 
 export type SurfaceKind = 'dirt' | 'wood' | 'metal' | 'concrete' | 'rubber' | 'grate' | 'stone' | 'snow';
-export type BiomeId = 'industrial' | 'canyon' | 'snow' | 'nightCity' | 'foundry';
+export type BiomeId = 'industrial' | 'canyon' | 'snow' | 'nightCity' | 'foundry' | 'coast' | 'alpine' | 'quarry';
 
 /** Authored camera key for a stretch of track; consumed by render only. */
 export interface CameraKey {

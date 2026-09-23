@@ -215,7 +215,7 @@ function warehouseWall(rng: Rng, paneColor: string, brick: string, foundry = fal
   if (rng.next() < 0.6) {
     g.fillStyle = 'rgba(230,220,200,0.45)';
     g.font = `bold ${Math.floor(0.9 * px)}px Impact, "Arial Black", sans-serif`;
-    g.fillText(rng.next() < 0.5 ? 'TRIALS' : 'BAY ' + rng.int(1, 9), 3 * px, H - 1.6 * px);
+    g.fillText(rng.next() < 0.5 ? 'ROCKHOP' : 'BAY ' + rng.int(1, 9), 3 * px, H - 1.6 * px);
   }
   return { map: tex(c), emissive: tex(ce, true), bytes: W * H * 4 * 1.33 * 2 };
 }

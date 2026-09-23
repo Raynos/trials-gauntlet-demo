@@ -60,7 +60,11 @@ export function idsFor(biome: string): string[] {
     case 'canyon':
       return [...COMMON_IDS, 'plate-canyon', 'sky-canyon'];
     case 'snow':
-      return [...COMMON_IDS, 'plate-snow', 'sky-snow'];
+      return [...COMMON_IDS, 'plate-snowline', 'sky-snowline'];
+    case 'coast':
+    case 'alpine':
+    case 'quarry':
+      return [...COMMON_IDS, `plate-${biome}`, `sky-${biome}`];
     case 'nightCity':
       return [...COMMON_IDS, 'plate-nightcity', 'sky-nightcity'];
     default:

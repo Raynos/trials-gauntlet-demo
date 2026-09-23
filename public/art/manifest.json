@@ -1244,6 +1244,98 @@
    "v": "47934321",
    "biome": "nalati",
    "variant": "1x"
+  },
+  {
+   "id": "plate-coast",
+   "path": "art/plates/plate-coast.webp",
+   "kind": "plate-far",
+   "w": 2048,
+   "h": 512,
+   "bytes": 111820,
+   "v": "36480bdf",
+   "biome": "coast",
+   "tileX": true,
+   "alphaFadeBottom": 0.2
+  },
+  {
+   "id": "plate-alpine",
+   "path": "art/plates/plate-alpine.webp",
+   "kind": "plate-far",
+   "w": 2048,
+   "h": 512,
+   "bytes": 138888,
+   "v": "1ce66b55",
+   "biome": "alpine",
+   "tileX": true,
+   "alphaFadeBottom": 0.22
+  },
+  {
+   "id": "plate-quarry",
+   "path": "art/plates/plate-quarry.webp",
+   "kind": "plate-far",
+   "w": 2048,
+   "h": 512,
+   "bytes": 133008,
+   "v": "91ec1b24",
+   "biome": "quarry",
+   "tileX": true,
+   "alphaFadeBottom": 0.2
+  },
+  {
+   "id": "plate-snowline",
+   "path": "art/plates/plate-snowline.webp",
+   "kind": "plate-far",
+   "w": 2048,
+   "h": 512,
+   "bytes": 178602,
+   "v": "09d035b7",
+   "biome": "snow",
+   "tileX": true,
+   "alphaFadeBottom": 0.22
+  },
+  {
+   "id": "sky-coast",
+   "path": "art/plates/sky-coast.webp",
+   "kind": "sky",
+   "w": 2048,
+   "h": 1024,
+   "bytes": 71536,
+   "v": "42263622",
+   "biome": "coast",
+   "tileX": true
+  },
+  {
+   "id": "sky-alpine",
+   "path": "art/plates/sky-alpine.webp",
+   "kind": "sky",
+   "w": 2048,
+   "h": 1024,
+   "bytes": 78170,
+   "v": "46d1e706",
+   "biome": "alpine",
+   "tileX": true
+  },
+  {
+   "id": "sky-quarry",
+   "path": "art/plates/sky-quarry.webp",
+   "kind": "sky",
+   "w": 2048,
+   "h": 1024,
+   "bytes": 56602,
+   "v": "61753691",
+   "biome": "quarry",
+   "tileX": true
+  },
+  {
+   "id": "sky-snowline",
+   "path": "art/plates/sky-snowline.webp",
+   "kind": "sky",
+   "w": 2048,
+   "h": 1024,
+   "bytes": 94842,
+   "v": "998e3855",
+   "biome": "snow",
+   "tileX": true
   }
  ]
 }

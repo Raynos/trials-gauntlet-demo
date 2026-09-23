@@ -12,9 +12,9 @@ export const ZONE_ORDER: readonly ZoneId[] = ['coast', 'alpine', 'quarry', 'snow
 
 /** Zone -> the nearest existing biome until the World owner's zone ids land (the one-line swap). */
 export const ROCKHOP_ZONE_BIOME: { readonly [Z in ZoneId]: BiomeId } = {
-  coast: 'industrial',
-  alpine: 'canyon',
-  quarry: 'canyon',
+  coast: 'coast',
+  alpine: 'alpine',
+  quarry: 'quarry',
   snowline: 'snow',
 };
 

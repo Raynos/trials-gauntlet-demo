@@ -42,12 +42,15 @@ export interface Biome {
   /** Default ridden surface when a collider has none we know. */
   groundSurface: 'dirt' | 'concrete' | 'snow' | 'stone' | 'metal';
   /** Ambient particles. */
-  ambient: 'motes' | 'snow' | 'embers' | 'dust' | 'none';
+  ambient: 'motes' | 'snow' | 'embers' | 'dust' | 'pollen' | 'haze' | 'none';
   /** Heat-haze shimmer amplitude (screen uv) and the screen height (0 = bottom) where it fades in. */
   heatHaze?: number;
   heatHazeV?: number;
   /** Sky clouds: 0 = none, 1 = a few cumulus near the horizon. */
   clouds?: number;
+  /** Store release: scale on the riding camera's pitch / yaw (the zones frame near side-on so the horizon reads). */
+  camPitchScale?: number;
+  camYawScale?: number;
   /** Floor-fog base height is relative to the ground floor (`groundFloorY`), set per track by the lighting rig. */
   /** Whether the scene is an interior (back wall + roof instead of a sky dome). */
   interior: boolean;
@@ -133,37 +136,36 @@ export const BIOMES: Record<BiomeId, Biome> = {
   },
   snow: {
     id: 'snow',
-    // Round 11: pale low key from the camera side, blue fill low so the lantern / window pools
-    // read, dense blue-grey air in three tiers (reference 15: p50 ≈ 0.47, everything past 40 m
-    // is a silhouette; the glowing windows are the depth cue), warm lanterns as follow spots,
-    // braziers as point lights.
-    sunDir: [-0.32, 0.4, 0.62],
-    sunColor: 0xe6eeff,
-    sunIntensity: 1.5,
-    hemiSky: 0xa8bcd8,
-    hemiGround: 0x5e6a80,
-    hemiIntensity: 0.75,
-    skyZenith: 0x6c819c,
-    skyHorizon: 0xb4c2d2,
-    skyGround: 0x98a4b4,
-    sunDiscIntensity: 6,
-    envIntensity: 0.7,
-    exposure: 0.8,
-    fogTiers: [13, 36, 72],
-    fogColor: 0x8298b6,
-    floorFog: { h0: 0.2, hs: 2.0, density: 0.22 },
-    gradeLift: [0.0, 0.008, 0.03],
-    gradeGain: [0.88, 0.95, 1.08],
-    saturation: 0.9,
-    contrast: 1.04,
-    vignette: 0.32,
-    bloomStrength: 0.6,
+    camPitchScale: 0.38,
+    camYawScale: 0.7,
+    // Store release (D5 / D20): SNOWLINE — B-ride-snow. A low warm sun from the camera side over
+    // cold blue snow: long blue shadows, a bright sky, glacier ice and ski-lift towers in the mid
+    // tier, the painted range behind. Daylight — no lanterns, no braziers.
+    sunDir: [-0.5, 0.36, 0.62],
+    sunColor: 0xffe2c0,
+    sunIntensity: 3.0,
+    hemiSky: 0x9cc0ec,
+    hemiGround: 0x7890b4,
+    hemiIntensity: 0.95,
+    skyZenith: 0x2f6fc4,
+    skyHorizon: 0xe4ecf4,
+    skyGround: 0xb4c4d8,
+    sunDiscIntensity: 24,
+    envIntensity: 0.8,
+    exposure: 0.92,
+    fogTiers: [55, 150, 360],
+    fogColor: 0xc6d6ea,
+    floorFog: { h0: 0.2, hs: 2.0, density: 0.05 },
+    gradeLift: [0.0, 0.004, 0.014],
+    gradeGain: [1.0, 0.99, 1.02],
+    saturation: 1.04,
+    contrast: 1.08,
+    vignette: 0.2,
+    bloomStrength: 0.3,
     groundSurface: 'snow',
     ambient: 'snow',
     clouds: 0.6,
     interior: false,
-    lampLights: { color: 0xffb860, intensity: 32, distance: 12, angle: 0.75, penumbra: 0.8 }, // snow albedo ≈ 0.9: 160 cd blew the pool and the cage to white
-    meltLights: { color: 0xff9a40, intensity: 40, distance: 14, count: 2 },
   },
   nightCity: {
     id: 'nightCity',
@@ -233,6 +235,106 @@ export const BIOMES: Record<BiomeId, Biome> = {
     heatHazeV: 0.42,
     interior: true,
     meltLights: { color: 0xff7a22, intensity: 140, distance: 34, count: 4 },
+  },
+  coast: {
+    id: 'coast',
+    camPitchScale: 0.38,
+    camYawScale: 0.7,
+    // Store release (D5 / D20): COAST — the coastal scrapyard of C-ride. High clear daylight from
+    // the camera side (the container fronts and the rider are the lit faces), a bright blue sky
+    // fill so the shadows read cool, a pale sea haze in three tiers: junk + containers at deck
+    // level / container stacks, cranes and the beached hull / the painted bay and its wrecks.
+    sunDir: [-0.42, 0.74, 0.52],
+    sunColor: 0xfff0da,
+    sunIntensity: 3.3,
+    hemiSky: 0x9ccaf0,
+    hemiGround: 0x6e6252,
+    hemiIntensity: 0.95,
+    skyZenith: 0x2a78cc,
+    skyHorizon: 0xd4eaf4,
+    skyGround: 0x4a6a74,
+    sunDiscIntensity: 30,
+    envIntensity: 0.95,
+    exposure: 1.05,
+    fogTiers: [90, 220, 480],
+    fogColor: 0xaccade,
+    gradeLift: [0.0, 0.004, 0.008],
+    gradeGain: [1.02, 1.0, 0.98],
+    saturation: 1.08,
+    contrast: 1.08,
+    vignette: 0.16,
+    bloomStrength: 0.3,
+    groundSurface: 'dirt',
+    ambient: 'haze',
+    clouds: 1,
+    interior: false,
+  },
+  alpine: {
+    id: 'alpine',
+    camPitchScale: 0.38,
+    camYawScale: 0.7,
+    // Store release (D5 / D20): ALPINE — the forest trail of B-ride. Warm afternoon key from the
+    // camera side, cool sky fill, a blue lake haze: grass, log stacks and stumps at deck level /
+    // pine rows, the sawmill and its water wheel / the painted range and lake.
+    sunDir: [-0.58, 0.56, 0.48],
+    sunColor: 0xffdcaa,
+    sunIntensity: 3.5,
+    hemiSky: 0xa4c4ea,
+    hemiGround: 0x4e5a32,
+    hemiIntensity: 0.9,
+    skyZenith: 0x3478c8,
+    skyHorizon: 0xe6e8dc,
+    skyGround: 0x4a5a3a,
+    sunDiscIntensity: 30,
+    envIntensity: 0.85,
+    exposure: 1.05,
+    fogTiers: [60, 160, 380],
+    fogColor: 0xbfd0dc,
+    gradeLift: [0.004, 0.004, 0.002],
+    gradeGain: [1.04, 1.0, 0.95],
+    saturation: 1.06,
+    contrast: 1.08,
+    vignette: 0.2,
+    bloomStrength: 0.3,
+    groundSurface: 'dirt',
+    ambient: 'pollen',
+    clouds: 0.8,
+    interior: false,
+  },
+  quarry: {
+    id: 'quarry',
+    camPitchScale: 0.38,
+    camYawScale: 0.7,
+    // Store release (D23): QUARRY — Q2's late-afternoon open pit. A low warm key raking across
+    // cream / ochre / rose stone, a teal sky fill, dust and heat shimmer: cut blocks, ore carts and
+    // plank bridges at deck level / terraced benches falling into the pit with its turquoise pool,
+    // the headframe and conveyor gantries / the painted far wall and mesas.
+    sunDir: [-0.7, 0.46, 0.42],
+    sunColor: 0xffc890,
+    sunIntensity: 3.7,
+    hemiSky: 0x8cc4d8,
+    hemiGround: 0xa47c56,
+    hemiIntensity: 0.8,
+    skyZenith: 0x1c6c8c,
+    skyHorizon: 0xf2dcbc,
+    skyGround: 0x9a7456,
+    sunDiscIntensity: 32,
+    envIntensity: 0.85,
+    exposure: 1.02,
+    fogTiers: [70, 180, 420],
+    fogColor: 0xe2c8a8,
+    gradeLift: [0.006, 0.004, 0.002],
+    gradeGain: [1.04, 1.0, 0.94],
+    saturation: 1.02,
+    contrast: 1.1,
+    vignette: 0.22,
+    bloomStrength: 0.3,
+    groundSurface: 'dirt',
+    ambient: 'dust',
+    heatHaze: 0.0016,
+    heatHazeV: 0.4,
+    clouds: 0.7,
+    interior: false,
   },
 };
 

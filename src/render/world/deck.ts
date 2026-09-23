@@ -257,6 +257,9 @@ export interface DeckResult extends TrackMeshes {
   supports: THREE.Group;
 }
 
+/** Store release: per-zone multiplier on the shared dirt ribbon's baked colour. */
+const ZONE_DIRT: Partial<Record<string, [number, number, number]>> = { coast: [1.18, 1.1, 0.98], alpine: [1.12, 0.96, 0.74], quarry: [1.9, 1.68, 1.32] };
+
 export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: MaterialLibrary): DeckResult {
   const group = new THREE.Group();
   group.name = 'deck';
@@ -267,7 +270,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   const interior = biome.interior;
   const floorY = groundFloorY(track.def.profile, interior);
 
-  const rocks = new PropBatch('edge-rock', rockGeometry(track.def.seed ^ 77, 1), lib.get('rock'));
+  const rocks = new PropBatch('edge-rock', rockGeometry(track.def.seed ^ 77, 1), biome.id === 'quarry' ? lib.get('concrete') : lib.get('rock')); // quarry: pale stone, not the baked-orange rock albedo
   const pallets = new PropBatch('support-pallet', bakeAO(palletLowGeometry(), 0.144, 0.25), lib.get('pallet'), false);
   const stacks = new PropBatch('support-stack', palletStackGeometry(3), lib.get('pallet'), false);
   // Round 9 (b1 read 1 920 stack instances = 346 k tris: a 2.5 m remainder was 18 pallets high):
@@ -300,23 +303,29 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
       continue;
     }
     if (surf === 'dirt') {
-      const section = ground ? (biome.id === 'canyon' ? RUT_SECTION : WIDE_SECTION) : OBSTACLE_SECTION;
+      const rutted = biome.id === 'canyon' || biome.id === 'quarry' || biome.id === 'alpine';
+      const section = ground ? (rutted ? RUT_SECTION : WIDE_SECTION) : OBSTACLE_SECTION;
       const rib = ribbonWithShade(pl, section, tile, ground ? 0 : 0.004, (z, drop) => {
         // Canyon: two tyre ruts (z ±0.4) worn darker, a pale crown between them; elsewhere one worn line.
-        const wear = biome.id === 'canyon' ? (Math.abs(Math.abs(z) - 0.4) < 0.16 ? 0.7 : Math.abs(z) < 0.2 ? 1.1 : 1) : Math.abs(z) < 0.3 ? 0.72 : 1;
+        const wear = rutted ? (Math.abs(Math.abs(z) - 0.4) < 0.16 ? 0.7 : Math.abs(z) < 0.2 ? 1.1 : 1) : Math.abs(z) < 0.3 ? 0.72 : 1;
         return wear * (0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9)));
       });
-      if (biome.id === 'canyon') {
+      const zoneTint = ZONE_DIRT[biome.id];
+      if (zoneTint) {
+        // Store release zones: packed gravel (coast), forest trail (alpine), pale quarry dust.
+        const col = rib.getAttribute('color') as THREE.BufferAttribute;
+        for (let i = 0; i < col.count; i++) col.setXYZ(i, col.getX(i) * zoneTint[0], col.getY(i) * zoneTint[1], col.getZ(i) * zoneTint[2]);
+      } else if (biome.id === 'canyon') {
         // Warm ochre over the shared dirt maps.
         const col = rib.getAttribute('color') as THREE.BufferAttribute;
         for (let i = 0; i < col.count; i++) col.setXYZ(i, col.getX(i) * 1.25, col.getY(i) * 1.02, col.getZ(i) * 0.8);
       }
-      push(buckets, 'dirt', rib);
-      if (biome.id === 'canyon' && ground) {
+      push(buckets, biome.id === 'quarry' ? 'concrete' : 'dirt', rib); // quarry: pale dust over the fine concrete grain
+      if ((biome.id === 'canyon' || biome.id === 'quarry') && ground) {
         const pts = resample(pl.points, 2.6);
         for (const p of pts) {
           for (const side of [-1, 1]) {
-            if (rng.next() < 0.45) rocks.add(p.x + rng.range(-0.5, 0.5), p.y - 0.12, side * rng.range(1.7, 2.3), rng.range(0, 6), rng.range(0.25, 0.65), null, rng.range(-0.3, 0.3), rng.range(0.2, 0.45), rng.range(0.25, 0.65));
+            if (rng.next() < 0.45) rocks.add(p.x + rng.range(-0.5, 0.5), p.y - 0.12, side * rng.range(1.7, 2.3), rng.range(0, 6), rng.range(0.25, 0.65), biome.id === 'quarry' ? 0xf0dcc0 : null, rng.range(-0.3, 0.3), rng.range(0.2, 0.45), rng.range(0.25, 0.65));
           }
         }
       }
@@ -351,7 +360,13 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
       }
       continue;
     }
-    push(buckets, SURFACE_MATERIAL[surf] ?? 'dirt', ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (_z, drop) => 0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9))));
+    const paleStone = surf === 'stone' && biome.id === 'quarry'; // cut sandstone, not the baked-orange rock albedo
+    const rib = ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (_z, drop) => 0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9)));
+    if (paleStone) {
+      const col = rib.getAttribute('color') as THREE.BufferAttribute;
+      for (let i = 0; i < col.count; i++) col.setXYZ(i, col.getX(i) * 1.9, col.getY(i) * 1.7, col.getZ(i) * 1.4);
+    }
+    push(buckets, paleStone ? 'concrete' : (SURFACE_MATERIAL[surf] ?? 'dirt'), rib);
   }
 
   // Supports under the ground profile (interior only): the deck rides on a

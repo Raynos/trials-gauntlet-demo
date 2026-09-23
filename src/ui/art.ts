@@ -229,4 +229,7 @@ export const BIOME_TINT: Record<BiomeId, string> = {
   snow: 'linear-gradient(160deg, #40607f 0%, #1f2f44 55%, #0d1219 100%)',
   nightCity: 'linear-gradient(160deg, #4a2560 0%, #1c3550 55%, #0b0f18 100%)',
   foundry: 'linear-gradient(160deg, #b0400f 0%, #4a1706 55%, #170804 100%)',
+  coast: 'linear-gradient(160deg, #2f8a8c 0%, #1b4a52 55%, #0b1d22 100%)',
+  alpine: 'linear-gradient(160deg, #4f7a3a 0%, #24401f 55%, #0e170c 100%)',
+  quarry: 'linear-gradient(160deg, #d09a5a 0%, #7a4a2c 55%, #241510 100%)',
 };

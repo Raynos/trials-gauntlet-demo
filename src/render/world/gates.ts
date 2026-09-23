@@ -22,6 +22,8 @@ import { CROWD_ATLAS_BYTES, CROWD_CELLS, CROWD_CELL_H, CROWD_CELL_W, castCrowd, 
 import { groundFloorY, profileY } from './track';
 import { foregroundKeepOut } from './hall';
 import { planSetPieces } from './setPieces';
+import { isZone } from './zones/zoneKit';
+import { buildZoneGates } from './zones/zoneGates';
 
 export interface Gates {
   group: THREE.Group;
@@ -41,7 +43,7 @@ export interface Gates {
 const TEAM = ['#2a5cc8', '#e0b83a', '#c8443a', '#3a9a68', '#e07a30', '#e8e6e0', '#7a4ab8', '#3aa8c0'];
 // Fictional sponsors only (round 8 brands audit): the art pack's banner brands plus generic
 // series text. No real-world company or trademark string anywhere in the renderer.
-const SPONSORS = ['VORTEX OIL', 'KESTREL', 'NORDVIK', 'APEX', 'BOLT', 'IRONWORKS', 'TRIALS'];
+const SPONSORS = ['VORTEX OIL', 'KESTREL', 'NORDVIK', 'APEX', 'BOLT', 'ROCKHOP'];
 /** Manifest ids of the sponsor banners (all fictional brands). */
 const BANNER_IDS = ['banner-vortex-oil', 'banner-kestrel-tyres', 'banner-nordvik', 'banner-apex-suspension', 'banner-bolt-energy'];
 
@@ -272,6 +274,15 @@ function cardMaterial(map: THREE.Texture, mode: 0 | 1, anim: Gates['anim'], cell
 }
 
 export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibrary, art: ArtLibrary | null = null): Gates {
+  // Store release: the ROCKHOP zones have their own gate language and no crowd (`zones/zoneGates.ts`).
+  if (isZone(biome.id)) {
+    return buildZoneGates(track, biome, lib, art, {
+      flagMaterial: (anim) => {
+        const t = flagAtlas(new Rng((track.def.seed ^ 0x7f4a7c15) >>> 0), art);
+        return { mat: cardMaterial(t, 1, anim, 4, 1), bytes: 512 * 512 * 4 * 1.33 };
+      },
+    });
+  }
   const group = new THREE.Group();
   group.name = 'gates';
   const profile = track.def.profile;
@@ -548,7 +559,7 @@ export function buildGates(track: CompiledTrack, biome: Biome, lib: MaterialLibr
   // cones round the gates are in the biome kit (`kit.flicker` runs the lightbars).
   if (biome.id === 'nightCity') {
     const sx = track.def.start.pos.x;
-    const led = bannerTexture('TRIALS NIGHT', '#0a1020', '#7fd0ff');
+    const led = bannerTexture('ROCKHOP NIGHT', '#0a1020', '#7fd0ff');
     textureBytes += 1024 * 256 * 4 * 1.33;
     const ledMat = fogify(new THREE.MeshStandardMaterial({ map: led, emissiveMap: led, emissive: 0xffffff, emissiveIntensity: 1.5, roughness: 0.6 }));
     const chk = checkerTexture();
