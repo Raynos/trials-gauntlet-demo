@@ -56,6 +56,7 @@ export class WorldMapScreen extends Screen {
   private readonly names: HTMLDivElement;
   private readonly markerLayer: HTMLDivElement;
   private readonly card: HTMLDivElement;
+  private readonly beam: HTMLDivElement;
   private readonly progress: HTMLDivElement;
   private readonly ride: HTMLButtonElement;
   private readonly ghost: HTMLButtonElement;
@@ -114,7 +115,8 @@ export class WorldMapScreen extends Screen {
     this.names = el('div', 'wm-names');
     this.markerLayer = el('div', 'wm-markers');
     this.card = el('div', 'wm-card');
-    this.scene.append(this.world, this.tier, this.route, this.fog, this.names, this.markerLayer);
+    this.beam = el('div', 'wm-beam', '<span class="wm-beacon"></span>');
+    this.scene.append(this.world, this.tier, this.route, this.fog, this.names, this.beam, this.markerLayer);
     this.view.append(this.scene, el('div', 'wm-haze'), el('div', 'wm-clouds'));
     const brand = el('div', 'wm-brand', `<div class="plate"><b class="wordmark">${wordmarkSvg()}</b><span>World map</span></div>${DEV_SURFACES ? `<div class="stamp">${escapeHtml(BUILD_STAMP_SHORT)}</div>` : ''}`);
     this.progress = el('div', 'wm-progress');
@@ -484,6 +486,12 @@ export class WorldMapScreen extends Screen {
     const s = this.screenOf(ref.marker);
     const safe = this.safeInsets();
     const chrome = this.blocks.filter((b) => b.src !== '.wm-card');
+    // The other markers' 46 px targets weigh three times: the card would rather cover map than a marker.
+    this.refs.forEach((r, i) => {
+      if (i === this.focus) return;
+      const m = this.screenOf(r.marker);
+      for (let n = 0; n < 3; n++) chrome.push({ src: 'marker', l: m.x - 23, t: m.y - 23, r: m.x + 23, b: m.y + 23 });
+    });
     const box = (left: boolean, up: boolean): { l: number; t: number; r: number; b: number } => {
       const l = left ? s.x - gap - cw : s.x + gap;
       const t = up ? s.y - ch * 0.9 : s.y - ch * 0.14;
@@ -507,6 +515,62 @@ export class WorldMapScreen extends Screen {
     this.card.classList.toggle('up', pick[1]);
   }
 
+  /**
+   * Name plates avoid each other: each hangs on its preferred side (right, or left for `PLATE_LEFT`) unless that side
+   * meets a diamond, the focused marker's beam, the card, the chrome, a zone name or a plate already placed — then it
+   * takes the other side when that meets less. In route order, so the road reads the same way every settle.
+   */
+  private placePlates(): void {
+    const v = this.view.getBoundingClientRect();
+    if (!v.width) return;
+    type R = { l: number; t: number; r: number; b: number };
+    const rel = (r: DOMRect): R => ({ l: r.left - v.left, t: r.top - v.top, r: r.right - v.left, b: r.bottom - v.top });
+    const area = (a: R, b: R): number => Math.max(0, Math.min(a.r, b.r) - Math.max(a.l, b.l)) * Math.max(0, Math.min(a.b, b.b) - Math.max(a.t, b.t));
+    const obstacles: R[] = this.blocks.filter((b) => b.src !== 'safe');
+    const beamH = this.far ? 110 : 320;
+    this.refs.forEach((ref, i) => {
+      const s = this.screenOf(ref.marker);
+      obstacles.push({ l: s.x - 12, t: s.y - 12, r: s.x + 12, b: s.y + 12 });
+      // The focused marker: its beam, and the ring + bike at its foot.
+      if (i === this.focus) obstacles.push({ l: s.x - 10, t: s.y - beamH, r: s.x + 10, b: s.y }, { l: s.x - 28, t: s.y - 16, r: s.x + 28, b: s.y + 28 });
+    });
+    for (const n of this.names.children) obstacles.push(rel(n.getBoundingClientRect()));
+    const placed: R[] = [];
+    const view: R = { l: 0, t: 0, r: v.width, b: v.height };
+    const cost = (r: R): number => {
+      let c = (r.r - r.l) * (r.b - r.t) - area(r, view);
+      for (const o of obstacles) c += area(r, o);
+      for (const o of placed) c += 2 * area(r, o);
+      return c;
+    };
+    this.refs.forEach((ref, i) => {
+      const plate = ref.el.querySelector<HTMLElement>('.wm-plate');
+      if (i === this.focus || !plate) return;
+      const pref = PLATE_LEFT.has(ref.marker.track.id);
+      const set = (left: boolean, down: boolean): R => {
+        ref.el.classList.toggle('lead-left', left);
+        ref.el.classList.toggle('lead-down', down);
+        return rel(plate.getBoundingClientRect());
+      };
+      let pick = set(pref, false);
+      if (pick.r - pick.l < 1) return;
+      let best = cost(pick);
+      let side: [boolean, boolean] = [pref, false];
+      for (const [left, down] of [[!pref, false], [pref, true], [!pref, true]] as [boolean, boolean][]) {
+        if (best <= 0) break;
+        const r = set(left, down);
+        const c = cost(r);
+        if (c < best) {
+          best = c;
+          pick = r;
+          side = [left, down];
+        }
+      }
+      set(side[0], side[1]);
+      placed.push(pick);
+    });
+  }
+
   /** The side safe areas (px) as the page resolves them (`--sal` / `--sar` on a probe; 0 in jsdom). */
   private safeInsets(): { l: number; r: number } {
     const p = this.root.querySelector<HTMLElement>('.wm-safe');
@@ -520,7 +584,11 @@ export class WorldMapScreen extends Screen {
     this.placeCard();
     this.measureBlocks();
     const hit = (sx: number, sy: number): boolean => {
-      for (const b of this.blocks) if (sx + 23 > b.l && sx - 23 < b.r && sy + 23 > b.t && sy - 23 < b.b) return true;
+      // A tappable box (MENU, the pills) may not meet the 46 px target; the card (it takes no pointer) only the diamond itself.
+      for (const b of this.blocks) {
+        const m = b.src === '.wm-card' ? 12 : 23;
+        if (sx + m > b.l && sx - m < b.r && sy + m > b.t && sy - m < b.b) return true;
+      }
       return false;
     };
     this.refs.forEach((ref, i) => {
@@ -528,6 +596,7 @@ export class WorldMapScreen extends Screen {
       ref.el.classList.toggle('shaded', i !== this.focus && hit(s.x, s.y));
     });
     if (this.gateEl && this.gate) this.gateEl.classList.toggle('shaded', hit(this.cam.x + this.gate.x * this.cam.k, this.cam.y + this.gate.y * this.cam.k));
+    if (!this.fly && !this.inertia && this.pointers.size === 0) this.placePlates(); // at rest only: it measures
     // A zone name (and its sign) that runs under the chrome steps back, so the badge and ‹ MENU never sit on a word.
     const v = this.view.getBoundingClientRect();
     for (const n of this.names.children as HTMLCollectionOf<HTMLElement>) {
@@ -705,7 +774,7 @@ export class WorldMapScreen extends Screen {
     const pro = best?.bike === 'pro' ? '<em class="tag pro">Pro</em>' : '';
     const next = marker.upNext ? '<em class="tag next">Up next</em>' : '';
     const title = marker.locked ? `${marker.code} ${t.name} — locked: ${marker.rule ?? ''}` : `${marker.code} ${t.name}`;
-    wrap.innerHTML = `<span class="wm-beacon"></span><span class="wm-spire"></span><span class="wm-foot"></span><span class="wm-ring"></span><button type="button" class="wm-hit" aria-label="${escapeHtml(title)}"><i class="wm-diamond"></i><i class="wm-lock"></i></button><span class="wm-lead"></span><span class="wm-plate"><b>${escapeHtml(marker.code)}</b> · ${escapeHtml(t.name)}${next}${pro}${ghost}</span><span class="wm-bike">${BIKE_SVG}</span>`;
+    wrap.innerHTML = `<span class="wm-spire"></span><span class="wm-foot"></span><span class="wm-ring"></span><button type="button" class="wm-hit" aria-label="${escapeHtml(title)}"><i class="wm-diamond"></i><i class="wm-lock"></i></button><span class="wm-lead"></span><span class="wm-plate"><b>${escapeHtml(marker.code)}</b> · ${escapeHtml(t.name)}${next}${pro}${ghost}</span><span class="wm-bike">${BIKE_SVG}</span>`;
     return { marker, el: wrap, hit: wrap.querySelector<HTMLButtonElement>('.wm-hit')! };
   }
 
@@ -813,6 +882,9 @@ export class WorldMapScreen extends Screen {
     if (!ref) return;
     this.scene.dataset['track'] = ref.marker.track.id;
     this.scene.dataset['region'] = ref.marker.region;
+    // The beam stands on its own layer under every marker, so no name plate is ever drawn behind it.
+    this.beam.style.left = `${ref.marker.x}px`;
+    this.beam.style.top = `${ref.marker.y}px`;
     this.renderCard(ref);
     this.card.classList.remove('rise');
     if (animate) {

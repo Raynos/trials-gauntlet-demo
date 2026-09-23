@@ -85,9 +85,10 @@ export const WORLD_MAP_CSS = `
 .wm-marker.on { z-index: 3; --mk: #6FA8FF; --mk2: #1D4FB8; }
 .wm-marker.on .wm-diamond { box-shadow: 0 0 0 2px #fff, 0 0 12px 3px rgba(111,168,255,.8), 0 3px 6px rgba(0,0,0,.6); }
 .wm-marker.on .wm-plate, .wm-marker.on .wm-lead { display: none; }
-.wm-marker .wm-beacon { position: absolute; left: -9px; bottom: 0; width: 18px; height: 320px; display: none; pointer-events: none; background: linear-gradient(to top, rgba(200,245,242,1), rgba(126,231,223,.8) 18%, rgba(47,184,176,.42) 48%, rgba(47,184,176,.12) 78%, transparent); box-shadow: 0 0 18px 4px rgba(47,184,176,.35); filter: blur(1px); border-radius: 9px; animation: wm-beacon 2.4s ease-in-out infinite alternate; }
-.wm-marker .wm-beacon::after { content: ''; position: absolute; left: -22px; bottom: -14px; width: 62px; height: 28px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(160,240,235,.85), rgba(47,184,176,.3) 50%, transparent 72%); }
-.wm-marker.on .wm-beacon { display: block; }
+.wm-beam .wm-beacon { position: absolute; left: -9px; bottom: 0; width: 18px; height: 320px; display: block; pointer-events: none; background: linear-gradient(to top, rgba(200,245,242,1), rgba(126,231,223,.8) 18%, rgba(47,184,176,.42) 48%, rgba(47,184,176,.12) 78%, transparent); box-shadow: 0 0 18px 4px rgba(47,184,176,.35); filter: blur(1px); border-radius: 9px; animation: wm-beacon 2.4s ease-in-out infinite alternate; }
+.wm-beam .wm-beacon::after { content: ''; position: absolute; left: -22px; bottom: -14px; width: 62px; height: 28px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(160,240,235,.85), rgba(47,184,176,.3) 50%, transparent 72%); }
+/* The beam: its own layer under the markers (a plate is never drawn behind it), at the focused marker. */
+.wm-beam { position: absolute; width: 0; height: 0; transform: scale(var(--inv)); transform-origin: 0 0; pointer-events: none; }
 @keyframes wm-beacon { from { opacity: .75; } to { opacity: 1; } }
 .wm-marker .wm-ring { position: absolute; left: -24px; top: -12px; width: 48px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,.9); box-shadow: 0 0 12px rgba(111,168,255,.8), inset 0 0 10px rgba(111,168,255,.35); display: none; pointer-events: none; }
 .wm-marker.on .wm-ring { display: block; }
@@ -103,15 +104,20 @@ export const WORLD_MAP_CSS = `
 .wm-scene.far .wm-marker .wm-plate { transform: scale(.8); transform-origin: 0 100%; left: 18px; top: -24px; }
 .wm-scene.far .wm-marker .wm-plate .tag { display: none; }
 .wm-scene.far .wm-lead { width: 15px; }
-/* A marker whose name plate would sit on a zone name hangs it to the left instead (PLATE_LEFT in worldMap.ts). */
+/* A name plate hangs up-right; placePlates() moves it left and / or down when that side meets less (PLATE_LEFT prefers left). */
 .wm-marker.lead-left .wm-lead { left: -25px; transform-origin: 100% 0; transform: rotate(32deg); }
 .wm-marker.lead-left .wm-plate { left: auto; right: 22px; }
 .wm-scene.far .wm-marker.lead-left .wm-plate { left: auto; right: 18px; transform-origin: 100% 100%; }
+.wm-marker.lead-down .wm-lead { top: 8px; transform: rotate(32deg); }
+.wm-marker.lead-down.lead-left .wm-lead { transform: rotate(-32deg); }
+.wm-marker.lead-down .wm-plate { top: 11px; }
+.wm-scene.far .wm-marker.lead-down .wm-plate { top: 8px; transform-origin: 0 0; }
+.wm-scene.far .wm-marker.lead-down.lead-left .wm-plate { transform-origin: 100% 0; }
 .wm-scene.far .wm-hit { pointer-events: none; }
 .wm-scene.far .wm-diamond { width: 13px; height: 13px; }
 .wm-scene.far .wm-marker.on .wm-diamond { width: 16px; height: 16px; }
 .wm-scene.far .wm-spire { height: 34px; top: -34px; }
-.wm-scene.far .wm-marker .wm-beacon { height: 110px; width: 10px; left: -5px; opacity: .8; }
+.wm-scene.far .wm-beam .wm-beacon { height: 110px; width: 10px; left: -5px; opacity: .8; }
 /* The zone gate: three vermilion chevrons across the road where it enters the locked land (its rule is on the zone's sign). */
 .wm-gate { position: absolute; width: 0; height: 0; transform: scale(var(--inv)); transform-origin: 0 0; z-index: 2; }
 .wm-gate .wm-hit { position: absolute; left: -23px; top: -23px; width: 46px; height: 46px; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer; }

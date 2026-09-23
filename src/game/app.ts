@@ -1078,6 +1078,8 @@ export class App {
       this.pause.show({
         trackName: t?.name ?? '',
         tier: t?.tier ?? '',
+        zone: (t?.meta as { zone?: string } | undefined)?.zone,
+        code: (t?.meta as { code?: string } | undefined)?.code,
         runTime: this.game.runTime(),
         faults: this.game.faults(),
         phase: this.game.phase(),

@@ -6,7 +6,7 @@
 import type { QualityTier } from '../core/types';
 import { formatTime } from './format';
 import { BUILD_STAMP, escapeHtml, hardReload } from './front';
-import { wordmarkSvg } from './brand';
+import { wordmarkSvg, zoneTitle } from './brand';
 import { TileRow } from './tiles';
 import { logicalRect } from './orientation';
 import type { UiSfx } from './sfx';
@@ -64,7 +64,11 @@ export function spatialMove(root: HTMLElement, dx: number, dy: number): void {
 
 export interface PauseInfo {
   trackName: string;
+  /** The track tier (the ride HUD chip prints it); the pause kicker names the zone instead. */
   tier: string;
+  /** A ROCKHOP course's zone + code (`meta.zone` / `meta.code`): the kicker reads `PAUSED · COASTAL SCRAPYARD / C1`. */
+  zone?: string | undefined;
+  code?: string | undefined;
   runTime: number;
   faults: number;
   /** `crashed` renders the CRASHED kicker + checkpoint line (SPEC §4.1). */
@@ -173,7 +177,7 @@ export class PauseMenu {
     this.short = document.documentElement.classList.contains('short');
     if (info) {
       const crashed = info.phase === 'crashed';
-      this.kicker.textContent = `${crashed ? 'Bailed' : 'Paused'} · ${info.tier}`;
+      this.kicker.textContent = `${crashed ? 'Bailed' : 'Paused'}${info.zone ? ` · ${zoneTitle(info.zone)}${info.code ? ` / ${info.code}` : ''}` : ''}`;
       this.kicker.classList.toggle('red', crashed);
       this.title.textContent = info.trackName;
       let stats = `<span>Time <b>${formatTime(info.runTime)}</b></span><i>·</i><span>Bails <b>${info.faults}</b></span>`;

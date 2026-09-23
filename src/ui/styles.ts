@@ -261,21 +261,34 @@ html.short #ui .menu-item[data-id="play"] { font-size: clamp(1.5rem, calc(8.8 * 
 .ov-reload.armed { color: var(--amber); }
 .overlay.focus-reload .ov-reload { box-shadow: inset 0 0 0 1px var(--line); }
 .pause-overlay .ov-head { flex-wrap: wrap; }
-.pause-overlay button:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+.pause-overlay .ov-title { gap: .45em; }
+.pause-overlay .ov-kicker { align-self: flex-start; padding: .42em 1.3em .4em .7em; font: 800 .66rem/1 var(--sans); letter-spacing: .24em; color: var(--cream); background: var(--teal); text-shadow: none; clip-path: polygon(0 0, calc(100% - .8em) 0, 100% 50%, calc(100% - .8em) 100%, 0 100%); }
+.pause-overlay .ov-kicker.red { color: var(--amber-ink); background: var(--vermilion); }
+.pause-overlay .ov-name { color: var(--cream); text-shadow: 0 2px 0 rgba(6,14,16,.4), 0 6px 18px rgba(4,10,12,.5); }
+.pause-overlay .ov-stats { font: 700 .8rem/1 var(--sans); letter-spacing: .1em; color: rgba(239,227,200,.72); text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.pause-overlay .ov-stats b { color: var(--cream); font-weight: 800; }
+.pause-overlay .ov-reload { color: rgba(239,227,200,.7); font-family: var(--sans); font-weight: 800; }
+.pause-overlay .ov-reload.armed { color: var(--vermilion); }
+.pause-overlay button:focus-visible { outline: 2px solid var(--cream); outline-offset: -2px; }
 html.short .pause-overlay { gap: var(--s1); }
-/* Action tiles: 240×128 desktop / 160×92 phone; exactly one is amber (the focused one). */
+/* Action cards: 240×128 desktop / 160×92 phone, the home screen's cream contour cards; exactly one is vermilion (the focused one). */
 .tiles { display: flex; justify-content: center; gap: var(--s4); width: 100%; }
-.tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 240px; height: 128px; min-height: 44px; padding: 0 var(--s3); border-radius: var(--r2); border: 1px solid var(--line); background: var(--slab-3); box-shadow: var(--plate); color: var(--ink); cursor: pointer; font-family: var(--display); font-weight: 400; font-size: 1.25rem; letter-spacing: .02em; text-transform: uppercase; line-height: 1; white-space: nowrap; transition: background var(--t1), color var(--t1), border-color var(--t1), box-shadow var(--t1), transform var(--t1) var(--ease); }
-.tile svg { width: 28px; height: 28px; color: var(--ink-dim); transition: color var(--t1); }
-.tile.on { background: var(--amber); color: var(--amber-ink); border-color: transparent; box-shadow: 0 0 24px -8px var(--amber), var(--plate); }
+.tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 240px; height: 128px; min-height: 44px; padding: 0 var(--s3); border-radius: 10px; border: 0; background: var(--contour) 0 0 / 240px 160px, linear-gradient(180deg, #F7EEDA, var(--cream) 55%, var(--cream-2)); box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -3px 0 rgba(15,92,99,.12), 0 10px 26px rgba(4,10,12,.45); color: var(--teal); cursor: pointer; font-family: var(--display); font-weight: 400; font-size: 1.3rem; letter-spacing: .015em; text-transform: uppercase; line-height: 1; white-space: nowrap; transition: background var(--t1), color var(--t1), box-shadow var(--t1), transform var(--t1) var(--ease); }
+.tile svg { width: 28px; height: 28px; color: var(--teal); transition: color var(--t1); }
+.tile.on { background: var(--contour-light) 0 0 / 240px 160px, linear-gradient(180deg, #EE6A40, var(--vermilion) 48%, var(--vermilion-2)); color: var(--amber-ink); box-shadow: inset 0 1px 0 rgba(255,210,190,.55), inset 0 -4px 0 rgba(100,24,6,.3), 0 10px 26px rgba(80,20,6,.42); text-shadow: 0 2px 0 rgba(120,30,8,.3); }
 .tile.on svg { color: var(--amber-ink); }
-.tile.on:focus-visible, .overlay.focus-tiles .tile.on { box-shadow: inset 0 0 0 2px var(--amber-ink), 0 0 24px -8px var(--amber); }
+.tile.on:focus-visible, .overlay.focus-tiles .tile.on { box-shadow: inset 0 1px 0 rgba(255,210,190,.6), 0 0 0 3px var(--cream), 0 0 0 5px rgba(120,30,8,.8), 0 14px 30px rgba(80,20,6,.5); }
 .tile.pressed, .tile:active { transform: scale(.97); }
-.tile[disabled] { color: var(--ink-mute); border-color: transparent; background: rgba(9,11,15,.5); box-shadow: none; cursor: default; }
-.tile[disabled] svg { color: var(--ink-mute); }
+.tile[disabled] { color: rgba(15,92,99,.45); background: rgba(239,227,200,.55); box-shadow: none; cursor: default; }
+#ui .pause-overlay .tile { color: var(--teal); font: 400 1.3rem/1 var(--display); letter-spacing: .015em; }
+html.short #ui .pause-overlay .tile { font-size: 1.05rem; }
+#ui .pause-overlay .tile.on { color: var(--amber-ink); }
+#ui .pause-overlay .tile[disabled] { color: rgba(15,92,99,.45); }
+.tile[disabled] svg { color: currentColor; }
 .overlay.show .tile { animation: rise var(--t2) var(--ease) both; }
 .overlay.show .tile:nth-child(2) { animation-delay: 40ms; } .overlay.show .tile:nth-child(3) { animation-delay: 80ms; }
 .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) 120ms both; }
+.pause-overlay { background: radial-gradient(120% 100% at 0% 0%, rgba(8,34,38,.72), rgba(6,16,18,.5) 60%, rgba(6,16,18,.34)); }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
 .overlay.leaving .tile, .overlay.leaving .ov-foot { animation: none; }
 @supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) { html:not(.short) .pause-overlay.show { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); } }
