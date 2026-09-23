@@ -93,20 +93,20 @@
       #loader .ring { fill: none; stroke: #E4572E; stroke-width: 5; stroke-linecap: butt; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 220ms cubic-bezier(.2,.8,.2,1); }
       #loader .gauge.su .ring { stroke: #EFE3C8; }
       /* Drum digits: three columns of 0–9 in a window one digit high, each translated one way only. */
-      #loader .drum { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -52%); display: flex; align-items: baseline; height: 1em; overflow: hidden; font-size: clamp(38px, 11vmin, 64px); font-weight: 900; font-style: italic; line-height: 1; letter-spacing: -.02em; color: #f3f5f8; font-variant-numeric: tabular-nums; background: linear-gradient(180deg, #0b1416 0%, #17262a 18%, #1D2326 50%, #17262a 82%, #0b1416 100%); border-radius: .08em; padding: 0 .1em; box-shadow: inset 0 0 .3em rgba(0,0,0,.8), 0 .04em 0 rgba(255,255,255,.06); }
-      #loader .drum::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 70%, rgba(0,0,0,.55) 100%); }
+      #loader .drum { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -52%); display: flex; align-items: baseline; height: 1em; overflow: hidden; font-size: clamp(38px, 11vmin, 64px); font-weight: 900; font-style: normal; line-height: 1; letter-spacing: -.02em; color: #0F5C63; font-variant-numeric: tabular-nums; background: linear-gradient(180deg, #E4D4B2 0%, #F6ECD6 22%, #FBF4E4 50%, #F6ECD6 78%, #E4D4B2 100%); border-radius: .1em; padding: 0 .12em; box-shadow: inset 0 0 0 .03em rgba(15,92,99,.35), 0 .06em .18em rgba(4,20,22,.35); }
+      #loader .drum::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(15,92,99,.28) 0%, rgba(15,92,99,0) 28%, rgba(15,92,99,0) 72%, rgba(15,92,99,.28) 100%); }
       #loader .col { display: inline-flex; flex-direction: column; width: .62em; transition: transform 240ms cubic-bezier(.2,.8,.2,1); }
       #loader .col b { display: block; height: 1em; line-height: 1; text-align: center; font-weight: 900; }
       #loader .col.h { width: .5em; }
       #loader .drum em { font-style: normal; font-size: .38em; color: #E4572E; margin-left: .1em; align-self: flex-end; padding-bottom: .12em; }
-      #loader .gauge.su .drum em { color: #EFE3C8; }
+      #loader .gauge.su .drum em { color: #0F5C63; }
       #loader .name { margin-top: 6px; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: rgba(243,245,248,.6); }
       #loader .line { min-height: 1.4em; margin-top: 2px; font-size: 12px; letter-spacing: .04em; color: rgba(243,245,248,.88); font-variant-numeric: tabular-nums; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       /* Done steps fold into a count; the full row log sits behind a native disclosure, closed by default. */
       #loader .row { display: flex; align-items: center; justify-content: center; gap: 18px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: rgba(243,245,248,.62); font-variant-numeric: tabular-nums; }
-      #loader .count { color: #4ae37f; }
+      #loader .count { color: #EFE3C8; font-weight: 700; }
       #loader details { position: relative; }
-      #loader summary { list-style: none; cursor: pointer; border: 1px solid rgba(243,245,248,.28); border-radius: 6px; padding: 8px 14px; min-height: 28px; line-height: 1; -webkit-user-select: none; user-select: none; }
+      #loader summary { list-style: none; cursor: pointer; display: flex; align-items: center; border: 1px solid rgba(239,227,200,.34); border-radius: 999px; padding: 0 16px; min-height: 44px; line-height: 1; -webkit-user-select: none; user-select: none; }
       #loader summary::-webkit-details-marker { display: none; }
       #loader summary::after { content: " ▾"; }
       #loader details[open] summary::after { content: " ▴"; }
@@ -114,7 +114,7 @@
       #loader li { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; white-space: nowrap; }
       #loader li span:first-child { overflow: hidden; text-overflow: ellipsis; }
       #loader li.on { color: #f3f5f8; }
-      #loader li.ok::after { content: "✓"; color: #4ae37f; }
+      #loader li.ok::after { content: "✓"; color: #EFE3C8; }
       #loader li.todo { color: rgba(243,245,248,.32); }
       #loader li.slow span:first-child::before { content: "■ "; color: #ff3d3d; }
       #loader li.bghead { margin-top: 8px; color: rgba(243,245,248,.42); letter-spacing: .12em; text-transform: uppercase; font-size: 10px; }

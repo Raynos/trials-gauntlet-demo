@@ -15,7 +15,7 @@
  *           (`reg.update()`, capped). No worker, or nothing lands in time: a cache-busted reload, and the
  *           loading screen's worker check (`swBoot`) adopts the new build before the bars move.
  *
- * Self-contained styles in the contract's tokens (the slanted charcoal plate with the amber leading edge,
+ * Self-contained styles in the brand colours (a deep-teal pill with the cream word and a vermilion pulse,
  * the menu stamp's family), top-centre where no screen puts a control, ≥ 44 px tall.
  */
 import { handOver } from '../boot/sw';
@@ -40,19 +40,18 @@ export function pillAllowed(doc: Document): boolean {
 const CSS = /* css */ `
 .update-pill { position: fixed; z-index: 50; left: 50%; top: calc(var(--s3, 12px) + var(--sat, env(safe-area-inset-top, 0px)));
   transform: translate(-50%, -8px); display: inline-flex; align-items: center; gap: .6em; min-height: 44px; padding: 0 1.5em 0 1em; border: 0; margin: 0;
-  background: var(--slab-2, rgba(9,11,15,.92)); box-shadow: inset 4px 0 0 var(--amber, #ffb020), 0 4px 14px rgba(0,0,0,.45);
-  clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%); color: var(--ink, #f3f5f8);
-  font: 700 .8rem/1 var(--font, "Rockhop UI", "Barlow Condensed", "Arial Narrow", system-ui, sans-serif); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap;
+  border-radius: 999px; background: rgba(10,58,63,.94); box-shadow: inset 0 0 0 1px rgba(239,227,200,.34), 0 4px 14px rgba(0,0,0,.4); color: #EFE3C8;
+  font: 800 .74rem/1 var(--sans, "Rockhop Sans", "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap;
   cursor: pointer; pointer-events: auto; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
   opacity: 0; visibility: hidden; transition: opacity var(--t2, 240ms) var(--ease, ease), transform var(--t2, 240ms) var(--ease, ease), visibility 0s linear var(--t2, 240ms); }
 .update-pill.on { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition: opacity var(--t2, 240ms) var(--ease, ease), transform var(--t2, 240ms) var(--ease, ease), visibility 0s; }
-.update-pill .dot { width: .6em; height: .6em; border-radius: 50%; background: var(--green, #4ae37f); box-shadow: 0 0 0 0 rgba(74,227,127,.6); animation: update-pulse 1.6s var(--ease, ease) infinite; flex: 0 0 auto; }
-.update-pill b { color: var(--amber, #ffb020); font-weight: 700; }
-.update-pill small { font-size: .78em; letter-spacing: .12em; color: var(--ink-mute, rgba(243,245,248,.38)); font-variant-numeric: tabular-nums; }
-.update-pill:hover, .update-pill:focus-visible { background: var(--slab-3, rgba(16,19,25,.96)); outline: none; box-shadow: inset 4px 0 0 var(--amber, #ffb020), inset 0 0 0 2px var(--ink, #f3f5f8), 0 4px 14px rgba(0,0,0,.45); }
+.update-pill .dot { width: .6em; height: .6em; border-radius: 50%; background: #E4572E; box-shadow: 0 0 0 0 rgba(228,87,46,.6); animation: update-pulse 1.6s var(--ease, ease) infinite; flex: 0 0 auto; }
+.update-pill b { color: #fff; font-weight: 800; }
+.update-pill small { font-size: .78em; letter-spacing: .12em; color: rgba(239,227,200,.6); font-variant-numeric: tabular-nums; }
+.update-pill:hover, .update-pill:focus-visible { background: #0F5C63; outline: none; box-shadow: inset 0 0 0 2px #EFE3C8, 0 4px 14px rgba(0,0,0,.4); }
 .update-pill:active { transform: translate(-50%, 1px); }
-.update-pill[aria-busy="true"] .dot { animation-duration: .5s; background: var(--amber, #ffb020); }
-@keyframes update-pulse { 0% { box-shadow: 0 0 0 0 rgba(74,227,127,.6); } 70% { box-shadow: 0 0 0 .6em rgba(74,227,127,0); } 100% { box-shadow: 0 0 0 0 rgba(74,227,127,0); } }
+.update-pill[aria-busy="true"] .dot { animation-duration: .5s; background: #EFE3C8; }
+@keyframes update-pulse { 0% { box-shadow: 0 0 0 0 rgba(228,87,46,.6); } 70% { box-shadow: 0 0 0 .6em rgba(228,87,46,0); } 100% { box-shadow: 0 0 0 0 rgba(228,87,46,0); } }
 @media (prefers-reduced-motion: reduce) { .update-pill .dot { animation: none; } }
 `;
 

@@ -104,26 +104,26 @@ export function reportMeta(now = new Date()): string {
 const CSS = /* css */ `
 #crash { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
   padding: calc(12px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) calc(12px + env(safe-area-inset-left, 0px));
-  background: rgba(7,8,10,.94); color: var(--ink, #f3f5f8); font: 500 14px/1.4 var(--font, "Rockhop UI", "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, system-ui, sans-serif);
+  background: rgba(8,24,27,.9); color: #1D2326; font: 500 14px/1.4 var(--sans, "Rockhop Sans", "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif);
   -webkit-user-select: text; user-select: text; touch-action: auto; pointer-events: auto; }
 #crash * { box-sizing: border-box; }
-#crash .sheet { display: flex; flex-direction: column; width: min(760px, 100%); max-height: 100%; background: var(--slab-3, rgba(16,19,25,.96));
-  box-shadow: inset 5px 0 0 var(--red, #ff3d3d), 0 0 0 1px rgba(255,255,255,.08), 0 24px 80px rgba(0,0,0,.6); border-radius: 0 var(--r2, 10px) var(--r2, 10px) 0; padding: 16px 18px 14px 24px; }
-#crash .tag { font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--red, #ff3d3d); }
-#crash h1 { margin: 2px 0 2px; font: 400 clamp(22px, 5.2vmin, 34px)/1 var(--display, "Rockhop Display", "Arial Narrow", Impact, system-ui, sans-serif); letter-spacing: -.01em; text-transform: uppercase; color: var(--ink, #f3f5f8); }
-#crash .sub { margin: 0 0 10px; font-size: 13px; color: var(--ink-dim, rgba(243,245,248,.62)); }
-#crash .msg { margin: 0 0 8px; font: 700 14px/1.35 var(--mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace); color: #fff; white-space: pre-wrap; word-break: break-word; }
-#crash .scroll { flex: 1 1 auto; min-height: 48px; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; margin: 0 0 10px; padding: 8px 10px; background: rgba(0,0,0,.45); border: 1px solid var(--line-2, rgba(255,255,255,.08)); border-radius: var(--r1, 6px); }
-#crash pre { margin: 0; font: 400 11.5px/1.45 var(--mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace); color: rgba(243,245,248,.82); white-space: pre-wrap; word-break: break-word; }
-#crash pre.meta { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-2, rgba(255,255,255,.08)); color: var(--ink-mute, rgba(243,245,248,.38)); font-size: 10.5px; }
+#crash .sheet { display: flex; flex-direction: column; width: min(760px, 100%); max-height: 100%; border-radius: 10px; padding: 16px 20px 14px;
+  background: var(--contour, none) 0 0 / 240px 160px, linear-gradient(180deg, #FBF4E4, #EFE3C8); box-shadow: inset 0 -3px 0 rgba(15,92,99,.12), 0 24px 70px rgba(0,0,0,.55); }
+#crash .tag { align-self: flex-start; padding: 5px 16px 5px 8px; font: 800 10px/1 var(--sans, system-ui, sans-serif); letter-spacing: .22em; text-transform: uppercase; color: #FFF4E2; background: #E4572E; clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%); }
+#crash h1 { margin: 8px 0 2px; font: 400 clamp(22px, 5.2vmin, 34px)/1 var(--display, "Rockhop Display", "Arial Black", Impact, system-ui, sans-serif); letter-spacing: 0; text-transform: uppercase; color: #0F5C63; }
+#crash .sub { margin: 0 0 10px; font-size: 13px; color: rgba(29,35,38,.72); }
+#crash .msg { margin: 0 0 8px; font: 700 14px/1.35 var(--mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace); color: #1D2326; white-space: pre-wrap; word-break: break-word; }
+#crash .scroll { flex: 1 1 auto; min-height: 48px; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; margin: 0 0 12px; padding: 8px 10px; background: #173236; border-radius: 6px; }
+#crash pre { margin: 0; font: 400 11.5px/1.45 var(--mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace); color: rgba(239,227,200,.9); white-space: pre-wrap; word-break: break-word; }
+#crash pre.meta { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(239,227,200,.16); color: rgba(239,227,200,.55); font-size: 10.5px; }
 #crash .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex: 0 0 auto; }
-#crash button { appearance: none; -webkit-appearance: none; min-height: 44px; min-width: 112px; padding: 0 18px; border: 0; border-radius: var(--r1, 6px); cursor: pointer;
-  font: 700 15px/1 var(--font, "Rockhop UI", "Barlow Condensed", "Arial Narrow", system-ui, sans-serif); letter-spacing: .1em; text-transform: uppercase; color: var(--ink, #f3f5f8); background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px var(--line, rgba(255,255,255,.18)); }
-#crash button.primary { background: var(--amber, #ffb020); color: var(--amber-ink, #1a1206); box-shadow: none; }
-#crash button:focus-visible { outline: 2px solid var(--ink, #f3f5f8); outline-offset: 2px; }
+#crash button { appearance: none; -webkit-appearance: none; min-height: 44px; min-width: 112px; padding: 0 18px; border: 0; border-radius: 8px; cursor: pointer;
+  font: 400 15px/1 var(--display, "Rockhop Display", "Arial Black", Impact, system-ui, sans-serif); letter-spacing: .02em; text-transform: uppercase; color: #0F5C63; background: rgba(15,92,99,.08); box-shadow: inset 0 0 0 1.5px rgba(15,92,99,.4); }
+#crash button.primary { background: #E4572E; color: #FFF4E2; box-shadow: inset 0 -3px 0 rgba(100,24,6,.3); }
+#crash button:focus-visible { outline: 2px solid #0F5C63; outline-offset: 2px; }
 #crash button:active { transform: translateY(1px); }
-#crash .n { margin-left: auto; font-size: 12px; color: var(--amber, #ffb020); font-variant-numeric: tabular-nums; }
-@media (max-height: 500px) { #crash .sheet { padding: 10px 14px 10px 20px; } #crash .sub { margin-bottom: 6px; } #crash .msg { margin-bottom: 6px; } #crash .scroll { margin-bottom: 8px; } }
+#crash .n { margin-left: auto; font-size: 12px; font-weight: 800; color: #C4441F; font-variant-numeric: tabular-nums; }
+@media (max-height: 500px) { #crash .sheet { padding: 10px 16px 10px; } #crash .sub { margin-bottom: 6px; } #crash .msg { margin-bottom: 6px; } #crash .scroll { margin-bottom: 8px; } }
 `;
 
 let root: HTMLElement | null = null;

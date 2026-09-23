@@ -727,8 +727,8 @@ export class CreditsScreen extends Screen {
     this.root.appendChild(plate);
     art.whenReady(() => art.applyBackground(plate, art.byId('results-coast') ?? art.byId('results-credits') ?? art.plate('results-bg')));
     const wrap = h('div', 'credits-wrap rise');
-    wrap.innerHTML = `<h1>Credits</h1>
-      <dl>
+    wrap.innerHTML = `<h1 class="rh-head"><small><i class="rh-pin"></i>Rockhop / The crew</small>Credits</h1>
+      <dl class="rh-card">
         <dt>Game</dt><dd><b>${GAME_NAME}</b> — dirt bikes, rocks, higher lines. A 2.5D motorbike physics game by Jake Verbaten.</dd>
         <dt>Engine</dt><dd>TypeScript · three.js · WebGL2 · Web Audio. 120 Hz fixed-step bike physics; every run replays byte-identical.</dd>
         <dt>Design</dt><dd>Attempts-to-clear and restart latency, measured by a bot and a stranger every round.</dd>

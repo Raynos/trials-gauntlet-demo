@@ -62,7 +62,11 @@ export const TOKENS_CSS = /* css */ `
   --plate: 0 0 0 1px rgba(0,0,0,.6), 0 2px 12px rgba(0,0,0,.45);
   /* The survey contour texture of the cream cards (teal hairlines, tiled). */
   --contour: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160' viewBox='0 0 240 160'%3E%3Cg fill='none' stroke='%230F5C63' stroke-opacity='.14' stroke-width='1'%3E%3Cpath d='M-10 30c40-18 70 14 110-2s60-30 100-10 40 20 50 14'/%3E%3Cpath d='M-10 52c36-14 74 18 116 2s58-26 96-8 40 18 48 12'/%3E%3Cpath d='M-10 76c44-10 70 20 112 6s64-22 98-6 34 16 50 10'/%3E%3Cpath d='M-10 102c40-8 76 16 114 4s62-18 100-4 30 12 46 8'/%3E%3Cpath d='M-10 128c42-6 72 12 116 2s64-14 96-2 32 10 48 6'/%3E%3Cpath d='M60 150c20-16 44-18 60-8s30 10 44-4'/%3E%3C/g%3E%3C/svg%3E");
+  /* The same lines drawn dark: the survey patch on the results ticket. */
+  --contour-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160' viewBox='0 0 240 160'%3E%3Cg fill='none' stroke='%230F5C63' stroke-opacity='.34' stroke-width='1'%3E%3Cpath d='M-10 30c40-18 70 14 110-2s60-30 100-10 40 20 50 14'/%3E%3Cpath d='M-10 52c36-14 74 18 116 2s58-26 96-8 40 18 48 12'/%3E%3Cpath d='M-10 76c44-10 70 20 112 6s64-22 98-6 34 16 50 10'/%3E%3Cpath d='M-10 102c40-8 76 16 114 4s62-18 100-4 30 12 46 8'/%3E%3Cpath d='M-10 128c42-6 72 12 116 2s64-14 96-2 32 10 48 6'/%3E%3Cpath d='M60 150c20-16 44-18 60-8s30 10 44-4'/%3E%3C/g%3E%3C/svg%3E");
   --contour-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160' viewBox='0 0 240 160'%3E%3Cg fill='none' stroke='%23FFF4E2' stroke-opacity='.16' stroke-width='1.2'%3E%3Cpath d='M-10 30c40-18 70 14 110-2s60-30 100-10 40 20 50 14'/%3E%3Cpath d='M-10 52c36-14 74 18 116 2s58-26 96-8 40 18 48 12'/%3E%3Cpath d='M-10 76c44-10 70 20 112 6s64-22 98-6 34 16 50 10'/%3E%3Cpath d='M-10 102c40-8 76 16 114 4s62-18 100-4 30 12 46 8'/%3E%3Cpath d='M-10 128c42-6 72 12 116 2s64-14 96-2 32 10 48 6'/%3E%3Cpath d='M60 150c20-16 44-18 60-8s30 10 44-4'/%3E%3C/g%3E%3C/svg%3E");
+  /* A-results' wreath behind the earned medal: two gold laurel branches. */
+  --laurel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23D9A94E' stroke='%238C5A10' stroke-width='.7'%3E%3Cellipse cx='65.6' cy='92.8' rx='2.6' ry='6.4' transform='rotate(30 65.6 92.8)'/%3E%3Cellipse cx='62.4' cy='84.2' rx='2.6' ry='6.4' transform='rotate(110 62.4 84.2)'/%3E%3Cellipse cx='76.8' cy='86.9' rx='2.4' ry='6.0' transform='rotate(14 76.8 86.9)'/%3E%3Cellipse cx='71.4' cy='79.4' rx='2.4' ry='6.0' transform='rotate(94 71.4 79.4)'/%3E%3Cellipse cx='85.9' cy='78.1' rx='2.2' ry='5.5' transform='rotate(-2 85.9 78.1)'/%3E%3Cellipse cx='78.7' cy='72.4' rx='2.2' ry='5.5' transform='rotate(78 78.7 72.4)'/%3E%3Cellipse cx='92.3' cy='67.1' rx='2.1' ry='5.1' transform='rotate(-18 92.3 67.1)'/%3E%3Cellipse cx='83.7' cy='63.6' rx='2.1' ry='5.1' transform='rotate(62 83.7 63.6)'/%3E%3Cellipse cx='95.4' cy='54.8' rx='1.9' ry='4.6' transform='rotate(-34 95.4 54.8)'/%3E%3Cellipse cx='86.2' cy='53.8' rx='1.9' ry='4.6' transform='rotate(46 86.2 53.8)'/%3E%3Cellipse cx='94.9' cy='42.1' rx='1.7' ry='4.2' transform='rotate(-50 94.9 42.1)'/%3E%3Cellipse cx='85.8' cy='43.7' rx='1.7' ry='4.2' transform='rotate(30 85.8 43.7)'/%3E%3Cellipse cx='91.0' cy='30.0' rx='1.5' ry='3.7' transform='rotate(-66 91.0 30.0)'/%3E%3Cellipse cx='82.7' cy='34.0' rx='1.5' ry='3.7' transform='rotate(14 82.7 34.0)'/%3E%3Cpath d='M57.1 90.4A41 41 0 0 0 86.9 32.0' fill='none' stroke-width='1.6'/%3E%3Cellipse cx='34.4' cy='92.8' rx='2.6' ry='6.4' transform='rotate(150 34.4 92.8)'/%3E%3Cellipse cx='37.6' cy='84.2' rx='2.6' ry='6.4' transform='rotate(70 37.6 84.2)'/%3E%3Cellipse cx='23.2' cy='86.9' rx='2.4' ry='6.0' transform='rotate(166 23.2 86.9)'/%3E%3Cellipse cx='28.6' cy='79.4' rx='2.4' ry='6.0' transform='rotate(86 28.6 79.4)'/%3E%3Cellipse cx='14.1' cy='78.1' rx='2.2' ry='5.5' transform='rotate(182 14.1 78.1)'/%3E%3Cellipse cx='21.3' cy='72.4' rx='2.2' ry='5.5' transform='rotate(102 21.3 72.4)'/%3E%3Cellipse cx='7.7' cy='67.1' rx='2.1' ry='5.1' transform='rotate(198 7.7 67.1)'/%3E%3Cellipse cx='16.3' cy='63.6' rx='2.1' ry='5.1' transform='rotate(118 16.3 63.6)'/%3E%3Cellipse cx='4.6' cy='54.8' rx='1.9' ry='4.6' transform='rotate(214 4.6 54.8)'/%3E%3Cellipse cx='13.8' cy='53.8' rx='1.9' ry='4.6' transform='rotate(134 13.8 53.8)'/%3E%3Cellipse cx='5.1' cy='42.1' rx='1.7' ry='4.2' transform='rotate(230 5.1 42.1)'/%3E%3Cellipse cx='14.2' cy='43.7' rx='1.7' ry='4.2' transform='rotate(150 14.2 43.7)'/%3E%3Cellipse cx='9.0' cy='30.0' rx='1.5' ry='3.7' transform='rotate(246 9.0 30.0)'/%3E%3Cellipse cx='17.3' cy='34.0' rx='1.5' ry='3.7' transform='rotate(166 17.3 34.0)'/%3E%3Cpath d='M42.9 90.4A41 41 0 0 1 13.1 32.0' fill='none' stroke-width='1.6'/%3E%3C/g%3E%3C/svg%3E");
   --sat: env(safe-area-inset-top, 0px);
   --sar: env(safe-area-inset-right, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
@@ -228,14 +232,14 @@ html.short #ui .menu-item[data-id="play"] { font-size: clamp(1.5rem, calc(8.8 * 
 #ui .settings-screen .btn.danger.armed, .btn.danger.armed { background: var(--vermilion); color: var(--amber-ink); box-shadow: inset 0 -3px 0 rgba(100,24,6,.3); }
 .btn.danger { color: var(--vermilion); border-color: rgba(228,87,46,.5); }
 
-/* ---- credits ---------------------------------------------------------- */
-.credits-screen { background: linear-gradient(90deg, rgba(6,7,9,.94) 0%, rgba(6,7,9,.7) 60%, rgba(6,7,9,.45) 100%); }
-.credits-wrap { position: absolute; left: calc(calc(7 * var(--vw)) + var(--sal)); top: calc(var(--s5) + var(--sat)); bottom: calc(var(--s6) + var(--sab)); width: min(40rem, calc(80 * var(--vw))); overflow-y: auto; scrollbar-width: none; touch-action: pan-y; display: flex; flex-direction: column; gap: var(--s4); }
-.credits-wrap h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 2.6rem; line-height: .9; text-transform: uppercase; }
-.credits-wrap dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: var(--s1) var(--s5); font-size: .95rem; }
-.credits-wrap dt { color: var(--amber); letter-spacing: .2em; text-transform: uppercase; font-size: .72rem; font-weight: 700; padding-top: .3em; }
-.credits-wrap dd { margin: 0; color: var(--ink-dim); }
-.credits-wrap dd b { color: var(--ink); }
+/* ---- credits: the settings screen's head over the finish plate, the roll on one cream contour card ---------- */
+.credits-screen { background: radial-gradient(130% 110% at 0% 0%, rgba(9,38,42,.9), rgba(8,20,22,.66) 55%, rgba(8,20,22,.3)); }
+.credits-wrap { position: absolute; left: calc(calc(5 * var(--vw)) + var(--sal)); top: calc(var(--s4) + var(--sat)); bottom: calc(var(--s3) + var(--sab)); width: min(40rem, calc(62 * var(--vw))); display: flex; flex-direction: column; gap: var(--s3); min-height: 0; }
+.credits-wrap dl { flex: 0 1 auto; min-height: 0; margin: 0; padding: var(--s3) var(--s4); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: none; display: grid; grid-template-columns: auto 1fr; gap: 7px var(--s4); font: 500 .8rem/1.42 var(--sans); }
+.credits-wrap dl::-webkit-scrollbar { display: none; }
+.credits-wrap dt { padding-top: .3em; font: 800 .6rem/1.4 var(--sans); letter-spacing: .22em; text-transform: uppercase; color: var(--vermilion-2); }
+.credits-wrap dd { margin: 0; color: rgba(29,35,38,.82); }
+.credits-wrap dd b { color: var(--teal); font-weight: 800; }
 
 /* ---- "Exit ROCKHOP?" (Android back on the home screen): a cream card over a dim; STAY is the safe default ---- */
 .exit-confirm { position: absolute; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(10,16,18,.6); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--t2) var(--ease), visibility 0s linear var(--t2); }
@@ -272,6 +276,7 @@ html.short #ui .menu-item[data-id="play"] { font-size: clamp(1.5rem, calc(8.8 * 
 .ov-reload.focus, .ov-reload:hover { color: var(--ink); }
 .ov-reload.armed { color: var(--amber); }
 .overlay.focus-reload .ov-reload { box-shadow: inset 0 0 0 1px var(--line); }
+.pause-overlay { background: radial-gradient(120% 100% at 0% 0%, rgba(8,34,38,.72), rgba(6,16,18,.5) 60%, rgba(6,16,18,.34)); }
 .pause-overlay .ov-head { flex-wrap: wrap; }
 .pause-overlay .ov-title { gap: .45em; }
 .pause-overlay .ov-kicker { align-self: flex-start; padding: .42em 1.3em .4em .7em; font: 800 .66rem/1 var(--sans); letter-spacing: .24em; color: var(--cream); background: var(--teal); text-shadow: none; clip-path: polygon(0 0, calc(100% - .8em) 0, 100% 50%, calc(100% - .8em) 100%, 0 100%); }
@@ -300,7 +305,6 @@ html.short #ui .pause-overlay .tile { font-size: 1.05rem; }
 .overlay.show .tile { animation: rise var(--t2) var(--ease) both; }
 .overlay.show .tile:nth-child(2) { animation-delay: 40ms; } .overlay.show .tile:nth-child(3) { animation-delay: 80ms; }
 .overlay.show .ov-foot { animation: fadein var(--t2) var(--ease) 120ms both; }
-.pause-overlay { background: radial-gradient(120% 100% at 0% 0%, rgba(8,34,38,.72), rgba(6,16,18,.5) 60%, rgba(6,16,18,.34)); }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
 .overlay.leaving .tile, .overlay.leaving .ov-foot { animation: none; }
 @supports (backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px)) { html:not(.short) .pause-overlay.show { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); } }
@@ -370,7 +374,9 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 /* ---- art plates behind a screen (credits): cover, masked clear where the live scene should show ---- */
 .plate-bg { position: absolute; inset: 0; pointer-events: none; background-size: cover; background-position: 50% 50%; opacity: 0; transition: opacity var(--t3) var(--ease); }
 .plate-bg.loaded { opacity: .55; }
-.credits-screen .plate-bg.loaded { opacity: .35; }
+.credits-screen .plate-bg.loaded { opacity: .6; }
+.credits-screen .rh-head { text-shadow: 0 2px 0 rgba(6,14,16,.5), 0 4px 18px rgba(4,10,12,.8); }
+.credits-screen .rh-head small { color: var(--cream); }
 /* ---- garage: the model explorer (garage round) — layout B "tool wall" on set E "shutter door" (assets/design/garage/SPEC.md) ---- */
 /* The screen itself is clear: the renderer's garage set is the backdrop. Framing is the renderer's orbit camera, never a CSS transform on the canvas.
    Rail of tags down the left edge (rider · outfit · bike, bike lowest), the metadata panel on the right, badge top-left, ‹ MENU top-right, the hero between. */
@@ -482,15 +488,17 @@ html.short .trace { top: calc(4.2rem + var(--sat)); width: 160px; }
 .hud.touch.results-on ~ .fpsmeter { top: auto; bottom: calc(.2rem + var(--sab)); }
 
 /* ---- onboarding card (first launch, over the first countdown, game paused) ---- */
-.onboard { position: absolute; inset: 0; z-index: 25; display: flex; align-items: center; justify-content: center; background: rgba(6,7,9,.55); opacity: 0; transition: opacity var(--t2) var(--ease); padding: var(--s4); }
+.onboard { position: absolute; inset: 0; z-index: 25; display: flex; align-items: center; justify-content: center; background: rgba(8,24,27,.6); opacity: 0; transition: opacity var(--t2) var(--ease); padding: var(--s4); }
 .onboard.show { opacity: 1; }
-.ob-card { width: min(34rem, 100%); display: flex; flex-direction: column; gap: var(--s3); padding: var(--s5); background: var(--slab-3); border: 1px solid var(--line); border-radius: var(--r3); box-shadow: var(--plate), 0 24px 60px rgba(0,0,0,.6); }
-.ob-card h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 2.4rem; line-height: .9; text-transform: uppercase; }
-.ob-lines { display: flex; flex-direction: column; gap: var(--s2); font-size: .98rem; color: var(--ink-dim); line-height: 1.35; }
-.ob-lines b { color: var(--ink); }
-.ob-lines kbd { font-family: var(--font); font-weight: 700; color: var(--ink); background: rgba(255,255,255,.1); border: 1px solid var(--line); border-bottom-width: 2px; padding: .02em .45em; border-radius: var(--r1); font-size: .9em; min-width: 1.6em; display: inline-block; text-align: center; }
-.ob-hop { font-size: .82rem; color: var(--ink-mute); border-top: 1px solid var(--line-2); padding-top: var(--s3); }
-.ob-tip { font-size: .74rem; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+/* The first-ride card: the exit card's cream contour paper, the kicker a teal tag, keys as teal keycaps. */
+.ob-card { width: min(34rem, 100%); display: flex; flex-direction: column; gap: var(--s3); padding: var(--s5); color: var(--coal); border-radius: 10px; background: var(--contour) 0 0 / 240px 160px, linear-gradient(180deg, #FBF4E4, var(--cream)); box-shadow: inset 0 -3px 0 rgba(15,92,99,.12), 0 24px 60px rgba(0,0,0,.55); }
+.ob-card .kicker { align-self: flex-start; padding: .42em 1.3em .4em .7em; font: 800 .66rem/1 var(--sans); letter-spacing: .24em; color: var(--cream); background: var(--teal); clip-path: polygon(0 0, calc(100% - .8em) 0, 100% 50%, calc(100% - .8em) 100%, 0 100%); }
+.ob-card h2 { margin: 0; font: 400 2.4rem/.9 var(--display); text-transform: uppercase; color: var(--teal); }
+.ob-lines { display: flex; flex-direction: column; gap: var(--s2); font: 500 .92rem/1.35 var(--sans); color: rgba(29,35,38,.8); }
+.ob-lines b { color: var(--coal); font-weight: 800; }
+.ob-lines kbd { font: 700 .9em/1.3 var(--font); color: var(--cream); background: var(--teal); border-bottom: 2px solid var(--teal-2); padding: 0 .45em; border-radius: 5px; min-width: 1.6em; display: inline-block; text-align: center; }
+.ob-hop { font: 600 .8rem/1.35 var(--sans); color: rgba(29,35,38,.66); border-top: 1.5px dashed rgba(15,92,99,.3); padding-top: var(--s3); }
+.ob-tip { font: 600 .72rem/1.3 var(--sans); color: rgba(29,35,38,.55); font-variant-numeric: tabular-nums; }
 .ob-card .btn { align-self: flex-end; min-height: 48px; }
 html.short .garage-screen { --rail-w: 236px; --panel-w: 172px; }
 html.short .garage-plate { font-size: 1rem; }
@@ -584,7 +592,7 @@ export const HUD_CSS = /* css */ `
 .hints kbd { font-family: var(--font); font-weight: 800; background: rgba(255,255,255,.12); border: 1px solid var(--line); border-bottom-width: 2px; padding: .05em .45em; border-radius: .25em; margin-right: .35em; font-size: .9em; }
 
 /* ---- results: the survey ticket (store release D19, mockup round1/A-results) ------------------------------------------
-   The cream ticket on the left (deckled left edge, contour paper, the ROCKHOP mark top-right): zone · code, track name,
+   The cream ticket on the left (a perforated left edge and two ticket bites, contour paper with a survey patch, the ROCKHOP mark top-right): zone · code, track name,
    CLEAN LINE, TIME (+ the PB line) and BAILS boxes, the local top 5, the four mountain medals. The finish scene stays live
    on the right. MAP · RETRY · REPLAY · NEXT TRACK (vermilion) along the bottom, the home screen's cards. Proportions from
    A-results at 1536 × 708: ticket x 4.5–56 %, y 6–74 %; buttons y 81–93 %. */
@@ -593,9 +601,17 @@ export const HUD_CSS = /* css */ `
 .ticket { position: absolute; left: calc(4.5 * var(--vw) + var(--sal)); top: calc(max(8px, calc(5.5 * var(--vh))) + var(--sat)); width: min(calc(52 * var(--vw)), calc(var(--tk) * 58)); font-size: var(--tk); padding: 1.25em 1.7em 1em 2.3em; color: var(--coal); filter: drop-shadow(0 .5em 1.1em rgba(8,14,16,.42)); transform: translateX(-1.5em); opacity: 0; transition: transform var(--t2) var(--ease), opacity var(--t2) var(--ease); }
 .results.show .ticket { transform: none; opacity: 1; }
 /* The paper: a pseudo so the deckled clip-path does not clip the drop shadow. */
-.ticket { --deckle: polygon(100% 0, 100% 100%, .42em 100%, 0 96.43%, .42em 92.86%, 0 89.29%, .42em 85.71%, 0 82.14%, .42em 78.57%, 0 75%, .42em 71.43%, 0 67.86%, .42em 64.29%, 0 60.71%, .42em 57.14%, 0 53.57%, .42em 50%, 0 46.43%, .42em 42.86%, 0 39.29%, .42em 35.71%, 0 32.14%, .42em 28.57%, 0 25%, .42em 21.43%, 0 17.86%, .42em 14.29%, 0 10.71%, .42em 7.14%, 0 3.57%, .42em 0%); }
-.ticket::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 0 .5em .5em 0; background: var(--contour) 0 0 / 240px 160px, radial-gradient(120% 90% at 80% 0%, #FBF4E4, var(--cream) 55%, var(--cream-2)); clip-path: var(--deckle); }
-.ticket::after { content: ""; position: absolute; left: 1.2em; top: .8em; bottom: .8em; border-left: 2px dashed rgba(29,35,38,.18); pointer-events: none; }
+.ticket { --bite: 64%; }
+/* The paper: a pseudo so its mask does not clip the drop shadow. The mask is the paper minus a perforated left edge (a bite every
+   1em) minus two half-round ticket bites at the medal rule. */
+.ticket::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: .35em .6em .6em .35em; background: var(--contour) 0 0 / 240px 160px, radial-gradient(120% 90% at 80% 0%, #FBF4E4, var(--cream) 55%, var(--cream-2));
+  -webkit-mask: radial-gradient(circle at 0 var(--bite), transparent 1em, #000 calc(1em + 1px)), radial-gradient(circle at 100% var(--bite), transparent 1em, #000 calc(1em + 1px)), radial-gradient(circle at 0 50%, transparent .34em, #000 calc(.34em + 1px)) 0 .2em / 1em 1em repeat-y, linear-gradient(#000, #000) .5em 0 / calc(100% - .5em) 100% no-repeat;
+  -webkit-mask-composite: source-in, source-in, source-over;
+  mask: radial-gradient(circle at 0 var(--bite), transparent 1em, #000 calc(1em + 1px)), radial-gradient(circle at 100% var(--bite), transparent 1em, #000 calc(1em + 1px)), radial-gradient(circle at 0 50%, transparent .34em, #000 calc(.34em + 1px)) 0 .2em / 1em 1em repeat-y, linear-gradient(#000, #000) .5em 0 / calc(100% - .5em) 100% no-repeat;
+  mask-composite: intersect, intersect, add; }
+/* The survey patch: the contour lines drawn close and dark under the route glyph (A-results' right half of the paper). */
+.tk-topo { position: absolute; right: 0; top: 0; width: 58%; height: 70%; z-index: -1; pointer-events: none; background: var(--contour-dark) 30px 12px / 170px 113px; -webkit-mask-image: radial-gradient(closest-side at 62% 48%, #000 35%, transparent); mask-image: radial-gradient(closest-side at 62% 48%, #000 35%, transparent); }
+
 .ticket * { text-shadow: none; }
 .tk-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1em; padding-bottom: .5em; border-bottom: 2px solid rgba(29,35,38,.75); width: 100%; }
 .ticket .ov-title { display: flex; flex-direction: column; gap: .3em; min-width: 0; }
@@ -609,13 +625,15 @@ export const HUD_CSS = /* css */ `
 .results .time { font: 800 2.55em/1 var(--sans); font-stretch: 104%; font-variant-numeric: tabular-nums; letter-spacing: -.01em; color: var(--coal); text-shadow: none; }
 .results .time .ms { font-size: 1em; }
 .results .faults b { font: 800 2.55em/1 var(--sans); font-variant-numeric: tabular-nums; color: var(--coal); }
+/* A bailed run: the count in vermilion (A-brand's BAIL +1), the stamp reads CLEARED instead of CLEAN LINE. */
+.results .faults.bailed b { color: var(--vermilion-2); }
 .results .faults { min-width: 5.2em; }
 .results .pb { font: 800 .95em/1.1 var(--sans); letter-spacing: .03em; text-transform: uppercase; color: var(--teal); min-height: 1.1em; text-shadow: none; white-space: nowrap; }
 .results .pb.behind { color: rgba(29,35,38,.7); }
 .results .pb em { font-style: normal; color: var(--vermilion-2); }
-.tk-route { position: absolute; right: .3em; top: -.4em; width: 3.4em; height: 5em; color: rgba(15,92,99,.55); pointer-events: none; }
+.tk-route { position: absolute; right: .2em; top: -3.8em; width: 4.4em; height: 8em; color: rgba(15,92,99,.62); pointer-events: none; }
 /* Local leaderboard (game.md § leaderboard): the ticket's right column, revealed with the medals. */
-.results .board { flex: 1 1 auto; align-self: stretch; min-width: 8em; max-width: 13em; margin-left: auto; margin-right: 3.6em; padding: .1em 0; font-variant-numeric: tabular-nums; opacity: 0; transform: translateY(.5em); transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease); }
+.results .board { flex: 1 1 auto; align-self: stretch; min-width: 8em; max-width: 13em; margin-left: auto; margin-right: 4.6em; padding: .1em 0; font-variant-numeric: tabular-nums; opacity: 0; transform: translateY(.5em); transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease); }
 .results .board[hidden] { display: none; }
 .results.stage-3 .board, .results.stage-4 .board, .results.stage-5 .board { opacity: 1; transform: none; }
 .results .board-head { font: 700 .66em/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: rgba(29,35,38,.7); margin-bottom: .35em; }
@@ -632,15 +650,16 @@ export const HUD_CSS = /* css */ `
 .results .medals { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: .7em; }
 .results .medal { position: relative; display: flex; flex-direction: column; align-items: center; gap: .3em; padding: 0 .4em; text-align: center; font: 800 .74em/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--coal); }
 .results .medal + .medal { border-left: 1.5px solid rgba(29,35,38,.2); }
-.results .medal i { position: relative; display: block; width: 4.6em; height: 4.6em; border-radius: 50%; background-size: cover; background-position: center; filter: saturate(.25) brightness(1.02); opacity: .55; transition: transform var(--t3) var(--ease), filter var(--t3), opacity var(--t3); }
+.results .medal i { position: relative; z-index: 1; display: block; width: 5.2em; height: 5.2em; border-radius: 50%; background-size: cover; background-position: center; filter: saturate(.55) brightness(1.02); opacity: .74; transition: transform var(--t3) var(--ease), filter var(--t3), opacity var(--t3); }
 .results .medal.bronze { --md: #B8693A; } .results .medal.silver { --md: #AEB6C0; } .results .medal.gold { --md: #E0AE36; } .results .medal.platinum { --md: #1E2A2E; }
 .results .medal i:not(.img) { background: radial-gradient(circle at 36% 30%, rgba(255,255,255,.55), transparent 42%), var(--md); box-shadow: inset 0 0 0 .3em rgba(0,0,0,.18); }
 .results .medal.got i { filter: none; opacity: 1; }
 .results .medal b { font-weight: 800; color: var(--coal); }
 .results .medal small { display: block; min-height: 1em; font: 700 .9em/1.1 var(--sans); letter-spacing: 0; text-transform: none; color: rgba(29,35,38,.75); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .results .medal.next small { color: var(--teal); }
-.results .medal.earned i::after { content: ""; position: absolute; inset: -.28em; border-radius: 50%; box-shadow: 0 0 0 .14em var(--teal), 0 0 1em .1em rgba(15,92,99,.35); }
-.results .medal.earned.platinum i::after { box-shadow: 0 0 0 .14em var(--plat), 0 0 1.2em .2em rgba(47,214,200,.5); }
+.results .medal.earned::before { content: ""; position: absolute; left: 50%; top: -.95em; width: 7.1em; height: 7.1em; margin-left: -3.55em; background: var(--laurel) center / contain no-repeat; pointer-events: none; opacity: 0; transform: scale(.8); transition: opacity var(--t3) var(--ease), transform var(--t3) var(--ease); }
+.results.stage-4 .medal.earned::before, .results.stage-5 .medal.earned::before { opacity: 1; transform: none; }
+.results .medal.earned.platinum i::after { content: ""; position: absolute; inset: -.2em; border-radius: 50%; box-shadow: 0 0 1.1em .15em rgba(47,214,200,.55); }
 .ticket .ov-stats { display: flex; justify-content: flex-end; gap: 0; margin-top: .55em; font: 700 .68em/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: rgba(29,35,38,.62); text-shadow: none; white-space: nowrap; }
 .ticket .ov-stats b { color: var(--coal); }
 .ticket .ov-stats b.bike-pro { color: #2a5da8; }
@@ -734,9 +753,9 @@ export const HUD_CSS = /* css */ `
 /* ---- landscape prompt (rotate-to-play) ------------------------------- */
 .rotate { position: absolute; inset: 0; z-index: 28; /* above .onboard (25) and every run overlay */ display: none; align-items: center; justify-content: center; flex-direction: column; gap: var(--s5); background: radial-gradient(120% 90% at 50% 30%, #17737B 0%, var(--teal) 45%, #093B40 100%); color: var(--ink); text-align: center; padding: calc(var(--s6) + var(--sat)) var(--s5) calc(var(--s6) + var(--sab)); pointer-events: auto; }
 .rotate .wordmark { width: min(78vw, 420px); }
-.rotate .msg { font-size: 1rem; font-weight: 700; letter-spacing: .34em; text-transform: uppercase; color: var(--ink-dim); }
+.rotate .msg { font: 800 .9rem/1.2 var(--sans); letter-spacing: .3em; text-transform: uppercase; color: var(--cream); }
 .rotate i { display: block; width: 3rem; height: 5.2rem; border: 3px solid var(--cream); border-radius: var(--r2); box-shadow: 0 0 24px -6px var(--cream); animation: rot 1.6s var(--ease) infinite; }
-.rotate .btn.reload { min-height: 56px; padding: 0 var(--s6); font-size: 1rem; margin-top: var(--s3); }
+.rotate .btn.reload, #ui .rotate .btn.reload { min-height: 56px; padding: 0 var(--s6); margin-top: var(--s3); border-radius: 10px; font: 400 1.15rem/1 var(--display); letter-spacing: .02em; }
 .rotate .build { position: absolute; bottom: calc(var(--s4) + var(--sab)); left: 0; right: 0; font-size: .7rem; letter-spacing: .16em; text-transform: uppercase; opacity: .4; }
 @keyframes rot { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
 @media (orientation: portrait) and (pointer: coarse) and (max-width: 900px) { .rotate.armed { display: flex; } }

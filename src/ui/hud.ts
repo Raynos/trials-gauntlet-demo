@@ -173,7 +173,7 @@ export class DomHud implements Hud {
     // and MAP · RETRY · NEXT TRACK (vermilion) along the bottom. The staged reveal classes are the old ones.
     this.results = el('div', 'results');
     this.results.innerHTML = `
-      <div class="ticket">
+      <div class="ticket"><i class="tk-topo"></i>
         <div class="tk-head"><div class="ov-title"><div class="ov-kicker"></div><div class="ov-name"></div></div><div class="tk-mark">${wordmarkSvg({ title: '' })}</div></div>
         <div class="tk-stamp">Clean line</div>
         <div class="tk-body">
@@ -407,7 +407,7 @@ export class DomHud implements Hud {
         this.flashStart = this.simTime;
         return;
       case 'finish':
-        this.spawn('finish', 'Clean line', 2.3);
+        this.spawn('finish', this.lastFaults > 0 ? 'Cleared' : 'Clean line', 2.3); // CLEAN LINE only when no bail
         this.flashKind = 'finish';
         this.flashStart = this.simTime;
         return;
@@ -485,6 +485,9 @@ export class DomHud implements Hud {
     const dot = text.indexOf('.');
     this.resTime.innerHTML = `${text.slice(0, dot)}<span class="ms">${text.slice(dot)}</span>`;
     this.resFaults.textContent = String(r.faults);
+    // CLEAN LINE is a run without a bail; a bailed clear reads CLEARED, its count in vermilion.
+    this.resFaults.parentElement?.classList.toggle('bailed', r.faults > 0);
+    (this.results.querySelector('.tk-stamp') as HTMLElement).textContent = r.faults > 0 ? 'Cleared' : 'Clean line';
     if (r.personalBest) {
       this.resPb.className = 'pb best';
       this.resPb.textContent = r.previousBest === null ? 'First clear' : `${formatDelta(r.time - r.previousBest).replace('-', '\u2212')} · New best`;

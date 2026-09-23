@@ -1,6 +1,46 @@
 {
+ "loading": {
+  "tappables": 0,
+  "bad": []
+ },
+ "menu": {
+  "tappables": 5,
+  "bad": []
+ },
  "map": {
   "tappables": 9,
+  "bad": []
+ },
+ "garage": {
+  "tappables": 8,
+  "bad": []
+ },
+ "settings": {
+  "tappables": 22,
+  "bad": []
+ },
+ "credits": {
+  "tappables": 1,
+  "bad": []
+ },
+ "pause": {
+  "tappables": 4,
+  "bad": []
+ },
+ "results": {
+  "tappables": 4,
+  "bad": []
+ },
+ "pause-bailed": {
+  "tappables": 4,
+  "bad": []
+ },
+ "bailed": {
+  "tappables": 4,
+  "bad": []
+ },
+ "error": {
+  "tappables": 0,
   "bad": []
  }
 }

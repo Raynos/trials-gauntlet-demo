@@ -220,7 +220,9 @@ try {
         await ctx.addInitScript(SEED);
         const page = await ctx.newPage();
         await page.goto(url);
-        await sleep(2500);
+        // The loader (z 100) stands over the prompt until the boot is done.
+        await page.waitForFunction(() => { const l = document.getElementById('loader'); return !l || l.classList.contains('out') || getComputedStyle(l).display === 'none'; }, null, { timeout: 120_000 }).catch(() => undefined);
+        await sleep(1200);
         await page.screenshot({ path: path.join(out, `${engine}-390x844-rotate.jpg`), type: 'jpeg', quality: 78 });
         console.log(`  ${engine}-390x844-rotate.jpg`);
         await ctx.close();
