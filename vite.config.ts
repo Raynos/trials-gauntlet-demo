@@ -71,8 +71,12 @@ function retiredTracksLazy(): Plugin {
   };
 }
 
-/** The lazy dev chunk of the retired tracks (`retiredTracksLazy`): never fetched by a player, never in a store build. */
-const DEV_CHUNK = /^assets\/retired-[\w-]+\.js$/;
+/**
+ * Dev chunks, never fetched by a player: the retired tracks (`retiredTracksLazy`, a `?` dev URL only, absent from a
+ * store build) and the main-thread audio renderer (`assets/audio-offline-*.js`: the harness hook
+ * `__rockhop.audio.renderOffline`; a player's DSP is the worklet asset). Phase `dev`: not streamed, not warmed.
+ */
+const DEV_CHUNK = /^assets\/(retired|audio-offline)-[\w-]+\.js$/;
 
 /** The inline loader script (`src/boot/inline.ts` bundled) must paint with the first HTML bytes: ≤ 8 KB minified. */
 const INLINE_BUDGET_BYTES = 8 * 1024;
@@ -85,6 +89,8 @@ const INLINE_BUDGET_BYTES = 8 * 1024;
  * audio-worklet asset the ship gate's `bundle.jsGzipKB` also sums). The +30 KB is real, so the build's budget
  * moves by 40 KB (the delta plus the headroom it ate); the gate's threshold and the CONTRACT line are the
  * parent's call.
+ *
+ * Since the ROCKHOP gate round both count the same set: every JS file but the `DEV_CHUNK`s, worklet asset included.
  */
 const BUNDLE_BUDGET_GZ_BYTES = 640 * 1024;
 
@@ -96,8 +102,10 @@ function bundleBudget(): Plugin {
       let total = 0;
       const rows: string[] = [];
       for (const [name, item] of Object.entries(bundle)) {
-        if (item.type !== 'chunk') continue;
-        const gz = gzipSync(Buffer.from(item.code)).length;
+        // Chunks and the emitted JS assets (the audio worklet is an asset): the same set the ship gate's
+        // `bundle.jsGzipKB` sums, so the build and the gate report one number.
+        if (item.type === 'chunk' ? false : !name.endsWith('.js')) continue;
+        const gz = gzipSync(item.type === 'chunk' ? Buffer.from(item.code) : Buffer.from(item.source)).length;
         // The retired tracks' dev chunk is fetched only by a `?` dev URL and absent from the store build: listed, not budgeted.
         const dev = DEV_CHUNK.test(name);
         if (!dev) total += gz;
@@ -611,6 +619,8 @@ export default defineConfig({
         manualChunks: {
           three: ['three'],
         },
+        // `src/audio/offline.ts` is a lazy harness-only chunk: named so it cannot be mistaken for the PWA's offline pack.
+        chunkFileNames: (c) => (c.facadeModuleId?.endsWith('/src/audio/offline.ts') ? 'assets/audio-offline-[hash].js' : 'assets/[name]-[hash].js'),
       },
     },
   },

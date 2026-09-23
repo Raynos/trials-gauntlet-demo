@@ -13,7 +13,7 @@
  *   G6 no countdown     throttle held from the first tick after restart rolls the bike within restart.movesWithinTicks
  *                       (the clutch model needs a few ticks from idle; a countdown would hold it 360+)
  *   G7 heap + perf      N s of play: heap growth, draw calls, tris, textures, physics us/tick, render submit ms
- *   G8 bundle           gzip of dist/assets/*.js
+ *   G8 bundle           gzip of the player's JS: dist/assets/*.js minus the load manifest's dev phase
  *   G9 determinism      gate/determinism.ts on the golden recording
  *   G10 stranger        out/metrics/{b1,b2,b3,e1}.stranger.json: median attempts of completed sessions on the
  *                       working tree's src fingerprint vs 1.5 x meta.attemptsBand[1]. Informational until all
@@ -171,12 +171,32 @@ function dirBytes(dir: string): number {
   return total;
 }
 
-function jsGzipBytes(dir: string): number {
+/**
+ * G8: gzip of the JS a web player downloads — every `assets/*.js` except the load manifest's `dev` phase (the
+ * retired tracks' `?`-URL chunk, the harness-only audio renderer: vite.config.ts `DEV_CHUNK`, the rule the build's
+ * own budget applies). The lazy chunks a player does fetch (the audio worklet, the review sheet the offline pack
+ * warms) count. Without a manifest every file counts.
+ */
+function jsGzipBytes(dir: string): { total: number; dev: number; devFiles: string[] } {
   const assets = path.join(dir, 'assets');
-  if (!fs.existsSync(assets)) return 0;
-  let total = 0;
-  for (const f of fs.readdirSync(assets)) if (f.endsWith('.js')) total += gzipSync(fs.readFileSync(path.join(assets, f))).length;
-  return total;
+  const out = { total: 0, dev: 0, devFiles: [] as string[] };
+  if (!fs.existsSync(assets)) return out;
+  const devPaths = new Set<string>();
+  try {
+    const m = JSON.parse(fs.readFileSync(path.join(dir, 'load-manifest.json'), 'utf8')) as { items?: { path: string; phase: string }[] };
+    for (const i of m.items ?? []) if (i.phase === 'dev') devPaths.add(i.path.replace(/^\.\//, ''));
+  } catch {
+    // no manifest: count everything
+  }
+  for (const f of fs.readdirSync(assets)) {
+    if (!f.endsWith('.js')) continue;
+    const gz = gzipSync(fs.readFileSync(path.join(assets, f))).length;
+    if (devPaths.has(`assets/${f}`)) {
+      out.dev += gz;
+      out.devFiles.push(f);
+    } else out.total += gz;
+  }
+  return out;
 }
 
 /** Cold-boot samples: `runs` fresh contexts, nav -> ready ms and ready -> first synced frame ms. */
@@ -249,7 +269,8 @@ async function main(): Promise<void> {
     buildMs = performance.now() - t0;
   }
   const distBytes = dirBytes(DIST_DIR);
-  const gz = jsGzipBytes(DIST_DIR);
+  const js = jsGzipBytes(DIST_DIR);
+  const gz = js.total;
 
   const physicsName = (await createSim(trackId)).physicsName;
   console.log(`gate ${trackId}: physics=${physicsName} thresholds=${path.relative(REPO_ROOT, THRESHOLDS_FILE)}`);
@@ -576,7 +597,7 @@ async function main(): Promise<void> {
     // G8 bundle
     const runBundle = (check: (c: GateCheck) => void): Promise<void> => (async () => {
     const gzKB = gz / 1024;
-    check({ id: 'bundle.jsGzipKB', value: gzKB, limit: num('bundle.jsGzipKB'), pass: gz > 0 && gzKB <= num('bundle.jsGzipKB'), unit: 'KB', note: `dist ${(distBytes / 1024).toFixed(0)} KB raw` });
+    check({ id: 'bundle.jsGzipKB', value: gzKB, limit: num('bundle.jsGzipKB'), pass: gz > 0 && gzKB <= num('bundle.jsGzipKB'), unit: 'KB', note: `player JS (every assets/*.js but the manifest's dev phase); dev-only, not counted: ${js.devFiles.join(', ') || 'none'} ${(js.dev / 1024).toFixed(1)} KB gz; dist ${(distBytes / 1024).toFixed(0)} KB raw` });
     })();
 
     // G9 determinism on the golden recording

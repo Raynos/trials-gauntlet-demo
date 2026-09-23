@@ -18,7 +18,7 @@ import type { BikeClass, CompiledTrack, GameEvent, InputFrame, PhysicsState } fr
 import type { PhysicsFactory } from '../../physics';
 import type { AudioSystem } from '../index';
 import { ModelDriver, type AudioScene } from '../driver';
-import { createOfflineRenderer, type OfflineOptions } from '../offline';
+import type { OfflineOptions } from '../offline';
 import { FallbackGraph } from './fallback';
 import { silentAutomation } from '../automation';
 import { MusicPlayer, type MusicPlayerOptions } from '../music/player';
@@ -69,7 +69,13 @@ export class WebAudioSystem implements AudioSystem {
   readonly renderOffline: ((recordingJson: string, seconds: number) => Promise<Float32Array>) | undefined;
 
   constructor(private readonly opts: WebAudioOptions = {}) {
-    if (opts.makePhysics) this.renderOffline = createOfflineRenderer(opts.makePhysics, opts.offline ?? {});
+    // The offline renderer runs the whole DSP on the main thread: a harness hook (`__rockhop.audio.renderOffline`),
+    // never a player path (the player's DSP is the worklet asset). Loaded on first call, it keeps the synth out
+    // of the entry chunk.
+    const makePhysics = opts.makePhysics;
+    if (makePhysics) {
+      this.renderOffline = async (json, seconds) => (await import('../offline')).createOfflineRenderer(makePhysics, opts.offline ?? {})(json, seconds);
+    }
   }
 
   /** 'worklet' | 'fallback' | null (not unlocked yet). */

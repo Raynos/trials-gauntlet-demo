@@ -46,18 +46,10 @@ export class NullAudio implements AudioSystem {
 }
 
 export { WebAudioSystem, type WebAudioOptions } from './graph/webAudio';
-export {
-  OFFLINE_SAMPLE_RATE,
-  OFFLINE_UPDATE_HZ,
-  createOfflineRenderer,
-  encodeWav16,
-  renderRecording,
-  renderScript,
-  renderWorld,
-  type WorldSource,
-  type OfflineOptions,
-  type OfflineResult,
-} from './offline';
+// The offline renderer's runtime (the main-thread DSP) is imported from './offline' directly (tools, harness,
+// tests) or lazily (`WebAudioSystem.renderOffline`): `main.ts` takes this barrel as a namespace, which keeps every
+// runtime export here in the entry chunk.
+export type { WorldSource, OfflineOptions, OfflineResult } from './offline';
 export type { AudioParams, Transient, TransientKind } from './params';
 export { MusicPlayer, MUSIC_LEVELS } from './music/player';
 export { MUSIC_CUES, type MusicCue, type CueFile } from './music/cues';
