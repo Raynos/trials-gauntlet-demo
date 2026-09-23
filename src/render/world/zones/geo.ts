@@ -882,3 +882,118 @@ export function snowBankGeometryZ(seed = 43): THREE.BufferGeometry {
 export function snowPostGeometry(): THREE.BufferGeometry {
   return merge([box(0.18, 1, 0.18, 0, 0.5, 0, rgb(0x5a4632)), box(0.26, 0.12, 0.26, 0, 1.04, 0, rgb(0xf4f8ff))]);
 }
+
+// ---------------------------------------------------------------------------
+// Round 2 foreground (the low near layer in front of the deck face)
+// ---------------------------------------------------------------------------
+
+/** Truck tyre standing on its tread, half sunk: 1.0 m across, axis along z, tread blocks on the outer ring. */
+export function truckTyreGeometry(): THREE.BufferGeometry {
+  const g = new THREE.TorusGeometry(0.4, 0.17, 8, 28);
+  const p = g.getAttribute('position');
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i);
+    const y = p.getY(i);
+    const z = p.getZ(i);
+    const r = Math.hypot(x, y);
+    if (r > 0.5) {
+      // Tread lugs: every other segment on the outer ring stands 2.5 cm proud.
+      const a = Math.atan2(y, x);
+      const lug = Math.cos(a * 14) > 0.2 ? 0.025 : 0;
+      p.setXYZ(i, (x / r) * (r + lug), (y / r) * (r + lug), z * 1.25);
+    } else p.setXYZ(i, x, y, z * 1.25);
+  }
+  g.computeVertexNormals();
+  g.translate(0, 0.36, 0);
+  return paint(g, rgb(0x2c2c2c), (x, y) => (Math.hypot(x, y - 0.36) > 0.5 ? 0.85 : 1.05));
+}
+
+/** A barked log lying along x: 1 m long (scale x), radius 0.22, sawn pale ends with darker rings, origin bottom centre. */
+export function logGeometry(seed = 5): THREE.BufferGeometry {
+  const rnd = lcg(seed);
+  const R = 0.22;
+  const g = new THREE.CylinderGeometry(R, R * 0.94, 1, 10, 3, false).rotateZ(Math.PI / 2);
+  const p = g.getAttribute('position');
+  const bark = rgb(0x5a4030);
+  const end = rgb(0xd6b080);
+  paint(g, [1, 1, 1]);
+  const c = g.getAttribute('color') as THREE.BufferAttribute;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i);
+    const y = p.getY(i);
+    const z = p.getZ(i);
+    const r = Math.hypot(y, z);
+    const isEnd = Math.abs(Math.abs(x) - 0.5) < 1e-3 && r < R * 0.9;
+    if (!isEnd && r > 1e-3) {
+      const k = 1 + (rnd() - 0.5) * 0.12;
+      p.setXYZ(i, x, y * k, z * k);
+    }
+    const col = isEnd ? end : bark;
+    const s = isEnd ? 0.75 + 0.3 * (r / R) : 0.75 + 0.3 * rnd();
+    c.setXYZ(i, col[0] * s, col[1] * s, col[2] * s);
+  }
+  g.computeVertexNormals();
+  g.translate(0, R, 0);
+  return g;
+}
+
+/** Fern: nine arched fronds with serrated leaflets, ~1 m across, 0.5 m tall. */
+export function fernGeometry(seed = 7, col = 0x4e7a2e): THREE.BufferGeometry {
+  const rnd = lcg(seed);
+  const parts: THREE.BufferGeometry[] = [];
+  const base = rgb(col);
+  for (let f = 0; f < 9; f++) {
+    const yaw = (f / 9) * Math.PI * 2 + rnd() * 0.5;
+    const L = 0.45 + rnd() * 0.25;
+    const n = 8;
+    const pos: number[] = [];
+    const idx: number[] = [];
+    for (let i = 0; i <= n; i++) {
+      const t = i / n;
+      const along = t * L;
+      const y = Math.sin(t * Math.PI * 0.75) * 0.45 * (0.7 + rnd() * 0.2) - t * t * 0.12;
+      const w = (i % 2 ? 0.13 : 0.07) * (1 - t * 0.85);
+      pos.push(along, y, -w, along, y + 0.01, w);
+      if (i > 0) {
+        const k = i * 2;
+        idx.push(k - 2, k - 1, k, k, k - 1, k + 1);
+      }
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    g.rotateY(yaw);
+    parts.push(paint(g, base, (x, y, z) => 0.55 + 0.6 * Math.min(1, Math.hypot(x, z) / 0.6) + 0.2 * y));
+  }
+  return merge(parts);
+}
+
+/** Snow cap: a flattened lumpy dome, 1 m across and 0.35 m tall (scale to the rock / log it sits on). */
+export function snowCapGeometry(seed = 9): THREE.BufferGeometry {
+  const rnd = lcg(seed);
+  const g = new THREE.IcosahedronGeometry(0.5, 2);
+  const p = g.getAttribute('position');
+  for (let i = 0; i < p.count; i++) {
+    const y = p.getY(i);
+    const k = 0.92 + rnd() * 0.14;
+    p.setXYZ(i, p.getX(i) * k, (y > 0 ? y * 0.7 : y * 0.15) * k, p.getZ(i) * k);
+  }
+  g.computeVertexNormals();
+  return paint(g, rgb(0xf6f9ff), (_x, y) => 0.86 + 0.3 * y);
+}
+
+/** Rubble pile: a heap of broken cream stone, 1.6 × 0.55 × 1.2. */
+export function rubblePileGeometry(seed = 11): THREE.BufferGeometry {
+  const rnd = lcg(seed);
+  const parts: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < 11; i++) {
+    const s = 0.12 + rnd() * 0.2;
+    const a = rnd() * Math.PI * 2;
+    const d = rnd() * 0.6;
+    const g = new THREE.IcosahedronGeometry(s, 0).scale(1.2 + rnd() * 0.4, 0.7 + rnd() * 0.3, 1 + rnd() * 0.3);
+    g.rotateY(rnd() * 3).translate(Math.cos(a) * d * 1.2, s * 0.6 + (0.6 - d) * 0.45, Math.sin(a) * d * 0.8);
+    parts.push(paint(g, STONE[i % STONE.length]!, () => 0.8 + rnd() * 0.3));
+  }
+  return ao(merge(parts), 0.5, 0.35);
+}

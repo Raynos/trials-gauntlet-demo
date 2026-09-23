@@ -21,6 +21,7 @@ import { PropBatch, bakeAO, containerGeometry, contactShadowBatch, drumGeometry,
 import { profileY } from '../track';
 import type { SetPiecePlan } from '../setPieces';
 import * as G from './geo';
+import { ZONE_FACE, zonePaint } from './zoneDeck';
 
 /** The zone ids this kit builds (`snow` is SNOWLINE). */
 export type ZoneBiome = 'coast' | 'alpine' | 'quarry' | 'snow';
@@ -52,8 +53,22 @@ export interface ZoneCtx {
 
 /** The zone's ground height at (x, z) — the terrain mesh and every prop placement read this. */
 export function zoneGround(id: ZoneBiome, profile: CompiledTrack['def']['profile'], x: number, z: number): number {
-  const base = profileY(profile, x) - 0.42;
+  const py = profileY(profile, x);
+  const base = py - 0.42;
   const az = Math.abs(z);
+  const face = ZONE_FACE[id];
+  if (face && z > 0) {
+    // Round 2: the near ground lies at the foot of the deck's face (zoneDeck.ts), where the foreground stands.
+    const z0 = face.edge + face.run;
+    if (z < z0) return base;
+    const wob = Math.sin(x * 0.13 + z * 0.3) * 0.2 * Math.min(1, (z - z0) / 8);
+    return py - face.h - Math.min(1, (z - z0) / 36) ** 2 * 1.4 + wob;
+  }
+  if (id === 'snow' && z > 3) {
+    // Round 2: the snow shelf falls away in front of the trail as a drift bank, so the foreground sits below it.
+    const t = Math.min(1, (z - 3) / 2.4);
+    return base - t * t * (3 - 2 * t) * 1.3 - Math.min(1, Math.max(0, z - 5.4) / 30) ** 2 * 1.4 + Math.sin(x * 0.13 + z * 0.3) * 0.2 * Math.min(1, (z - 3) / 10);
+  }
   if (az <= 3) return base;
   const wob = Math.sin(x * 0.13 + z * 0.3) * 0.25 * Math.min(1, (az - 3) / 20);
   if (z > 0) return base - Math.min(1, (z - 3) / 30) ** 2 * 2.2 + wob;
@@ -78,6 +93,9 @@ export function zoneGround(id: ZoneBiome, profile: CompiledTrack['def']['profile
     }
   }
 }
+
+/** Foreground scrap reads as rust, not a black tangle (the rust-steel albedo is dark under the vertex colours). */
+const SCRAP_LIFT = new THREE.Color(1.9, 1.6, 1.4);
 
 const COAST_LIVERIES = [0x2f8a8a, 0xa8482e, 0x2e5f8e, 0x1f6e70, 0xb86a2a, 0x8a2e24, 0xd8cdb4, 0x3a7a58].map((c) => new THREE.Color(c));
 
@@ -107,8 +125,12 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
   lib.complete(painted);
   const rust = lib.get('rustSteel');
   const wood = lib.get('pallet');
-  const rock = lib.derive('concrete');
-  rock.color.setHex(0xffffff); // stone: the fine neutral concrete grain, tinted per zone (the library rock albedo is baked orange)
+  // Stone: the fine neutral concrete grain tinted per zone (the library rock albedo is baked orange); the quarry's
+  // stone and ground take its own painted pale dust instead (round 2: the concrete grain read dark brown there).
+  const quarryPaint = id === 'quarry' ? zonePaint(lib, 'quarry', 'top') : null;
+  if (quarryPaint) textureBytes += quarryPaint.bytes;
+  const rock = quarryPaint ? quarryPaint.mat : lib.derive('concrete');
+  rock.color.setHex(0xffffff);
   const cont = lib.get('container');
   const tyreM = lib.get('tyre');
   const snowM = lib.get('snow');
@@ -119,13 +141,20 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
 
   // --- Terrain ------------------------------------------------------------------------------------------
   {
+    // Round 2: faced zones leave the band under the deck open (the slab and its pits are the deck's own
+    // geometry) — the far ground stops at z −3 and the near ground starts at the face's foot.
+    const face = ZONE_FACE[id];
+    const nearZ = face ? face.edge + face.run : 3.0;
     const zRows: number[] =
-      id === 'coast' ? [-24, -19, -15, -12, -7, -3.0, 3.0, 9, 45]
-      : id === 'alpine' ? [-110, -72, -50, -30, -16, -8, -3.0, 3.0, 9, 45]
-      : id === 'quarry' ? [-9.2, -6, -3.0, 3.0, 9, 45]
-      : [-170, -110, -70, -52, -50, -26, -20, -12, -3.0, 3.0, 9, 45];
+      id === 'coast' ? [-24, -19, -15, -12, -7, -3.0, nearZ, 3.4, 5, 7, 10, 45]
+      : id === 'alpine' ? [-110, -72, -50, -30, -16, -8, -3.0, nearZ, 3.6, 5, 7, 10, 45]
+      : id === 'quarry' ? [-9.2, -6, -3.0, nearZ, 3.4, 5, 7, 10, 45]
+      : [-170, -110, -70, -52, -50, -26, -20, -12, -3.0, 3.0, 3.8, 4.6, 5.4, 6.4, 9, 45];
+    const grid: number[] = [];
+    for (let x = x0 - 20; x <= x1 + 20; x += 4) grid.push(x);
+    // Round 2: columns also at every profile vertex, so the near ground meets the face's foot on every bump.
     const cols: number[] = [];
-    for (let x = x0 - 20; x <= x1 + 20; x += 4) cols.push(x);
+    for (const x of [...grid, ...profile.map((p) => p.x)].sort((a, b) => a - b)) if (!cols.length || x - cols[cols.length - 1]! > 0.35) cols.push(x);
     const pos: number[] = [];
     const uv: number[] = [];
     const col: number[] = [];
@@ -148,7 +177,7 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
         const g = mix(C.grass, C.grass2, patch, n);
         return az < 4.2 ? mix(C.trail, g, (az - 3) / 1.2, 1) : g;
       }
-      if (id === 'quarry') return mix(C.dust, C.dust, 0, n * 1.35);
+      if (id === 'quarry') return [n * 0.98, n * 0.95, n * 0.9]; // the painted dust (quarryPaint) carries the colour
       return az > 20 && az < 26 ? mix(C.rockSnow, C.snow, 0.3, n) : mix(C.snow, C.snow, 0, n);
     };
     for (let i = 0; i < cols.length; i++) {
@@ -159,7 +188,7 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
         pos.push(x, y, z);
         uv.push(x / 4, z / 4);
         col.push(...tint(x, z, y));
-        if (i > 0 && r > 0) {
+        if (i > 0 && r > 0 && !(face && zRows[r - 1] === -3.0 && zRows[r] === nearZ)) {
           const c = i * zRows.length + r;
           const p = (i - 1) * zRows.length + r;
           idx.push(p - 1, p, c - 1, c - 1, p, c);
@@ -172,7 +201,7 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
     g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     g.setIndex(idx);
     g.computeVertexNormals();
-    const tm = lib.derive(id === 'snow' ? 'snow' : 'concrete'); // a neutral fine grain the vertex colour tints per zone
+    const tm = quarryPaint ? quarryPaint.mat : lib.derive(id === 'snow' ? 'snow' : 'concrete'); // a neutral fine grain the vertex colour tints per zone
     tm.color.setHex(0xffffff);
     tm.vertexColors = true;
     tm.needsUpdate = true;
@@ -212,11 +241,30 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
     if (s > 0.5) shadowAt(x, z, s * 1.2);
   };
 
-  /** Foreground low dressing at z +3.6 … +8 (≤ 0.6 m, never on a spawn keep-out). */
-  const foreground = (place: (x: number, z: number) => void, gap: [number, number] = [2.2, 4.5]): void => {
-    for (let x = x0 + 6; x < x1; x += rng.range(gap[0], gap[1])) {
-      if (keepOut(x, 1)) continue;
-      place(x, rng.range(3.6, 7.5));
+  // --- Round 2: the near layer ------------------------------------------------------------------------------
+  // Everything in front of the deck stands on the lowered near ground (the face's foot, `zoneGround`) and is
+  // scaled to stay 12 cm under the lowest deck top within 2.5 m either side, so from any riding camera above the
+  // deck it draws below the bike's contact line: it frames the bottom third without ever reaching the bike.
+  const faceDef = ZONE_FACE[id];
+  const nearZ0 = faceDef ? faceDef.edge + faceDef.run : 3.0;
+  const deckMin = (x: number, r = 2.5): number => {
+    let m = Math.min(profileY(profile, x - r), profileY(profile, x), profileY(profile, x + r));
+    for (const p of profile) if (p.x > x - r && p.x < x + r) m = Math.min(m, p.y);
+    return m;
+  };
+  const room = (x: number, z: number): number => deckMin(x) - 0.12 - gy(x, z);
+  /** Scale `s` of an item `H` metres tall at that scale 1, fitted under the room `h`. */
+  const fit = (H: number, s: number, h: number): number => Math.min(s, h / H);
+  const nearLayer = (foot: (x: number, z: number, h: number) => void, front: (x: number, z: number, h: number) => void, footGap: [number, number] = [0.7, 1.6], frontGap: [number, number] = [1.2, 2.6]): void => {
+    for (let x = x0 + 2; x < x1; x += rng.range(footGap[0], footGap[1])) {
+      const z = nearZ0 + rng.range(0.25, 1.2);
+      const h = room(x, z);
+      if (h > 0.22) foot(x, z, h);
+    }
+    for (let x = x0 + 3; x < x1; x += rng.range(frontGap[0], frontGap[1])) {
+      const z = nearZ0 + rng.range(1.3, 4.8);
+      const h = room(x, z);
+      if (h > 0.3) front(x, z, h);
     }
   };
 
@@ -251,7 +299,9 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
     const bollards = PB('bollard', G.bollardGeometry(), painted);
     const ropes = PB('rope', G.ropeCoilGeometry(), foliage);
     const nets = PB('net', G.netPileGeometry(track.def.seed ^ 3), foliage);
-    const scrap = [0, 1].map((i) => PB(`scrap${i}`, G.scrapHeapGeometry((track.def.seed ^ (i * 977 + 5)) >>> 0), rust));
+    const rustDull = lib.derive('rustSteel'); // scrap: weathered, not polished — the library's 0.6 metalness read black
+    rustDull.metalness = 0.2;
+    const scrap = [0, 1].map((i) => PB(`scrap${i}`, G.scrapHeapGeometry((track.def.seed ^ (i * 977 + 5)) >>> 0), rustDull));
     const quay = PB('quay', G.quayGeometry(), lib.get('concrete'));
     const piles = PB('pile', G.pileGeometry(), wood);
     const deckPlanks = PB('pierdeck', G.paint(new THREE.BoxGeometry(1, 0.3, 1).translate(0, -0.15, 0), G.rgb(0x7a6246)), wood);
@@ -347,15 +397,57 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
     }
     // Gulls wheeling over the bay (vertex-animated from ZONE_TIME).
     meshes.push(gulls(24, -10, -70, floor + 7, floor + 20));
-    // Foreground junk.
-    foreground((x, z) => {
-      const r = rng.next();
-      if (r < 0.3) tyreFlat.add(x, gy(x, z), z, 0, rng.range(0.9, 1.2));
-      else if (r < 0.5) ropes.add(x, gy(x, z), z, rng.range(0, 6));
-      else if (r < 0.65) pallets.add(x, gy(x, z), z, rng.range(-0.4, 0.4));
-      else if (r < 0.8) nets.add(x, gy(x, z), z, rng.range(0, 6), 0.8, null, 0, 0.7, 0.8);
-      else boulder(x, z, rng.range(0.25, 0.5), rng.range(0.15, 0.3));
-    });
+    // Round 2 near layer (C-ride's bottom third): truck tyres, tyre stacks, rope coils, nets, rusty scrap, pallets,
+    // drums, a beached buoy, bollards; tyre fenders hung on the quay face.
+    const truckTyre = PB('trucktyre', G.truckTyreGeometry(), tyreM);
+    const tyreStack = (x: number, z: number, h: number): void => {
+      const n = Math.max(1, Math.min(rng.int(1, 3), Math.floor(h / 0.32)));
+      for (let k = 0; k < n; k++) tyreFlat.add(x + rng.range(-0.08, 0.08), gy(x, z) + k * 0.3, z + rng.range(-0.08, 0.08), 0, rng.range(0.95, 1.15));
+      shadowAt(x, z, 0.8);
+    };
+    const palletPile = (x: number, z: number, h: number): void => {
+      const n = Math.max(1, Math.min(rng.int(1, 5), Math.floor(h / 0.144)));
+      const ry = rng.range(-0.5, 0.5);
+      for (let k = 0; k < n; k++) pallets.add(x + rng.range(-0.06, 0.06), gy(x, z) + k * 0.144, z, ry + rng.range(-0.08, 0.08));
+      shadowAt(x, z, 0.9, 0.7);
+    };
+    nearLayer(
+      (x, z, h) => {
+        const r = rng.next();
+        if (r < 0.2) tyreStack(x, z, h);
+        else if (r < 0.34) truckTyre.add(x, gy(x, z), z, rng.range(-0.6, 0.6), fit(0.95, rng.range(0.85, 1.1), h), null, rng.range(-0.15, 0.15));
+        else if (r < 0.5) palletPile(x, z, h);
+        else if (r < 0.6) ropes.add(x, gy(x, z), z, rng.range(0, 6), fit(0.45, rng.range(0.9, 1.2), h));
+        else if (r < 0.7) nets.add(x, gy(x, z), z, rng.range(0, 6), fit(0.55, rng.range(0.6, 0.9), h));
+        else if (r < 0.78) drums.add(x, gy(x, z) + 0.29, z, rng.range(-0.4, 0.4), 1, rng.next() < 0.5 ? 0x9a4a24 : 0x2a6a6a, Math.PI / 2);
+        else if (r < 0.86) scrap[rng.int(0, 1)]!.add(x, gy(x, z), z, rng.range(0, 6), fit(1.2, rng.range(0.5, 0.8), h), SCRAP_LIFT);
+        else boulder(x, z, rng.range(0.25, 0.45), rng.range(0.15, 0.3));
+      },
+      (x, z, h) => {
+        const r = rng.next();
+        if (r < 0.2) {
+          truckTyre.add(x, gy(x, z), z, rng.range(-0.9, 0.9), fit(0.95, rng.range(1.0, 1.35), h), null, rng.range(-0.2, 0.2));
+          shadowAt(x, z, 0.9, 0.6);
+        } else if (r < 0.36) {
+          scrap[rng.int(0, 1)]!.add(x, gy(x, z), z, rng.range(0, 6), fit(1.2, rng.range(0.8, 1.2), h), SCRAP_LIFT);
+          shadowAt(x, z, 1.5, 1.1);
+        } else if (r < 0.48) nets.add(x, gy(x, z), z, rng.range(0, 6), fit(0.55, rng.range(0.9, 1.3), h));
+        else if (r < 0.6) palletPile(x, z, h);
+        else if (r < 0.7) {
+          ropes.add(x, gy(x, z), z, rng.range(0, 6), fit(0.45, 1.1, h));
+          tyreStack(x + 1.0, z + rng.range(-0.3, 0.3), h);
+        } else if (r < 0.78) {
+          buoysLying.add(x, gy(x, z) + 0.45 * fit(1.1, 1, h), z, rng.range(-0.6, 0.6), fit(1.1, 1, h), null, Math.PI / 2 - 0.1);
+          shadowAt(x, z, 1.1, 0.6);
+        } else if (r < 0.86) bollards.add(x, gy(x, z), z, 0, fit(0.72, 1, h));
+        else tyreStack(x, z, h);
+      },
+    );
+    // Tyre fenders hung on the quay face, every 5–9 m, their tops 17 cm under the deck edge.
+    for (let x = x0 + 4; x < x1; x += rng.range(5, 9)) {
+      const py = deckMin(x, 0.6);
+      truckTyre.add(x, py - 1.12, (faceDef?.edge ?? 2) + 0.22, 0, 1, null, 0);
+    }
   }
 
   // =========================================================================================================
@@ -437,12 +529,43 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
       ramps.add(tx + 14, gy(tx + 14, -8), -8, 0);
     }
     for (let x = x0 + span * 0.6; x < x1; x += rng.range(160, 240)) cabins.add(x, gy(x, -18), -18, rng.range(-0.2, 0.2));
-    foreground((x, z) => {
-      const r = rng.next();
-      if (r < 0.5) grass[rng.int(0, 1)]!.add(x, gy(x, z), z, rng.range(0, 6), rng.range(1.0, 1.6));
-      else if (r < 0.7) flowers[0]!.add(x, gy(x, z), z, rng.range(0, 6), 1.1);
-      else boulder(x, z, rng.range(0.3, 0.6), rng.range(0.2, 0.4));
-    }, [1.4, 3]);
+    // Round 2 near layer (B-ride's meadow foreground): logs, mossy rocks, ferns, lupins and daisies, stumps.
+    const ferns = [PB('fern0', G.fernGeometry(track.def.seed ^ 21), foliage, false), PB('fern1', G.fernGeometry(track.def.seed ^ 23, 0x6a9238), foliage, false)];
+    const logB = PB('log', G.ao(G.logGeometry(track.def.seed ^ 25), 0.44, 0.3), wood);
+    const mossy = (x: number, z: number, s: number, h: number): void => {
+      const sy = Math.min(s * rng.range(0.5, 0.8), h / 1.15);
+      rockBatches[rng.int(0, 2)]!.add(x, gy(x, z) + sy * 0.12, z, rng.range(0, 6), s, new THREE.Color(0x8a9278).multiplyScalar(rng.range(0.85, 1.1)), rng.range(-0.15, 0.15), sy, s * rng.range(0.8, 1.2));
+      if (s > 0.5) shadowAt(x, z, s * 1.2);
+    };
+    const logs1 = (x: number, z: number, h: number): void => {
+      const n = h > 0.8 && rng.next() < 0.4 ? 2 : 1;
+      const ry = rng.range(-0.35, 0.35);
+      const s = fit(0.44, rng.range(0.85, 1.2), h / n);
+      for (let k = 0; k < n; k++) logB.add(x + rng.range(-0.3, 0.3), gy(x, z) + k * 0.4 * s, z + k * 0.05, ry + rng.range(-0.06, 0.06), rng.range(2.2, 4.4), null, 0, s, s);
+      shadowAt(x, z, 2.2, 0.6);
+    };
+    nearLayer(
+      (x, z, h) => {
+        const r = rng.next();
+        if (r < 0.4) ferns[rng.int(0, 1)]!.add(x, gy(x, z), z, rng.range(0, 6), fit(0.5, rng.range(0.9, 1.3), h));
+        else if (r < 0.6) grass[rng.int(0, 1)]!.add(x, gy(x, z), z, rng.range(0, 6), fit(0.6, rng.range(1.0, 1.5), h));
+        else if (r < 0.72) flowers[rng.next() < 0.65 ? 0 : 1]!.add(x, gy(x, z), z, rng.range(0, 6), fit(0.85, rng.range(0.9, 1.2), h));
+        else if (r < 0.86) mossy(x, z, rng.range(0.3, 0.6), h);
+        else logs1(x, z, h);
+      },
+      (x, z, h) => {
+        const r = rng.next();
+        if (r < 0.22) logs1(x, z, h);
+        else if (r < 0.4) mossy(x, z, rng.range(0.5, 1.1), h);
+        else if (r < 0.62) ferns[rng.int(0, 1)]!.add(x, gy(x, z), z, rng.range(0, 6), fit(0.5, rng.range(1.2, 1.7), h));
+        else if (r < 0.74) flowers[0]!.add(x, gy(x, z), z, rng.range(0, 6), fit(0.85, rng.range(1.0, 1.3), h));
+        else if (r < 0.82) flowers[1]!.add(x, gy(x, z), z, rng.range(0, 6), fit(0.85, 1.1, h));
+        else if (r < 0.9) stumps.add(x, gy(x, z), z, rng.range(0, 6), fit(0.55, rng.range(0.8, 1.1), h));
+        else bushes.add(x, gy(x, z), z, rng.range(0, 6), fit(1.0, rng.range(0.7, 1.0), h));
+      },
+      [0.5, 1.2],
+      [1.0, 2.2],
+    );
     void midX;
   }
 
@@ -537,12 +660,35 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
       conveyors.add(x + 18, pitFloor, -58, rng.next() < 0.5 ? 0 : Math.PI, 1);
     }
     for (let x = x0 + rng.range(40, 90); x < x1; x += rng.range(150, 220)) trucks.add(x, floor - 3.4, -14, rng.next() < 0.5 ? 0 : Math.PI, 0.9);
-    foreground((x, z) => {
-      const r = rng.next();
-      if (r < 0.4) boulder(x, z, rng.range(0.3, 0.55), rng.range(0.2, 0.4));
-      else if (r < 0.75) scrub.add(x, gy(x, z), z, rng.range(0, 6), rng.range(0.6, 0.9), null, 0, 0.5, 0.8);
-      else blocks[rng.int(0, 2)]!.add(x, gy(x, z), z, rng.range(-0.3, 0.3), 0.8, stone(), 0, 0.45, 0.6);
-    });
+    // Round 2 near layer (Q2's foreground): cut blocks and broken block, rubble piles, desert scrub, pale rocks.
+    const rubblePile = PB('rubblepile', G.rubblePileGeometry(track.def.seed ^ 27), rock);
+    const block = (x: number, z: number, h: number, tilt: number): void => {
+      let y = gy(x, z);
+      const n = h > 1.2 && rng.next() < 0.35 ? 2 : 1;
+      for (let k = 0; k < n; k++) {
+        const s = Math.min(rng.range(0.55, 1.1) * (1 - k * 0.15), (h - (y - gy(x, z))) * 0.95);
+        if (s < 0.2) break;
+        blocks[rng.int(0, 2)]!.add(x + rng.range(-0.15, 0.15), y - (tilt ? s * 0.12 : 0), z + rng.range(-0.1, 0.1), rng.range(-0.4, 0.4), s * rng.range(1.1, 1.6), stone().multiplyScalar(1.2), tilt ? rng.range(-0.3, 0.3) : 0, s, s * rng.range(0.8, 1.1));
+        y += s;
+      }
+      shadowAt(x, z, 1.2, 0.9);
+    };
+    nearLayer(
+      (x, z, h) => {
+        const r = rng.next();
+        if (r < 0.3) rubblePile.add(x, gy(x, z), z, rng.range(0, 6), fit(0.55, rng.range(0.7, 1.2), h), 0xffffff);
+        else if (r < 0.58) block(x, z, Math.min(h, 0.9), 1);
+        else if (r < 0.78) scrub.add(x, gy(x, z), z, rng.range(0, 6), fit(0.9, rng.range(0.5, 0.8), h), null, 0, fit(0.9, 0.55, h), 0.8);
+        else boulder(x, z, rng.range(0.25, 0.5), rng.range(0.15, 0.3));
+      },
+      (x, z, h) => {
+        const r = rng.next();
+        if (r < 0.32) block(x, z, h, rng.next() < 0.3 ? 1 : 0);
+        else if (r < 0.56) rubblePile.add(x, gy(x, z), z, rng.range(0, 6), fit(0.55, rng.range(1.0, 1.6), h), 0xffffff);
+        else if (r < 0.78) scrub.add(x, gy(x, z), z, rng.range(0, 6), fit(0.9, rng.range(0.7, 1.1), h), null, 0, fit(0.9, 0.8, h), 1);
+        else boulder(x, z, rng.range(0.4, 0.8), Math.min(h / 1.2, rng.range(0.3, 0.6)));
+      },
+    );
   }
 
   // =========================================================================================================
@@ -637,11 +783,42 @@ export function buildZoneKit(ctx: ZoneCtx): ZoneKit {
       }
     }
     for (let x = x0 + span * 0.35; x < x1; x += rng.range(160, 240)) cats.add(x, gy(x, -78), -78, rng.range(-0.4, 0.4), 1.2);
-    foreground((x, z) => {
-      const r = rng.next();
-      if (r < 0.6) banks.add(x, gy(x, z) - 0.05, z, rng.range(0, 6), rng.range(1.2, 2.4), null, 0, rng.range(0.3, 0.55), rng.range(0.8, 1.4));
-      else boulder(x, z, rng.range(0.3, 0.55), rng.range(0.2, 0.4));
-    }, [1.8, 3.6]);
+    // Round 2 near layer (B-ride-snow's foreground): snow-laden rocks and timber on the drift bank below the trail.
+    const capB = PB('snowcap', G.snowCapGeometry(track.def.seed ^ 29), snowM, false);
+    const slog = PB('slog', G.logGeometry(track.def.seed ^ 31), wood);
+    const snowRock = (x: number, z: number, s: number, h: number): void => {
+      const sy = Math.min(s * rng.range(0.5, 0.8), (h - 0.1) / 1.2);
+      if (sy < 0.12) return;
+      const ry = rng.range(0, 6);
+      rockBatches[rng.int(0, 2)]!.add(x, gy(x, z) + sy * 0.12, z, ry, s, rockTint, rng.range(-0.1, 0.1), sy, s * rng.range(0.8, 1.1));
+      capB.add(x, gy(x, z) + sy * 0.8, z, ry, s * 1.5, null, 0, sy * 0.95, s * 1.35);
+      if (s > 0.5) shadowAt(x, z, s * 1.2);
+    };
+    const snowLog = (x: number, z: number, h: number): void => {
+      const s = fit(0.62, rng.range(0.8, 1.1), h);
+      const ry = rng.range(-0.5, 0.5);
+      const L = rng.range(1.8, 3.6);
+      slog.add(x, gy(x, z) - 0.04, z, ry, L, null, rng.range(-0.08, 0.08), s, s);
+      capB.add(x, gy(x, z) + 0.4 * s, z, ry, L * 0.95, null, 0, 0.35 * s, 0.5 * s);
+    };
+    nearLayer(
+      (x, z, h) => {
+        const r = rng.next();
+        if (r < 0.45) banks.add(x, gy(x, z) - 0.05, z, rng.range(0, 6), rng.range(1.0, 2.2), null, 0, Math.min(h * 0.9, rng.range(0.3, 0.6)), rng.range(0.8, 1.3));
+        else if (r < 0.75) snowRock(x, z, rng.range(0.3, 0.6), h);
+        else if (r < 0.88) snowLog(x, z, h);
+        else posts.add(x, gy(x, z), z, rng.range(0, 6), 1, null, rng.range(-0.35, 0.35), Math.min(h * 0.9, rng.range(0.5, 0.9)), 1);
+      },
+      (x, z, h) => {
+        const r = rng.next();
+        if (r < 0.36) snowRock(x, z, rng.range(0.45, 0.95), h);
+        else if (r < 0.6) snowLog(x, z, h);
+        else if (r < 0.84) banks.add(x, gy(x, z) - 0.05, z, rng.range(0, 6), rng.range(1.4, 2.8), null, 0, Math.min(h * 0.9, rng.range(0.4, 0.8)), rng.range(0.9, 1.5));
+        else for (let k = 0; k < 3; k++) posts.add(x + k * 0.45, gy(x + k * 0.45, z), z + rng.range(-0.2, 0.2), rng.range(0, 6), 1, null, rng.range(-0.4, 0.4), Math.min(h * 0.9, rng.range(0.5, 1.0)), 1);
+      },
+      [0.8, 1.8],
+      [1.2, 2.6],
+    );
   }
 
   /** `n` gulls circling in a box; one merged mesh whose vertex shader flaps and wheels them on ZONE_TIME. */

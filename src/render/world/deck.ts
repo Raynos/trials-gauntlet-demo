@@ -26,6 +26,7 @@ import { PropBatch, bakeAO, containerGeometry, palletLowGeometry, palletStackGeo
 import { groundFloorY, profileY, ribbonGeometry, resample, type TrackMeshes } from './track';
 import { canvas, tex } from './canvasTex';
 import { chunkByX } from '../util/merge';
+import { buildZoneDeck, zoneFace, zonePaint } from './zones/zoneDeck';
 
 const DECK_W = 3.0;
 const BOARD_W = 0.22;
@@ -280,10 +281,29 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
   const containers = new PropBatch('support-container', bakeAO(containerGeometry(), 2.59, 0.4), lib.get('container'));
   const palette = [0x2f7a66, 0x9a3424, 0x2e5588, 0x5e5e54, 0xa8722a, 0x3e7238, 0x6a6a62, 0x7a4a3a]; // round 11: the support wall is the bottom third of the high riding frame — lifted so it is not a black band
 
+  // Store release round 2: coast / quarry / alpine ride a built slab (quay, sandstone courses, forest bank) —
+  // the ground line's top, near face, pit walls and edge trim come from zones/zoneDeck.ts.
+  const zoneDeck = zoneFace(biome.id) ? buildZoneDeck(track, biome.id, lib) : null;
+  let zoneDeckTris = 0;
+  if (zoneDeck) {
+    for (const m of zoneDeck.meshes) {
+      zoneDeckTris += triCount(m.geo);
+      chunkByX(m.geo).forEach((g, k) => {
+        const mesh = new THREE.Mesh(g, m.mat);
+        mesh.receiveShadow = true;
+        mesh.castShadow = m.castShadow;
+        mesh.name = `${m.name}:${k}`;
+        group.add(mesh);
+      });
+    }
+    for (const b of zoneDeck.bucketed) push(buckets, b.mat, b.geo);
+  }
+
   for (const c of track.colliders) {
     if (c.kind !== 'polyline' || c.points.length < 2) continue;
     const pl = c;
     const ground = pl.obstacleIndex < 0;
+    if (ground && zoneDeck) continue;
     const surf: SurfaceKind = pl.surface === 'dirt' && biome.id === 'snow' && pl.obstacleIndex < 0 ? 'snow' : pl.surface;
     const tile = TILE[surf] ?? 2;
     if (surf === 'wood') {
@@ -310,7 +330,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
         const wear = rutted ? (Math.abs(Math.abs(z) - 0.4) < 0.16 ? 0.7 : Math.abs(z) < 0.2 ? 1.1 : 1) : Math.abs(z) < 0.3 ? 0.72 : 1;
         return wear * (0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9)));
       });
-      const zoneTint = ZONE_DIRT[biome.id];
+      const zoneTint = biome.id === 'quarry' ? undefined : ZONE_DIRT[biome.id]; // quarry: the painted dust carries the colour
       if (zoneTint) {
         // Store release zones: packed gravel (coast), forest trail (alpine), pale quarry dust.
         const col = rib.getAttribute('color') as THREE.BufferAttribute;
@@ -320,7 +340,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
         const col = rib.getAttribute('color') as THREE.BufferAttribute;
         for (let i = 0; i < col.count; i++) col.setXYZ(i, col.getX(i) * 1.25, col.getY(i) * 1.02, col.getZ(i) * 0.8);
       }
-      push(buckets, biome.id === 'quarry' ? 'concrete' : 'dirt', rib); // quarry: pale dust over the fine concrete grain
+      push(buckets, biome.id === 'quarry' ? 'zone:top' : 'dirt', rib); // quarry: the zone's painted pale dust (zoneDeck.ts)
       if ((biome.id === 'canyon' || biome.id === 'quarry') && ground) {
         const pts = resample(pl.points, 2.6);
         for (const p of pts) {
@@ -362,11 +382,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     }
     const paleStone = surf === 'stone' && biome.id === 'quarry'; // cut sandstone, not the baked-orange rock albedo
     const rib = ribbonWithShade(pl, ground ? WIDE_SECTION : OBSTACLE_SECTION, tile, ground ? 0 : 0.004, (_z, drop) => 0.55 + 0.45 * (1 - Math.min(1, -drop * 0.9)));
-    if (paleStone) {
-      const col = rib.getAttribute('color') as THREE.BufferAttribute;
-      for (let i = 0; i < col.count; i++) col.setXYZ(i, col.getX(i) * 1.9, col.getY(i) * 1.7, col.getZ(i) * 1.4);
-    }
-    push(buckets, paleStone ? 'concrete' : (SURFACE_MATERIAL[surf] ?? 'dirt'), rib);
+    push(buckets, paleStone ? 'zone:top' : (SURFACE_MATERIAL[surf] ?? 'dirt'), rib); // quarry stone: the zone's painted pale dust
   }
 
   // Supports under the ground profile (interior only): the deck rides on a
@@ -520,14 +536,15 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     }
   }
 
-  let triangles = 0;
-  let drawCalls = 0;
+  let triangles = zoneDeckTris;
+  let drawCalls = zoneDeck ? zoneDeck.meshes.length : 0;
   for (const [matName, geos] of buckets) {
     // Geometries mix colour attributes; make sure every one has colour before merging.
     for (const g of geos) tint(g, 1, 1, 1);
     const merged = geos.length === 1 ? geos[0]! : mergeGeometries(geos, false);
     if (!merged) continue;
-    const mat = lib.derive(matName);
+    const zp = matName.startsWith('zone:') ? zonePaint(lib, biome.id, matName.slice(5) as 'top' | 'face') : null;
+    const mat = zp ? zp.mat : lib.derive(matName);
     mat.vertexColors = true;
     fogify(mat);
     // Round 12: one mesh per 40 m chunk (frustum-culled) — `drawCalls` / `triangles` stay the
@@ -537,7 +554,7 @@ export function buildRideSurfaces(track: CompiledTrack, biome: Biome, lib: Mater
     chunkByX(merged).forEach((g, k) => {
       const mesh = new THREE.Mesh(g, mat);
       mesh.receiveShadow = true;
-      mesh.castShadow = matName !== 'dirt' && matName !== 'concrete' && matName !== 'snow' && matName !== 'rustSteel'; // round 11: the under-deck frames (rustSteel, 51 k tris on b1) live in the deck's own shadow — no caster
+      mesh.castShadow = matName !== 'dirt' && matName !== 'concrete' && matName !== 'snow' && matName !== 'rustSteel' && !matName.startsWith('zone:'); // round 11: the under-deck frames (rustSteel, 51 k tris on b1) live in the deck's own shadow — no caster
       mesh.name = `deck:${matName}:${k}`;
       group.add(mesh);
     });

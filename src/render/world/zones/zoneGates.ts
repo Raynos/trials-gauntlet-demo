@@ -84,7 +84,45 @@ function drawWordmark(g: CanvasRenderingContext2D, cx: number, cy: number, px: n
 }
 
 type SignStyle = 'teal' | 'wood' | 'cream';
-function signTexture(style: SignStyle, text: 'ROCKHOP' | 'FINISH', checker = false): THREE.CanvasTexture {
+/**
+ * Round 2 (Q2's gantry plate): sun-faded, chipped and rust-run — a darker edge vignette, paint chips through
+ * the letters to bare steel, rust bleeding from the bolt heads and a dust film settling on the lower half.
+ */
+function weather(g: CanvasRenderingContext2D, w: number, h: number): void {
+  const r = G.lcg(0x0a1b2c);
+  const v = g.createRadialGradient(w / 2, h / 2, h * 0.3, w / 2, h / 2, w * 0.62);
+  v.addColorStop(0, 'rgba(0,0,0,0)');
+  v.addColorStop(1, 'rgba(24,18,12,0.55)');
+  g.fillStyle = v;
+  g.fillRect(0, 0, w, h);
+  const dust = g.createLinearGradient(0, h * 0.45, 0, h);
+  dust.addColorStop(0, 'rgba(200,170,130,0)');
+  dust.addColorStop(1, 'rgba(200,170,130,0.28)');
+  g.fillStyle = dust;
+  g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 420; i++) {
+    const x = r() * w;
+    const y = r() * h;
+    const s = 1 + r() * 5;
+    g.fillStyle = r() < 0.6 ? `rgba(92,58,34,${0.5 + r() * 0.4})` : `rgba(40,44,44,${0.4 + r() * 0.4})`;
+    g.beginPath();
+    g.ellipse(x, y, s, s * (0.4 + r() * 0.6), r() * 3, 0, Math.PI * 2);
+    g.fill();
+  }
+  for (const [bx, by] of [[34, 34], [w - 34, 34], [34, h - 34], [w - 34, h - 34], [w / 2, 30], [w / 2, h - 30]] as const) {
+    g.fillStyle = '#2a2622';
+    g.beginPath();
+    g.arc(bx, by, 9, 0, Math.PI * 2);
+    g.fill();
+    const run = g.createLinearGradient(0, by, 0, by + 90);
+    run.addColorStop(0, 'rgba(130,64,26,0.75)');
+    run.addColorStop(1, 'rgba(130,64,26,0)');
+    g.fillStyle = run;
+    g.fillRect(bx - 4, by, 8, 90);
+  }
+}
+
+function signTexture(style: SignStyle, text: 'ROCKHOP' | 'FINISH', checker = false, worn = false): THREE.CanvasTexture {
   const [c, g] = canvas(1024, 256);
   if (style === 'wood') {
     g.fillStyle = '#8a6440';
@@ -143,6 +181,7 @@ function signTexture(style: SignStyle, text: 'ROCKHOP' | 'FINISH', checker = fal
     g.fillStyle = ink;
     g.fillText(text, 512, checker ? 104 : 128);
   }
+  if (worn) weather(g, 1024, 256);
   const t = tex(c, true, false);
   t.anisotropy = 8;
   return t;
@@ -392,20 +431,37 @@ export function buildZoneGates(track: CompiledTrack, biome: Biome, lib: Material
     }
     // quarry
     if (big) {
-      const rust = G.rgb(0x8a4e2e);
+      // Round 2 (Q2): weathered dark iron, not painted orange — near-black brown members with rust bloom, on
+      // the library's rust-steel maps; heavier chords, gusset plates at the truss nodes, a worn teal plate.
       const w = 10;
       const H = 6.4;
-      for (const dx of [-w / 2, w / 2]) for (const p of G.lattice(1.0, H, rust, 0.14, 4)) structure.push(p.translate(x + dx, y0, ZB - 0.3));
-      for (const yy of [H, H + 1.1]) structure.push(G.box(w + 1.2, 0.2, 0.2, x, y0 + yy, ZB - 0.3, rust));
-      for (let i = 0; i < 10; i++) structure.push(G.beam(x - w / 2 - 0.5 + i * 1.1, y0 + H, ZB - 0.3, x - w / 2 + 0.6 + i * 1.1, y0 + H + 1.1, ZB - 0.3, 0.1, rust));
-      sign('teal', 'ROCKHOP', kind === 'finish', 6.2, 1.55, x, y0 + H + 0.55, ZB + 0.05);
+      const ironParts: THREE.BufferGeometry[] = [];
+      const ir = (): G.RGB => {
+        const k = rng.range(0.7, 1.05);
+        return rng.next() < 0.35 ? [0.24 * k, 0.11 * k, 0.05 * k] : [0.12 * k, 0.08 * k, 0.055 * k];
+      };
+      for (const dx of [-w / 2, w / 2]) for (const p of G.lattice(1.1, H, ir(), 0.18, 4)) ironParts.push(G.paint(p.translate(x + dx, y0, ZB - 0.3), ir()));
+      for (const yy of [H, H + 1.1]) ironParts.push(G.box(w + 1.6, 0.26, 0.26, x, y0 + yy, ZB - 0.3, ir()));
+      for (let i = 0; i < 10; i++) ironParts.push(G.beam(x - w / 2 - 0.5 + i * 1.1, y0 + H, ZB - 0.3, x - w / 2 + 0.6 + i * 1.1, y0 + H + 1.1, ZB - 0.3, 0.12, ir()));
+      for (let i = 0; i <= 10; i++) for (const yy of [H, H + 1.1]) ironParts.push(G.box(0.34, 0.34, 0.03, x - w / 2 - 0.5 + i * 1.1, y0 + yy, ZB - 0.3 + 0.15, ir()));
+      for (const dx of [-w / 2, w / 2]) ironParts.push(G.box(1.6, 0.12, 1.6, x + dx, y0 + 0.06, ZB - 0.3, [0.2, 0.18, 0.16]));
+      const ironMat = lib.derive('rustSteel');
+      ironMat.vertexColors = true;
+      ironMat.color.setHex(0xffffff);
+      add(new THREE.Mesh(G.merge(ironParts), ironMat));
+      const t = signTexture('teal', 'ROCKHOP', kind === 'finish', true);
+      textureBytes += 1024 * 256 * 4 * 1.33;
+      board(6.2, 1.55, t, x, y0 + H + 0.55, ZB + 0.05);
       // Timing beam: a teal light line across the course at hub height, emitters on two posts.
       const beamMat = fogify(new THREE.MeshStandardMaterial({ color: 0x0a2a2c, emissive: 0x4ff0e0, emissiveIntensity: 3, roughness: 0.4 }));
-      const bm = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 5.6, 5).rotateX(Math.PI / 2), beamMat);
-      bm.position.set(x, y0 + 1.05, 0);
+      const bm = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 4.75, 5).rotateX(Math.PI / 2), beamMat);
+      bm.position.set(x, y0 + 1.05, -0.525);
       group.add(bm);
       drawCalls++;
-      for (const z of [-2.9, 2.9]) structure.push(G.box(0.16, 1.2, 0.16, x, y0 + 0.6, z, G.rgb(0x2a2c30)), G.box(0.22, 0.22, 0.22, x, y0 + 1.05, z, G.rgb(0xd8d2c4)));
+      // Emitter posts either side; the near one stands on the deck inside its edge (round 2: the ground in front
+      // of the quarry deck is 1.7 m lower).
+      structure.push(G.box(0.16, 1.2, 0.16, x, y0 + 0.6, -2.9, G.rgb(0x2a2c30)), G.box(0.22, 0.22, 0.22, x, y0 + 1.05, -2.9, G.rgb(0xd8d2c4)));
+      structure.push(G.box(0.16, 0.8, 0.16, x, y0 + 0.42 + 0.4, 1.85, G.rgb(0x2a2c30)), G.box(0.22, 0.22, 0.22, x, y0 + 1.05, 1.85, G.rgb(0xd8d2c4)));
       const lamp = lampAt(x + w / 2, y0 + H + 1.4, ZB - 0.3);
       if (kind === 'finish') finishLampHolder.m = lamp;
       return;

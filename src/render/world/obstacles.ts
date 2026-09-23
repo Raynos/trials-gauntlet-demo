@@ -12,6 +12,7 @@ import type { MaterialLibrary } from '../materials/library';
 import { fogify } from '../lighting/environment';
 import { profileY } from './track';
 import * as G from './zones/geo';
+import { zoneFace, zonePaint } from './zones/zoneDeck';
 
 export interface ObstacleMeshes {
   group: THREE.Group;
@@ -392,11 +393,17 @@ export function buildObstacles(track: CompiledTrack, lib: MaterialLibrary): Obst
     const w = hz.max.x - hz.min.x;
     const h = hz.max.y - hz.min.y;
     if (hz.kind === 'water') {
-      const g = new THREE.PlaneGeometry(w, DEPTH * 2);
+      // Store release round 2: in a zone with a deck face (zones/zoneDeck.ts) the pit's water sits just under
+      // the notch in the face (the near ground), between the pit's back wall and the face — never proud of it.
+      const face = zoneFace(track.def.meta?.biome ?? 'industrial');
+      const zA = face ? -2.97 : -DEPTH;
+      const zB = face ? face.edge - 0.02 : DEPTH;
+      const g = new THREE.PlaneGeometry(w, zB - zA);
       g.rotateX(-Math.PI / 2);
-      const m = fogify(new THREE.MeshStandardMaterial({ color: 0x0f2a33, roughness: 0.05, metalness: 0.6 }));
+      const m = fogify(new THREE.MeshStandardMaterial({ color: face ? 0x1a4a52 : 0x0f2a33, roughness: 0.05, metalness: 0.6 }));
       const mesh = new THREE.Mesh(g, m);
-      mesh.position.set((hz.min.x + hz.max.x) / 2, hz.max.y - 0.02, 0);
+      const wy = face ? Math.min(hz.max.y - 0.02, profileY(profile, (hz.min.x + hz.max.x) / 2) - face.h - 0.08) : hz.max.y - 0.02;
+      mesh.position.set((hz.min.x + hz.max.x) / 2, wy, (zA + zB) / 2);
       group.add(mesh);
     } else if (hz.kind === 'fire') {
       const g = new THREE.BoxGeometry(w, Math.max(0.05, h * 0.2), DEPTH);
@@ -416,7 +423,8 @@ export function buildObstacles(track: CompiledTrack, lib: MaterialLibrary): Obst
     if (tinted) for (const g of geos) if (!g.getAttribute('color')) G.paint(g, [1, 1, 1]);
     const merged = geos.length === 1 ? geos[0]! : mergeGeometries(geos, false);
     if (!merged) throw new Error(`Obstacle material batch could not merge: ${matName}`);
-    let mat = lib.get(matName);
+    const zp = matName.startsWith('zone:') ? zonePaint(lib, track.def.meta?.biome ?? 'industrial', matName.slice(5) as 'top' | 'face') : null;
+    let mat = zp ? zp.mat : lib.get(matName);
     if (tinted && !mat.vertexColors) {
       mat = lib.derive(matName);
       mat.vertexColors = true;
@@ -449,6 +457,17 @@ interface PropCtx {
 }
 
 const LIVERY = [0x2f8a8a, 0xa8482e, 0x2e5f8e, 0xb86a2a, 0x8a2e24, 0x3a7a58];
+
+/** Replace uv with world-space planar coordinates: u from x (and a little z, so end faces are not a smear), v from −y. */
+function worldUv(g: THREE.BufferGeometry, su: number, sv: number): void {
+  const p = g.getAttribute('position');
+  const uv = new Float32Array(p.count * 2);
+  for (let i = 0; i < p.count; i++) {
+    uv[i * 2] = (p.getX(i) + p.getZ(i) * 0.37) / su;
+    uv[i * 2 + 1] = -p.getY(i) / sv;
+  }
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+}
 
 /** Tint every vertex — the bucket materials read vertex colours. */
 function tintGeo(g: THREE.BufferGeometry, hex: number, f?: (x: number, y: number, z: number) => number): THREE.BufferGeometry {
@@ -572,9 +591,14 @@ function zoneProp(prop: string, po: PlacedObstacle, cols: Collider[], ctx: PropC
       for (let x = x0 + 0.28; x < x1 - 0.2; x += 0.52) for (let y = profileY(profile, x) + 0.26; y < topAt(x) - 0.2; y += 0.48) push(buckets, 'pallet', tintGeo(new THREE.CylinderGeometry(0.25, 0.25, 0.08, 10).rotateX(Math.PI / 2), 0xd8b484), at(x, y, face + 0.04));
       return true;
     }
-    case 'block':
-      solid('concrete', 0xfff0d0, (x, y) => (Math.abs(((y - y0) % 1.1) - 1.05) < 0.05 || Math.abs(((x - x0) % 1.6) - 1.55) < 0.05 ? 0.7 : 0.9 + 0.1 * Math.sin(x * 13 + y * 7)));
+    case 'block': {
+      // Round 2: cut sandstone courses — the quarry deck's own painting (zoneDeck.ts), mapped in world space so
+      // the courses run level and continue across neighbouring blocks: 4 m of course per u, 1.7 m per v.
+      const before = (buckets.get('zone:face') ?? []).length;
+      solid('zone:face', 0xffffff, (_x, y) => 0.92 + 0.08 * Math.min(1, (y - y0) / 1.5));
+      for (const g of (buckets.get('zone:face') ?? []).slice(before)) worldUv(g, 4, 1.7);
       return true;
+    }
     case 'ice-ledge':
       solid('snow', 0x8cc8e4, (_x, y) => 0.6 + 0.4 * Math.min(1, (y - y0) / Math.max(0.3, y1 - y0)));
       plankBoard('snow', 0xf4f8ff, 0.18);
