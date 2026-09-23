@@ -28,23 +28,28 @@ import { startServer } from '../../harness/lib/server';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(here, '../..');
 
-/** Set-piece x per track: where the bike is when the shot is taken (the feature fills the right of the frame). */
+/**
+ * Set-piece x per ROCKHOP course (store release round 2): where the bike is when the shot is taken — about 4 m
+ * before the course's signature zone prop (docs/evidence/store-release/world/README.md prop table), so the prop
+ * fills the right of the frame. The retired curriculum's thumbs left with its tracks (46fa2d44).
+ */
 export const THUMB_X: Record<string, { x: number; what: string }> = {
-  'b1-first-ride': { x: 470, what: 'the 21 m descent into the brake zone and low plateau' },
-  'b2-lean-back': { x: 535.5, what: 'leaving the 1.8 m container drop onto the landing ramp' },
-  'b3-kicker-row': { x: 391, what: 'launched off the 5x1.5 kicker over the 4 m gap' },
-  'e1-uphill-weight': { x: 437.5, what: 'on the 48 deg plank' },
-  'e2-rear-wheel-first': { x: 487.5, what: 'leaving the kicker lip toward the 5 m gap' },
-  'e3-stairway': { x: 404, what: 'climbing the eight-step stair' },
-  'm1-hop-up': { x: 379.5, what: 'the 2 m hop across from the 0.9 m ledge' },
-  'm2-drum-roll': { x: 301, what: 'drum top before the 2 m gap' },
-  'm3-see-saw': { x: 389, what: 'gap onto the see-saw' },
-  'h1-wheelie-wire': { x: 539, what: 'wheelie along the rail slots after the 1.4 m lip' },
-  'h2-gap-chain': { x: 525.5, what: 'the kicker lip into the lipped gap chain' },
-  'h3-fire-line': { x: 459, what: 'the kicker lip before the six burning barrels' },
-  'x1-vertical-limit': { x: 531, what: 'on the 60 deg plank' },
-  'x2-pipe-dream': { x: 365, what: 'the spinning drum shelf over molten metal' },
-  'x3-gauntlet': { x: 414.5, what: 'the kicker lip before the fire line' },
+  'c1-low-tide': { x: 307.7, what: 'the container steps on the quay' },
+  'c2-crane-hop': { x: 46, what: 'onto the timber pier over the harbour' },
+  'c3-hull-breach': { x: 62, what: 'the rusted hull ramp' },
+  'a1-sawdust': { x: 280, what: 'the water flume on trestles' },
+  'a2-log-jam': { x: 115, what: 'the log teetering on the jam' },
+  'a3-timberline': { x: 247.3, what: 'the logging truck bed' },
+  'd1-dust-devil': { x: 27, what: 'the cut sandstone blocks under the gantry' },
+  'd2-conveyor': { x: 57.3, what: 'the belt conveyor ramp' },
+  'd3-rope-walk': { x: 349.4, what: 'the rope bridge' },
+  's1-lift-line': { x: 353.9, what: 'the lift tower platform' },
+  's2-cornice': { x: 139.9, what: 'the wind cornice' },
+  's3-whiteout': { x: 197, what: 'the avalanche fence ledge' },
+  'p-coast': { x: 278, what: 'the container yard' },
+  'p-alpine': { x: 141.6, what: 'the log see-saw' },
+  'p-quarry': { x: 58.4, what: 'the conveyor' },
+  'p-snowline': { x: 109.5, what: 'the snow-cat' },
 };
 
 const sh = (cmd: string, args: string[]): string => execFileSync(cmd, args, { stdio: ['ignore', 'pipe', 'inherit'] }).toString().trim();
@@ -110,7 +115,7 @@ async function main(): Promise<void> {
       for (let t = 0; t < prefix.length; t += hz * 5) {
         const slice: InputFrame[] = prefix.slice(t, Math.min(prefix.length, t + hz * 5));
         await page.evaluate((inputs) => {
-          const tr = window.__trials!;
+          const tr = window.__rockhop!;
           for (const f of inputs) {
             tr.setInput(f);
             tr.step(1);
@@ -123,7 +128,7 @@ async function main(): Promise<void> {
       for (let k = 0; k < warmFrames.length; k += 2) {
         const slice: InputFrame[] = warmFrames.slice(k, k + 2);
         state = await page.evaluate((inputs) => {
-          const tr = window.__trials!;
+          const tr = window.__rockhop!;
           for (const f of inputs) {
             tr.setInput(f);
             tr.step(1);
@@ -161,6 +166,31 @@ async function main(): Promise<void> {
   const prev: Record<string, unknown>[] = fs.existsSync(metaFile) ? JSON.parse(fs.readFileSync(metaFile, 'utf8')).thumbs ?? [] : [];
   const merged = Object.keys(THUMB_X).map((id) => report.find((r) => r.id === id) ?? prev.find((r) => r.id === id)).filter(Boolean);
   fs.writeFileSync(metaFile, JSON.stringify({ generatedAt: new Date().toISOString(), width, height, outW, thumbs: merged }, null, 1));
+  await foldIntoManifests(merged as { id: string; x: number; what: string; recording: string }[]);
+}
+
+/**
+ * Fold the thumbs into both art manifests (kind `thumb`, the card lookup `ArtManifest.thumbFor`) without re-running
+ * the whole art build: every existing `thumb` entry is replaced by this table's, with the file's own `v` hash and
+ * the course's zone and tier; the full manifest's summary and the prompt-free runtime copy are re-derived.
+ */
+async function foldIntoManifests(thumbs: { id: string; x: number; what: string; recording: string }[]): Promise<void> {
+  const { createHash } = await import('node:crypto');
+  const { fullManifest, writeManifests, FULL_MANIFEST } = (await import('./runtime-manifest.mjs')) as unknown as { fullManifest(a: unknown[], r: unknown, g?: string): unknown; writeManifests(f: unknown): void; FULL_MANIFEST: string };
+  const { ROCKHOP_ALL, rockhopMeta } = await import('../../src/tracks/rockhop');
+  const full = JSON.parse(fs.readFileSync(FULL_MANIFEST, 'utf8')) as { assets: Record<string, unknown>[]; rejected: unknown };
+  const kept = full.assets.filter((a) => a.kind !== 'thumb');
+  for (const t of thumbs) {
+    const rel = `thumbs/${t.id}.webp`;
+    const f = path.join(repo, 'public/art', rel);
+    if (!fs.existsSync(f)) continue;
+    const def = ROCKHOP_ALL.find((d) => d.id === t.id);
+    const dims = sh('magick', ['identify', '-format', '%w %h', f]).split(' ').map(Number);
+    const buf = fs.readFileSync(f);
+    kept.push({ id: `thumb-${t.id}`, path: 'art/' + rel, kind: 'thumb', track: t.id, tier: def?.tier, biome: def?.meta?.biome, zone: def ? rockhopMeta(def).zone : undefined, atX: t.x, shot: t.what, recording: t.recording, rendered: true, w: dims[0], h: dims[1], bytes: buf.length, src: 'thumbs.mts', prompt: '', v: createHash('sha256').update(buf).digest('hex').slice(0, 8) });
+  }
+  writeManifests(fullManifest(kept, full.rejected));
+  console.log(`art manifests: ${thumbs.length} thumbs folded in`);
 }
 
 main().catch((err) => {
