@@ -266,11 +266,11 @@
     "finishX": 425.1
   },
   "p-coast": {
-    "hash": "76b951e17c82a097",
-    "colliders": 26,
+    "hash": "e17cb31f4fef29d3",
+    "colliders": 28,
     "hazards": 1,
-    "obstacles": 23,
-    "finishX": 368.1
+    "obstacles": 25,
+    "finishX": 386.1
   },
   "p-alpine": {
     "hash": "30b10d5d8b71fe22",
@@ -280,11 +280,11 @@
     "finishX": 350.9
   },
   "p-quarry": {
-    "hash": "430bdc8a91b86209",
-    "colliders": 24,
+    "hash": "c0c08700b278b33c",
+    "colliders": 26,
     "hazards": 1,
-    "obstacles": 21,
-    "finishX": 404.396973
+    "obstacles": 23,
+    "finishX": 412.396973
   },
   "p-snowline": {
     "hash": "9aa772c98bae3ef7",

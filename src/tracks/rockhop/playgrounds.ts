@@ -5,6 +5,10 @@
  * falling ground, grounded cosine hills, sunk logs / tyres / rubble 0.2-0.25 m proud, small gaps onto landing
  * inclines, <= 0.3 m kerbs, 0.12 x 0.8 stairs, a <= 22 deg board, drops only off >= 8 x h ramps.
  *
+ * Free ride never punishes plain gas: held full gas from the start line clears every playground course. A step up
+ * is never a bare face (a 4 m wedge, 4.3 deg, climbs every 0.3 m kerb / container / terrace, as C1's causeway), and
+ * a pier or deck is long enough for an 18 m/s bike to land on it before its lip.
+ *
  * `meta.segments` (six per course, `segmentsOf(def)`) are the review segments the level reviewer walks.
  */
 import type { TrackDef, TrackMeta } from '../../core/types';
@@ -34,22 +38,30 @@ function playground(zone: ZoneId, code: string, name: string, idea: string, dema
 }
 
 /** The harbour yard: slipway, tyres, pier hops, a pontoon gap, the container stack and its gangway. */
-export const P_COAST = playground('coast', 'PC', 'Harbour Yard', 'the whole scrapyard at an easy roll', 'nothing new: a pier hop, sunk tyres, a 2.5 m pontoon gap, a pallet kerb, a container stack and its gangway', (b, seg) => {
+export const P_COAST = playground('coast', 'PC', 'Harbour Yard', 'the whole scrapyard at an easy roll', 'nothing new: a pier hop, sunk tyres, a 2.5 m pontoon gap, a pallet kerb on a wedge, a container stack on pallet wedges and its gangway', (b, seg) => {
   b.hint('Gas up the pier, lean back if the nose drops').hint('Steady over the tyres').hint('Ease off down the gangway').camera({ mode: 'side' });
   seg('The harbour gate and the slipway');
   b.setPiece('start', 'The Harbour Gate').flat(6).arch({ style: 'start' }).flat(18).endSetPiece();
   b.smooth(20, 1.4).flat(10).descent(20, 1.4, 20).flat(8).checkpoint();
   seg('The pier hop');
-  b.flat(16).ramp({ length: 10, height: 1.0, surface: 'wood', prop: 'pallet' }).box({ width: 6, height: 1.0, surface: 'wood', prop: 'pier' });
-  b.ramp({ length: 3, height: 0.5, surface: 'wood', prop: 'pallet' }, { base: 1.0 }).ramp({ length: 14, height: 1.0, direction: 'down', surface: 'wood', prop: 'gangway' }).flat(12);
+  // Held gas reaches the pier at 18 m/s. It used to be a 10 m pallet ramp, a 6 m pier and a 3 x 0.5 kicker onto a
+  // gangway 0.5 m below the lip: the bike floated the whole pier, landed on the kicker's foot, was bucked nose-down and
+  // flew 1.1 s onto the flat (crash x 139). Now a 12 m ramp, a 10 m pier to land on, a 3 x 0.3 kicker and the gangway
+  // straight down from the lip (18 x 1.3): the hop is 0.6 s and lands on the slope for every speed and lean.
+  b.flat(16).ramp({ length: 12, height: 1.0, surface: 'wood', prop: 'pallet' }).box({ width: 10, height: 1.0, surface: 'wood', prop: 'pier' });
+  b.ramp({ length: 3, height: 0.3, surface: 'wood', prop: 'pallet' }, { base: 1.0 }).ramp({ length: 18, height: 1.3, direction: 'down', surface: 'wood', prop: 'gangway' }).flat(12);
   seg('The tyre line and the pontoon gap');
   b.bumpDrum(0.6, 0.18, { surface: 'rubber', prop: 'tyre' }).flat(6).bumpDrum(0.6, 0.18, { surface: 'rubber', prop: 'tyre' }).flat(10).checkpoint();
   b.flat(16).ramp({ length: 5, height: 1.0, surface: 'wood', prop: 'pallet' }).gap({ width: 2.5 }).gapLanding(0.6, 6, 6, 8).flat(12);
   seg('The pallet kerb and the beached buoys');
-  b.ledge({ height: 0.3, length: 6, surface: 'wood', prop: 'pallet' }).ramp({ length: 4, height: 0.3, direction: 'down', surface: 'wood', prop: 'pallet' }).flat(10);
+  // A bare 0.3 m kerb face at 17.5 m/s stands the bike on its front wheel (crash x 229): a 4 m pallet wedge up it.
+  b.ramp({ length: 4, height: 0.3, surface: 'wood', prop: 'pallet' }).ledge({ height: 0.3, length: 6, surface: 'wood', prop: 'pallet' }).ramp({ length: 4, height: 0.3, direction: 'down', surface: 'wood', prop: 'pallet' }).flat(10);
   b.bumpDrum(0.6, 0.2, { surface: 'metal', prop: 'buoy' }).flat(10).checkpoint();
   seg('The container stack');
-  b.flat(8).setPiece('balance', 'The Stack').ramp({ length: 12, height: 1.0, surface: 'wood', prop: 'pallet' }).box({ width: 8, height: 1.0, prop: 'container' }).box({ width: 8, height: 1.3, prop: 'container', variant: 1 });
+  b.flat(8).setPiece('balance', 'The Stack').ramp({ length: 12, height: 1.0, surface: 'wood', prop: 'pallet' }).box({ width: 8, height: 1.0, prop: 'container' });
+  // C1's fix: the bare 0.3 m step between the containers bucked a held-gas bike off container 2 (crash x 288) and
+  // stopped a coasting one dead; a 4 m pallet wedge up it rolls at every speed.
+  b.ramp({ length: 4, height: 0.3, surface: 'wood', prop: 'pallet' }, { base: 1.0 }).box({ width: 8, height: 1.3, prop: 'container', variant: 1 });
   b.ramp({ length: 16, height: 1.3, direction: 'down', surface: 'metal', prop: 'gangway' }).endSetPiece().flat(12).checkpoint();
   seg('The quay home');
   b.flat(6).wave(36, 1.2, 20).flat(6).arch({ style: 'crowd' }).setPiece('finish').flat(8).arch({ style: 'finish' });
@@ -77,7 +89,7 @@ export const P_ALPINE = playground('alpine', 'PA', 'Forest Trail', 'the sawmill 
 });
 
 /** The quarry floor: rubble, cut kerbs, a conveyor ramp, the ore-cart gap, the terraces and the whoops. */
-export const P_QUARRY = playground('quarry', 'PD', 'Quarry Floor', 'the quarry floor and its plant at an easy roll', 'nothing new: rubble humps, 0.3 m cut kerbs, a 20 deg conveyor onto the hopper, a 2.5 m ore-cart gap, 0.3 m terraces, the whoops', (b, seg) => {
+export const P_QUARRY = playground('quarry', 'PD', 'Quarry Floor', 'the quarry floor and its plant at an easy roll', 'nothing new: rubble humps, 0.3 m cut kerbs, a 20 deg conveyor onto the hopper, a 2.5 m ore-cart gap, 0.3 m terraces on cut-stone wedges, the whoops', (b, seg) => {
   b.hint('Steady over the rubble').hint('Roll the kerbs').hint('Lean forward up the belt').camera({ mode: 'side' });
   seg('The pit head and the rubble');
   b.setPiece('start', 'The Pit Head').flat(6).arch({ style: 'start' }).flat(18).endSetPiece();
@@ -91,7 +103,11 @@ export const P_QUARRY = playground('quarry', 'PD', 'Quarry Floor', 'the quarry f
   seg('The ore-cart gap');
   b.flat(16).ramp({ length: 5, height: 1.0, surface: 'metal', prop: 'ore-cart' }).gap({ width: 2.5 }).gapLanding(0.6, 6, 6, 8).flat(12).checkpoint();
   seg('The terraces');
-  b.flat(12).setPiece('climb', 'The Low Terraces').ledge({ height: 0.3, length: 6, surface: 'stone', prop: 'block' }).ledge({ height: 0.6, length: 8, surface: 'stone', prop: 'block' });
+  // Two 0.3 m terraces used to be bare faces (ground -> 0.3 -> 0.6): at 14 m/s and up every riding style crashed on the
+  // second (x 283-286). Each terrace is now climbed on a 4 m cut-stone wedge; the stepped benches stay.
+  b.flat(12).setPiece('climb', 'The Low Terraces');
+  b.ramp({ length: 4, height: 0.3, surface: 'stone', prop: 'block' }).ledge({ height: 0.3, length: 6, surface: 'stone', prop: 'block' });
+  b.ramp({ length: 4, height: 0.3, surface: 'stone', prop: 'block' }, { base: 0.3 }).ledge({ height: 0.6, length: 8, surface: 'stone', prop: 'block' });
   b.ramp({ length: 8, height: 0.6, direction: 'down', surface: 'dirt' }).endSetPiece().flat(12).checkpoint();
   seg('The whoops home');
   b.flat(6).rollers(30, 0.25, 4).flat(8).wave(36, 1.2, 20).flat(6).arch({ style: 'crowd' }).setPiece('finish').flat(8).arch({ style: 'finish' });

@@ -4607,10 +4607,16 @@
         1,
         1,
         1,
+        2,
         1,
         1,
         1,
         1,
+        1,
+        2,
+        1,
+        3,
+        2,
         1,
         1,
         1,
@@ -4620,23 +4626,11 @@
         1,
         1,
         1,
-        2,
-        1,
-        1,
         1,
         1,
         2,
         2,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
+        2,
         1,
         1,
         1,
@@ -4648,36 +4642,64 @@
         1,
         1,
         1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         1
       ],
       "median": 1,
-      "mean": 1.156,
+      "mean": 1.267,
       "clears": 45,
       "runs": 45,
-      "medianTimeToClearS": 35.141666666666666,
+      "medianTimeToClearS": 36.03333333333333,
       "replayFaithful": true,
       "topDeaths": [
         {
-          "site": "ground@160:air-short",
+          "site": "ground@165:air-short",
           "count": 2
         },
         {
-          "site": "box@191:air-gas-nose-up",
+          "site": "drum@160:nose-low",
+          "count": 2
+        },
+        {
+          "site": "ground@165:nose-low",
           "count": 1
         },
         {
-          "site": "ground@200:nose-low",
+          "site": "ground@165:air-gas-nose-up",
           "count": 1
         },
         {
-          "site": "ground@160:nose-low",
-          "count": 1
-        },
-        {
-          "site": "drum@150:air-short",
+          "site": "drum@160:air-short",
           "count": 1
         }
-      ]
+      ],
+      "srcFingerprint": "1d1e72eb",
+      "remeasured": "playground plain-gas fix: every step on a 4 m wedge (on a736a26f physics)",
+      "before": {
+        "mean": 1.311,
+        "median": 1,
+        "clears": 45,
+        "topDeaths": [
+          {
+            "site": "ground@225:nose-low",
+            "count": 2
+          },
+          {
+            "site": "drum@150:air-short",
+            "count": 2
+          },
+          {
+            "site": "ground@225:air-short",
+            "count": 1
+          }
+        ],
+        "srcFingerprint": "4466cdda"
+      }
     },
     {
       "trackId": "p-coast",
@@ -4731,6 +4753,9 @@
         3201478584
       ],
       "attempts": [
+        2,
+        1,
+        2,
         1,
         1,
         1,
@@ -4739,72 +4764,91 @@
         1,
         1,
         2,
-        1,
-        1,
+        3,
+        2,
         2,
         1,
         1,
         1,
-        1,
         2,
+        1,
         2,
         1,
         1,
         1,
         3,
         1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
         3,
-        2,
-        2,
-        2,
         1,
-        1,
+        2,
         4,
-        4,
-        1,
-        1,
-        1,
-        1,
         2,
-        3,
-        2,
-        3,
         1,
-        2,
         2,
         1,
         1,
-        3,
-        2
+        1
       ],
       "median": 1,
-      "mean": 1.622,
+      "mean": 1.444,
       "clears": 45,
       "runs": 45,
-      "medianTimeToClearS": 40.96666666666667,
+      "medianTimeToClearS": 42.041666666666664,
       "replayFaithful": true,
       "topDeaths": [
         {
-          "site": "drum@150:air-short",
+          "site": "ground@165:nose-low",
+          "count": 3
+        },
+        {
+          "site": "drum@160:air-short",
           "count": 2
         },
         {
-          "site": "ground@160:nose-low",
+          "site": "ground@170:nose-low",
           "count": 2
         },
         {
-          "site": "drum@150:nose-low",
-          "count": 2
+          "site": "ground@165:air-gas-nose-up",
+          "count": 1
         },
         {
-          "site": "ramp@197:air-short",
-          "count": 2
-        },
-        {
-          "site": "ground@125:nose-low",
-          "count": 2
+          "site": "drum@160:nose-low",
+          "count": 1
         }
-      ]
+      ],
+      "srcFingerprint": "1d1e72eb",
+      "remeasured": "playground plain-gas fix: every step on a 4 m wedge (on a736a26f physics)",
+      "before": {
+        "mean": 1.689,
+        "median": 1,
+        "clears": 45,
+        "topDeaths": [
+          {
+            "site": "ground@125:air-short",
+            "count": 4
+          },
+          {
+            "site": "ramp@223:air-short",
+            "count": 3
+          },
+          {
+            "site": "ground@125:nose-low",
+            "count": 2
+          }
+        ],
+        "srcFingerprint": "4466cdda"
+      }
     },
     {
       "trackId": "p-coast",
@@ -4871,10 +4915,8 @@
         1,
         1,
         1,
-        1,
-        1,
-        1,
-        1,
+        2,
+        2,
         1,
         1,
         2,
@@ -4888,11 +4930,13 @@
         1,
         1,
         1,
+        2,
+        1,
+        2,
         1,
         1,
         1,
-        1,
-        1,
+        2,
         1,
         1,
         1,
@@ -4905,17 +4949,51 @@
         1
       ],
       "median": 1,
-      "mean": 1.022,
+      "mean": 1.133,
       "clears": 45,
       "runs": 45,
-      "medianTimeToClearS": 31.816666666666666,
+      "medianTimeToClearS": 32.44166666666667,
       "replayFaithful": true,
       "topDeaths": [
         {
-          "site": "box@191:air-gas-nose-up",
+          "site": "box@201:nose-low",
+          "count": 2
+        },
+        {
+          "site": "box@201:air-short",
+          "count": 1
+        },
+        {
+          "site": "ground@165:nose-low",
+          "count": 1
+        },
+        {
+          "site": "ground@170:nose-low",
+          "count": 1
+        },
+        {
+          "site": "ramp@207:nose-low",
           "count": 1
         }
-      ]
+      ],
+      "srcFingerprint": "1d1e72eb",
+      "remeasured": "playground plain-gas fix: every step on a 4 m wedge (on a736a26f physics)",
+      "before": {
+        "mean": 1.067,
+        "median": 1,
+        "clears": 45,
+        "topDeaths": [
+          {
+            "site": "box@191:air-short",
+            "count": 2
+          },
+          {
+            "site": "box@191:air-gas-nose-up",
+            "count": 1
+          }
+        ],
+        "srcFingerprint": "4466cdda"
+      }
     },
     {
       "trackId": "p-alpine",
@@ -5326,20 +5404,7 @@
         2971446442
       ],
       "attempts": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
+        2,
         1,
         1,
         1,
@@ -5362,32 +5427,75 @@
         1,
         1,
         2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         2,
         1,
         1,
         1,
         1,
         1,
+        1,
+        1,
+        1,
+        2,
         1,
         1,
         1
       ],
       "median": 1,
-      "mean": 1.044,
+      "mean": 1.089,
       "clears": 45,
       "runs": 45,
-      "medianTimeToClearS": 40.13333333333333,
+      "medianTimeToClearS": 40.09166666666667,
       "replayFaithful": true,
       "topDeaths": [
         {
-          "site": "ledge@282:nose-low",
+          "site": "ground@35:air-gas-nose-up",
           "count": 1
         },
         {
-          "site": "ground@350:nose-low",
+          "site": "box@66:nose-high",
+          "count": 1
+        },
+        {
+          "site": "ground@75:touchdown",
+          "count": 1
+        },
+        {
+          "site": "ground@340:air-short",
           "count": 1
         }
-      ]
+      ],
+      "srcFingerprint": "1d1e72eb",
+      "remeasured": "playground plain-gas fix: every step on a 4 m wedge (on a736a26f physics)",
+      "before": {
+        "mean": 1.267,
+        "median": 1,
+        "clears": 45,
+        "topDeaths": [
+          {
+            "site": "ledge@282:nose-low",
+            "count": 2
+          },
+          {
+            "site": "ledge@282:stuck-restart",
+            "count": 1
+          },
+          {
+            "site": "ledge@282:air-short",
+            "count": 1
+          }
+        ],
+        "srcFingerprint": "4466cdda"
+      }
     },
     {
       "trackId": "p-quarry",
@@ -5441,22 +5549,13 @@
         2971446442
       ],
       "attempts": [
-        1,
-        1,
-        1,
-        1,
         2,
+        1,
         3,
         1,
         2,
-        1,
-        1,
-        1,
-        2,
-        1,
-        1,
-        1,
-        1,
+        3,
+        4,
         1,
         1,
         1,
@@ -5464,57 +5563,88 @@
         1,
         1,
         1,
+        3,
         1,
         1,
+        3,
+        1,
+        2,
+        2,
+        3,
+        1,
+        3,
+        1,
+        2,
         1,
         1,
+        2,
+        1,
+        2,
+        2,
         1,
         1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
+        2,
         2,
         1,
         1,
         1,
         1,
+        1,
+        1,
         3,
-        1,
-        1,
         1,
         1
       ],
       "median": 1,
-      "mean": 1.222,
+      "mean": 1.644,
       "clears": 45,
       "runs": 45,
-      "medianTimeToClearS": 45.65833333333333,
+      "medianTimeToClearS": 46.675,
       "replayFaithful": true,
       "topDeaths": [
         {
-          "site": "ledge@276:nose-low",
+          "site": "ground@175:air-short",
           "count": 2
         },
         {
-          "site": "ground@155:air-brake-nose-down",
+          "site": "ramp@72:air-short",
+          "count": 2
+        },
+        {
+          "site": "ground@45:nose-low",
+          "count": 2
+        },
+        {
+          "site": "ground@175:nose-low",
           "count": 1
         },
         {
-          "site": "drum@33:nose-low",
-          "count": 1
-        },
-        {
-          "site": "ground@190:air-short",
-          "count": 1
-        },
-        {
-          "site": "ledge@282:air-short",
+          "site": "ground@175:air-gas-nose-up",
           "count": 1
         }
-      ]
+      ],
+      "srcFingerprint": "1d1e72eb",
+      "remeasured": "playground plain-gas fix: every step on a 4 m wedge (on a736a26f physics)",
+      "before": {
+        "mean": 1.756,
+        "median": 1,
+        "clears": 45,
+        "topDeaths": [
+          {
+            "site": "ledge@282:nose-low",
+            "count": 2
+          },
+          {
+            "site": "ledge@282:air-gas-nose-up",
+            "count": 2
+          },
+          {
+            "site": "ground@175:air-short",
+            "count": 2
+          }
+        ],
+        "srcFingerprint": "4466cdda"
+      }
     },
     {
       "trackId": "p-quarry",
@@ -5570,16 +5700,6 @@
       "attempts": [
         1,
         1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        2,
-        1,
         2,
         1,
         1,
@@ -5592,52 +5712,80 @@
         1,
         1,
         1,
-        2,
-        2,
-        1,
-        2,
-        1,
-        1,
-        2,
-        1,
-        2,
-        1,
-        2,
         1,
         1,
         1,
         1,
         1,
         2,
-        2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         1,
         2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         1
       ],
       "median": 1,
-      "mean": 1.244,
+      "mean": 1.067,
       "clears": 45,
       "runs": 45,
-      "medianTimeToClearS": 37.55,
+      "medianTimeToClearS": 36.858333333333334,
       "replayFaithful": true,
       "topDeaths": [
         {
-          "site": "ledge@282:air-short",
-          "count": 5
-        },
-        {
-          "site": "ledge@282:air-gas-nose-up",
-          "count": 4
-        },
-        {
-          "site": "ramp@290:air-short",
+          "site": "ground@45:air-short",
           "count": 1
         },
         {
-          "site": "ramp@290:nose-low",
+          "site": "box@238:air-short",
+          "count": 1
+        },
+        {
+          "site": "ground@345:air-short",
           "count": 1
         }
-      ]
+      ],
+      "srcFingerprint": "1d1e72eb",
+      "remeasured": "playground plain-gas fix: every step on a 4 m wedge (on a736a26f physics)",
+      "before": {
+        "mean": 1.2,
+        "median": 1,
+        "clears": 45,
+        "topDeaths": [
+          {
+            "site": "ramp@290:nose-low",
+            "count": 2
+          },
+          {
+            "site": "ramp@290:air-short",
+            "count": 2
+          },
+          {
+            "site": "ledge@282:air-short",
+            "count": 1
+          }
+        ],
+        "srcFingerprint": "4466cdda"
+      }
     },
     {
       "trackId": "p-snowline",
@@ -6063,7 +6211,7 @@
       "seed": 3654478777
     },
     "p-coast": {
-      "finish": 23.842,
+      "finish": 24.492,
       "attempts": 1,
       "seed": 3201478540
     },
@@ -6073,7 +6221,7 @@
       "seed": 2167122917
     },
     "p-quarry": {
-      "finish": 27.192,
+      "finish": 27.392,
       "attempts": 1,
       "seed": 2971446398
     },
