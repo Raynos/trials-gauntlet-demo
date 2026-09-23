@@ -731,7 +731,7 @@ export class CreditsScreen extends Screen {
       <dl class="rh-card">
         <dt>Game</dt><dd><b>${GAME_NAME}</b> — dirt bikes, rocks, higher lines. A 2.5D motorbike physics game by Jake Verbaten.</dd>
         <dt>Engine</dt><dd>TypeScript · three.js · WebGL2 · Web Audio. 120 Hz fixed-step bike physics; every run replays byte-identical.</dd>
-        <dt>Design</dt><dd>Attempts-to-clear and restart latency, measured by a bot and a stranger every round.</dd>
+        <dt>Design</dt><dd>Twelve tracks across four zones, each one tuned so a crash is only ever one tap from another try.</dd>
         <dt>Music</dt><dd>Music generated with <b>ACE-Step 1.5</b> (MIT). Engine, tyres, crowd and ambience are synthesised in code.</dd>
         <dt>Type</dt><dd><b>Archivo Black</b> and <b>Archivo</b> by Omnibus-Type; <b>Barlow Condensed</b> by Jeremy Tribby (all SIL OFL 1.1).</dd>
         <dt>Art</dt><dd>Key art, icons, medals and world textures generated for ROCKHOP; the zones are built in-engine.</dd>

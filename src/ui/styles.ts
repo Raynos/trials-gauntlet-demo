@@ -202,7 +202,7 @@ html.short #ui .menu-item[data-id="play"] { font-size: clamp(1.5rem, calc(8.8 * 
 .rh-pin::before { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: .85em; background: var(--vermilion); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .rh-pin::after { content: ""; position: absolute; left: 50%; bottom: 0; width: .3em; height: .3em; margin-left: -.15em; border-radius: 50%; background: currentColor; }
 .rh-card { color: var(--coal); border-radius: 10px; background: var(--contour) 0 0 / 240px 160px, linear-gradient(180deg, #F7EEDA, var(--cream) 55%, var(--cream-2)); box-shadow: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -3px 0 rgba(15,92,99,.12), 0 16px 36px rgba(4,10,12,.5); }
-.settings-list { display: flex; flex-direction: column; gap: 0; padding: var(--s1) var(--s2); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: none; }
+.settings-list { display: flex; flex-direction: column; gap: 0; padding: var(--s1) var(--s2) 28px; -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: none; }
 .settings-list::-webkit-scrollbar { display: none; }
 .setting { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--s3); min-height: 52px; padding: 6px var(--s3) 6px calc(var(--s4) + 10px); border-radius: 6px; transition: background var(--t1) var(--ease); }
 .setting + .setting { box-shadow: 0 -1px 0 rgba(15,92,99,.16); }
