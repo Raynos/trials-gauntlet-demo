@@ -57,15 +57,16 @@ export const REGIONS: readonly RegionDef[] = [
     label: 'Coastal Scrapyard',
     name: { x: 190, y: 530 },
     crop: { x: 0, y: 330, w: 700, h: 467 },
-    // The harbour with the forest beyond it: the opening frame of a new player (W-worldmap's left half).
-    frame: { x: 0, y: 330, w: 1000, h: 520 },
+    // The harbour with the forest beyond it: the opening frame of a new player (W-worldmap's left half), high enough
+    // that the forest's name and sign stand inside it on a 390 px phone.
+    frame: { x: 0, y: 290, w: 1000, h: 520 },
     fog: [{ x: 250, y: 600, rx: 300, ry: 170 }],
     lamp: '#2FB8C4',
   },
   {
     id: 'alpine',
     label: 'Alpine Forest Trail',
-    name: { x: 730, y: 380 },
+    name: { x: 790, y: 368 }, // over the forest ridge; the forest FREE RIDE flag hangs its plate left (PLATE_LEFT)
     crop: { x: 430, y: 300, w: 720, h: 480 },
     frame: { x: 380, y: 300, w: 1000, h: 480 },
     fog: [{ x: 800, y: 560, rx: 330, ry: 170 }, { x: 640, y: 440, rx: 200, ry: 120 }],
@@ -113,6 +114,9 @@ export const ANCHOR: Readonly<Record<string, { x: number; y: number }>> = {
   'p-quarry': { x: 1490, y: 378 },
   'p-snowline': { x: 1255, y: 205 },
 };
+
+/** Markers that hang their name plate to the LEFT (the forest flag's plate would otherwise run into the zone's name). */
+export const PLATE_LEFT: ReadonlySet<string> = new Set(['p-alpine']);
 
 /**
  * The trail between two markers (map units, in travel order) so the route follows the painted track rather than

@@ -15,11 +15,12 @@ import type { BestEntry, BoardEntry } from './best';
 import { formatTime } from './format';
 import { BUILD_STAMP_SHORT, escapeHtml, Screen, type FrontCallbacks, type FrontState } from './front';
 import { isLiveTarget } from './live';
-import { wordmarkSvg, zoneTitle } from './brand';
+import { DEV_SURFACES } from '../core/release';
+import { MEDAL_NAME, medalSvg, wordmarkSvg, zoneTitle } from './brand';
 import { isLabTrack, medalTotals, nextTrack, shipTracks, stageLabel, type MedalOf } from './progress';
 import type { UiSfx } from './sfx';
 import { wantsHiRes } from '../boot/tier';
-import { allMarkers, buildRegions, fitZoom, FLY_MS, fogPatches, frameFor, locate, MAP, nextGate, regionPlateSrc, routePath, TAP_SLOP, tierBlend, worldPlateSrc, ZOOM, type FogPatch, type Gate, type Marker, type Region, type RegionId } from './worldMap';
+import { allMarkers, buildRegions, fitZoom, FLY_MS, fogPatches, frameFor, locate, MAP, nextGate, PLATE_LEFT, regionPlateSrc, routePath, TAP_SLOP, tierBlend, worldPlateSrc, ZOOM, type FogPatch, type Gate, type Marker, type Region, type RegionId } from './worldMap';
 import { injectWorldMapStyles } from './worldMapStyles';
 
 interface Cam {
@@ -115,7 +116,7 @@ export class WorldMapScreen extends Screen {
     this.card = el('div', 'wm-card');
     this.scene.append(this.world, this.tier, this.route, this.fog, this.names, this.markerLayer);
     this.view.append(this.scene, el('div', 'wm-haze'), el('div', 'wm-clouds'));
-    const brand = el('div', 'wm-brand', `<div class="plate"><b class="wordmark">${wordmarkSvg()}</b><span>World map</span></div><div class="stamp">${escapeHtml(BUILD_STAMP_SHORT)}</div>`);
+    const brand = el('div', 'wm-brand', `<div class="plate"><b class="wordmark">${wordmarkSvg()}</b><span>World map</span></div>${DEV_SURFACES ? `<div class="stamp">${escapeHtml(BUILD_STAMP_SHORT)}</div>` : ''}`);
     this.progress = el('div', 'wm-progress');
     const actions = el('div', 'wm-actions');
     this.ride = el('button', 'wm-ride');
@@ -124,7 +125,7 @@ export class WorldMapScreen extends Screen {
     this.ghost.type = 'button';
     actions.append(this.ride, this.ghost);
     this.legend = el('div', 'legend');
-    this.root.append(this.view, brand, this.progress, actions, this.legend);
+    this.root.append(this.view, brand, this.progress, actions, this.legend, el('i', 'wm-safe'));
     this.addBackButton('Menu');
     this.bindCamera();
     this.view.addEventListener('pointermove', (e) => {
@@ -446,7 +447,7 @@ export class WorldMapScreen extends Screen {
   }
 
   /** Screen-space boxes (view px) the overlays cover — the card, the brand plate, MENU, the progress chip, the pills: a marker under one is shaded. */
-  private blocks: { l: number; t: number; r: number; b: number }[] = [];
+  private blocks: { src: string; l: number; t: number; r: number; b: number }[] = [];
 
   private measureBlocks(): void {
     const v = this.view.getBoundingClientRect();
@@ -457,22 +458,65 @@ export class WorldMapScreen extends Screen {
       if (!e) continue;
       const r = e.getBoundingClientRect();
       if (r.width < 2) continue;
-      this.blocks.push({ l: r.left - v.left - 4, t: r.top - v.top - 4, r: r.right - v.left + 4, b: r.bottom - v.top + 4 });
+      this.blocks.push({ src: sel, l: r.left - v.left - 4, t: r.top - v.top - 4, r: r.right - v.left + 4, b: r.bottom - v.top + 4 });
     }
+    // The side safe areas (the notch, the rounded corners): nothing tappable stands in them.
+    const safe = this.safeInsets();
+    if (safe.l > 0) this.blocks.push({ src: 'safe', l: -1e4, t: -1e4, r: safe.l, b: 1e4 });
+    if (safe.r > 0) this.blocks.push({ src: 'safe', l: v.width - safe.r, t: -1e4, r: 1e4, b: 1e4 });
   }
 
-  /** The card hangs to the marker's right; when the marker is in the lowest 20 % of the view it stands above it instead (never under the progress chip or the pills). */
+  /**
+   * The card hangs beside the marker: right and down by default, else right-up, left-down, left-up — the first that
+   * stays inside the view (clear of the side safe areas) and off every chrome box (brand, MENU, the progress chip, the
+   * pills); none clear, the one that covers the least. Its box is measured (it is drawn at 1 screen px per CSS px at
+   * every zoom), or assumed 178 × 110 before layout.
+   */
   private placeCard(): void {
     const ref = this.refs[this.focus];
+    const w = this.view.clientWidth;
     const hgt = this.view.clientHeight;
     if (!ref || !hgt) return;
-    const sy = this.cam.y + ref.marker.y * this.cam.k;
-    this.card.classList.toggle('up', sy > hgt * 0.8);
+    const f = this.far ? 0.7 : 1;
+    const cw = (this.card.offsetWidth || 178) * f;
+    const ch = (this.card.offsetHeight || 110) * f;
+    const gap = 26 * f;
+    const s = this.screenOf(ref.marker);
+    const safe = this.safeInsets();
+    const chrome = this.blocks.filter((b) => b.src !== '.wm-card');
+    const box = (left: boolean, up: boolean): { l: number; t: number; r: number; b: number } => {
+      const l = left ? s.x - gap - cw : s.x + gap;
+      const t = up ? s.y - ch * 0.9 : s.y - ch * 0.14;
+      return { l, t, r: l + cw, b: t + ch };
+    };
+    const cost = (b: { l: number; t: number; r: number; b: number }): number => {
+      let c = Math.max(0, safe.l + 4 - b.l) * ch + Math.max(0, b.r - (w - safe.r - 4)) * ch + Math.max(0, 4 - b.t) * cw + Math.max(0, b.b - (hgt - 4)) * cw;
+      for (const o of chrome) c += Math.max(0, Math.min(b.r, o.r) - Math.max(b.l, o.l)) * Math.max(0, Math.min(b.b, o.b) - Math.max(b.t, o.t));
+      return c;
+    };
+    let pick: [boolean, boolean] = [false, false];
+    let best = Infinity;
+    for (const [left, up] of [[false, false], [false, true], [true, false], [true, true]] as [boolean, boolean][]) {
+      const c = cost(box(left, up));
+      if (c < best - 0.5) {
+        best = c;
+        pick = [left, up];
+      }
+    }
+    this.card.classList.toggle('left', pick[0]);
+    this.card.classList.toggle('up', pick[1]);
+  }
+
+  /** The side safe areas (px) as the page resolves them (`--sal` / `--sar` on a probe; 0 in jsdom). */
+  private safeInsets(): { l: number; r: number } {
+    const p = this.root.querySelector<HTMLElement>('.wm-safe');
+    return { l: p?.offsetWidth ?? 0, r: p?.offsetHeight ?? 0 };
   }
 
   /** A marker (or the gate) whose diamond meets an overlay's box is shaded: drawn dim, no pointer — nothing tappable hides under another tappable. */
   private shade(): void {
     if (!this.view.clientWidth) return;
+    this.measureBlocks();
     this.placeCard();
     this.measureBlocks();
     const hit = (sx: number, sy: number): boolean => {
@@ -484,6 +528,13 @@ export class WorldMapScreen extends Screen {
       ref.el.classList.toggle('shaded', i !== this.focus && hit(s.x, s.y));
     });
     if (this.gateEl && this.gate) this.gateEl.classList.toggle('shaded', hit(this.cam.x + this.gate.x * this.cam.k, this.cam.y + this.gate.y * this.cam.k));
+    // A zone name (and its sign) that runs under the chrome steps back, so the badge and ‹ MENU never sit on a word.
+    const v = this.view.getBoundingClientRect();
+    for (const n of this.names.children as HTMLCollectionOf<HTMLElement>) {
+      const r = n.getBoundingClientRect();
+      const under = this.blocks.some((b) => b.src !== 'safe' && b.src !== '.wm-card' && r.right - v.left > b.l && r.left - v.left < b.r && r.bottom - v.top > b.t && r.top - v.top < b.b);
+      n.classList.toggle('under', under);
+    }
   }
 
   /** The fit zoom from the view's box; the camera re-centres on its anchor. Called on build, show and resize (never per frame). */
@@ -518,6 +569,28 @@ export class WorldMapScreen extends Screen {
     const sy = c.y + m.y * f.k;
     c.x -= Math.max(0, sx - w * 0.72) - Math.max(0, w * 0.15 - sx);
     c.y -= Math.max(0, sy - hgt * 0.68) - Math.max(0, hgt * 0.15 - sy);
+    // Then the zone's painted name comes fully into view (clear of the side safe areas and the brand plate), as far as
+    // the marker allows: it may slide to 10 % / 85 % of the width, 12 % / 72 % of the height, never off the view.
+    const nameEl = this.names.querySelector<HTMLElement>(`.wm-name[data-region="${region.id}"]`);
+    if (nameEl?.offsetWidth) {
+      this.measureBlocks();
+      const safe = this.safeInsets();
+      const sc = Math.sqrt(f.k); // the name counter-scales by 1 / √k inside a scene drawn at k
+      const hw = (nameEl.offsetWidth * sc) / 2 + 14;
+      const hh = (nameEl.offsetHeight * sc) / 2 + 10;
+      const nx = c.x + region.name.x * f.k;
+      const ny = c.y + region.name.y * f.k;
+      const mx = c.x + m.x * f.k;
+      const my = c.y + m.y * f.k;
+      let dx = Math.max(0, safe.l - (nx - hw)) - Math.max(0, nx + hw - (w - safe.r));
+      const brand = this.blocks.find((b) => b.src === '.wm-brand');
+      let dy = Math.max(0, 4 - (ny - hh)) - Math.max(0, ny + hh - (hgt - 4));
+      if (brand && nx - hw + dx < brand.r && ny - hh + dy < brand.b) dy = Math.max(dy, brand.b - (ny - hh));
+      dx = Math.max(w * 0.1 - mx, Math.min(w * 0.85 - mx, dx));
+      dy = Math.max(hgt * 0.12 - my, Math.min(hgt * 0.72 - my, dy));
+      c.x += dx;
+      c.y += dy;
+    }
     this.flyCam(this.clampCam(c), { x: (w / 2 - c.x) / f.k, y: (hgt / 2 - c.y) / f.k }, smooth);
   }
 
@@ -560,10 +633,15 @@ export class WorldMapScreen extends Screen {
     this.fog0 = fog;
     const ell = (f: FogPatch, cls: string): string => `<ellipse class="${cls}" data-key="${escapeHtml(f.key)}" cx="${f.x}" cy="${f.y}" rx="${f.rx}" ry="${f.ry}"/>`;
     this.fog.innerHTML = `<defs><radialGradient id="wm-fog-g"><stop offset="0" stop-color="#a9b6c9" stop-opacity=".6"/><stop offset=".55" stop-color="#8b97ad" stop-opacity=".42"/><stop offset="1" stop-color="#6b7688" stop-opacity="0"/></radialGradient></defs>${fog.map((f) => ell(f, 'fog')).join('')}${lifted.map((f) => ell(f, 'fog open')).join('')}`;
-    // Region names with their counts.
+    // Zone names, painted over the land on two lines (W-worldmap); under an open zone its count, under a locked one its
+    // sign — the rule stated once per zone (the gate zone's sign also names the next unlock), a padlock on each marker.
     this.names.innerHTML = '';
     for (const r of regions) {
-      const n = el('div', `wm-name${r.locked ? ' locked' : ''}`, `<b>${escapeHtml(r.label)}</b><small>${r.total ? `${r.done} / ${r.total}` : ''}</small>`);
+      const [first, ...rest] = r.label.split(' ');
+      const rule = r.markers.find((m) => m.locked && !m.proving)?.rule;
+      const next = this.gate && this.gate.region === r.id ? `<small>Next unlock · ${escapeHtml(this.gate.track.name)}</small>` : '';
+      const foot = rule ? `<span class="wm-sign"><i class="wm-padlock"></i>${escapeHtml(rule)}${next}</span>` : `<small>${r.total ? `${r.done} / ${r.total}` : ''}</small>`;
+      const n = el('div', `wm-name${r.locked ? ' locked' : ''}`, `<b><span>${escapeHtml(first ?? '')}</span>${rest.length ? ` <span>${escapeHtml(rest.join(' '))}</span>` : ''}</b>${foot}`);
       n.dataset['region'] = r.id;
       n.style.left = `${r.name.x}px`;
       n.style.top = `${r.name.y}px`;
@@ -585,15 +663,17 @@ export class WorldMapScreen extends Screen {
       ge.style.left = `${g.x}px`;
       ge.style.top = `${g.y}px`;
       const deg = (Math.atan2(g.dy, g.dx) * 180) / Math.PI;
-      ge.innerHTML = `<button type="button" class="wm-hit" aria-label="${escapeHtml(zoneTitle(g.stage))} locked: ${escapeHtml(g.rule)}"></button><span class="chev" style="transform: rotate(${deg.toFixed(1)}deg)">›››</span><span class="wm-plate">${escapeHtml(zoneTitle(g.stage))} · ${escapeHtml(g.rule)}<small>Next unlock · ${escapeHtml(g.track.name)}</small></span>`;
+      // The chevrons across the road; the rule itself stands on the zone's sign (once per zone).
+      ge.innerHTML = `<button type="button" class="wm-hit" aria-label="${escapeHtml(zoneTitle(g.stage))} locked: ${escapeHtml(g.rule)}. Next unlock: ${escapeHtml(g.track.name)}"></button><span class="chev" style="transform: rotate(${deg.toFixed(1)}deg)">›››</span>`;
       this.markerLayer.appendChild(ge);
       this.gateEl = ge;
     }
     this.markerLayer.appendChild(this.card);
     // Progress chip: cleared / total and the medal dots.
     const totals = medalTotals(ship, medalOf);
-    const dot = (m: Medal, n: number, label: string): string => `<span class="${m}"><i></i>${n} <em>${label}</em></span>`;
-    this.progress.innerHTML = `<span class="n"><b>${totals.cleared}</b> / ${totals.total} cleared</span><span class="dots">${dot('platinum', totals.platinum, 'Obsidian')}${dot('gold', totals.gold, 'Gold')}${dot('silver', totals.silver, 'Silver')}${dot('bronze', totals.bronze, 'Bronze')}</span>`;
+    // W-worldmap's chip: the count, a rule, then each medal as its badge and a number (the name is the badge's label).
+    const dot = (m: Medal, n: number): string => `<span class="${m}" title="${MEDAL_NAME[m]}">${medalSvg(m, MEDAL_NAME[m])}${n}</span>`;
+    this.progress.innerHTML = `<span class="n"><b>${totals.cleared}</b> / ${totals.total} cleared</span><span class="dots">${dot('platinum', totals.platinum)}${dot('gold', totals.gold)}${dot('silver', totals.silver)}${dot('bronze', totals.bronze)}</span>`;
     // Opening focus: last played if still open, else the first unridden track of the highest open tier (`nextTrack`).
     const target = nextTrack(ship, medalOf, s.dev, s.lastPlayed);
     const at = locate(regions, target?.id);
@@ -615,7 +695,7 @@ export class WorldMapScreen extends Screen {
     const t = marker.track;
     const best = this.bestOf(t.id);
     const kind = marker.locked ? 'locked' : marker.proving ? 'proving' : marker.medal ? marker.medal : 'open';
-    const wrap = el('div', `wm-marker ${kind}${marker.upNext ? ' next' : ''}`);
+    const wrap = el('div', `wm-marker ${kind}${marker.upNext ? ' next' : ''}${PLATE_LEFT.has(t.id) ? ' lead-left' : ''}`);
     wrap.dataset['i'] = String(i);
     wrap.dataset['track'] = t.id;
     wrap.dataset['region'] = marker.region;
@@ -625,7 +705,7 @@ export class WorldMapScreen extends Screen {
     const pro = best?.bike === 'pro' ? '<em class="tag pro">Pro</em>' : '';
     const next = marker.upNext ? '<em class="tag next">Up next</em>' : '';
     const title = marker.locked ? `${marker.code} ${t.name} — locked: ${marker.rule ?? ''}` : `${marker.code} ${t.name}`;
-    wrap.innerHTML = `<span class="wm-beacon"></span><span class="wm-spire"></span><span class="wm-foot"></span><span class="wm-ring"></span><button type="button" class="wm-hit" aria-label="${escapeHtml(title)}"><i class="wm-diamond"></i><i class="wm-lock"></i></button><span class="wm-lead"></span><span class="wm-plate"><b>${escapeHtml(marker.code)}</b> · ${escapeHtml(t.name)}${next}${pro}${ghost}</span>${marker.locked ? `<span class="wm-rule">${escapeHtml(marker.rule ?? '')}</span>` : ''}<span class="wm-bike">${BIKE_SVG}</span>`;
+    wrap.innerHTML = `<span class="wm-beacon"></span><span class="wm-spire"></span><span class="wm-foot"></span><span class="wm-ring"></span><button type="button" class="wm-hit" aria-label="${escapeHtml(title)}"><i class="wm-diamond"></i><i class="wm-lock"></i></button><span class="wm-lead"></span><span class="wm-plate"><b>${escapeHtml(marker.code)}</b> · ${escapeHtml(t.name)}${next}${pro}${ghost}</span><span class="wm-bike">${BIKE_SVG}</span>`;
     return { marker, el: wrap, hit: wrap.querySelector<HTMLButtonElement>('.wm-hit')! };
   }
 

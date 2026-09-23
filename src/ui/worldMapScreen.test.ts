@@ -73,13 +73,19 @@ describe('world map screen — the painted continent as the level select', () =>
     expect(a.scene.dataset['region']).toBe('coast');
     expect(document.querySelector<HTMLButtonElement>('.wm-ride')!.disabled).toBe(false);
     expect(document.querySelector('.wm-ride')!.textContent).toContain('Low Tide');
-    expect(document.querySelector('.wm-gate')!.textContent).toContain('Alpine Forest Trail · Medal every Coast track');
+    // The rule stands once per locked zone, on its sign under the name; the gate zone's sign names the next unlock.
+    const sign = (z: string): string => document.querySelector(`.wm-name[data-region="${z}"] .wm-sign`)?.textContent ?? '';
+    expect(document.querySelectorAll('.wm-sign')).toHaveLength(3);
+    expect(sign('alpine')).toBe('Medal every Coast trackNext unlock · Sawdust');
+    expect(sign('quarry')).toBe('Medal every Alpine track');
+    expect(document.querySelector('.wm-gate .wm-hit')!.getAttribute('aria-label')).toBe('Alpine Forest Trail locked: Medal every Coast track. Next unlock: Sawdust');
     document.body.innerHTML = '';
     const b = fixture({ seeded: true });
     expect(b.on()).toBe('a1-sawdust');
     expect(document.querySelector('.wm-progress')!.textContent).toContain('3 / 12 cleared');
-    expect(document.querySelector('.wm-gate')!.textContent).toContain('Desert Quarry · Medal every Alpine track');
-    expect(document.querySelector('.wm-gate')!.textContent).toContain('Dust Devil');
+    expect(document.querySelectorAll('.wm-sign')).toHaveLength(2);
+    expect(sign('alpine')).toBe('');
+    expect(sign('quarry')).toBe('Medal every Alpine trackNext unlock · Dust Devil');
     document.body.innerHTML = '';
     const c = fixture({ seeded: true, lastPlayed: 'c2-crane-hop' });
     expect(c.on()).toBe('c2-crane-hop');
@@ -88,7 +94,7 @@ describe('world map screen — the painted continent as the level select', () =>
     expect(d.on()).toBe('c1-low-tide');
   });
 
-  it('markers carry their state: medal class, UP NEXT tag, the padlock + rule on locked ones, PRO on the Pro best, FREE RIDE flags', () => {
+  it('markers carry their state: medal class, UP NEXT tag, the padlock on locked ones, PRO on the Pro best, FREE RIDE flags', () => {
     fixture({ seeded: true });
     const m = (id: string): HTMLElement => document.querySelector<HTMLElement>(`.wm-marker[data-track="${id}"]`)!;
     expect(m('c1-low-tide').classList.contains('gold')).toBe(true);
@@ -96,7 +102,10 @@ describe('world map screen — the painted continent as the level select', () =>
     expect(m('a1-sawdust').classList.contains('next')).toBe(true);
     expect(m('a1-sawdust').querySelector('.tag.next')?.textContent).toBe('Up next');
     expect(m('d1-dust-devil').classList.contains('locked')).toBe(true);
-    expect(m('d1-dust-devil').querySelector('.wm-rule')?.textContent).toBe('Medal every Alpine track');
+    // A padlock on the marker, the rule in its label (and once on the zone's sign, never per marker).
+    expect(m('d1-dust-devil').querySelector('.wm-lock')).not.toBeNull();
+    expect(m('d1-dust-devil').querySelector('.wm-rule')).toBeNull();
+    expect(m('d1-dust-devil').querySelector('.wm-hit')?.getAttribute('aria-label')).toBe('D1 Dust Devil — locked: Medal every Alpine track');
     expect(m('c3-hull-breach').querySelector('.tag.pro')?.textContent).toBe('Pro');
     expect(m('p-coast').classList.contains('proving')).toBe(true);
     expect(m('p-coast').querySelector('.wm-plate b')?.textContent).toBe('Free ride');
