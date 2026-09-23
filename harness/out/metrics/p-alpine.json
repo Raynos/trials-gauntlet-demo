@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "p-alpine",
+  "bike": "rookie",
+  "updatedAt": "2026-09-23T01:25:36.560Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    1,
+    2
+  ],
+  "targetAttempts": 2,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        2167122917
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        22.616666666666667
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260922-202411-84f54b"
+  ]
+}

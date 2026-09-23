@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "a3-timberline",
+  "bike": "rookie",
+  "updatedAt": "2026-09-23T01:17:50.377Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    2,
+    5
+  ],
+  "targetAttempts": 5,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        849270865
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        23.75
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260922-201630-858c24"
+  ]
+}

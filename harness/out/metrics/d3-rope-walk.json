@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "d3-rope-walk",
+  "bike": "rookie",
+  "updatedAt": "2026-09-23T01:22:22.610Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    4,
+    8
+  ],
+  "targetAttempts": 8,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        3775916223
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        33.55833333333333
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260922-202029-d277ad"
+  ]
+}

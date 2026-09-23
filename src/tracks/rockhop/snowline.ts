@@ -27,7 +27,7 @@ export const S1 = rockhop('S1', 's1-lift-line', 'Lift Line', 'snowline', 'hard',
   idea: 'ride the ski-lift line: cap to cap along the towers',
   hero: 'The Lift Line',
   attemptsBand: [5, 10],
-  targetTimeS: 60, // gold: skill-3 bot 30.68 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 55, // gold: skill-3 bot 30.50 s x 1.6 = 48.8, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .camera({ mode: 'side' })
   .setPiece('start', 'The Base Station')
@@ -107,7 +107,7 @@ export const S2 = rockhop('S2', 's2-cornice', 'Cornice', 'snowline', 'extreme', 
   idea: 'climb the ice wall and drop off the cornice',
   hero: 'The Cornice',
   attemptsBand: [6, 12],
-  targetTimeS: 60, // gold: skill-3 bot 34.88 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 60, // gold: skill-3 bot 35.54 s x 1.6 = 56.9, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .camera({ mode: 'side' })
   .setPiece('start', 'The Hut')
@@ -198,15 +198,18 @@ export const S2 = rockhop('S2', 's2-cornice', 'Cornice', 'snowline', 'extreme', 
  * S3 WHITEOUT — the summit run in the storm. DEMANDS everything the snowline taught, closer together: the crevasse
  * slots on the rear wheel, the spinning rollers, the fence hop, and the summit: a rising shelf chain up to the top
  * towers and a cap row at the top, then the long run down in the whiteout.
+ *
+ * Riding-poses physics (a736a26f): with the caps 0.4 m over the shelf one average reflex seed of 45 hit the
+ * 50-attempt cap at the towers. The caps are now 0.35 m over it (2.55 m): every seed clears, mean 9.56.
  */
 export const S3 = (() => {
   const b = rockhop('S3', 's3-whiteout', 'Whiteout', 'snowline', 'extreme', {
     technique: 'everything, closer together',
-    demands: 'the summit: a rising ice-shelf chain to 2.2 m, four summit tower caps at 2.6 m over the crevasse, off the station and down',
+    demands: 'the summit: a rising ice-shelf chain to 2.2 m, four summit tower caps at 2.55 m over the crevasse, off the station and down',
     idea: 'the summit in a storm: slots, rollers, the shelves up and the summit towers',
     hero: 'The Summit Towers',
     attemptsBand: [8, 16],
-    targetTimeS: 60, // gold: skill-3 bot 29.63 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+    targetTimeS: 60, // gold: skill-3 bot 29.41 s x 1.6 = 47.1, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
   })
     .camera({ mode: 'side' })
     .setPiece('start', 'The Top Station')
@@ -263,7 +266,7 @@ export const S3 = (() => {
     .ramp({ length: 3, height: 0.4, surface: 'snow', prop: 'ice-ledge' }, { base: 1.8 }) // landing lip onto the top shelf
     .box({ width: 10, height: 2.2, surface: 'snow', prop: 'ice-ledge' }) // the top shelf: settle
     .camera({ mode: 'low' })
-    .poleRow([2.6, 2.6, 2.6, 2.6], 1.2, { radius: 0.3 }) // the summit towers, 0.4 m above the shelf
+    .poleRow([2.55, 2.55, 2.55, 2.55], 1.2, { radius: 0.3 }) // the summit towers, 0.35 m above the shelf
     .space(0.5)
     .box({ width: 5, height: 2.6, surface: 'snow', prop: 'lift-tower' })
     .ramp({ length: 22, height: 2.6, direction: 'down', surface: 'snow', prop: 'ice-ledge' })

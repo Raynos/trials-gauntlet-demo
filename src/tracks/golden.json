@@ -217,7 +217,7 @@
     "finishX": 391.5
   },
   "a3-timberline": {
-    "hash": "64a116a40cb6984d",
+    "hash": "f6cc21ff1f6445ef",
     "colliders": 31,
     "hazards": 4,
     "obstacles": 27,
@@ -238,11 +238,11 @@
     "finishX": 457.751169
   },
   "d3-rope-walk": {
-    "hash": "f87d306df9368989",
+    "hash": "0508a8db339d03cd",
     "colliders": 32,
-    "hazards": 22,
-    "obstacles": 43,
-    "finishX": 454.8
+    "hazards": 23,
+    "obstacles": 44,
+    "finishX": 457.1
   },
   "s1-lift-line": {
     "hash": "9882fd73452a726e",
@@ -259,7 +259,7 @@
     "finishX": 459.424243
   },
   "s3-whiteout": {
-    "hash": "7613685097facee4",
+    "hash": "b2a369cc6e6dd614",
     "colliders": 47,
     "hazards": 13,
     "obstacles": 46,
@@ -273,7 +273,7 @@
     "finishX": 386.1
   },
   "p-alpine": {
-    "hash": "30b10d5d8b71fe22",
+    "hash": "68d16daa6844e1f1",
     "colliders": 28,
     "hazards": 1,
     "obstacles": 22,
@@ -287,7 +287,7 @@
     "finishX": 412.396973
   },
   "p-snowline": {
-    "hash": "9aa772c98bae3ef7",
+    "hash": "21faf8c8bcbbb422",
     "colliders": 27,
     "hazards": 1,
     "obstacles": 22,

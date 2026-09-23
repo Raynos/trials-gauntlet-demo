@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "d2-conveyor",
+  "bike": "rookie",
+  "updatedAt": "2026-09-23T01:20:28.781Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    3,
+    7
+  ],
+  "targetAttempts": 7,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        2279068015
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        33.84166666666667
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260922-201835-1fcd49"
+  ]
+}

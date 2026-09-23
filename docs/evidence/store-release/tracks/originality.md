@@ -12,17 +12,17 @@ Retired set: 24 courses (curriculum, p1-p5 playgrounds, labs). New set: 16 cours
 | C3 | c3-hull-breach | 0.553 | x1-vertical-limit | -1.000 | 0.553 | p4-night-circuit 0.452 | yes |
 | A1 | a1-sawdust | 0.412 | b1-first-ride | 0.412 | 0.199 | e1-uphill-weight 0.409 | yes |
 | A2 | a2-log-jam | 0.458 | m3-see-saw | 0.458 | 0.341 | e3-stairway 0.349 | yes |
-| A3 | a3-timberline | 0.410 | x3-gauntlet | -1.000 | 0.410 | x1-vertical-limit 0.352 | yes |
+| A3 | a3-timberline | 0.409 | x3-gauntlet | -1.000 | 0.409 | x1-vertical-limit 0.351 | yes |
 | D1 | d1-dust-devil | 0.555 | p3-snow-line | 0.555 | 0.467 | p5-foundry-floor 0.555 | yes |
 | D2 | d2-conveyor | 0.505 | h2-gap-chain | 0.398 | 0.505 | lab-box-climb 0.504 | yes |
-| D3 | d3-rope-walk | 0.434 | e1-uphill-weight | 0.224 | 0.434 | x3-gauntlet 0.423 | yes |
+| D3 | d3-rope-walk | 0.458 | e1-uphill-weight | 0.203 | 0.458 | x3-gauntlet 0.437 | yes |
 | S1 | s1-lift-line | 0.467 | x1-vertical-limit | -1.000 | 0.467 | e1-uphill-weight 0.455 | yes |
 | S2 | s2-cornice | 0.455 | x3-gauntlet | 0.455 | 0.273 | p5-foundry-floor 0.397 | yes |
-| S3 | s3-whiteout | 0.424 | x3-gauntlet | 0.424 | 0.404 | x1-vertical-limit 0.404 | yes |
+| S3 | s3-whiteout | 0.423 | x3-gauntlet | 0.423 | 0.403 | x1-vertical-limit 0.404 | yes |
 | PC | p-coast | 0.447 | x3-gauntlet | 0.317 | 0.447 | e1-uphill-weight 0.441 | yes |
-| PA | p-alpine | 0.431 | m2-drum-roll | 0.431 | 0.227 | b2-lean-back 0.395 | yes |
+| PA | p-alpine | 0.434 | m2-drum-roll | 0.434 | 0.243 | m1-hop-up 0.389 | yes |
 | PD | p-quarry | 0.444 | b1-first-ride | 0.444 | 0.278 | m1-hop-up 0.432 | yes |
-| PS | p-snowline | 0.402 | p4-night-circuit | 0.402 | 0.047 | x3-gauntlet 0.380 | yes |
+| PS | p-snowline | 0.435 | p4-night-circuit | 0.435 | 0.049 | x3-gauntlet 0.409 | yes |
 
 Worst pair overall: d1-dust-devil vs p3-snow-line at 0.555.
 
@@ -32,9 +32,9 @@ Worst pair overall: d1-dust-devil vs p3-snow-line at 0.555.
 |---|---|---:|
 | c3-hull-breach | d2-conveyor | 0.681 |
 | c3-hull-breach | p-coast | 0.662 |
+| p-alpine | p-quarry | 0.637 |
 | c1-low-tide | p-coast | 0.626 |
 | c2-crane-hop | c3-hull-breach | 0.617 |
-| p-alpine | p-quarry | 0.609 |
+| c3-hull-breach | p-alpine | 0.606 |
+| p-quarry | p-snowline | 0.589 |
 | c1-low-tide | d2-conveyor | 0.587 |
-| c3-hull-breach | p-alpine | 0.578 |
-| d1-dust-devil | p-quarry | 0.564 |

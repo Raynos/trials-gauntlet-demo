@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "track-bot-metrics",
+  "trackId": "s3-whiteout",
+  "bike": "rookie",
+  "updatedAt": "2026-09-23T01:23:54.832Z",
+  "physics": "bikePhysicsFactory-v2",
+  "attemptsBand": [
+    8,
+    16
+  ],
+  "targetAttempts": 16,
+  "curve": [
+    {
+      "skill": 3,
+      "seeds": [
+        3654478777
+      ],
+      "attempts": [
+        1
+      ],
+      "median": 1,
+      "finishTimes": [
+        29.408333333333335
+      ]
+    }
+  ],
+  "botParTime": null,
+  "shaped": null,
+  "singleWall": null,
+  "runs": [
+    "20260922-202223-a5cdd7"
+  ]
+}

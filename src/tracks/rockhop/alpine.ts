@@ -21,7 +21,7 @@ export const A1 = rockhop('A1', 'a1-sawdust', 'Sawdust', 'alpine', 'easy', {
   idea: 'the sawmill yard: timber stairs, the mill race and the flume jump',
   hero: 'The Flume',
   attemptsBand: [1, 3],
-  targetTimeS: 50, // gold: skill-3 bot 26.48 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 50, // gold: skill-3 bot 26.53 s x 1.6 = 42.5, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .camera({ mode: 'side' })
   .setPiece('start', 'The Mill Gate')
@@ -96,7 +96,7 @@ export const A2 = rockhop('A2', 'a2-log-jam', 'Log Jam', 'alpine', 'medium', {
   idea: 'a river jammed with logs: roll the piles, ride the log that teeters',
   hero: 'The Jam',
   attemptsBand: [2, 4],
-  targetTimeS: 55, // gold: skill-3 bot 31.47 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 50, // gold: skill-3 bot 29.98 s x 1.6 = 48.0, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .camera({ mode: 'side' })
   .setPiece('start', 'The Landing')
@@ -158,14 +158,18 @@ export const A2 = rockhop('A2', 'a2-log-jam', 'Log Jam', 'alpine', 'medium', {
  * A3 TIMBERLINE — the logging road up to the last trees. TEACHES the hop (preload back with a little gas, snap
  * forward) onto cribbing and stumps, and the thin landing on a skid beam. DEMANDS the log loader: a kicker onto the
  * logging truck's bed, a hop onto its log load and across to the landing.
+ *
+ * Riding-poses physics (a736a26f): the 0.4 m load flipped a 4 m/s bike over its front wheel, and the average reflex
+ * player needed 3.84 attempts, above Dust Devil's 3.82. The load is now 0.38 m (its landing lip 2 cm taller, so the
+ * landing deck stays at 1.6 m): 3.51, between Log Jam and Dust Devil again.
  */
 export const A3 = rockhop('A3', 'a3-timberline', 'Timberline', 'alpine', 'medium', {
   technique: 'the hop, and the thin landing on a beam',
-  demands: 'the log loader: a kicker onto the truck bed, a 0.4 m hop onto the load and a 1.5 m hop across to the landing',
+  demands: 'the log loader: a kicker onto the truck bed, a 0.38 m hop onto the load and a 1.5 m hop across to the landing',
   idea: 'the logging road to the timberline: hop the cribbing, ride the beam, jump the loader',
   hero: 'The Log Loader',
   attemptsBand: [2, 5],
-  targetTimeS: 55, // gold: skill-3 bot 22.57 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 50, // gold: skill-3 bot 23.75 s x 1.6 = 38.0, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .camera({ mode: 'side' })
   .setPiece('start', 'The Logging Road')
@@ -214,9 +218,9 @@ export const A3 = rockhop('A3', 'a3-timberline', 'Timberline', 'alpine', 'medium
   .gap({ width: 3 })
   .ramp({ length: 2, height: 0.25, surface: 'metal', prop: 'truck-bed' }, { base: 0.95 })
   .box({ width: 8, height: 1.2, prop: 'truck-bed' }) // the logging truck bed
-  .ledge({ height: 0.4, length: 6, surface: 'wood', prop: 'log-stack' }, { base: 1.2 }) // hop onto the load
+  .ledge({ height: 0.38, length: 6, surface: 'wood', prop: 'log-stack' }, { base: 1.2 }) // hop onto the load
   .gap({ width: 1.5, depth: 2 }) // and across to the landing
-  .ramp({ length: 3, height: 0.3, surface: 'wood', prop: 'timber-deck' }, { base: 1.3 }) // landing lip
+  .ramp({ length: 3, height: 0.32, surface: 'wood', prop: 'timber-deck' }, { base: 1.28 }) // landing lip
   .box({ width: 6, height: 1.6, surface: 'wood', prop: 'timber-deck' })
   .ramp({ length: 14, height: 1.6, direction: 'down', surface: 'wood', prop: 'timber-deck' })
   .endSetPiece()

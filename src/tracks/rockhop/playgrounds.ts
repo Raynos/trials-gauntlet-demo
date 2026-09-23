@@ -68,7 +68,7 @@ export const P_COAST = playground('coast', 'PC', 'Harbour Yard', 'the whole scra
 });
 
 /** The forest trail: log bumps, the loading-dock stairs, a board, a log row, the mill race and the lake shore. */
-export const P_ALPINE = playground('alpine', 'PA', 'Forest Trail', 'the sawmill and the lake trail at an easy roll', 'nothing new: bark bumps, 0.12 m timber stairs, a 17 deg board, a log row, a 2.5 m mill-race gap, a 1.0 m ramp drop', (b, seg) => {
+export const P_ALPINE = playground('alpine', 'PA', 'Forest Trail', 'the sawmill and the lake trail at an easy roll', 'nothing new: bark bumps, 0.12 m timber stairs, an 11 deg board, a log row, a 2.5 m mill-race gap, a 1.0 m ramp drop', (b, seg) => {
   b.hint('Steady over the logs').hint('No brakes on the stairs').hint('Slow onto the board').camera({ mode: 'side' });
   seg('The trailhead and the bark bumps');
   b.setPiece('start', 'The Trailhead').flat(6).arch({ style: 'start' }).flat(18).endSetPiece();
@@ -77,7 +77,10 @@ export const P_ALPINE = playground('alpine', 'PA', 'Forest Trail', 'the sawmill 
   b.flat(16).stair({ count: 6, height: 0.12, length: 0.8, surface: 'wood', prop: 'timber-deck' }).box({ width: 8, height: 0.72, surface: 'wood', prop: 'timber-deck' });
   b.ramp({ length: 8, height: 0.72, direction: 'down', surface: 'wood', prop: 'timber-deck' }).flat(12).wave(40, 1.4, 20).flat(10);
   seg('The teetering log and the log row');
-  b.seesawEntry({ length: 8, height: 1.2, surface: 'wood', prop: 'log' }).flat(14).checkpoint();
+  // The log used to pivot 1.2 m up (a 17 deg board): held gas meets it at 16 m/s, the rising end throws the bike 3 m
+  // up, 1.2 s in the air with the gas rotating the nose up to 62 deg, and it loops out on the flat (crash x 172.7).
+  // Pivoting 0.8 m up (11 deg) it throws nobody: every riding style at every approach speed rides it.
+  b.seesawEntry({ length: 8, height: 0.8, surface: 'wood', prop: 'log' }).flat(14).checkpoint();
   b.flat(16).ramp({ length: 4, height: 0.6, surface: 'wood', prop: 'timber-deck' }).logpile({ radius: 0.3, count: 3, surface: 'wood', prop: 'log' }).flat(14);
   seg('The mill race');
   b.ramp({ length: 5, height: 1.0, surface: 'wood', prop: 'timber-deck' }).gap({ width: 2.5 }).gapLanding(0.6, 6, 6, 8).flat(12).checkpoint();
@@ -114,7 +117,7 @@ export const P_QUARRY = playground('quarry', 'PD', 'Quarry Floor', 'the quarry f
 });
 
 /** The piste: fence kerbs, the snow-cat ramp, an ice-shelf gap, a board, a low tower shelf and the run down. */
-export const P_SNOWLINE = playground('snowline', 'PS', 'Piste', 'the ski area at an easy roll', 'nothing new: fence kerbs, a 2.5 m ice-shelf gap, the snow-cat blade ramp, a 17 deg board, the long run down', (b, seg) => {
+export const P_SNOWLINE = playground('snowline', 'PS', 'Piste', 'the ski area at an easy roll', 'nothing new: fence kerbs, a 2.5 m ice-shelf gap, the snow-cat blade ramp, an 11 deg board, the long run down', (b, seg) => {
   b.hint('Roll the fence kerbs').hint('Hold the gas over the ice gap').hint('Slow onto the board').camera({ mode: 'side' });
   seg('The base station and the fence kerbs');
   b.setPiece('start', 'The Base Station').flat(6).arch({ style: 'start' }).flat(18).endSetPiece();
@@ -125,7 +128,9 @@ export const P_SNOWLINE = playground('snowline', 'PS', 'Piste', 'the ski area at
   seg('The snow-cat');
   b.ramp({ length: 10, height: 1.0, surface: 'metal', prop: 'snowcat' }).box({ width: 6, height: 1.0, surface: 'metal', prop: 'snowcat' }).ramp({ length: 10, height: 1.0, direction: 'down', surface: 'snow', prop: 'ice-ledge' }).flat(12).checkpoint();
   seg('The board under the lift line');
-  b.flat(3).setPiece('balance', 'The Lift Line').seesawEntry({ length: 8, height: 1.2, surface: 'wood' }).endSetPiece().flat(14);
+  // As P-A's log: at 1.2 m (17 deg) held gas (18.8 m/s) flew 1.4 s off it, landed rear-first at 44 deg and endoed in
+  // the bumps (crash x 202.2); at 0.8 m (11 deg) every style at every speed rides it.
+  b.flat(3).setPiece('balance', 'The Lift Line').seesawEntry({ length: 8, height: 0.8, surface: 'wood' }).endSetPiece().flat(14);
   b.bumpRow(2, 0.25, 20).flat(8).checkpoint();
   seg('The glacier shelf');
   b.flat(8).ramp({ length: 12, height: 1.2, surface: 'snow', prop: 'ice-ledge' }).box({ width: 8, height: 1.2, surface: 'snow', prop: 'ice-ledge' });

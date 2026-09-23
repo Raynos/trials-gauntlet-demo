@@ -26,7 +26,7 @@ export const C1 = rockhop('C1', 'c1-low-tide', 'Low Tide', 'coast', 'beginner', 
   idea: 'the harbour at low tide: ride the dry causeway out to the containers',
   hero: 'The Causeway',
   attemptsBand: [1, 1],
-  targetTimeS: 50, // gold: skill-3 bot 30.12 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 50, // gold: skill-3 bot 29.72 s x 1.6 = 47.5, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .hint('Hold the gas up the slipway')
   .hint('Steady gas over the tyres')
@@ -98,7 +98,7 @@ export const C2 = rockhop('C2', 'c2-crane-hop', 'Crane Hop', 'coast', 'beginner'
   idea: 'hop the harbour pier to pier, then jump the water onto the barge under the crane',
   hero: 'The Crane Hop',
   attemptsBand: [1, 2],
-  targetTimeS: 50, // gold: skill-3 bot 25.26 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 50, // gold: skill-3 bot 25.05 s x 1.6 = 40.1, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .hint('Hold the gas off the pier lip') // rockhop-r1: coasting off the lip at full speed pitches the nose down
   .hint('Lean back if the nose drops') // not forward: leaning forward when the nose rises crashes pier 2 at >= 12 m/s
@@ -166,7 +166,7 @@ export const C3 = rockhop('C3', 'c3-hull-breach', 'Hull Breach', 'coast', 'easy'
   idea: 'climb into a beached freighter and burst out through the breach',
   hero: 'The Breach',
   attemptsBand: [1, 3],
-  targetTimeS: 50, // gold: skill-3 bot 30.80 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 50, // gold: skill-3 bot 30.81 s x 1.6 = 49.3, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .camera({ mode: 'side' })
   .setPiece('start', 'The Wreck Beach')

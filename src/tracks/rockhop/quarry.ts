@@ -27,7 +27,7 @@ export const D1 = rockhop('D1', 'd1-dust-devil', 'Dust Devil', 'quarry', 'medium
   idea: 'the quarry floor: hop the cut blocks, climb the terraces, ride the dust whoops out',
   hero: 'The Terraces',
   attemptsBand: [3, 6],
-  targetTimeS: 55, // gold: skill-3 bot 25.81 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 50, // gold: skill-3 bot 25.95 s x 1.6 = 41.5, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .camera({ mode: 'side' })
   .setPiece('start', 'The Pit Head')
@@ -104,7 +104,7 @@ export const D2 = rockhop('D2', 'd2-conveyor', 'Conveyor', 'quarry', 'hard', {
   idea: 'ride the crushing plant: up the conveyors, over the pulleys, out along the ore carts',
   hero: 'The Head Pulley',
   attemptsBand: [3, 7],
-  targetTimeS: 60, // gold: skill-3 bot 34.92 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 55, // gold: skill-3 bot 33.84 s x 1.6 = 54.1, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .camera({ mode: 'side' })
   .setPiece('start', 'The Weighbridge')
@@ -175,6 +175,10 @@ export const D2 = rockhop('D2', 'd2-conveyor', 'Conveyor', 'quarry', 'hard', {
  * D3 ROPE WALK — across the main pit. TEACHES the rear-wheel crossing (front up over the missing boards) and the
  * lip climb onto a cut block; the ore-cart see-saw on the rail stub. DEMANDS the rope walk: up onto the bridge
  * deck 1.5 m over the pit and across six missing boards on the rear wheel.
+ *
+ * Riding-poses physics (a736a26f) made the course easier than Conveyor at the median (3 vs 4 average reflex
+ * attempts); the first cut's slot row has a seventh missing board, and the median is 4 again (mean 4.73, under
+ * Lift Line's 5.31).
  */
 export const D3 = (() => {
   const b = rockhop('D3', 'd3-rope-walk', 'Rope Walk', 'quarry', 'hard', {
@@ -183,7 +187,7 @@ export const D3 = (() => {
     idea: 'cross the main pit on a plank-and-rope bridge with missing boards',
     hero: 'The Rope Walk',
     attemptsBand: [4, 8],
-    targetTimeS: 60, // gold: skill-3 bot 33.39 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+    targetTimeS: 55, // gold: skill-3 bot 33.56 s x 1.6 = 53.7, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
   })
     .camera({ mode: 'side' })
     .setPiece('start', 'The Pit Rim')
@@ -212,7 +216,7 @@ export const D3 = (() => {
     .camera({ mode: 'side-tight' })
     .steppedWall({ height: 1.0, width: 8, lip: 0.15, surface: 'stone', prop: 'block' }, 0.3) // lip climb onto the cut block, or the ramp and a 0.3 m hop
     .flat(3);
-  slots(b, 6, 2.3);
+  slots(b, 7, 2.3); // seven missing boards past the first cut
   b.flat(8)
     .camera({ mode: 'side' })
     .rollers(20, 0.25, 3)
