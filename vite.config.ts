@@ -8,6 +8,7 @@ import { defineConfig, type Plugin } from 'vite';
 import { HERO_FILES_BY_OUTFIT } from './src/render/hero/urls';
 import { declaredBootTotals, emptyBootTotals, offlinePackBytes, type DeclaredBootTotals } from './src/boot/asset-totals';
 import { modelAssetsPlugin, type ModelAsset } from './src/boot/model-catalog';
+import { REGIONS } from './src/ui/worldMap';
 
 /** esbuild's own API (bundling the inline loader). Not a direct dependency: resolved through Vite's, so the two never disagree. */
 interface Esbuild {
@@ -200,7 +201,7 @@ export function writeBootPlanTable(root: string, modelAssets?: readonly ModelAss
   // device fetches the one `worldMapUrls()` names.
   const wm = path.join(pub, 'art', 'worldmap');
   for (const f of fs.existsSync(wm) ? fs.readdirSync(wm).sort() : []) rows.set(`art/worldmap/${f}`, fs.statSync(path.join(wm, f)).size);
-  const pack = offlinePackBytes(rows, (id) => facets.get(id) ?? {});
+  const pack = offlinePackBytes(rows, (id) => facets.get(id) ?? {}, REGIONS.map((r) => r.id));
   const keys = [...rows.keys()].sort();
   const body = keys.map((k) => `  ${JSON.stringify(k)}: ${rows.get(k)},`).join('\n');
   const src = [

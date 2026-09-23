@@ -62,7 +62,15 @@ export const HERO_FILE_SET: readonly BootAssetKey[] = [...new Set(Object.values(
  * which has the manifest and therefore the facets); the result is written into `plan.generated.ts`,
  * so the module path (`totals.ts`) and `__BOOT_TOTALS__` cannot be different sums.
  */
-export function offlinePackBytes(rows: Iterable<readonly [string, number]>, facetOf: (id: string) => { kind?: string; variant?: string } = () => ({})): OfflinePackBytes {
+export function offlinePackBytes(rows: Iterable<readonly [string, number]>, facetOf: (id: string) => { kind?: string; variant?: string } = () => ({}), regionIds?: readonly string[]): OfflinePackBytes {
+  // A region plate counts only when the world map can fetch it (`worldMapUrls` names `REGIONS` alone): plates
+  // for regions the map does not draw yet (the ROCKHOP zones' region-<zone>-*.webp before the map switches to
+  // them) sit in public/ and in the byte table but are never downloaded, so they are not promised either.
+  const regions = regionIds ? new Set(regionIds) : null;
+  const fetched = (key: string): boolean => {
+    const m = /^art\/worldmap\/region-(.+)-(?:1024|1536)\.webp$/.exec(key);
+    return !m || !regions || regions.has(m[1]!);
+  };
   const boot = new Set<string>(BOOT_IDS);
   const out = emptyPackBytes();
   const add = (where: ArtTier | 'both' | null, bytes: number): void => {
@@ -75,7 +83,7 @@ export function offlinePackBytes(rows: Iterable<readonly [string, number]>, face
     if (key.startsWith('art:')) {
       const id = key.slice(4);
       if (!boot.has(id)) add(packMembership(facetOf(id)), bytes);
-    } else if (key.startsWith('art/worldmap/')) add(platePackMembership(key), bytes);
+    } else if (key.startsWith('art/worldmap/') && fetched(key)) add(platePackMembership(key), bytes);
   }
   return out;
 }
