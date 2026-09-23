@@ -35,7 +35,7 @@ function playground(zone: ZoneId, code: string, name: string, idea: string, dema
 
 /** The harbour yard: slipway, tyres, pier hops, a pontoon gap, the container stack and its gangway. */
 export const P_COAST = playground('coast', 'PC', 'Harbour Yard', 'the whole scrapyard at an easy roll', 'nothing new: a pier hop, sunk tyres, a 2.5 m pontoon gap, a pallet kerb, a container stack and its gangway', (b, seg) => {
-  b.hint('Gas up the pier, off at the lip').hint('Steady over the tyres').hint('Ease off down the gangway').camera({ mode: 'side' });
+  b.hint('Gas up the pier, lean back if the nose drops').hint('Steady over the tyres').hint('Ease off down the gangway').camera({ mode: 'side' });
   seg('The harbour gate and the slipway');
   b.setPiece('start', 'The Harbour Gate').flat(6).arch({ style: 'start' }).flat(18).endSetPiece();
   b.smooth(20, 1.4).flat(10).descent(20, 1.4, 20).flat(8).checkpoint();
@@ -99,7 +99,7 @@ export const P_QUARRY = playground('quarry', 'PD', 'Quarry Floor', 'the quarry f
 
 /** The piste: fence kerbs, the snow-cat ramp, an ice-shelf gap, a board, a low tower shelf and the run down. */
 export const P_SNOWLINE = playground('snowline', 'PS', 'Piste', 'the ski area at an easy roll', 'nothing new: fence kerbs, a 2.5 m ice-shelf gap, the snow-cat blade ramp, a 17 deg board, the long run down', (b, seg) => {
-  b.hint('Roll the fence kerbs').hint('Gas to the ramp, off at the lip').hint('Slow onto the board').camera({ mode: 'side' });
+  b.hint('Roll the fence kerbs').hint('Hold the gas over the ice gap').hint('Slow onto the board').camera({ mode: 'side' });
   seg('The base station and the fence kerbs');
   b.setPiece('start', 'The Base Station').flat(6).arch({ style: 'start' }).flat(18).endSetPiece();
   b.ledge({ height: 0.25, length: 5, surface: 'wood', prop: 'fence' }).ramp({ length: 3, height: 0.25, direction: 'down', surface: 'snow', prop: 'ice-ledge' }).flat(8);

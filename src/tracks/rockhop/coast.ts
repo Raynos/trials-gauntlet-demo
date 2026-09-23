@@ -12,20 +12,25 @@ import { rockhop } from './builder';
 /**
  * C1 LOW TIDE — the tide is out and the causeway is dry. TEACHES throttle: hold it up the slipway, keep it
  * steady over the tyre line and the ripples, ease it down the gangway. DEMANDS the causeway: up a pallet ramp onto
- * a row of containers (stepping up 0.3 m a container) and off the end down a 10 x h gangway.
- * No jump anywhere: every rise is a cosine grounded at 20 m/s.
+ * a row of containers (stepping up 0.3 m a container, a pallet wedge up each step) and off the end down a 12.5 x h
+ * gangway. No jump anywhere: every rise is a cosine grounded at 20 m/s.
+ *
+ * Stranger round rockhop-r1: the containers stepped up as bare 0.3 m faces. At full gas (~17 m/s) the pallet ramp's
+ * top floats the bike onto the end of the first container, the front wheel hits the face, the rear bucks off it and
+ * the bike endoes into the second step (crash x 327.7). Track 1 has to clear first time on held gas, so each step is
+ * now a 4 m pallet wedge (4.3 deg): held gas, coasting, and a stop-start respawn at the checkpoint all roll them.
  */
 export const C1 = rockhop('C1', 'c1-low-tide', 'Low Tide', 'coast', 'beginner', {
   technique: 'throttle control',
-  demands: 'the causeway: a pallet ramp onto three containers, stepping up 0.3 m a container, and the gangway down',
+  demands: 'the causeway: a pallet ramp onto three containers, stepping up 0.3 m a container on pallet wedges, and the gangway down',
   idea: 'the harbour at low tide: ride the dry causeway out to the containers',
   hero: 'The Causeway',
   attemptsBand: [1, 1],
-  targetTimeS: 50, // gold: skill-3 bot 30.01 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
+  targetTimeS: 50, // gold: skill-3 bot 30.12 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
   .hint('Hold the gas up the slipway')
   .hint('Steady gas over the tyres')
-  .hint('Roll the step on the containers')
+  .hint('Stay on the gas up the containers')
   .hint('Ease off down the gangway')
   .camera({ mode: 'side' })
   .setPiece('start', 'The Slipway')
@@ -64,7 +69,9 @@ export const C1 = rockhop('C1', 'c1-low-tide', 'Low Tide', 'coast', 'beginner', 
   .setPiece('balance', 'The Causeway')
   .ramp({ length: 12, height: 1.0, surface: 'wood', prop: 'pallet' }) // 4.8 deg pallet ramp
   .box({ width: 8, height: 1.0, prop: 'container', variant: 0 })
-  .box({ width: 8, height: 1.3, prop: 'container', variant: 1 }) // each container 0.3 m taller: a kerb that rolls
+  .ramp({ length: 4, height: 0.3, surface: 'wood', prop: 'pallet' }, { base: 1.0 }) // a 4.3 deg pallet wedge up each 0.3 m step
+  .box({ width: 6, height: 1.3, prop: 'container', variant: 1 })
+  .ramp({ length: 4, height: 0.3, surface: 'wood', prop: 'pallet' }, { base: 1.3 })
   .box({ width: 8, height: 1.6, prop: 'container', variant: 2 })
   .ramp({ length: 20, height: 1.6, direction: 'down', surface: 'metal', prop: 'gangway' }) // 12.5 x h gangway
   .endSetPiece()
@@ -93,8 +100,8 @@ export const C2 = rockhop('C2', 'c2-crane-hop', 'Crane Hop', 'coast', 'beginner'
   attemptsBand: [1, 2],
   targetTimeS: 50, // gold: skill-3 bot 25.26 s x 1.6, rounded up to 5 s, non-decreasing through the tier (OBSIDIAN = 0.85 x gold, 0 bails)
 })
-  .hint('Gas up the pier, off at the lip')
-  .hint('Lean forward to level')
+  .hint('Hold the gas off the pier lip') // rockhop-r1: coasting off the lip at full speed pitches the nose down
+  .hint('Lean back if the nose drops') // not forward: leaning forward when the nose rises crashes pier 2 at >= 12 m/s
   .hint('Land on the ramp down')
   .hint('Full speed for the barge')
   .camera({ mode: 'side' })

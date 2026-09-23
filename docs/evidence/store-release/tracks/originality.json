@@ -31,170 +31,170 @@
       "id": "c1-low-tide",
       "name": "Low Tide",
       "code": "C1",
-      "max": 0.498,
-      "closest": "lab-ramp-jump",
+      "max": 0.53,
+      "closest": "e1-uphill-weight",
       "pass": true,
       "cells": [
         {
+          "retired": "e1-uphill-weight",
+          "score": 0.53,
+          "metric": 0.53,
+          "metricLagM": -119.5,
+          "stretched": 0.246
+        },
+        {
           "retired": "lab-ramp-jump",
-          "score": 0.498,
+          "score": 0.489,
           "metric": -1,
           "metricLagM": 0,
-          "stretched": 0.498
+          "stretched": 0.489
         },
         {
-          "retired": "p1-container-yard",
-          "score": 0.495,
-          "metric": 0.495,
-          "metricLagM": 145.5,
-          "stretched": 0.265
+          "retired": "x3-gauntlet",
+          "score": 0.478,
+          "metric": 0.478,
+          "metricLagM": 198,
+          "stretched": 0.469
         },
         {
-          "retired": "e1-uphill-weight",
-          "score": 0.475,
-          "metric": 0.475,
-          "metricLagM": -117.5,
-          "stretched": 0.239
+          "retired": "lab-box-climb",
+          "score": 0.478,
+          "metric": -1,
+          "metricLagM": 0,
+          "stretched": 0.478
         },
         {
           "retired": "m1-hop-up",
           "score": 0.463,
           "metric": 0.463,
-          "metricLagM": -120.5,
-          "stretched": 0.273
-        },
-        {
-          "retired": "x3-gauntlet",
-          "score": 0.462,
-          "metric": 0.449,
-          "metricLagM": 202,
-          "stretched": 0.462
-        },
-        {
-          "retired": "e3-stairway",
-          "score": 0.43,
-          "metric": 0.43,
-          "metricLagM": -73,
-          "stretched": 0.232
-        },
-        {
-          "retired": "lab-box-climb",
-          "score": 0.415,
-          "metric": -1,
-          "metricLagM": 0,
-          "stretched": 0.415
+          "metricLagM": -122,
+          "stretched": 0.268
         },
         {
           "retired": "x2-pipe-dream",
-          "score": 0.411,
-          "metric": 0.411,
-          "metricLagM": -105.5,
-          "stretched": 0.14
+          "score": 0.437,
+          "metric": 0.437,
+          "metricLagM": -108.5,
+          "stretched": 0.126
         },
         {
-          "retired": "b2-lean-back",
-          "score": 0.403,
-          "metric": 0.403,
-          "metricLagM": 6,
-          "stretched": 0.278
+          "retired": "p1-container-yard",
+          "score": 0.429,
+          "metric": 0.429,
+          "metricLagM": 145.5,
+          "stretched": 0.269
+        },
+        {
+          "retired": "e3-stairway",
+          "score": 0.428,
+          "metric": 0.428,
+          "metricLagM": -76.5,
+          "stretched": 0.251
         },
         {
           "retired": "lab-physics-test",
-          "score": 0.4,
+          "score": 0.421,
           "metric": -1,
           "metricLagM": 0,
-          "stretched": 0.4
+          "stretched": 0.421
         },
         {
           "retired": "b1-first-ride",
-          "score": 0.397,
-          "metric": 0.397,
-          "metricLagM": -65,
-          "stretched": 0.116
+          "score": 0.401,
+          "metric": 0.401,
+          "metricLagM": -71,
+          "stretched": 0.101
         },
         {
           "retired": "h1-wheelie-wire",
-          "score": 0.377,
-          "metric": 0.268,
-          "metricLagM": -67,
-          "stretched": 0.377
+          "score": 0.389,
+          "metric": 0.292,
+          "metricLagM": -69,
+          "stretched": 0.389
         },
         {
           "retired": "b3-kicker-row",
           "score": 0.367,
           "metric": 0.367,
           "metricLagM": 165,
-          "stretched": 0.109
+          "stretched": 0.084
+        },
+        {
+          "retired": "b2-lean-back",
+          "score": 0.354,
+          "metric": 0.354,
+          "metricLagM": 2.5,
+          "stretched": 0.27
         },
         {
           "retired": "m2-drum-roll",
-          "score": 0.34,
-          "metric": 0.34,
-          "metricLagM": -72,
-          "stretched": 0.272
+          "score": 0.339,
+          "metric": 0.339,
+          "metricLagM": -78,
+          "stretched": 0.269
         },
         {
           "retired": "p5-foundry-floor",
-          "score": 0.33,
-          "metric": 0.33,
-          "metricLagM": -2,
-          "stretched": 0.329
-        },
-        {
-          "retired": "p3-snow-line",
           "score": 0.318,
           "metric": 0.318,
-          "metricLagM": 47.5,
-          "stretched": 0.286
-        },
-        {
-          "retired": "p2-canyon-run",
-          "score": 0.3,
-          "metric": 0.287,
-          "metricLagM": 50,
-          "stretched": 0.3
+          "metricLagM": 68.5,
+          "stretched": 0.31
         },
         {
           "retired": "x1-vertical-limit",
-          "score": 0.294,
-          "metric": -1,
-          "metricLagM": 0,
-          "stretched": 0.294
+          "score": 0.291,
+          "metric": 0.262,
+          "metricLagM": 198,
+          "stretched": 0.291
+        },
+        {
+          "retired": "p2-canyon-run",
+          "score": 0.281,
+          "metric": 0.258,
+          "metricLagM": 43.5,
+          "stretched": 0.281
         },
         {
           "retired": "m3-see-saw",
-          "score": 0.278,
-          "metric": 0.278,
-          "metricLagM": -72,
-          "stretched": 0.16
+          "score": 0.28,
+          "metric": 0.28,
+          "metricLagM": -73,
+          "stretched": 0.175
         },
         {
-          "retired": "p4-night-circuit",
+          "retired": "p3-snow-line",
           "score": 0.272,
-          "metric": 0.258,
-          "metricLagM": 89.5,
-          "stretched": 0.272
+          "metric": 0.272,
+          "metricLagM": 40,
+          "stretched": 0.263
         },
         {
           "retired": "h2-gap-chain",
-          "score": 0.246,
-          "metric": 0.246,
-          "metricLagM": 78.5,
-          "stretched": 0.214
+          "score": 0.265,
+          "metric": 0.252,
+          "metricLagM": 93.5,
+          "stretched": 0.265
+        },
+        {
+          "retired": "p4-night-circuit",
+          "score": 0.258,
+          "metric": 0.258,
+          "metricLagM": 85.5,
+          "stretched": 0.254
         },
         {
           "retired": "h3-fire-line",
-          "score": 0.182,
-          "metric": 0.182,
-          "metricLagM": -46,
-          "stretched": 0.042
+          "score": 0.218,
+          "metric": 0.218,
+          "metricLagM": -50,
+          "stretched": 0.012
         },
         {
           "retired": "e2-rear-wheel-first",
-          "score": 0.135,
-          "metric": 0.099,
-          "metricLagM": 173.5,
-          "stretched": 0.135
+          "score": 0.15,
+          "metric": 0.122,
+          "metricLagM": 31,
+          "stretched": 0.15
         },
         {
           "retired": "lab-flat-200",
@@ -2885,7 +2885,7 @@
     {
       "a": "c1-low-tide",
       "b": "p-coast",
-      "score": 0.659
+      "score": 0.645
     },
     {
       "a": "c3-hull-breach",
@@ -2903,6 +2903,11 @@
       "score": 0.606
     },
     {
+      "a": "c1-low-tide",
+      "b": "d2-conveyor",
+      "score": 0.587
+    },
+    {
       "a": "c3-hull-breach",
       "b": "p-alpine",
       "score": 0.578
@@ -2910,12 +2915,7 @@
     {
       "a": "c1-low-tide",
       "b": "p-quarry",
-      "score": 0.577
-    },
-    {
-      "a": "c1-low-tide",
-      "b": "d2-conveyor",
-      "score": 0.564
+      "score": 0.567
     },
     {
       "a": "d1-dust-devil",
@@ -2973,14 +2973,14 @@
       "score": 0.489
     },
     {
-      "a": "c1-low-tide",
-      "b": "c3-hull-breach",
-      "score": 0.478
-    },
-    {
       "a": "d2-conveyor",
       "b": "d3-rope-walk",
       "score": 0.474
+    },
+    {
+      "a": "c1-low-tide",
+      "b": "c3-hull-breach",
+      "score": 0.47
     },
     {
       "a": "a1-sawdust",
@@ -3001,6 +3001,11 @@
       "a": "s1-lift-line",
       "b": "s2-cornice",
       "score": 0.46
+    },
+    {
+      "a": "c1-low-tide",
+      "b": "d3-rope-walk",
+      "score": 0.45
     },
     {
       "a": "s1-lift-line",
@@ -3038,6 +3043,11 @@
       "score": 0.423
     },
     {
+      "a": "c1-low-tide",
+      "b": "s1-lift-line",
+      "score": 0.422
+    },
+    {
       "a": "c2-crane-hop",
       "b": "p-snowline",
       "score": 0.422
@@ -3051,11 +3061,6 @@
       "a": "p-coast",
       "b": "p-quarry",
       "score": 0.421
-    },
-    {
-      "a": "c1-low-tide",
-      "b": "d3-rope-walk",
-      "score": 0.42
     },
     {
       "a": "s1-lift-line",
@@ -3103,11 +3108,6 @@
       "score": 0.404
     },
     {
-      "a": "c1-low-tide",
-      "b": "s1-lift-line",
-      "score": 0.403
-    },
-    {
       "a": "d2-conveyor",
       "b": "s1-lift-line",
       "score": 0.4
@@ -3138,11 +3138,6 @@
       "score": 0.388
     },
     {
-      "a": "c1-low-tide",
-      "b": "c2-crane-hop",
-      "score": 0.387
-    },
-    {
       "a": "a3-timberline",
       "b": "s1-lift-line",
       "score": 0.387
@@ -3164,8 +3159,8 @@
     },
     {
       "a": "c1-low-tide",
-      "b": "a3-timberline",
-      "score": 0.374
+      "b": "s2-cornice",
+      "score": 0.375
     },
     {
       "a": "d3-rope-walk",
@@ -3178,6 +3173,11 @@
       "score": 0.37
     },
     {
+      "a": "c1-low-tide",
+      "b": "c2-crane-hop",
+      "score": 0.369
+    },
+    {
       "a": "c2-crane-hop",
       "b": "a2-log-jam",
       "score": 0.368
@@ -3186,6 +3186,11 @@
       "a": "d2-conveyor",
       "b": "p-alpine",
       "score": 0.368
+    },
+    {
+      "a": "c1-low-tide",
+      "b": "p-snowline",
+      "score": 0.364
     },
     {
       "a": "a1-sawdust",
@@ -3201,6 +3206,11 @@
       "a": "d3-rope-walk",
       "b": "p-alpine",
       "score": 0.361
+    },
+    {
+      "a": "c1-low-tide",
+      "b": "a3-timberline",
+      "score": 0.359
     },
     {
       "a": "s3-whiteout",
@@ -3236,11 +3246,6 @@
       "a": "c2-crane-hop",
       "b": "p-coast",
       "score": 0.342
-    },
-    {
-      "a": "c1-low-tide",
-      "b": "p-snowline",
-      "score": 0.341
     },
     {
       "a": "p-coast",
@@ -3288,11 +3293,6 @@
       "score": 0.313
     },
     {
-      "a": "c1-low-tide",
-      "b": "s2-cornice",
-      "score": 0.31
-    },
-    {
       "a": "d1-dust-devil",
       "b": "d3-rope-walk",
       "score": 0.309
@@ -3306,6 +3306,11 @@
       "a": "c3-hull-breach",
       "b": "a2-log-jam",
       "score": 0.306
+    },
+    {
+      "a": "c1-low-tide",
+      "b": "s3-whiteout",
+      "score": 0.303
     },
     {
       "a": "c2-crane-hop",
@@ -3343,11 +3348,6 @@
       "score": 0.292
     },
     {
-      "a": "c1-low-tide",
-      "b": "a1-sawdust",
-      "score": 0.291
-    },
-    {
       "a": "a2-log-jam",
       "b": "d3-rope-walk",
       "score": 0.291
@@ -3378,11 +3378,6 @@
       "score": 0.274
     },
     {
-      "a": "c1-low-tide",
-      "b": "s3-whiteout",
-      "score": 0.27
-    },
-    {
       "a": "a2-log-jam",
       "b": "p-snowline",
       "score": 0.27
@@ -3393,14 +3388,19 @@
       "score": 0.264
     },
     {
+      "a": "c1-low-tide",
+      "b": "a2-log-jam",
+      "score": 0.263
+    },
+    {
       "a": "a1-sawdust",
       "b": "p-quarry",
       "score": 0.262
     },
     {
       "a": "c1-low-tide",
-      "b": "a2-log-jam",
-      "score": 0.261
+      "b": "a1-sawdust",
+      "score": 0.257
     },
     {
       "a": "s3-whiteout",

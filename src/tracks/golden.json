@@ -182,11 +182,11 @@
     "finishX": 38
   },
   "c1-low-tide": {
-    "hash": "dd7b6858129de8ec",
-    "colliders": 16,
+    "hash": "2889f78ea5dd5c08",
+    "colliders": 18,
     "hazards": 0,
-    "obstacles": 15,
-    "finishX": 443.6
+    "obstacles": 17,
+    "finishX": 449.6
   },
   "c2-crane-hop": {
     "hash": "60e41032d028a771",

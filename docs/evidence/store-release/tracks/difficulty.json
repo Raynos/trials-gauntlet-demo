@@ -96,7 +96,7 @@
         1,
         1,
         2,
-        1,
+        2,
         1,
         1,
         1,
@@ -106,10 +106,10 @@
         2
       ],
       "median": 1,
-      "mean": 1.067,
+      "mean": 1.089,
       "clears": 45,
       "runs": 45,
-      "medianTimeToClearS": 43.11666666666667,
+      "medianTimeToClearS": 42.891666666666666,
       "replayFaithful": true,
       "topDeaths": [
         {
@@ -119,8 +119,14 @@
         {
           "site": "ground@105:air-gas-nose-up",
           "count": 1
+        },
+        {
+          "site": "ground@380:nose-low",
+          "count": 1
         }
-      ]
+      ],
+      "srcFingerprint": "56482684",
+      "remeasured": "rockhop-r1 fix: C1 container steps on pallet wedges"
     },
     {
       "trackId": "c1-low-tide",
@@ -224,7 +230,7 @@
       "mean": 1.178,
       "clears": 45,
       "runs": 45,
-      "medianTimeToClearS": 49.5,
+      "medianTimeToClearS": 49.40833333333333,
       "replayFaithful": true,
       "topDeaths": [
         {
@@ -244,10 +250,12 @@
           "count": 1
         },
         {
-          "site": "ground@105:air-short",
+          "site": "drum@92:stuck-restart",
           "count": 1
         }
-      ]
+      ],
+      "srcFingerprint": "56482684",
+      "remeasured": "rockhop-r1 fix: C1 container steps on pallet wedges"
     },
     {
       "trackId": "c1-low-tide",
@@ -302,11 +310,11 @@
       ],
       "attempts": [
         1,
-        2,
         1,
         1,
         1,
-        2,
+        1,
+        1,
         1,
         1,
         1,
@@ -348,21 +356,14 @@
         1
       ],
       "median": 1,
-      "mean": 1.044,
+      "mean": 1.0,
       "clears": 45,
       "runs": 45,
-      "medianTimeToClearS": 38.916666666666664,
+      "medianTimeToClearS": 38.49166666666667,
       "replayFaithful": true,
-      "topDeaths": [
-        {
-          "site": "box@328:nose-low",
-          "count": 1
-        },
-        {
-          "site": "ground@340:nose-low",
-          "count": 1
-        }
-      ]
+      "topDeaths": [],
+      "srcFingerprint": "56482684",
+      "remeasured": "rockhop-r1 fix: C1 container steps on pallet wedges"
     },
     {
       "trackId": "c2-crane-hop",
@@ -6002,7 +6003,7 @@
   ],
   "skill3Goldens": {
     "c1-low-tide": {
-      "finish": 30.008,
+      "finish": 30.117,
       "attempts": 1,
       "seed": 341352973
     },

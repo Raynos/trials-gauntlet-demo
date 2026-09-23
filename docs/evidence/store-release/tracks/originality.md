@@ -7,7 +7,7 @@ Retired set: 24 courses (curriculum, p1-p5 playgrounds, labs). New set: 16 cours
 
 | code | track | max r | closest retired | metric r | stretched r | 2nd closest | pass |
 |---|---|---:|---|---:|---:|---|---|
-| C1 | c1-low-tide | 0.498 | lab-ramp-jump | -1.000 | 0.498 | p1-container-yard 0.495 | yes |
+| C1 | c1-low-tide | 0.530 | e1-uphill-weight | 0.530 | 0.246 | lab-ramp-jump 0.489 | yes |
 | C2 | c2-crane-hop | 0.373 | m1-hop-up | 0.373 | 0.237 | p2-canyon-run 0.367 | yes |
 | C3 | c3-hull-breach | 0.553 | x1-vertical-limit | -1.000 | 0.553 | p4-night-circuit 0.452 | yes |
 | A1 | a1-sawdust | 0.412 | b1-first-ride | 0.412 | 0.199 | e1-uphill-weight 0.409 | yes |
@@ -31,10 +31,10 @@ Worst pair overall: d1-dust-devil vs p3-snow-line at 0.555.
 | a | b | r |
 |---|---|---:|
 | c3-hull-breach | d2-conveyor | 0.681 |
-| c1-low-tide | p-coast | 0.659 |
+| c1-low-tide | p-coast | 0.645 |
 | c3-hull-breach | p-coast | 0.634 |
 | c2-crane-hop | c3-hull-breach | 0.617 |
 | p-alpine | p-quarry | 0.606 |
+| c1-low-tide | d2-conveyor | 0.587 |
 | c3-hull-breach | p-alpine | 0.578 |
-| c1-low-tide | p-quarry | 0.577 |
-| c1-low-tide | d2-conveyor | 0.564 |
+| c1-low-tide | p-quarry | 0.567 |
