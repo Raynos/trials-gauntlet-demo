@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "h1-wheelie-wire",
   "bike": "rookie",
-  "updatedAt": "2026-09-21T11:30:46.094Z",
+  "updatedAt": "2026-09-22T20:22:14.261Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     10,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        46.36666666666667
+        45.86666666666667
       ]
     }
   ],
@@ -38,6 +38,7 @@
     "20260915-223743-31c1cd",
     "20260915-225622-e70578",
     "20260921-051150-0b0d6f",
-    "20260921-062729-b3ec55"
+    "20260921-062729-b3ec55",
+    "20260922-151927-81c0d2"
   ]
 }

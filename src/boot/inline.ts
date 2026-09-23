@@ -46,8 +46,8 @@ declare const __BOOT_HOOK__: boolean;
   const coreTotal = core.reduce((sum, item) => sum + item[1], 0);
   const plan = createBootPlan(createLoaderRenderer(root, __BOOT_BUILD__).paint, { totals: { core: coreTotal, ...selectedBootTotals(__BOOT_TOTALS__) } });
   const fail = (m: string): void => {
-    // Offline with an unfinished cache: "⟳ Retry" against a dead radio is a lie, so say what happened.
-    if (!plan.view.done && !plan.view.error) plan.fail(navigator.onLine ? m : `Offline — this build was not fully downloaded. Connect once and reopen. (${m})`);
+    // Keep the offline cause visible alongside the underlying load error.
+    if (!plan.view.done && !plan.view.error) plan.fail(navigator.onLine ? m : `Offline: ${m}`);
   };
   root.querySelector<HTMLButtonElement>('.err button')!.onclick = () => location.reload();
   addEventListener('error', (e) => {

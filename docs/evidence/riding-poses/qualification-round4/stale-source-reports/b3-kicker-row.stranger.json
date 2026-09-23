@@ -1,0 +1,1271 @@
+{
+  "schema": 2,
+  "kind": "stranger-metrics",
+  "trackId": "b3-kicker-row",
+  "attemptsBand": [
+    1,
+    2
+  ],
+  "physics": "bikePhysicsFactory-v2",
+  "srcFingerprint": "2495d8d5",
+  "updatedAt": "2026-09-22T22:45:23.818Z",
+  "includeStale": false,
+  "sessions": [
+    {
+      "sessionId": "b3-kicker-row-20260914-051941",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "73762476",
+      "strangerAttempts": 13,
+      "cleared": true,
+      "finishTime": 121.5667,
+      "calls": 100,
+      "wallMs": 1013963,
+      "firstCheckpointCalls": 6,
+      "faultsByCheckpoint": [
+        1,
+        5,
+        5,
+        0,
+        1
+      ],
+      "bestAttempt": {
+        "n": 13,
+        "cleared": true,
+        "x": 410,
+        "startTick": 13715,
+        "endTick": 14588,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260914-051941.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260914-051941.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 24.466,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 3
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 45.717,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 6
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 124.478,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 23
+        },
+        {
+          "n": 4,
+          "endedBy": "restart",
+          "reason": "restart",
+          "x": 143.489,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 150.0 m",
+          "calls": 35
+        },
+        {
+          "n": 5,
+          "endedBy": "reset",
+          "reason": "reset",
+          "x": 130.073,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 36
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 63.552,
+          "checkpoint": 0,
+          "obstacle": "ramp @ 70.0 m",
+          "calls": 43
+        },
+        {
+          "n": 7,
+          "endedBy": "reset",
+          "reason": "reset",
+          "x": 144.068,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 150.0 m",
+          "calls": 51
+        },
+        {
+          "n": 8,
+          "endedBy": "restart",
+          "reason": "restart",
+          "x": 31.019,
+          "checkpoint": 0,
+          "obstacle": "ramp @ 36.0 m",
+          "calls": 53
+        },
+        {
+          "n": 9,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 134.255,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 57
+        },
+        {
+          "n": 10,
+          "endedBy": "reset",
+          "reason": "reset",
+          "x": 130.073,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 58
+        },
+        {
+          "n": 11,
+          "endedBy": "restart",
+          "reason": "restart",
+          "x": 31.019,
+          "checkpoint": 0,
+          "obstacle": "ramp @ 36.0 m",
+          "calls": 60
+        },
+        {
+          "n": 12,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 355.236,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 92
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-20260914-051942",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "73762476",
+      "strangerAttempts": 10,
+      "cleared": true,
+      "finishTime": 92.6417,
+      "calls": 78,
+      "wallMs": 909231,
+      "firstCheckpointCalls": 4,
+      "faultsByCheckpoint": [
+        1,
+        3,
+        4,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 10,
+        "cleared": true,
+        "x": 410,
+        "startTick": 8496,
+        "endTick": 11117,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260914-051942.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260914-051942.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 24.466,
+          "checkpoint": -1,
+          "obstacle": null,
+          "calls": 3
+        },
+        {
+          "n": 2,
+          "endedBy": "restart",
+          "reason": "restart",
+          "x": 143.905,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 150.0 m",
+          "calls": 16
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 143.395,
+          "checkpoint": 1,
+          "obstacle": "ramp @ 150.0 m",
+          "calls": 20
+        },
+        {
+          "n": 4,
+          "endedBy": "reset",
+          "reason": "reset",
+          "x": 130.073,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 21
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 120.81,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 26
+        },
+        {
+          "n": 6,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 43.092,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 31
+        },
+        {
+          "n": 7,
+          "endedBy": "reset",
+          "reason": "reset",
+          "x": 29.073,
+          "checkpoint": 0,
+          "obstacle": "ramp @ 36.0 m",
+          "calls": 32
+        },
+        {
+          "n": 8,
+          "endedBy": "reset",
+          "reason": "reset",
+          "x": 138.825,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 38
+        },
+        {
+          "n": 9,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 213.017,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 218.8 m",
+          "calls": 53
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-20260914-073447",
+      "agent": "s3",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "c83b6ca8",
+      "strangerAttempts": 6,
+      "cleared": true,
+      "finishTime": 62.9583,
+      "calls": 35,
+      "wallMs": 631264,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        3,
+        0,
+        1
+      ],
+      "bestAttempt": {
+        "n": 6,
+        "cleared": true,
+        "x": 426,
+        "startTick": 6686,
+        "endTick": 7555,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260914-073447.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260914-073447.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 79.728,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 6
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 157.251,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 12
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 137.892,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 13
+        },
+        {
+          "n": 4,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 201.856,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 18
+        },
+        {
+          "n": 5,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 383.899,
+          "checkpoint": 3,
+          "obstacle": null,
+          "calls": 31
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-20260914-073448",
+      "agent": "s4",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "c83b6ca8",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 40.0167,
+      "calls": 19,
+      "wallMs": 341287,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 426,
+        "startTick": 1755,
+        "endTick": 4802,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260914-073448.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260914-073448.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 179.993,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 8
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-20260921-055813",
+      "agent": "pose-b3-fresh-one",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "ae2c0bca",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 44.275,
+      "calls": 18,
+      "wallMs": 62133,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 767,
+        "endTick": 5627,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260921-055813.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260921-055813.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 57.508,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 3
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-20260921-063235",
+      "agent": "pose-round3-b3-first",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "1255af7f",
+      "strangerAttempts": 3,
+      "cleared": true,
+      "finishTime": 52.525,
+      "calls": 22,
+      "wallMs": 88850,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        2,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 2045,
+        "endTick": 6620,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260921-063235.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260921-063235.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 92.804,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 4
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 97.488,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 7
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-20260921-063438",
+      "agent": "pose-round3-b3-second",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "1255af7f",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 48.8667,
+      "calls": 26,
+      "wallMs": 230180,
+      "firstCheckpointCalls": 3,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 767,
+        "endTick": 6178,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260921-063438.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260921-063438.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 57.507,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 4
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-20260922-154010",
+      "agent": "pose-r4-b",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "15300486",
+      "strangerAttempts": 3,
+      "cleared": true,
+      "finishTime": 48.925,
+      "calls": 22,
+      "wallMs": 124327,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 4007,
+        "endTick": 6189,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260922-154010.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260922-154010.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 348.972,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 9
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 349.446,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 14
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-20260922-160437",
+      "agent": "pose-r4-d2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "f5036219",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 45.875,
+      "calls": 23,
+      "wallMs": 102681,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 2342,
+        "endTick": 5824,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260922-160437.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-20260922-160437.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 248.55,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 9
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r13-s1-20260915-203701",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "605a8174",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 45.7,
+      "calls": 20,
+      "wallMs": 158259,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 2267,
+        "endTick": 5821,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r13-s1-20260915-203701.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r13-s1-20260915-203701.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 243.311,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 8
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r14-s1-20260915-214558",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "2503f384",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 42.4167,
+      "calls": 14,
+      "wallMs": 139939,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 795,
+        "endTick": 5407,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14-s1-20260915-214558.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14-s1-20260915-214558.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 60.879,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 3
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r14-s2-20260915-214558",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "2503f384",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 42.7833,
+      "calls": 11,
+      "wallMs": 101218,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 1064,
+        "endTick": 5452,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14-s2-20260915-214558.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14-s2-20260915-214558.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 91.844,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 3
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r14b-s1-20260915-220131",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "089e0885",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 42.4417,
+      "calls": 13,
+      "wallMs": 160038,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 1072,
+        "endTick": 5412,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14b-s1-20260915-220131.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14b-s1-20260915-220131.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 94.197,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 4
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r14b-s2-20260915-220131",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "089e0885",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 44.45,
+      "calls": 16,
+      "wallMs": 197979,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 1073,
+        "endTick": 5649,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14b-s2-20260915-220131.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r14b-s2-20260915-220131.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 94.373,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 3
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r15-s1-20260915-225608",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "24a246e0",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 42.1167,
+      "calls": 18,
+      "wallMs": 223099,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 2994,
+        "endTick": 5366,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r15-s1-20260915-225608.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r15-s1-20260915-225608.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 334.598,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 334.8 m",
+          "calls": 11
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r15-s2-20260915-225608",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "24a246e0",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 34.65,
+      "calls": 14,
+      "wallMs": 104038,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 0,
+        "endTick": 4478,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r15-s2-20260915-225608.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r15-s2-20260915-225608.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "b3-kicker-row-r3-s1-20260914-113731",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "68e975a6",
+      "strangerAttempts": 3,
+      "cleared": true,
+      "finishTime": 61.6917,
+      "calls": 16,
+      "wallMs": 352803,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": true,
+        "x": 457.8,
+        "startTick": 6317,
+        "endTick": 7595,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r3-s1-20260914-113731.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r3-s1-20260914-113731.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 222.018,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 6
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 403.193,
+          "checkpoint": 3,
+          "obstacle": "gap @ 405.8 m",
+          "calls": 13
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r3-s2-20260914-113731",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "d39d492b",
+      "strangerAttempts": 3,
+      "cleared": true,
+      "finishTime": 46.6083,
+      "calls": 26,
+      "wallMs": 451368,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 3,
+        "cleared": true,
+        "x": 457.8,
+        "startTick": 3824,
+        "endTick": 5818,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r3-s2-20260914-113731.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r3-s2-20260914-113731.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 48.561,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 2
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 332.118,
+          "checkpoint": 2,
+          "obstacle": "ramp @ 334.8 m",
+          "calls": 17
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r4-s1-20260914-164224",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "abandoned",
+      "stale": false,
+      "srcFingerprint": null,
+      "strangerAttempts": 1,
+      "cleared": false,
+      "finishTime": null,
+      "calls": 0,
+      "wallMs": 694978957,
+      "firstCheckpointCalls": null,
+      "faultsByCheckpoint": [],
+      "bestAttempt": null,
+      "recordingFile": null,
+      "deaths": []
+    },
+    {
+      "sessionId": "b3-kicker-row-r4-s1-20260914-191143",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "3d5fd16f",
+      "strangerAttempts": 4,
+      "cleared": true,
+      "finishTime": 60.8,
+      "calls": 22,
+      "wallMs": 424245,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 4,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 5456,
+        "endTick": 7627,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r4-s1-20260914-191143.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r4-s1-20260914-191143.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 86.936,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 4
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 239.473,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 11
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 357.503,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 16
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r4-s2-20260914-164224",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "abandoned",
+      "stale": false,
+      "srcFingerprint": null,
+      "strangerAttempts": 1,
+      "cleared": false,
+      "finishTime": null,
+      "calls": 0,
+      "wallMs": 694978951,
+      "firstCheckpointCalls": null,
+      "faultsByCheckpoint": [],
+      "bestAttempt": null,
+      "recordingFile": null,
+      "deaths": []
+    },
+    {
+      "sessionId": "b3-kicker-row-r4-s2-20260914-191143",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "3d5fd16f",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 45.8,
+      "calls": 26,
+      "wallMs": 929259,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 2306,
+        "endTick": 5829,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r4-s2-20260914-191143.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r4-s2-20260914-191143.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 239.83,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 11
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r5-s1-20260914-192920",
+      "agent": "s1",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "74f5de4d",
+      "strangerAttempts": 2,
+      "cleared": true,
+      "finishTime": 43.1333,
+      "calls": 13,
+      "wallMs": 269317,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "bestAttempt": {
+        "n": 2,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 3219,
+        "endTick": 5506,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r5-s1-20260914-192920.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r5-s1-20260914-192920.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 348.092,
+          "checkpoint": 2,
+          "obstacle": null,
+          "calls": 7
+        }
+      ]
+    },
+    {
+      "sessionId": "b3-kicker-row-r5-s2-20260914-192920",
+      "agent": "s2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "74f5de4d",
+      "strangerAttempts": 4,
+      "cleared": true,
+      "finishTime": 61.4167,
+      "calls": 24,
+      "wallMs": 155716,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        2,
+        1,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 4,
+        "cleared": true,
+        "x": 471.8,
+        "startTick": 4183,
+        "endTick": 7697,
+        "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r5-s2-20260914-192920.json"
+      },
+      "recordingFile": "harness/inputs/b3-kicker-row/stranger-b3-kicker-row-r5-s2-20260914-192920.json",
+      "deaths": [
+        {
+          "n": 1,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 93.304,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 4
+        },
+        {
+          "n": 2,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 95.198,
+          "checkpoint": 0,
+          "obstacle": null,
+          "calls": 6
+        },
+        {
+          "n": 3,
+          "endedBy": "fault",
+          "reason": "crash",
+          "x": 239.162,
+          "checkpoint": 1,
+          "obstacle": null,
+          "calls": 14
+        }
+      ]
+    }
+  ],
+  "bike": "rookie",
+  "completed": 0,
+  "clearedCount": 0,
+  "medianAttempts": null,
+  "medianFinishTime": null,
+  "medianCalls": null,
+  "medianWallMs": null,
+  "census": {
+    "n": 0,
+    "minSessions": 2,
+    "censored": [
+      {
+        "sessionId": "b3-kicker-row-r4-s1-20260914-164224",
+        "status": "abandoned",
+        "attemptsSoFar": 1,
+        "calls": 0
+      },
+      {
+        "sessionId": "b3-kicker-row-r4-s2-20260914-164224",
+        "status": "abandoned",
+        "attemptsSoFar": 1,
+        "calls": 0
+      }
+    ],
+    "staleExcluded": 22,
+    "otherBikeExcluded": 0
+  },
+  "asserted": {
+    "band": [
+      1,
+      2
+    ],
+    "factor": 1.5,
+    "limit": 3
+  },
+  "verdict": "INSUFFICIENT",
+  "pass": null,
+  "deaths": {
+    "total": 0,
+    "byReason": {},
+    "byObstacle": [],
+    "byCheckpoint": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

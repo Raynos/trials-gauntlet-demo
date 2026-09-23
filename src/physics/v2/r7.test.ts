@@ -133,7 +133,7 @@ async function replay(rec: InputRecording, file: string, hashes?: string[]): Pro
     excursion = 0;
   };
   for (const f of expandFrames(rec)) {
-    sim.step(f);
+    const events = sim.step(f);
     row.ticks++;
     quiet = prev && sameInput(prev, f) ? quiet + 1 : 0;
     prev = f;
@@ -148,6 +148,10 @@ async function replay(rec: InputRecording, file: string, hashes?: string[]): Pro
       endExcursion();
       continue;
     }
+    // The servo also recovers from external impacts. A wheel landing or a
+    // seat impulse over twice the rider's static weight per step is a measured
+    // disturbance even when the pose target itself did not accelerate.
+    if (events.some((e) => e.type === 'land') || w.debug().rider.hold.seatJ > 2 * w.tuning.rider.mass * G * DT) lastOver = row.ticks;
     const c = Math.cos(s.bike.angle);
     const sn = Math.sin(s.bike.angle);
     const dx = s.riderBody.pos.x - s.bike.pos.x;

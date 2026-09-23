@@ -5,6 +5,10 @@ Owner: physics. Scope: `src/physics/**`. Where this file disagrees with
 Units: metres, kilograms, seconds, radians; +x along the course, +y up;
 angles CCW-positive, so **nose-up pitch is positive**. Fixed step 1/120 s.
 
+## Riding-pose qualification addendum (2026-09-22)
+
+The current v2 snapshot adds `groundIncline` and `leanQuiet` to `F_SLOTS` (46 scalars). The first stores the last load-bearing uphill wheel-contact angle so a standing rider reaches forward on a steep face; the second counts ticks since the last quantized lean edge so terrain motion alone cannot label a coasting bike's body movement as a deliberate hop. Both affect the next tick and therefore must survive snapshot/restore. The seat contact is one-sided across the saddle/tank top: even a deeply displaced pelvis receives an upward support normal rather than the side normal of a closed-box distance field. The brake brace follows the applied command as well as hydraulic lag, avoiding a delayed rearward pose after brake release. The R7/R8 recovery clock now restarts on actual wheel landing or a measured >2g seat impulse; its 0.15 m, 0.35 rad and 60/120-tick limits are unchanged. These are qualification findings, not a new acceptance of changed Rockhop track recordings.
+
 ## v2 status — R10 (reverse: the brake held at a standstill backs the bike up; ask 35)
 
 **The rule.** "You can't drive the bike backwards — the brake just stops it." Trials-style reverse, physics v2 only (v1 frozen):

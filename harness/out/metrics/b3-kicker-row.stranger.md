@@ -1,6 +1,6 @@
-# Stranger — b3-kicker-row (bikePhysicsFactory-v2, src 1255af7f, 2026-09-21T11:38:55.443Z, medians on rookie)
+# Stranger — b3-kicker-row (bikePhysicsFactory-v2, src 207404d3, 2026-09-23T00:37:57.031Z, medians on rookie)
 
-**PASS** — n = 2 completed on rookie (min 2) · cleared 2/2 · median attempts 2.5 · asserted 1 ≤ median ≤ 3.0 (1.5 × band top 2) and every counted session cleared · censored 2 (b3-kicker-row-r4-s1-20260914-164224 abandoned at attempt 1; b3-kicker-row-r4-s2-20260914-164224 abandoned at attempt 1) · excluded: 18 stale src, 0 other bike · median time to clear 50.7 s · median calls 24 · median wall 2.7 min
+**PASS** — n = 2 completed on rookie (min 2) · cleared 2/2 · median attempts 2.5 · asserted 1 ≤ median ≤ 3.0 (1.5 × band top 2) and every counted session cleared · censored 2 (b3-kicker-row-r4-s1-20260914-164224 abandoned at attempt 1; b3-kicker-row-r4-s2-20260914-164224 abandoned at attempt 1) · excluded: 22 stale src, 0 other bike · median time to clear 49.7 s · median calls 25 · median wall 1.3 min
 
 | session | agent | bike | status | attempts | cleared | time to clear | calls | wall | 1st cp call | died at | best attempt |
 |---|---|---|---|---:|---|---:|---:|---:|---:|---|---|
@@ -9,8 +9,12 @@
 | b3-kicker-row-20260914-073447 | s3 | rookie | done (stale src) | 6 | yes | 63.0 s | 35 | 10.5 min | 3 | crash@80m, crash@157m, crash@138m, crash@202m, crash@384m | #6 clear ticks 6686–7555 |
 | b3-kicker-row-20260914-073448 | s4 | rookie | done (stale src) | 2 | yes | 40.0 s | 19 | 5.7 min | 3 | crash@180m | #2 clear ticks 1755–4802 |
 | b3-kicker-row-20260921-055813 | pose-b3-fresh-one | rookie | done (stale src) | 2 | yes | 44.3 s | 18 | 1.0 min | 2 | crash@58m | #2 clear ticks 767–5627 |
-| b3-kicker-row-20260921-063235 | pose-round3-b3-first | rookie | done | 3 | yes | 52.5 s | 22 | 1.5 min | 2 | crash@93m, crash@97m | #3 clear ticks 2045–6620 |
-| b3-kicker-row-20260921-063438 | pose-round3-b3-second | rookie | done | 2 | yes | 48.9 s | 26 | 3.8 min | 3 | crash@58m | #2 clear ticks 767–6178 |
+| b3-kicker-row-20260921-063235 | pose-round3-b3-first | rookie | done (stale src) | 3 | yes | 52.5 s | 22 | 1.5 min | 2 | crash@93m, crash@97m | #3 clear ticks 2045–6620 |
+| b3-kicker-row-20260921-063438 | pose-round3-b3-second | rookie | done (stale src) | 2 | yes | 48.9 s | 26 | 3.8 min | 3 | crash@58m | #2 clear ticks 767–6178 |
+| b3-kicker-row-20260922-154010 | pose-r4-b | rookie | done (stale src) | 3 | yes | 48.9 s | 22 | 2.1 min | 2 | crash@349m, crash@349m | #3 clear ticks 4007–6189 |
+| b3-kicker-row-20260922-160437 | pose-r4-d2 | rookie | done (stale src) | 2 | yes | 45.9 s | 23 | 1.7 min | 2 | crash@249m | #2 clear ticks 2342–5824 |
+| b3-kicker-row-20260922-193054 | pose-stranger-b | rookie | done | 3 | yes | 57.4 s | 29 | 1.5 min | 2 | crash@251m, crash@243m | #3 clear ticks 3670–7198 |
+| b3-kicker-row-20260922-193549 | pose-stranger-a | rookie | done | 2 | yes | 42.0 s | 21 | 1.1 min | 2 | crash@175m | #2 clear ticks 1788–5360 |
 | b3-kicker-row-r13-s1-20260915-203701 | s1 | rookie | done (stale src) | 2 | yes | 45.7 s | 20 | 2.6 min | 2 | crash@243m | #2 clear ticks 2267–5821 |
 | b3-kicker-row-r14-s1-20260915-214558 | s1 | rookie | done (stale src) | 2 | yes | 42.4 s | 14 | 2.3 min | 2 | crash@61m | #2 clear ticks 795–5407 |
 | b3-kicker-row-r14-s2-20260915-214558 | s2 | rookie | done (stale src) | 2 | yes | 42.8 s | 11 | 1.7 min | 2 | crash@92m | #2 clear ticks 1064–5452 |
@@ -20,9 +24,9 @@
 | b3-kicker-row-r15-s2-20260915-225608 | s2 | rookie | done (stale src) | 1 | yes | 34.6 s | 14 | 1.7 min | 2 | — | #1 clear ticks 0–4478 |
 | b3-kicker-row-r3-s1-20260914-113731 | s1 | rookie | done (stale src) | 3 | yes | 61.7 s | 16 | 5.9 min | 2 | crash@222m, crash@403m (gap) | #3 clear ticks 6317–7595 |
 | b3-kicker-row-r3-s2-20260914-113731 | s2 | rookie | done (stale src) | 3 | yes | 46.6 s | 26 | 7.5 min | 2 | crash@49m, crash@332m (ramp) | #3 clear ticks 3824–5818 |
-| b3-kicker-row-r4-s1-20260914-164224 | s1 | rookie | abandoned | 1 | no | — | 0 | 9476.5 min | — | — | — |
+| b3-kicker-row-r4-s1-20260914-164224 | s1 | rookie | abandoned | 1 | no | — | 0 | 11695.5 min | — | — | — |
 | b3-kicker-row-r4-s1-20260914-191143 | s1 | rookie | done (stale src) | 4 | yes | 60.8 s | 22 | 7.1 min | 2 | crash@87m, crash@239m, crash@358m | #4 clear ticks 5456–7627 |
-| b3-kicker-row-r4-s2-20260914-164224 | s2 | rookie | abandoned | 1 | no | — | 0 | 9476.5 min | — | — | — |
+| b3-kicker-row-r4-s2-20260914-164224 | s2 | rookie | abandoned | 1 | no | — | 0 | 11695.5 min | — | — | — |
 | b3-kicker-row-r4-s2-20260914-191143 | s2 | rookie | done (stale src) | 2 | yes | 45.8 s | 26 | 15.5 min | 2 | crash@240m | #2 clear ticks 2306–5829 |
 | b3-kicker-row-r5-s1-20260914-192920 | s1 | rookie | done (stale src) | 2 | yes | 43.1 s | 13 | 4.5 min | 2 | crash@348m | #2 clear ticks 3219–5506 |
 | b3-kicker-row-r5-s2-20260914-192920 | s2 | rookie | done (stale src) | 4 | yes | 61.4 s | 24 | 2.6 min | 2 | crash@93m, crash@95m, crash@239m | #4 clear ticks 4183–7697 |
@@ -31,6 +35,6 @@ Where they died (3 ended attempts over counted sessions):
 
 | obstacle | deaths | x (m) |
 |---|---:|---|
-| ground | 3 | 92.8, 97.5, 57.5 |
+| ground | 3 | 251.3, 243.2, 175.3 |
 
-by reason: crash 3 · by checkpoint segment: [0, 3, 0, 0, 0]
+by reason: crash 3 · by checkpoint segment: [0, 0, 3, 0, 0]

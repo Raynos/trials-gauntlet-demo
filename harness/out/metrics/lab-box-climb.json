@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "lab-box-climb",
   "bike": "rookie",
-  "updatedAt": "2026-09-21T13:20:39.596Z",
+  "updatedAt": "2026-09-22T20:20:08.441Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     3,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        4.75
+        4.55
       ]
     }
   ],
@@ -31,6 +31,7 @@
   "runs": [
     "20260921-081455-a847ba",
     "20260921-081559-16fdcd",
-    "20260921-082037-dec089"
+    "20260921-082037-dec089",
+    "20260922-152000-59b665"
   ]
 }

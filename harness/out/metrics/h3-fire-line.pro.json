@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "h3-fire-line",
   "bike": "pro",
-  "updatedAt": "2026-09-21T11:53:09.022Z",
+  "updatedAt": "2026-09-22T20:38:19.604Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     18,
@@ -17,17 +17,20 @@
         3173388572
       ],
       "attempts": [
-        1
+        2
       ],
-      "median": 1,
+      "median": 2,
       "finishTimes": [
-        42.208333333333336
+        52.108333333333334
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": null,
+  "singleWall": {
+    "checkpoint": 3,
+    "share": 1
+  },
   "runs": [
     "20260915-161413-e98471",
     "20260915-184559-70b240",
@@ -41,6 +44,7 @@
     "20260915-223834-62e032",
     "20260915-225645-77b884",
     "20260921-052913-7a7c5e",
-    "20260921-065033-13422f"
+    "20260921-065033-13422f",
+    "20260922-153452-ec8532"
   ]
 }

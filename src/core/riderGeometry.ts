@@ -39,7 +39,7 @@ export const RIDER_PROFILE = {
   poses: [
     { lean: -1, hipX: -0.66, hipY: 0.725, torso: 40, head: 66 },
     { lean: 0, hipX: -0.34, hipY: 0.732, torso: 65, head: 85 },
-    { lean: 1, hipX: -0.20, hipY: 0.974, torso: 48, head: 70.8 },
+    { lean: 1, hipX: -0.14, hipY: 0.974, torso: 48, head: 70.8 },
   ],
 } as const;
 
@@ -324,10 +324,11 @@ export function riderPoseAtLean(lean: number, out: RiderRigPose): RiderRigPose {
   // Forward input first lifts the pelvis over the pegs, then hinges toward the bars.
   // Almost-straight legs retain flexion and stay inside the physical 0.870 m planar
   // stop; keeping the chest high also opens the elbows instead of folding them under it.
+  const ready = { hipX: -0.28, hipY: 0.775, torso: 60 };
   const standing = { hipX: -0.24, hipY: 0.953, torso: 50 };
-  const a = l < -0.5 ? back : l < 0 ? clear : l < 0.5 ? neutral : standing;
-  const b = l < -0.5 ? clear : l < 0 ? neutral : l < 0.5 ? standing : forward;
-  const t = l < -0.5 ? (l + 1) * 2 : l < 0 ? (l + 0.5) * 2 : l < 0.5 ? l * 2 : (l - 0.5) * 2;
+  const a = l < -0.5 ? back : l < 0 ? clear : l < 0.3 ? neutral : l < 0.5 ? ready : standing;
+  const b = l < -0.5 ? clear : l < 0 ? neutral : l < 0.3 ? ready : l < 0.5 ? standing : forward;
+  const t = l < -0.5 ? (l + 1) * 2 : l < 0 ? (l + 0.5) * 2 : l < 0.3 ? l / 0.3 : l < 0.5 ? (l - 0.3) / 0.2 : (l - 0.5) * 2;
   const u = t * t * (3 - 2 * t);
   return riderRigFromHips(a.hipX + (b.hipX - a.hipX) * u, a.hipY + (b.hipY - a.hipY) * u, ((a.torso + (b.torso - a.torso) * u) * PI) / 180, out);
 }

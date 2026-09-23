@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "p5-foundry-floor",
   "bike": "rookie",
-  "updatedAt": "2026-09-21T11:44:56.559Z",
+  "updatedAt": "2026-09-22T20:33:16.409Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        32.3
+        30.983333333333334
       ]
     }
   ],
@@ -38,6 +38,7 @@
     "20260915-223956-78ea6a",
     "20260915-225834-62b5c5",
     "20260921-052245-f4ac8e",
-    "20260921-064308-c14e98"
+    "20260921-064308-c14e98",
+    "20260922-153130-d3624e"
   ]
 }

@@ -27,7 +27,7 @@ import { describe, expect, it } from 'vitest';
 import { decodeJSON, expandFrames, quantizeInput, type InputRecording } from '../../core/replay';
 import { createSimFor } from '../../../harness/lib/sim';
 import { makeRiderRigPose, riderRigFromCOM, RIDER_TORSO_REST } from '../../core/riderGeometry';
-import { createBikePhysicsV2 as createBikePhysics, type BikePhysicsWorldV2 } from './bike';
+import { createBikePhysicsV2 as createBikePhysics, NSCALAR, type BikePhysicsWorldV2 } from './bike';
 import type { BikeClassV2, PartialTuningV2 } from './tuning';
 import { makeTrack } from '../testTracks';
 import { stepN } from '../controllers';
@@ -48,6 +48,11 @@ const EXCURSION_MAX_TICKS = 60;
 // the sit is the seat taking the body, and the drawn pose (riderBody.drawn) never draws it below the seat.
 const SLOP = 0.08;
 const deg = (r: number): number => (r * 180) / Math.PI;
+
+/** Mean servo force ceiling over the same solver steps as the velocity-difference demand. */
+function availableDemandG(fullDemandG: number, capFractions: readonly number[]): number {
+  return fullDemandG * capFractions.reduce((sum, fraction) => sum + fraction, 0) / capFractions.length;
+}
 
 function feel(name: string, value: number | string, band: string): void {
   console.log(`FEEL ${name} = ${typeof value === 'number' ? value.toFixed(3) : value} [${band}]`);
@@ -145,6 +150,10 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
   const vhx: number[] = Array(DEMAND_W + 1).fill(0);
   const vhy: number[] = Array(DEMAND_W + 1).fill(0);
   const vha: number[] = Array(DEMAND_W + 1).fill(0);
+  // v[t] - v[t - 6] covers the six solver steps t - 5..t. Compare its
+  // average target acceleration with the mean force cap from those same steps,
+  // including the Hill closing-speed cap after an air-commanded lean lands.
+  const capFrac: number[] = Array(DEMAND_W).fill(1);
   let lastOver = -1e9;
   let tick = 0;
   let excursion = 0;
@@ -158,7 +167,7 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
     excursion = 0;
   };
   for (const f of expandFrames(rec)) {
-    sim.step(f);
+    const events = sim.step(f);
     tick++;
     const s = sim.state();
     const ph = sim.phase();
@@ -170,10 +179,15 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
       vhx.length = 0;
       vhy.length = 0;
       vha.length = 0;
+      capFrac.length = 0;
       lastOver = -1e9;
       endExcursion();
       continue;
     }
+    // A landing or a >2g seat contact can knock the body off its target even
+    // when the rider did not command a new pose. Start the same recovery clock
+    // at the measured impact; the 0.15 m / 0.35 rad / 60-tick bars are unchanged.
+    if (events.some((e) => e.type === 'land') || w.debug().rider.hold.seatJ > 2 * w.tuning.rider.mass * G * DT) lastOver = tick;
     const c = Math.cos(s.bike.angle);
     const sn = Math.sin(s.bike.angle);
     const dx = s.riderBody.pos.x - s.bike.pos.x;
@@ -186,6 +200,19 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
     const twx = s.bike.pos.x + tx * c - ty * sn;
     const twy = s.bike.pos.y + tx * sn + ty * c;
     const twa = s.bike.angle + tpsi;
+    if (Number.isNaN(ptx)) {
+      // A respawn begins a new rider/target trajectory at rest. The prior
+      // segment's demand history is gone, so its first ticks cannot already
+      // count as recovered. Seed zero target velocity at this actual spawn and
+      // start the existing recovery clock here; numerical bands stay intact.
+      vhx.push(...Array(DEMAND_W + 1).fill(0));
+      vhy.push(...Array(DEMAND_W + 1).fill(0));
+      vha.push(...Array(DEMAND_W + 1).fill(0));
+      capFrac.push(...Array(DEMAND_W).fill(1));
+      lastOver = tick;
+    }
+    capFrac.push(w.debug().rider.legFrac);
+    if (capFrac.length > DEMAND_W) capFrac.shift();
     if (!Number.isNaN(ptx)) {
       vhx.push((twx - ptx) / DT);
       vhy.push((twy - pty) / DT);
@@ -198,7 +225,7 @@ async function replay(rec: InputRecording, file: string): Promise<Row> {
       if (vhx.length === DEMAND_W + 1) {
         const demand = Math.hypot((vhx[DEMAND_W]! - vhx[0]!) / (DEMAND_W * DT), (vhy[DEMAND_W]! - vhy[0]!) / (DEMAND_W * DT) + G) / G;
         const demandAng = Math.abs((vha[DEMAND_W]! - vha[0]!) / (DEMAND_W * DT));
-        if (demand > demandG || demandAng > demandA) {
+        if (demand > availableDemandG(demandG, capFrac) || demandAng > demandA) {
           lastOver = tick;
           row.overDemand++;
         }
@@ -348,6 +375,23 @@ function brake(cls: BikeClassV2, v: number, lean: number, brace: number, holdS =
 describe('R8: the hold envelope, the thrown rider and the brake brace', () => {
   const all = goldens();
 
+  it('a pelvis driven deep under the saddle recovers upward instead of getting trapped against its side', () => {
+    const w = flatWorld('pro');
+    const snapshot = w.snapshot();
+    const n = (snapshot.f64.length - NSCALAR) / 8;
+    snapshot.f64[NSCALAR + n + 3] = snapshot.f64[NSCALAR + n + 3]! - 0.65;
+    w.restore(snapshot);
+    const start = hips(w).y;
+    expect(start).toBeLessThan(w.tuning.rider.hold.seatY - SLOP);
+    w.step(quantizeInput({}));
+    const seatImpulse = w.debug().rider.hold.seatJ;
+    for (let i = 1; i < 4; i++) w.step(quantizeInput({}));
+    const end = hips(w).y;
+    expect(seatImpulse).toBeGreaterThan(0);
+    expect(w.getState().faulted).toBeNull();
+    expect(end).toBeGreaterThanOrEqual(w.tuning.rider.hold.seatY - SLOP);
+  });
+
   it(
     `envelope on every riding tick of every golden (both classes): hips >= seatY - ${SLOP} m, hips x <= tankX + ${SLOP} m, leg / arm <= reach + ${SLOP} m; COM <= ${BAND_COM} m and psi <= ${BAND_PSI} rad on every riding tick >= ${RECOVER_TICKS} ticks after the last over-demand tick; no COM excursion > ${EXCURSION_M} m longer than ${EXCURSION_MAX_TICKS} ticks; every golden finishes`,
     async () => {
@@ -379,6 +423,7 @@ describe('R8: the hold envelope, the thrown rider and the brake brace', () => {
         for (const f of r.faults) faults.push(`${r.file} ${f}`);
       }
       const longest = [...rows].sort((a, b) => b.longestExcursion - a.longestExcursion);
+      console.log(`R8 residuals: ${rows.filter((r) => r.outRecovered > 0).map((r) => `${r.file} ${r.outRecovered} bad, max COM ${r.maxComRecovered.toFixed(3)}, psi ${r.maxPsiRecovered.toFixed(3)}`).join('; ') || 'none'}`);
       console.log(
         `R8 envelope: ${rows.length} goldens, ${riding} riding ticks, over-demand ${((100 * over) / riding).toFixed(1)} %; COM outside ${BAND_COM}: ${outCom} (${((100 * outCom) / riding).toFixed(2)} %), ` +
           `p50 / p95 / p99 / max ${q(allCom, 0.5).toFixed(3)} / ${q(allCom, 0.95).toFixed(3)} / ${q(allCom, 0.99).toFixed(3)} / ${q(allCom, 1).toFixed(3)} m; ` +

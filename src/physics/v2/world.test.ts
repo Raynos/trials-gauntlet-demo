@@ -69,7 +69,7 @@ describe('determinism (§14.1)', () => {
   it('every cross-tick scalar and flag is enumerated (§12): the F/U slot lists are the spec\'s, nothing more', () => {
     // §12: tick, time, checkpoint, finishTime, throttleEff, brakeEff, pose target (3), rear/front compression
     // (2), air counters (2), rng (4) + seed, crash timer, ragdoll rest (6), previous wheel centres (4),
-    // applied input (3), rear slip (output). No hop phase timer, no slope memory, no airborne blend, no kappa,
+    // applied input (3), rear slip (output). No hop phase timer, no airborne blend, no kappa,
     // no leg stop. R3 adds ONE slot, `targetMove`: the intent memory (the pose target's own travel, decaying over
     // ~0.2 s) that tells the servo a hop push from a landing recovery (physics.md v2 status R3, deviation 19).
     // R5 adds ONE more, `airLimit`: the 0.1 s blend of the Rookie's airborne target-rate limit (physics.md v2 status
@@ -80,7 +80,10 @@ describe('determinism (§14.1)', () => {
     // hold.gripTau, the thrown-rider fault's memory (physics.md v2 status R8, deviation 15). R10 adds `reverseT`: seconds the
     // reverse gate has held (physics.md "Reverse", ask 35). The shared-geometry transfer adds six
     // slots: blend, captured lean/hips/torso, and input progress. These make the physical
-    // preload-to-extension path byte-replayable through holds and cancellation. Adding a slot fails here
+    // preload-to-extension path byte-replayable through holds and cancellation. The
+    // contact-grounded uphill stance adds `groundIncline`: contact manifolds are scratch, so
+    // this one load-bearing slope must be snapshot-owned for foreign restore to replay.
+    // Adding a slot fails here
     // until it is justified in physics-v2.md / physics.md.
     expect([...F_SLOTS]).toEqual([
       'tick', 'time', 'checkpoint', 'finishTime', 'throttleEff', 'brakeEff',
@@ -89,9 +92,9 @@ describe('determinism (§14.1)', () => {
       'ragRest0', 'ragRest1', 'ragRest2', 'ragRest3', 'ragRest4', 'ragRest5',
       'prevRearX', 'prevRearY', 'prevFrontX', 'prevFrontY', 'inThrottle', 'inBrake', 'inLean', 'rearSlip',
       'targetMove', 'airLimit', 'leanEdgeAir', 'gripJ', 'reverseT',
-      'transferBlend', 'transferLean', 'transferHipX', 'transferHipY', 'transferTorso', 'transferProgress',
+      'transferBlend', 'transferLean', 'transferHipX', 'transferHipY', 'transferTorso', 'transferProgress', 'groundIncline', 'leanQuiet',
     ]);
-    expect(NSCALAR).toBe(44);
+    expect(NSCALAR).toBe(46);
     expect([...U_SLOTS]).toEqual(['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid']);
     expect(NU).toBe(14);
     const w = createBikePhysics(HZ);

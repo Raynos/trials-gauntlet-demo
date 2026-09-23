@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "kind": "gate-partial",
+  "runId": "20260922-153310-7d4f29",
+  "startedAt": "2026-09-22T20:33:10.438Z",
+  "wallMs": 54839,
+  "git": "8c8c61fe",
+  "srcFingerprint": "7fd76cb9",
+  "node": "v24.18.1",
+  "chromium": "151.0.7922.34",
+  "only": [
+    "boot",
+    "crash",
+    "restart"
+  ],
+  "checks": [
+    {
+      "id": "boot.readyP50Ms",
+      "value": 117.60687499999995,
+      "limit": 300,
+      "pass": true,
+      "unit": "ms",
+      "note": "runs 118/618/100 min 100 loadavg 11.06/18"
+    },
+    {
+      "id": "boot.firstFrameMs",
+      "value": 9676.420000076294,
+      "limit": 4000,
+      "pass": false,
+      "unit": "ms",
+      "note": "ready -> first synced frame; SwiftShader limit; ship target 900ms NOT met (informational on this machine)",
+      "shipLimit": 900,
+      "shipPass": false
+    },
+    {
+      "id": "crash.faultWithinS",
+      "value": 0.8583333333333333,
+      "limit": 8,
+      "pass": true,
+      "unit": "s",
+      "note": "reason=crash"
+    },
+    {
+      "id": "fault.toControlMs",
+      "value": 25,
+      "limit": 500,
+      "pass": true,
+      "unit": "ms",
+      "note": "crash tick -> restart mash on the next tick -> bike moving; auto-respawn path 1017 ms (CONTRACT §2.8: 1.0 s)"
+    },
+    {
+      "id": "restart.ticks",
+      "value": 1,
+      "limit": 1,
+      "pass": true,
+      "note": "tick==0 && faulted==null after exactly one tick, 20 reps"
+    },
+    {
+      "id": "restart.wallMsP95",
+      "value": 0.15999984741210938,
+      "limit": 5,
+      "pass": true,
+      "unit": "ms"
+    },
+    {
+      "id": "restart.frameMsP95",
+      "value": 498.98999977111816,
+      "limit": 150,
+      "pass": false,
+      "unit": "ms",
+      "note": "restart -> synced frame; SwiftShader limit; ship target 33ms NOT met (informational on this machine)",
+      "shipLimit": 33,
+      "shipPass": false
+    },
+    {
+      "id": "restart.noCountdown",
+      "value": 1,
+      "limit": 12,
+      "pass": true,
+      "unit": " ticks",
+      "note": "worst of 20 reps: held throttle after the restart tick until the bike rolls (a countdown would be 360+); first-tick roll yes; game faults=20"
+    }
+  ],
+  "failed": 2
+}

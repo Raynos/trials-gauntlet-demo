@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "h2-gap-chain",
   "bike": "pro",
-  "updatedAt": "2026-09-21T11:52:36.730Z",
+  "updatedAt": "2026-09-22T20:36:25.389Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     14,
@@ -21,7 +21,7 @@
       ],
       "median": 1,
       "finishTimes": [
-        42.75
+        43.63333333333333
       ]
     }
   ],
@@ -40,6 +40,7 @@
     "20260915-223831-95d3c2",
     "20260915-225639-21d2ea",
     "20260921-052833-befa40",
-    "20260921-065007-6a717c"
+    "20260921-065007-6a717c",
+    "20260922-153318-48faac"
   ]
 }

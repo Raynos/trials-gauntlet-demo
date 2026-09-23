@@ -7,8 +7,8 @@
     6
   ],
   "physics": "bikePhysicsFactory-v2",
-  "srcFingerprint": "1255af7f",
-  "updatedAt": "2026-09-21T12:03:30.508Z",
+  "srcFingerprint": "207404d3",
+  "updatedAt": "2026-09-23T00:37:57.084Z",
   "includeStale": false,
   "sessions": [
     {
@@ -16,7 +16,7 @@
       "agent": "poses-round3-e3-a",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "1255af7f",
       "strangerAttempts": 1,
       "cleared": true,
@@ -47,7 +47,7 @@
       "agent": "poses-round3-e3-b",
       "bike": "rookie",
       "status": "done",
-      "stale": false,
+      "stale": true,
       "srcFingerprint": "1255af7f",
       "strangerAttempts": 1,
       "cleared": true,
@@ -71,6 +71,130 @@
         "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260921-070002.json"
       },
       "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260921-070002.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "e3-stairway-20260922-154722",
+      "agent": "pose-r4-c",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "15300486",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 41.2083,
+      "calls": 15,
+      "wallMs": 56277,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 543.7,
+        "startTick": 0,
+        "endTick": 5280,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260922-154722.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260922-154722.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "e3-stairway-20260922-160656",
+      "agent": "pose-r4-a2",
+      "bike": "rookie",
+      "status": "done",
+      "stale": true,
+      "srcFingerprint": "f5036219",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 41.2083,
+      "calls": 11,
+      "wallMs": 27735,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 543.7,
+        "startTick": 0,
+        "endTick": 5280,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260922-160656.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260922-160656.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "e3-stairway-20260922-193324",
+      "agent": "pose-stranger-b",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "207404d3",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 41.2083,
+      "calls": 11,
+      "wallMs": 24044,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 543.7,
+        "startTick": 0,
+        "endTick": 5280,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260922-193324.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260922-193324.json",
+      "deaths": []
+    },
+    {
+      "sessionId": "e3-stairway-20260922-193659",
+      "agent": "pose-stranger-a",
+      "bike": "rookie",
+      "status": "done",
+      "stale": false,
+      "srcFingerprint": "207404d3",
+      "strangerAttempts": 1,
+      "cleared": true,
+      "finishTime": 41.2083,
+      "calls": 11,
+      "wallMs": 41025,
+      "firstCheckpointCalls": 2,
+      "faultsByCheckpoint": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "bestAttempt": {
+        "n": 1,
+        "cleared": true,
+        "x": 543.7,
+        "startTick": 0,
+        "endTick": 5280,
+        "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260922-193659.json"
+      },
+      "recordingFile": "harness/inputs/e3-stairway/stranger-e3-stairway-20260922-193659.json",
       "deaths": []
     },
     {
@@ -491,7 +615,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 570065593,
+      "wallMs": 701732170,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -712,7 +836,7 @@
       "cleared": false,
       "finishTime": null,
       "calls": 0,
-      "wallMs": 570065589,
+      "wallMs": 701732166,
       "firstCheckpointCalls": null,
       "faultsByCheckpoint": [],
       "bestAttempt": null,
@@ -989,9 +1113,9 @@
   "completed": 2,
   "clearedCount": 2,
   "medianAttempts": 1,
-  "medianFinishTime": 41.55415,
-  "medianCalls": 11.5,
-  "medianWallMs": 112930,
+  "medianFinishTime": 41.2083,
+  "medianCalls": 11,
+  "medianWallMs": 32534.5,
   "census": {
     "n": 2,
     "minSessions": 2,
@@ -1009,7 +1133,7 @@
         "calls": 0
       }
     ],
-    "staleExcluded": 15,
+    "staleExcluded": 19,
     "otherBikeExcluded": 0
   },
   "asserted": {

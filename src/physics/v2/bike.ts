@@ -20,7 +20,7 @@ import { atan2, clamp, cos, sin, wrapAngle, HALF_PI, PI } from '../dmath';
 import { BIKE_GEOMETRY_V2, bikeTuningV2, suspensionPoint, type BikeClassV2, type PartialTuningV2, type SuspensionV2, type TuningV2 } from './tuning';
 import { driveTorque, lag, limiterLatch, reportRpm, thrustFrac, wheelieTrim } from './engine';
 import { brushImpulse, tyreMu } from './tyre';
-import { makeRiderRigPose, riderRigFromCOM, riderRigFromHips, RIDER_TORSO_REST, RIDER_PROFILE, RIDER_SEAT } from '../../core/riderGeometry';
+import { makeRiderRigPose, riderPoseAtLean, riderRigFromCOM, riderRigFromHips, RIDER_TORSO_REST, RIDER_PROFILE, RIDER_SEAT } from '../../core/riderGeometry';
 import { advanceTarget, drawnPoseId, GRIP_X, GRIP_Y, leanFromX, PEG_X, PEG_Y, poseAt, type ChainOut } from './rider';
 
 // ---------------------------------------------------------------------------
@@ -142,6 +142,8 @@ export const F_SLOTS = [
   'transferHipY',
   'transferTorso',
   'transferProgress',
+  'groundIncline',
+  'leanQuiet',
 ] as const;
 const S_TICK = 0;
 const S_TIME = 1;
@@ -179,7 +181,9 @@ const S_TRANSFER_HIP_X = 40; // captured physical hips in axle coordinates
 const S_TRANSFER_HIP_Y = 41;
 const S_TRANSFER_TORSO = 42; // captured physical torso angle, radians
 const S_TRANSFER_PROGRESS = 43; // normalized forward input travel, 0..1
-export const NSCALAR = F_SLOTS.length; // 44
+const S_GROUND_INCLINE = 44; // greatest positive load-bearing wheel-contact slope, radians; next tick's stance target
+const S_LEAN_QUIET = 45; // ticks since last lean edge; only recent input can make a visible intentional hop
+export const NSCALAR = F_SLOTS.length; // 46
 
 /** Flags (physics-v2.md §12). */
 export const U_SLOTS = ['finished', 'fault', 'limiter', 'restartLatch', 'rearGround', 'frontGround', 'rearSurface', 'frontSurface', 'ragdoll', 'asleep', 'crashPending', 'crashCause', 'hopPhase', 'finishVoid'] as const;
@@ -464,6 +468,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
     const previousLean = F[S_IN_L]!;
     const leanVelocity = (input.lean - previousLean) / dt;
     const leanEdge = previousLean !== input.lean;
+    F[S_LEAN_QUIET] = leanEdge ? 0 : Math.min(60, F[S_LEAN_QUIET]! + 1);
     F[S_IN_T] = input.throttle;
     F[S_IN_B] = input.brake;
     F[S_IN_L] = input.lean;
@@ -524,7 +529,13 @@ class WorldV2 implements BikePhysicsWorldV2 {
       // braces nothing, so brake + lean forward is still the stoppie. Reads the lagged brake so a tap is continuous.
       // A brace is a reaction to the deceleration through the wheels: with both wheels off the ground there is none,
       // and the brace is exactly 0 (the R4 / R5 air-brake nudges stay the declared air control, identical per class).
-      const poseLean = input.lean - r.brakeBrace * F[S_BRAKE_EFF]! * (1 - Math.max(0, input.lean)) * (1 - bothAir);
+      // Brace while the rider is commanding the brake. The hydraulic brake
+      // lag can persist after release, but the rider starts unbracing at the
+      // input edge; otherwise a +1 stoppie followed by brake release acquires
+      // a delayed rearward pose that was never commanded and changes its
+      // recovery relative to the no-brace bike.
+      const brace = Math.min(F[S_BRAKE_EFF]!, input.brake * 6.5);
+      const poseLean = input.lean - r.brakeBrace * brace * (1 - Math.max(0, input.lean)) * (1 - bothAir);
       // A ground-started weight transfer extends directly from the physical preload. Passing
       // through neutral during a throw does not command a seated pause. Every cross-tick
       // value is snapshot-owned; held input smoothly returns to its ordinary static target.
@@ -566,6 +577,24 @@ class WorldV2 implements BikePhysicsWorldV2 {
         this.transferTarget.y = p.com.y + this.axleOrgY;
         this.transferTarget.psi = p.torsoAngle - RIDER_TORSO_REST;
         requested = this.transferTarget;
+      }
+      // On a steep face, hinge forward relative to the rising chassis. The rider
+      // keeps the standing hip/leg position, but reaches over the bars instead of
+      // becoming vertical in world space as the bike pitches uphill. Use actual
+      // wheel-contact normals: a flat-ground wheelie or a free-air hop cannot
+      // masquerade as a slope. This is the same mass/geometry target seen by the
+      // servo, anatomical constraints and skinned rig.
+      if (poseLean > 0.5) {
+        const bend = Math.min((24 * PI) / 180, F[S_GROUND_INCLINE]! * 0.5) * clamp((poseLean - 0.5) * 2, 0, 1);
+        if (bend > 0) {
+          const p = this.transferGeometry;
+          if (!requested) riderPoseAtLean(poseLean, p);
+          riderRigFromHips(p.hips.x, p.hips.y, p.torsoAngle - bend, p);
+          this.transferTarget.x = p.com.x + this.axleOrgX;
+          this.transferTarget.y = p.com.y + this.axleOrgY;
+          this.transferTarget.psi = p.torsoAngle - RIDER_TORSO_REST;
+          requested = this.transferTarget;
+        }
       }
       advanceTarget(
         r,
@@ -649,6 +678,17 @@ class WorldV2 implements BikePhysicsWorldV2 {
     this.forces(riding); // 3
     this.collide(riding); // 4
     this.solve(riding); // 5
+    // Contact manifolds are scratch and are not in snapshots. Copy the one
+    // slope needed by next tick's physical stance into the snapshot-owned F.
+    let incline = 0;
+    if (F[S_IN_L]! > 0.5) {
+      for (let i = 0; i < this.nC; i++) {
+        if (this.cA[i] !== REAR && this.cA[i] !== FRONT) continue;
+        if (this.cLn[i]! <= 0 || this.cNx[i]! >= 0) continue;
+        incline = Math.max(incline, atan2(-this.cNx[i]!, this.cNy[i]!));
+      }
+    }
+    F[S_GROUND_INCLINE] = incline;
     this.integrate(); // 6
     this.positionPass(); // 7
     this.derive(riding); // 8
@@ -2108,23 +2148,37 @@ class WorldV2 implements BikePhysicsWorldV2 {
             radius = 0.09;
           const cx = p.hips.x - centreDrop * torsoCos,
             cy = p.hips.y - centreDrop * torsoSin;
-          const mx = (RIDER_SEAT.rearX + RIDER_SEAT.frontX) * 0.5,
+          // The tank's top meets the seat: the pelvis can cross the visible seat's
+          // front edge before its hip reaches the tank's forward stop. Keep an
+          // upward-facing support through that span so the rounded front corner
+          // cannot turn a recovery into a downward slide beside the tank.
+          const seatFront = Math.max(RIDER_SEAT.frontX, h.tankX - this.axleOrgX),
+            mx = (RIDER_SEAT.rearX + seatFront) * 0.5,
             top = RIDER_SEAT.topY;
-          const qx = Math.abs(cx - mx) - (RIDER_SEAT.frontX - RIDER_SEAT.rearX) * 0.5,
+          const qx = Math.abs(cx - mx) - (seatFront - RIDER_SEAT.rearX) * 0.5,
             qy = cy - top;
           const ex = Math.max(0, qx),
             ey = Math.max(0, qy),
             len = Math.sqrt(ex * ex + ey * ey);
-          C = Math.min(Math.max(qx, qy), 0) + len - radius;
-          if (len > 1e-9) {
-            gx = ((cx < mx ? -1 : 1) * ex) / len;
-            gy = ey / len;
-          } else if (qx > qy) {
-            gx = cx < mx ? -1 : 1;
-            gy = 0;
-          } else {
+          if (cx >= RIDER_SEAT.rearX && cx <= seatFront) {
+            // This is a one-sided support, not a closed box. Deep penetration
+            // must retain the upward normal: a box SDF picks the nearer side
+            // wall below its centre and can trap the pelvis under the saddle.
+            C = cy - top - radius;
             gx = 0;
             gy = 1;
+          } else {
+            C = Math.min(Math.max(qx, qy), 0) + len - radius;
+            if (len > 1e-9) {
+              gx = ((cx < mx ? -1 : 1) * ex) / len;
+              gy = ey / len;
+            } else if (qx > qy) {
+              gx = cx < mx ? -1 : 1;
+              gy = 0;
+            } else {
+              gx = 0;
+              gy = 1;
+            }
           }
           // CPU-skinned garment probe: rear fender envelope tops at .5504m; pelvis/thigh support
           // needs an additional 30mm radius beyond the seat proxy (Openface limits clearance) (cloth-audit/rear-support.json).
@@ -2529,7 +2583,7 @@ class WorldV2 implements BikePhysicsWorldV2 {
         const frontAir = F[S_FRONT_AIR]!;
         // push = the rider extending on purpose: the body leaving the chassis at > 0.5 m/s WITH intent (R7; a chassis
         // dropping under a settled body on a front slam is not a push, and a hop needs an input edge within ~0.3 s)
-        if (relVy > 0.5 && F[S_TGT_MOVE]! >= 0.5 * t.rider.servoIntentM) hop = 2;
+        if (relVy > 0.5 && F[S_TGT_MOVE]! >= 0.5 * t.rider.servoIntentM && F[S_LEAN_QUIET]! < 60) hop = 2;
         else if (F[S_TGT_Y]! < this.poseTmp.y - 0.01 && F[S_REAR_COMP]! > prevRearComp) hop = 1;
         else if (rearAir > 0 && frontAir > 0 && (rearAir < frontAir ? frontAir : rearAir) <= RECOVER_TICKS) hop = 3;
       }

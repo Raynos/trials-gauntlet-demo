@@ -1,6 +1,6 @@
-# Stranger — b1-first-ride (bikePhysicsFactory-v2, src 1255af7f, 2026-09-21T11:22:28.834Z, medians on rookie)
+# Stranger — b1-first-ride (bikePhysicsFactory-v2, src 207404d3, 2026-09-23T00:37:57.001Z, medians on rookie)
 
-**PASS** — n = 2 completed on rookie (min 2) · cleared 2/2 · median attempts 1 · asserted 1 ≤ median ≤ 1.5 (1.5 × band top 1) and every counted session cleared · censored 2 (b1-first-ride-r4-s1-20260914-164224 abandoned at attempt 1; b1-first-ride-r4-s2-20260914-164224 abandoned at attempt 1) · excluded: 20 stale src, 0 other bike · median time to clear 46.6 s · median calls 12.5 · median wall 1.9 min
+**PASS** — n = 2 completed on rookie (min 2) · cleared 2/2 · median attempts 1 · asserted 1 ≤ median ≤ 1.5 (1.5 × band top 1) and every counted session cleared · censored 2 (b1-first-ride-r4-s1-20260914-164224 abandoned at attempt 1; b1-first-ride-r4-s2-20260914-164224 abandoned at attempt 1) · excluded: 24 stale src, 0 other bike · median time to clear 40.4 s · median calls 11 · median wall 0.4 min
 
 | session | agent | bike | status | attempts | cleared | time to clear | calls | wall | 1st cp call | died at | best attempt |
 |---|---|---|---|---:|---|---:|---:|---:|---:|---|---|
@@ -11,8 +11,12 @@
 | b1-first-ride-20260914-073446 | s4 | rookie | done (stale src) | 2 | yes | 55.7 s | 15 | 2.9 min | 3 | crash@478m | #2 clear ticks 4633–6688 |
 | b1-first-ride-20260921-051433 | stranger_b1_a | rookie | done (stale src) | 1 | yes | 46.3 s | 12 | 0.6 min | 3 | — | #1 clear ticks 0–5840 |
 | b1-first-ride-20260921-051948 | stranger-b1-b | rookie | done (stale src) | 1 | yes | 47.9 s | 12 | 0.7 min | 3 | — | #1 clear ticks 0–6047 |
-| b1-first-ride-20260921-061537 | pose-r3-b1-one | rookie | done | 1 | yes | 46.0 s | 12 | 0.8 min | 3 | — | #1 clear ticks 0–5810 |
-| b1-first-ride-20260921-061643 | pose-r3-b1-two | rookie | done | 1 | yes | 47.2 s | 13 | 3.0 min | 4 | — | #1 clear ticks 0–5958 |
+| b1-first-ride-20260921-061537 | pose-r3-b1-one | rookie | done (stale src) | 1 | yes | 46.0 s | 12 | 0.8 min | 3 | — | #1 clear ticks 0–5810 |
+| b1-first-ride-20260921-061643 | pose-r3-b1-two | rookie | done (stale src) | 1 | yes | 47.2 s | 13 | 3.0 min | 4 | — | #1 clear ticks 0–5958 |
+| b1-first-ride-20260922-153559 | pose-r4-a | rookie | done (stale src) | 1 | yes | 40.2 s | 11 | 0.7 min | 3 | — | #1 clear ticks 0–5130 |
+| b1-first-ride-20260922-155959 | pose-r4-d | rookie | done (stale src) | 1 | yes | 40.7 s | 11 | 0.6 min | 3 | — | #1 clear ticks 0–5175 |
+| b1-first-ride-20260922-193016 | pose-stranger-a | rookie | done | 1 | yes | 40.2 s | 11 | 0.4 min | 3 | — | #1 clear ticks 0–5123 |
+| b1-first-ride-20260922-193028 | pose-stranger-b | rookie | done | 1 | yes | 40.5 s | 11 | 0.4 min | 3 | — | #1 clear ticks 0–5152 |
 | b1-first-ride-r13-s1-20260915-203701 | s1 | rookie | done (stale src) | 2 | yes | 51.4 s | 15 | 1.4 min | 3 | crash@485m | #2 clear ticks 4176–6498 |
 | b1-first-ride-r14-s1-20260915-214558 | s1 | rookie | done (stale src) | 1 | yes | 44.1 s | 13 | 1.3 min | 3 | — | #1 clear ticks 0–5584 |
 | b1-first-ride-r14-s2-20260915-214558 | s2 | rookie | done (stale src) | 1 | yes | 44.8 s | 11 | 0.9 min | 3 | — | #1 clear ticks 0–5630 |
@@ -22,9 +26,9 @@
 | b1-first-ride-r15-s2-20260915-225608 | s2 | rookie | done (stale src) | 1 | yes | 46.6 s | 15 | 1.6 min | 3 | — | #1 clear ticks 0–5883 |
 | b1-first-ride-r3-s1-20260914-113731 | s1 | rookie | done (stale src) | 2 | yes | 76.5 s | 20 | 3.1 min | 3 | crash@220m | #2 clear ticks 2370–9372 |
 | b1-first-ride-r3-s2-20260914-113731 | s2 | rookie | done (stale src) | 1 | yes | 58.3 s | 19 | 3.0 min | 3 | — | #1 clear ticks 0–7184 |
-| b1-first-ride-r4-s1-20260914-164224 | s1 | rookie | abandoned | 1 | no | — | 0 | 9460.1 min | — | — | — |
+| b1-first-ride-r4-s1-20260914-164224 | s1 | rookie | abandoned | 1 | no | — | 0 | 11695.5 min | — | — | — |
 | b1-first-ride-r4-s1-20260914-191143 | s1 | rookie | done (stale src) | 1 | yes | 49.0 s | 13 | 2.4 min | 3 | — | #1 clear ticks 0–6115 |
-| b1-first-ride-r4-s2-20260914-164224 | s2 | rookie | abandoned | 1 | no | — | 0 | 9460.1 min | — | — | — |
+| b1-first-ride-r4-s2-20260914-164224 | s2 | rookie | abandoned | 1 | no | — | 0 | 11695.5 min | — | — | — |
 | b1-first-ride-r4-s2-20260914-191143 | s2 | rookie | done (stale src) | 1 | yes | 42.8 s | 12 | 5.5 min | 3 | — | #1 clear ticks 0–5416 |
 | b1-first-ride-r5-s1-20260914-192920 | s1 | rookie | done (stale src) | 1 | yes | 45.0 s | 12 | 2.6 min | 3 | — | #1 clear ticks 0–5701 |
 | b1-first-ride-r5-s2-20260914-192920 | s2 | rookie | done (stale src) | 1 | yes | 43.4 s | 12 | 5.2 min | 3 | — | #1 clear ticks 0–5509 |

@@ -3,7 +3,7 @@
   "kind": "track-bot-metrics",
   "trackId": "p3-snow-line",
   "bike": "rookie",
-  "updatedAt": "2026-09-21T12:00:37.681Z",
+  "updatedAt": "2026-09-22T20:31:28.942Z",
   "physics": "bikePhysicsFactory-v2",
   "attemptsBand": [
     1,
@@ -14,23 +14,20 @@
     {
       "skill": 3,
       "seeds": [
-        2782902854
+        2782902853
       ],
       "attempts": [
-        15
+        1
       ],
-      "median": 15,
+      "median": 1,
       "finishTimes": [
-        null
+        33.99166666666667
       ]
     }
   ],
   "botParTime": null,
   "shaped": null,
-  "singleWall": {
-    "checkpoint": 1,
-    "share": 1
-  },
+  "singleWall": null,
   "runs": [
     "20260915-170219-834978",
     "20260915-171402-74a19a",
@@ -43,6 +40,7 @@
     "20260915-225830-3a287d",
     "20260921-052110-3bd800",
     "20260921-064010-325164",
-    "20260921-065537-4a48d4"
+    "20260921-065537-4a48d4",
+    "20260922-152932-75529e"
   ]
 }
