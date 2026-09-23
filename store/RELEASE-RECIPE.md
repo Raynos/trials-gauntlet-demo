@@ -7,6 +7,8 @@ Nothing in this recipe runs by itself.
 
 The answers for every form are in `COMPLIANCE.md`, and the listing text is in `metadata/`. Run all commands from the repo root.
 
+`scripts/store-build.mjs` builds from a clean export of **HEAD**, so an upload is always a commit. Commit, and push if CI must see it, before building anything that ships. `store/build/SOURCE` names the sha.
+
 ## 0. Version bump (every upload)
 
 Each store refuses a build number it has already seen, so bump both platforms together.

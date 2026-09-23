@@ -14,6 +14,8 @@ npx tsx harness/native/gate.ts web,ios --evidence          # the web leg renders
 npx tsx harness/native/gate.ts web,ios --from-out --evidence   # re-report the last runs without launching anything
 ```
 
+**Source rule (parent, 2026-09-22):** the bundle is always built from a clean `git archive` export of HEAD (`/tmp/rockhop-build-<sha>`, node_modules linked), never from the shared working tree, which carries other sessions' uncommitted physics and UI. `store/build/SOURCE` records the sha and `gate.json` reports it as `source`. `--from-tree` is for local iteration only.
+
 **Load rule (user, 2026-09-22):** do not start the Android emulator unless the user asks for it. With software GL it held about 490 % CPU and pushed the shared host to a load average of 50, so the Android leg is BLOCKED. The user's own Android phone is the Android check. Run the iOS Simulator leg only when `uptime` shows a load average under 12, and run one gate at a time. Web legs render on Metal by default on macOS.
 
 ## How a run works
@@ -50,7 +52,7 @@ npx tsx harness/native/gate.ts web,ios --from-out --evidence   # re-report the l
 | file | what |
 |---|---|
 | `gate.ts` | CLI: runs the platforms, checks, bar-3 table, `--evidence` → `docs/evidence/store-release/native/<stamp>/` |
-| `ios.ts` | own simulator `rockhop-gate` (iPhone 17 Pro Max, created on first use; other sessions' devices untouched) |
+| `ios.ts` | own simulator `rockhop-gate` (iPhone 17 Pro Max, created on first use; other sessions' devices untouched); platform `ipad` runs the same iPhone-only app on `rockhop-gate-ipad` (iPad Pro 11-inch) in compatibility mode — bar 5's iPad row |
 | `android.ts` | own AVD `rockhop_api36` on console port 5584, `-no-window -no-audio` (BLOCKED, see the load rule) |
 | `web.ts` | headless Chromium over `store/build/web` with a plain static server |
 | `screens.ts` | store screenshots from played runs: iOS 6.9" 2868×1320 from the simulator, Play 1920×1080 from Chromium as a phone; `--final` → `store/screenshots/` |

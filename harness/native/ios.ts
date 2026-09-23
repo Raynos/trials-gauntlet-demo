@@ -8,7 +8,7 @@
  * Silent: the shell makes `navigator.webdriver` true for a gate launch, so the game opens no AudioContext; the run
  * reports the count of AudioContexts constructed (must be 0).
  */
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { REPO_ROOT } from '../lib/paths';
@@ -16,6 +16,9 @@ import { APP_ID, armFor, freshOutDir, contactSheet, OUT, readManifest, sh, sleep
 
 export const IOS_DEVICE_NAME = 'rockhop-gate';
 const DEVICE_TYPE = 'com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max';
+/** Bar 5's second iOS row: the iPhone-only app (TARGETED_DEVICE_FAMILY = 1) in an iPad's compatibility mode. */
+export const IPAD_DEVICE_NAME = 'rockhop-gate-ipad';
+const IPAD_DEVICE_TYPE = 'com.apple.CoreSimulator.SimDeviceType.iPad-Pro-11-inch-M5-12GB';
 
 export function iosAppPath(): string {
   return path.join(REPO_ROOT, 'store', 'build', 'ios-derived', 'Build', 'Products', 'Debug-iphonesimulator', 'App.app');
@@ -29,7 +32,7 @@ interface SimDevice {
 }
 
 /** Our own simulator, created on first use: other sessions' booted devices are never touched. */
-export function ensureDevice(name = IOS_DEVICE_NAME): string {
+export function ensureDevice(name = IOS_DEVICE_NAME, type = DEVICE_TYPE): string {
   const list = JSON.parse(sh('xcrun', ['simctl', 'list', 'devices', 'available', '--json'])) as { devices: Record<string, SimDevice[]> };
   for (const [runtime, devs] of Object.entries(list.devices)) {
     const d = devs.find((x) => x.name === name && x.isAvailable);
@@ -38,7 +41,7 @@ export function ensureDevice(name = IOS_DEVICE_NAME): string {
   const runtimes = JSON.parse(sh('xcrun', ['simctl', 'list', 'runtimes', '--json'])) as { runtimes: { identifier: string; isAvailable: boolean; platform?: string }[] };
   const rt = runtimes.runtimes.findLast((r) => r.isAvailable && r.identifier.includes('iOS'));
   if (!rt) throw new Error('no iOS simulator runtime installed');
-  return sh('xcrun', ['simctl', 'create', name, DEVICE_TYPE, rt.identifier]).trim();
+  return sh('xcrun', ['simctl', 'create', name, type, rt.identifier]).trim();
 }
 
 export async function bootDevice(udid: string): Promise<void> {
@@ -67,18 +70,18 @@ function readMessages(dir: string): GateMessages {
   return out;
 }
 
-export async function runIos(opts: { arm?: Partial<GateArm>; record?: boolean; timeoutS?: number; tag?: string } = {}): Promise<PlatformRun> {
+export async function runIos(opts: { arm?: Partial<GateArm>; record?: boolean; timeoutS?: number; tag?: string; ipad?: boolean } = {}): Promise<PlatformRun> {
   const t0 = Date.now();
   const app = iosAppPath();
   if (!fs.existsSync(app)) throw new Error(`no ${path.relative(REPO_ROOT, app)}: run \`node scripts/store-build.mjs debug --ios\``);
   const arm = armFor(readManifest(), opts.arm);
-  const udid = ensureDevice();
+  const udid = opts.ipad ? ensureDevice(IPAD_DEVICE_NAME, IPAD_DEVICE_TYPE) : ensureDevice();
   await bootDevice(udid);
   sh('xcrun', ['simctl', 'terminate', udid, APP_ID], { allowFail: true });
   sh('xcrun', ['simctl', 'install', udid, app]);
   const gateDir = path.join(dataDir(udid), 'Documents', 'gate');
   fs.rmSync(gateDir, { recursive: true, force: true });
-  const outDir = freshOutDir(path.join(OUT, `ios${opts.tag ? `-${opts.tag}` : ''}`));
+  const outDir = freshOutDir(path.join(OUT, `${opts.ipad ? 'ipad' : 'ios'}${opts.tag ? `-${opts.tag}` : ''}`));
   const raw = path.join(outDir, 'raw.mov');
   const clip = path.join(outDir, 'clip.mp4');
   let rec: ReturnType<typeof spawn> | null = null;
@@ -112,12 +115,16 @@ export async function runIos(opts: { arm?: Partial<GateArm>; record?: boolean; t
   }
   let clipOut: string | null = null;
   if (rec && fs.existsSync(raw)) {
-    uprightVideo(raw, clip, 2);
+    // The iPhone panel is portrait with the landscape game on it: turn it upright. The iPad stays as recorded — an
+    // iPhone-only app in compatibility mode is a window on the iPad's own (portrait) home screen.
+    if (opts.ipad) execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '28', '-an', clip]);
+    else uprightVideo(raw, clip, 2);
     contactSheet(clip, path.join(outDir, 'sheet.jpg'), 12);
     fs.rmSync(raw, { force: true });
     clipOut = clip;
   }
   for (const [name, m] of Object.entries(messages)) fs.writeFileSync(path.join(outDir, `${name}.json`), `${JSON.stringify(m, null, 1)}\n`);
   const runtime = sh('xcrun', ['simctl', 'list', 'devices', '--json']).includes(udid) ? udid : 'unknown';
-  return { platform: 'ios', device: `iOS Simulator ${IOS_DEVICE_NAME} (iPhone 17 Pro Max, ${runtime})`, ok: !messages['error'] && !!messages['result'], messages, clip: clipOut, wallS: Math.round((Date.now() - t0) / 1000), notes };
+  const device = opts.ipad ? `iOS Simulator ${IPAD_DEVICE_NAME} (iPad Pro 11-inch M5, iPhone app in compatibility mode, ${runtime})` : `iOS Simulator ${IOS_DEVICE_NAME} (iPhone 17 Pro Max, ${runtime})`;
+  return { platform: opts.ipad ? 'ipad' : 'ios', device, ok: !messages['error'] && !!messages['result'], messages, clip: clipOut, wallS: Math.round((Date.now() - t0) / 1000), notes };
 }

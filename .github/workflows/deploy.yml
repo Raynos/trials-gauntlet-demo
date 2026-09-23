@@ -143,7 +143,7 @@ jobs:
       # VITE_STORE=1 into store/build/web (refused if the automation hook survived), then `cap sync` into ios/ and
       # android/. On Linux the iOS half is the web copy + Package.swift; the Xcode build is the Mac's (RELEASE-RECIPE).
       - name: Store bundle + cap sync
-        run: node scripts/store-build.mjs release
+        run: node scripts/store-build.mjs release --from-tree   # the CI checkout is the commit itself
 
       - name: Store listing (lengths, denied terms)
         run: node scripts/store-metadata.mjs

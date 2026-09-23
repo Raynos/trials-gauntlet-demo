@@ -5,9 +5,47 @@ The harness is `harness/native/README.md`. Each run is written to its own `<stam
 - `gate.json` — every check, the boot and result messages, and the bar-3 table
 - `<platform>-clip.mp4` + `-sheet.jpg` — the played clip: cold boot → menu → countdown → the paced golden ride → crash → restarts
 
+Since `20260923-005522`, `scripts/store-build.mjs` builds from a clean `git archive` of HEAD, never the shared working tree. The sha is `source` in `gate.json`.
+
+## 20260923-005522 — HEAD `a736a26f`: web, iPhone and iPad (compatibility mode) byte-identical on 7 rows
+
+Bundle: store debug build of `a736a26fb89caff64218b8d662ab315b04ef20f5`, from a clean export.
+
+**Bar 3.** Each row compares the float64 bytes of the finish time, the tick count and the state hash. Every row is identical on all three platforms:
+
+- web: headless Chromium, ANGLE Metal
+- iOS: 26.5 Simulator, iPhone 17 Pro Max, WKWebView
+- iPad: Pro 11-inch M5, the iPhone app in compatibility mode
+
+| recording | finish time | bytes | hash |
+|---|---|---|---|
+| flat-test `bot-3.json` | 8.591666666666667 | `efeeeeeeee2e2140` | `622bb2554e0f9a26` |
+| b1-first-ride `bot-3.json` | 40.083333333333336 | `abaaaaaaaa0a4440` | `368f1ca5bd9e830a` |
+| b1-first-ride `bot-3-pro.json` (Pro bike) | 38.825 | `9a99999999694340` | `5f78ab40a954f176` |
+| c2-crane-hop `bot-3.json` | **no finish** (tick 39 after a bail) | — | `a775d149aec89fa9` |
+| d3-rope-walk `bot-3.json` | **no finish** | — | `beb04535deaabed3` |
+| s1-lift-line `bot-3.json` | **no finish** | — | `502ee6a306b1a85d` |
+| flat-test paced at 60 fps, rendered | 8.591666666666667 | `efeeeeeeee2e2140` | `622bb2554e0f9a26` |
+
+**Finding:** at this HEAD the committed ROCKHOP goldens (C2, D3, S1) do not finish when the game replays them through `runRecording`. The plain web build of the same commit gives the same result: `a775d149…` for C2, so this is not a store-build difference. The runs bail identically on every platform, which makes it a recording/track mismatch for the Tracks owner, not a shell problem.
+
+**Ship gate:** every check passes on all three, except `clear.golden` on those three ROCKHOP rows.
+
+| check | web | iPhone | iPad compat | limit |
+|---|---|---|---|---|
+| boot → loader gone | 5.6 s | 6.3 s | 8.4 s | informational |
+| `app.play` → riding | 3.2 s | 4.1 s | 4.0 s | reaches riding |
+| crash fault / fault → control | 0.858 s / 25 ms | 0.858 s / 25 ms | 0.858 s / 25 ms | ≤ 8 s / ≤ 500 ms |
+| restart: one tick, wall p95, frame p95 | yes, 0.1, 4.3 ms | yes, 1.0, 5.0 ms | yes, 1.0, 7.0 ms | 1 tick, ≤ 5 ms, ≤ 33 ms |
+| no countdown on restart | 1 tick | 1 tick | 1 tick | ≤ 12 |
+| paced flat-test (516 frames) | — | 8.69 s | 8.61 s | real time: 8.6 s |
+| AudioContexts (boot / harness) | 0 / 0 | 0 / 0 | 0 / 0 | 0 |
+
+Clips: `ios-clip.mp4` and `ipad-clip.mp4`, each with a sheet. On the iPad, the iPhone-only app runs as a letterboxed window over the iPad's portrait home screen, which is iPadOS compatibility mode (D12).
+
 ## 20260922-234239 — first native gate: web and iOS identical; Android partial, then blocked
 
-Bundle: the store debug build (`VITE_STORE=1 VITE_STORE_DEBUG=1`) of the working tree on top of `af0f8c39`, with physics as shipped.
+Bundle: the store debug build (`VITE_STORE=1 VITE_STORE_DEBUG=1`) of the working tree on top of `af0f8c39`, with physics as shipped. This run came before the clean-export rule; the numbers match the clean HEAD run above.
 
 **Bar 3 — finish time: the float64 bytes, plus the state hash after the last tick.**
 

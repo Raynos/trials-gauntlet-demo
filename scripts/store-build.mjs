@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 // Builds the store bundle into the Capacitor webDir and syncs both shells (docs/plans/STORE_RELEASE.md Phase 5).
 //
-//   node scripts/store-build.mjs release [--ios] [--android]
-//   node scripts/store-build.mjs debug   [--ios] [--android] [--gate a.json,b.json] [--crash c.json]
+//   node scripts/store-build.mjs release [--ios] [--android] [--from-tree]
+//   node scripts/store-build.mjs debug   [--ios] [--android] [--gate a.json,b.json] [--crash c.json] [--from-tree]
+//
+// The bundle is built from a clean export of the committed HEAD (`git archive` of what the build reads, into
+// /tmp/rockhop-build-<sha>, node_modules linked), never from the working tree: the one shared checkout carries other
+// builders' uncommitted edits (physics, UI), and a store build or a gate/screenshot run must be a commit. The source
+// is written to store/build/SOURCE and every evidence run names it. `--from-tree` builds the working tree instead
+// (local iteration only; SOURCE says so).
 //
 // release  VITE_STORE=1 → store/build/web, refused if the automation hook survived; then `cap sync`.
 //          --android also runs `gradlew bundleRelease` (signed with the upload key when ~/.config/rockhop/
@@ -13,7 +19,7 @@
 //
 // Never builds into dist/: that is the web build's output and other builders rebuild it at any time.
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -33,9 +39,27 @@ const opt = (n) => {
 const WEB_DIR = join(repo, 'store', 'build', 'web');
 const run = (cmd, a, env = {}, cwd = repo) => execFileSync(cmd, a, { cwd, stdio: 'inherit', env: { ...process.env, ...env } });
 
-// 1. The bundle.
-const env = { VITE_STORE: '1', ...(mode === 'debug' ? { VITE_STORE_DEBUG: '1' } : { VITE_STORE_DEBUG: '' }) };
-run(join(repo, 'node_modules', '.bin', 'vite'), ['build', '--outDir', WEB_DIR, '--emptyOutDir', '--logLevel', 'warn'], env);
+// 0. The source: HEAD, exported clean (only what the build and the gate read), unless --from-tree.
+const sha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+const fromTree = flag('from-tree');
+let src = repo;
+if (!fromTree) {
+  src = `/tmp/rockhop-build-${sha}`;
+  if (!existsSync(join(src, '.complete'))) {
+    rmSync(src, { recursive: true, force: true });
+    mkdirSync(src, { recursive: true });
+    const tar = execFileSync('git', ['archive', '--format=tar', sha, '--', 'src', 'public', 'index.html', 'vite.config.ts', 'package.json', 'tsconfig.json', 'harness/inputs'], { cwd: repo, maxBuffer: 1 << 30 });
+    execFileSync('tar', ['-x', '-C', src], { input: tar, maxBuffer: 1 << 30 });
+    symlinkSync(join(repo, 'node_modules'), join(src, 'node_modules'), 'dir');
+    writeFileSync(join(src, '.complete'), `${sha}\n`);
+  }
+}
+const source = fromTree ? `working tree on ${sha} (uncommitted edits included)` : sha;
+console.info(`store-build: ${mode} bundle from ${fromTree ? 'the WORKING TREE' : `HEAD ${sha.slice(0, 10)} (clean export ${src})`}`);
+
+// 1. The bundle. Outside a git checkout vite.config.ts stamps the build from VERCEL_GIT_COMMIT_SHA.
+const env = { VITE_STORE: '1', VERCEL_GIT_COMMIT_SHA: sha, ...(mode === 'debug' ? { VITE_STORE_DEBUG: '1' } : { VITE_STORE_DEBUG: '' }) };
+run(join(repo, 'node_modules', '.bin', 'vite'), ['build', '--outDir', WEB_DIR, '--emptyOutDir', '--logLevel', 'warn'], env, src);
 
 // 2. A release must be a release: no automation hook, no gate runner, no source maps next to the page.
 const texts = [];
@@ -61,17 +85,18 @@ if (mode === 'debug') {
   const gateDir = join(WEB_DIR, 'gate');
   mkdirSync(gateDir, { recursive: true });
   const name = (f) => `${basename(dirname(f))}.${basename(f)}`;
-  const inputs = join(repo, 'harness', 'inputs');
+  const inputs = join(src, 'harness', 'inputs');
   const all = readdirSync(inputs, { withFileTypes: true })
     .filter((d) => d.isDirectory())
     .flatMap((d) => readdirSync(join(inputs, d.name)).filter((f) => /^(bot-3(-pro)?|crash)\.json$/.test(f)).map((f) => `harness/inputs/${d.name}/${f}`));
   for (const f of new Set([...all, ...clear, crash])) {
-    if (!existsSync(join(repo, f))) throw new Error(`store-build: gate recording ${f} missing`);
-    cpSync(join(repo, f), join(gateDir, name(f)));
+    if (!existsSync(join(src, f))) throw new Error(`store-build: gate recording ${f} missing at ${fromTree ? 'the working tree' : sha}`);
+    cpSync(join(src, f), join(gateDir, name(f)));
   }
   writeFileSync(join(gateDir, 'manifest.json'), `${JSON.stringify({ clear: clear.map((f) => `gate/${name(f)}`), crash: `gate/${name(crash)}`, sources: [...clear, crash], all: all.map((f) => `gate/${name(f)}`) }, null, 1)}\n`);
 }
 writeFileSync(join(repo, 'store', 'build', 'MODE'), `${mode}\n`);
+writeFileSync(join(repo, 'store', 'build', 'SOURCE'), `${source}\n`);
 
 // 4. Both shells.
 run(join(repo, 'node_modules', '.bin', 'cap'), ['sync']);

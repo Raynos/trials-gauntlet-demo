@@ -43,7 +43,7 @@ export interface ClearRow {
 export type GateMessages = Record<string, Record<string, unknown> & { name: string }>;
 
 export interface PlatformRun {
-  platform: 'web' | 'ios' | 'android';
+  platform: 'web' | 'ios' | 'ipad' | 'android';
   device: string;
   ok: boolean;
   messages: GateMessages;
@@ -56,6 +56,12 @@ export function readManifest(): GateManifest {
   const f = path.join(WEB_DIR, 'gate', 'manifest.json');
   if (!fs.existsSync(f)) throw new Error(`no ${path.relative(REPO_ROOT, f)}: run \`node scripts/store-build.mjs debug\` first`);
   return JSON.parse(fs.readFileSync(f, 'utf8')) as GateManifest;
+}
+
+/** What store/build was built from (scripts/store-build.mjs): a commit sha, or "working tree on <sha> …". */
+export function buildSource(): string {
+  const f = path.join(REPO_ROOT, 'store', 'build', 'SOURCE');
+  return fs.existsSync(f) ? fs.readFileSync(f, 'utf8').trim() : 'unknown';
 }
 
 export function buildMode(): string {
@@ -118,7 +124,9 @@ export function compareBar3(runs: PlatformRun[]): Bar3Row[] {
   }
   for (const row of rows.values()) {
     const vals = Object.values(row.byPlatform).filter((v) => v !== null);
-    row.identical = vals.length >= 2 && vals.every((v) => v.finishTimeHex !== null && v.finishTimeHex === vals[0]!.finishTimeHex && v.hash === vals[0]!.hash);
+    // Identity across platforms (bar 3). Whether the run finished at all is `clear.golden`'s question, not this one:
+    // a recording that bails identically everywhere (null finish, same hash) is still byte-identical.
+    row.identical = vals.length >= 2 && vals.every((v) => v.finishTimeHex === vals[0]!.finishTimeHex && v.ticks === vals[0]!.ticks && v.hash === vals[0]!.hash);
   }
   return [...rows.values()];
 }

@@ -2,7 +2,7 @@
  * The native gate (docs/plans/STORE_RELEASE.md bar 3 + bar 5, harness/native/README.md).
  *
  *   node scripts/store-build.mjs debug --ios --android      # once per bundle change
- *   npx tsx harness/native/gate.ts [web,ios,android] [--no-clip] [--evidence]
+ *   npx tsx harness/native/gate.ts [web,ios,ipad,android] [--no-clip] [--evidence]
  *
  * Runs the in-app gate runner (src/platform/gate.ts) on each platform — cold boot → start a track on the player's
  * path → every golden recording replayed to its finish → one replayed paced and rendered (the clip) → the crash
@@ -16,7 +16,7 @@ import path from 'node:path';
 import { REPO_ROOT } from '../lib/paths';
 import { runAndroid } from './android';
 import { runIos } from './ios';
-import { buildMode, compareBar3, EVIDENCE_DIR, messagesFromOut, OUT, stamp, type PlatformRun } from './lib';
+import { buildMode, buildSource, compareBar3, EVIDENCE_DIR, messagesFromOut, OUT, stamp, type PlatformRun } from './lib';
 import { runWeb } from './web';
 
 const args = process.argv.slice(2);
@@ -70,6 +70,7 @@ function checks(run: PlatformRun): Check[] {
 
 async function main(): Promise<void> {
   if (!fromOut && buildMode() !== 'debug') throw new Error(`store/build is a ${buildMode()} bundle: run \`node scripts/store-build.mjs debug --ios --android\``);
+  console.info(`native gate: bundle source ${buildSource()}`);
   const runs: PlatformRun[] = [];
   for (const p of which) {
     console.info(`native gate: ${p} …`);
@@ -80,7 +81,7 @@ async function main(): Promise<void> {
       runs.push({ platform: p as PlatformRun['platform'], device: (messages['boot']?.['userAgent'] as string | undefined) ?? p, ok: !!messages['result'] && !messages['error'], messages, clip, wallS: 0, notes: ['from harness/out/native (not re-run)'] });
       continue;
     }
-    const run = p === 'web' ? await runWeb() : p === 'ios' ? await runIos({ record }) : p === 'android' ? await runAndroid({ record }) : null;
+    const run = p === 'web' ? await runWeb() : p === 'ios' ? await runIos({ record }) : p === 'ipad' ? await runIos({ record, ipad: true }) : p === 'android' ? await runAndroid({ record }) : null;
     if (!run) throw new Error(`unknown platform ${p}`);
     runs.push(run);
     console.info(`native gate: ${p} ${run.ok ? 'completed' : 'FAILED'} in ${run.wallS} s${run.notes.length ? ` (${run.notes.join('; ')})` : ''}`);
@@ -88,13 +89,8 @@ async function main(): Promise<void> {
   const bar3 = compareBar3(runs);
   const report = {
     at: new Date().toISOString(),
-    commit: (() => {
-      try {
-        return fs.readFileSync(path.join(REPO_ROOT, '.git', 'HEAD'), 'utf8').trim();
-      } catch {
-        return null;
-      }
-    })(),
+    /** The commit the bundle was built from (store/build/SOURCE): a gate run is evidence for that sha only. */
+    source: buildSource(),
     runs: runs.map((r) => ({ platform: r.platform, device: r.device, ok: r.ok, wallS: r.wallS, clip: r.clip && path.relative(REPO_ROOT, r.clip), notes: r.notes, checks: checks(r), boot: r.messages['boot'] ?? null, result: r.messages['result'] ?? null })),
     bar3,
   };
